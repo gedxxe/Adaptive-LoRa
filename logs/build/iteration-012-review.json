@@ -1,7 +1,7 @@
 {
   "baseline": "8fa0a473b6cc0905ddff53e4b9a5f22806e058e2",
   "branch": "iteration-012-runtime-reliability",
-  "file_count": 57,
+  "file_count": 58,
   "files": [
     {
       "path": "CHANGELOG.md",
@@ -114,6 +114,10 @@
     {
       "path": "logs/build/iteration-012-memory-final.log",
       "responsibility": "Retained exact command/source/symbol/size/scenario evidence: iteration-012-memory-final.log"
+    },
+    {
+      "path": "logs/build/iteration-012-publication-receipt.json",
+      "responsibility": "Verified implementation commit/push, observed remote refs and physical/timing exclusions; docs-only follow-up receipt"
     },
     {
       "path": "logs/build/iteration-012-review.json",
@@ -241,7 +245,7 @@
   "behavior_changes": "Eight-attempt/zero sentinel and checked app session recovery; post-poll/post-stop/post-drain current timestamps only",
   "staging_check": "git diff --cached --check exit0, no diagnostics",
   "security_scan": {
-    "tracked_staged_blobs": 359,
+    "tracked_staged_blobs": 360,
     "identified_organization_localpath_credentials_privateaddress_matches": 0,
     "unexpected_binaries": 0
   },
@@ -250,5 +254,7 @@
   "relative_document_links_verified": 35,
   "bilingual_current_facts": "Both languages agree on290 tests, versions, corrected behavior and unverified physical evidence",
   "full_diff_review": "All production/support/test/probe/document changes and complete evidence artifacts reviewed against required011 baseline; full patch retained privately",
-  "log_formatting": "Full command stdout/stderr retained with disclosed local-path/EOL/trailing-display cleanup; original new dumps retained privately"
+  "log_formatting": "Full command stdout/stderr retained with disclosed local-path/EOL/trailing-display cleanup; original new dumps retained privately",
+  "implementation_file_count": 57,
+  "publication_followup": "Documentation-only receipt, English/Chinese progress, memory and inventory; firmware/test inputs remain frozen"
 }

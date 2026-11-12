@@ -1,8 +1,8 @@
 # 开发进度
 
-## Iteration012软件验证PASS，待发布
+## Iteration012软件验证PASS，实施已发布
 
-直接基线8fa0a473b6cc0905ddff53e4b9a5f22806e058e2，分支iteration-012-runtime-reliability，不基于main5bc607cd1a86e5d86ff0fc95ba7a3cd31159b861。native退出0 **290/290 PASS**，77.575s（旧266不变+新24）；ESP32退出0 PASS31.748s。ERR-019以8次/0失败/保持旧session/1s恢复/禁TX修正；ERR-020刷新poll后app、stop后100ms、drain后reset。保留RED9FAIL/1PASS及修正10/10证据；ERR-018工具修正保留。完整暂存审查/commit/push待完成。
+直接基线8fa0a473b6cc0905ddff53e4b9a5f22806e058e2，分支iteration-012-runtime-reliability，不基于main5bc607cd1a86e5d86ff0fc95ba7a3cd31159b861。native退出0 **290/290 PASS**，77.575s（旧266不变+新24）；ESP32退出0 PASS31.748s。ERR-019以8次/0失败/保持旧session/1s恢复/禁TX修正；ERR-020刷新poll后app、stop后100ms、drain后reset。保留RED9FAIL/1PASS及修正10/10证据；ERR-018工具修正保留。完整暂存审查通过；实施 `bdab1cec5de6e38f84b524a8189945dec1ee7dd2` commit/push及独立remote012核实均退出0，main/011不变。回执 `logs/build/iteration-012-publication-receipt.json` 记录已验证实施，后续仅文档提交保存回执，无merge/PR/tag。
 
 RAM24,564（+16）、flash364,308（+466）；固件0.2.0-alpha.1/协议1/RadioLib7.8.1/NVS/wire/pins/PHY/命令/main15行不变；有意故障/deadline修正见ADR-015。无新warning。DEPENDENCY_BUDGET_AUDIT.md及iteration-012记录精确源码/ELF/分配/时延；ERR-021是上游TX BUSY-ramp无显式timeout的源码风险，未实测；ERR-005/008/009/010保留，不承诺硬实时/熵/唯一或实物性能。
 

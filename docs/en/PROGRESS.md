@@ -1,8 +1,8 @@
 # Development Progress
 
-## Iteration 012 software verification PASS; publication pending
+## Iteration 012 software verification PASS; implementation published
 
-Direct baseline8fa0a473b6cc0905ddff53e4b9a5f22806e058e2, branch iteration-012-runtime-reliability; main5bc607cd1a86e5d86ff0fc95ba7a3cd31159b861 unchanged at preflight. `pio test -e native` exit0 **290/290 PASS**,77.575s (266 unchanged+24 reliability). `pio run -e esp32c3_supermini` exit0 PASS31.748s. Corrected ERR-019 boundedID/zero sentinel/preserved prior session/1s retry/TX suppression; ERR-020 post-poll app time/post-stop100ms/post-drain reset check. First RED9FAIL/1PASS and focused10/10 records preserved. ERR-018 launcher/GDB corrections recorded. Full staged review/commit/push pending.
+Direct baseline8fa0a473b6cc0905ddff53e4b9a5f22806e058e2, branch iteration-012-runtime-reliability; main5bc607cd1a86e5d86ff0fc95ba7a3cd31159b861 unchanged at preflight. `pio test -e native` exit0 **290/290 PASS**,77.575s (266 unchanged+24 reliability). `pio run -e esp32c3_supermini` exit0 PASS31.748s. Corrected ERR-019 boundedID/zero sentinel/preserved prior session/1s retry/TX suppression; ERR-020 post-poll app time/post-stop100ms/post-drain reset check. First RED9FAIL/1PASS and focused10/10 records preserved. ERR-018 launcher/GDB corrections recorded. Complete staged review passed; implementation `bdab1cec5de6e38f84b524a8189945dec1ee7dd2` committed/pushed and independently matched remote012 (exit0). main/011 unchanged. Receipt `logs/build/iteration-012-publication-receipt.json` records verified implementation; a documentation-only follow-up preserves it. No merge/PR/tag.
 
 RAM24,564 (+16), flash364,308 (+466). Firmware0.2.0-alpha.1/protocol1/RadioLib7.8.1/NVS/wire/pins/PHY/commands/main15 unchanged; intentional fault/deadline fixes documented in ADR-015. No new compiler warning. DEPENDENCY_BUDGET_AUDIT.md and iteration-012 artifacts contain exact source/ELF/allocation/timing evidence. ERR-021 upstream TX BUSY-ramp loop has no explicit timeout (source risk, not physical reproduction); ERR-005/008/009/010 remain open. No hard latency/entropy/uniqueness/physical claim.
 
