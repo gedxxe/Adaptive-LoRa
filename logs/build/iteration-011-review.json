@@ -2,7 +2,7 @@
   "baseline": "3902de90058ec775587105c5c3edb4914853a9d8",
   "branch": "iteration-011-runtime-verification",
   "review_scope": "Complete production/test/config/document diffs and all command/scenario artifacts against specified baseline",
-  "file_count": 47,
+  "file_count": 48,
   "files": [
     {
       "path": "AGENTS.md",
@@ -91,6 +91,10 @@
     {
       "path": "logs/build/iteration-011-esp32.log",
       "responsibility": "Retained iteration011 command, fingerprint, scenario or verification evidence: iteration-011-esp32.log"
+    },
+    {
+      "path": "logs/build/iteration-011-publication-receipt.json",
+      "responsibility": "Verified implementation commit/push and independently observed remote references; documentation follow-up receipt"
     },
     {
       "path": "logs/build/iteration-011-review.json",
@@ -198,7 +202,7 @@
   "behavior": "No production coordinator/app/driver/store policy change; no versions/storage/wire/PHY change",
   "staging_check": "git diff --cached --check exit0, no diagnostics",
   "security_scan": {
-    "tracked_staged_blobs": 331,
+    "tracked_staged_blobs": 332,
     "organization_localpath_credential_privateaddress_matches": 0,
     "unexpected_binaries": 0
   },
@@ -207,5 +211,7 @@
   "bilingual_facts": "Both current snapshots and READMEs agree on266/versions/unverified physical evidence",
   "relative_markdown_links_verified": 33,
   "full_diff": "Reviewed policy/code/document changes and entire retained stdout/stderr/scenario/fingerprint artifacts; complete patch retained privately",
-  "normalization": "Git CRLF-to-LF notices on new documentation working copies resolved by LF normalization; staged historical prefixes/source hashes preserved"
+  "normalization": "Git CRLF-to-LF notices on new documentation working copies resolved by LF normalization; staged historical prefixes/source hashes preserved",
+  "implementation_file_count": 47,
+  "publication_followup": "Documentation-only addition of implementation receipt plus memory/current-progress/review updates; source/test/build inputs unchanged"
 }

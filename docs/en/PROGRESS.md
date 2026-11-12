@@ -1,8 +1,8 @@
 # Development Progress
 
-## Iteration 011 software verification PASS; publication review in progress
+## Iteration 011 software verification PASS; implementation published
 
-ESP32 final build `pio run -e esp32c3_supermini` exit0, PASS (143.01s); `pio test -e native` exit0, **266/266 PASS** (36.68s): 47 actual runtime cases plus all219 unchanged regressions. Direct baseline `3902de90058ec775587105c5c3edb4914853a9d8`; dedicated branch `iteration-011-runtime-verification`, main is external merge `5bc607cd1a86e5d86ff0fc95ba7a3cd31159b861`. Implementation is verified; commit/push remains pending at this checkpoint.
+ESP32 final build `pio run -e esp32c3_supermini` exit0, PASS (143.01s); `pio test -e native` exit0, **266/266 PASS** (36.68s): 47 actual runtime cases plus all219 unchanged regressions. Direct baseline `3902de90058ec775587105c5c3edb4914853a9d8`; dedicated branch `iteration-011-runtime-verification`, main is external merge `5bc607cd1a86e5d86ff0fc95ba7a3cd31159b861`. Implementation commit `04280ed3d36e97924a7644c47b1e9cea09b438fd` was pushed and independently matched remote011 (commit/push/ls-remote each exit0). main and010 remain unchanged. Receipt: `logs/build/iteration-011-publication-receipt.json`; a documentation-only follow-up records this verified implementation SHA. No merge, PR or tag.
 
 Firmware0.2.0-alpha.1/protocol1/RadioLib7.8.1 and wire/NVS/pins/PHY/app policy preserved. Minimal reference seam plus Esp32Firmware composition; main15 lines. RAM24,548 (+16), flash363,842 (-12) bytes. Initial native assertion configuration failure ERR-017 is retained and CLOSED after full-width Unity correction; ERR-016 runner workaround verified, root cause unresolved. No new warning; ERR-005/008/009/010 remain. Details: RUNTIME_AUDIT.md and `logs/test/iteration-011-scenarios.md`.
 

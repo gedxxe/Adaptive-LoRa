@@ -1,8 +1,8 @@
 # 开发进度
 
-## Iteration 011 软件验证PASS，发布审查进行中
+## Iteration 011 软件验证PASS，实施已发布
 
-最终 `pio run -e esp32c3_supermini` 退出0，PASS（143.01s）；`pio test -e native` 退出0，**266/266 PASS**（36.68s），实际runtime新增47，既有219全部不变且通过。直接基线 `3902de90058ec775587105c5c3edb4914853a9d8`，分支 `iteration-011-runtime-verification`；main是外部合并 `5bc607cd1a86e5d86ff0fc95ba7a3cd31159b861`。本检查点实施已验证，commit/push待完成。
+最终 `pio run -e esp32c3_supermini` 退出0，PASS（143.01s）；`pio test -e native` 退出0，**266/266 PASS**（36.68s），实际runtime新增47，既有219全部不变且通过。直接基线 `3902de90058ec775587105c5c3edb4914853a9d8`，分支 `iteration-011-runtime-verification`；main是外部合并 `5bc607cd1a86e5d86ff0fc95ba7a3cd31159b861`。实施提交 `04280ed3d36e97924a7644c47b1e9cea09b438fd` 已push并独立核实与remote011一致（commit/push/ls-remote均退出0），main和010不变。回执 `logs/build/iteration-011-publication-receipt.json`；仅文档后续提交记录已验证实施SHA，无merge/PR/tag。
 
 固件0.2.0-alpha.1/协议1/RadioLib7.8.1、NVS/wire/pins/PHY/app策略不变。仅引用seam与Esp32Firmware组合，main15行。RAM24,548（+16）、flash363,842（-12）。首次native配置失败ERR-017保留，启用完整64位Unity断言后CLOSED；ERR-016 runner workaround已验证、根因未知。无新增warning，ERR-005/008/009/010保留。细节见RUNTIME_AUDIT.md及 `logs/test/iteration-011-scenarios.md`。
 
