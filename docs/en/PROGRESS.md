@@ -83,3 +83,5 @@ ERR-007's header filter remains unchanged from iteration 005; physical IRQ behav
 ## Next action
 
 Continue software-only work with focused driver-API fault injection and configuration-store boundary tests if requested; resolve synchronous-call/memory budgets before claiming hard timing guarantees. Physical gates wait for the second MCU, antenna and assembly; then follow BENCH_RUNBOOK.md for M0/M1 and >=200 actual M2 HELLO attempts. Do not start M3 until M2 acceptance evidence exists. TDMA/bitmap/retry scheduling/ADR remain unimplemented.
+
+Final evidence-reader check: Windows default decoding failed on a UTF-8 build log; explicit UTF-8 succeeded (ERR-006 recurrence). Firmware/native PASS evidence is unchanged; no new firmware error.

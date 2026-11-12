@@ -513,3 +513,7 @@ Complete staged file inventory/blob scan PASS: no detected identity, workstation
 - Publication complete for the establishment tree. Next: choose project licensing, then a separately scoped driver/configuration-boundary verification iteration; await hardware completion for physical gates. Physical behavior remains NOT VERIFIED.
 
 Final receipt-tree review: all 271 staged files scanned without detected sensitive/excluded findings; all 38 compiled-manifest entries still match. The receipt commit contains only three documentation updates and two publication-evidence files; no firmware/test/config changes.
+
+### ITERATION-008 final evidence-reader correction
+
+The post-push log-tail inspection used Python's Windows default cp1252 and exited 1 on the UTF-8 ESP32 log (ERR-006 recurrence). Explicit UTF-8 read exited 0, showing the recorded 156.00-second SUCCESS. No build, source, test or stored log was changed. The documentation receipt commit `eb008cbc010eef75c91cd108c8d064acf49da3ba` was already pushed with exit 0 and independently matched remote main; this final record correction is documentation-only.

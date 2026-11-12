@@ -221,3 +221,7 @@ Status CLOSED — VERIFIED. The original historical report body is retained byte
 - Fix: require a drive-path token boundary; retain the identity, credential, private-address, filename and source-fingerprint checks. No firmware or public URL changed.
 - Initial/corrected output: `logs/build/iteration-008-staged-scan.log`; corrected results: `logs/build/iteration-008-staged-review.json`.
 - Two attempted reads of nonexistent Chinese build/error record counterparts also failed; the directory inventory confirms English holds those canonical chronological records. Chinese progress/decision documentation carries the migration summary.
+
+### ERR-006 recurrence — iteration 008 final log inspection
+
+A final Python `Path.read_text()` inspection without an encoding returned exit 1 while reading the UTF-8 ESP32 log under the Windows cp1252 default: UnicodeDecodeError, byte 0x90 at offset 15464. This was a log-reader failure, not a firmware build/test failure. Re-reading with `Get-Content -Encoding utf8 logs/build/iteration-008-esp32.log -Tail 11` exited 0 and showed SUCCESS / one environment succeeded. Keep explicit UTF-8 for evidence readers; the original successful log remains unchanged.

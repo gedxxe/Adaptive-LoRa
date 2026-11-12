@@ -74,3 +74,5 @@ ITERATION-004：冻结源码 ESP32 编译成功，退出码 0（`logs/build/iter
 ITERATION-005 最终结果：HEADER_ERR 条件已与固定版本 RadioLib 对齐；固件编译退出码 0（`logs/build/iteration-005-esp32.log`），native 44/44 通过、退出码 0（`logs/test/iteration-005-native.log`）。源码缺陷 ERR-007 已经静态/编译验证关闭；实物 IRQ 行为仍未测试。最终文件清单、每个 cpp 职责、SHA-256 和 M3–M8 计划见英文 IMPLEMENTATION_REPORT.md；最终源码 hash 清单为 `logs/build/iteration-005-source-manifest.sha256`。USB CDC 与全部实物门槛仍待验证，M0/M1/M2 保持 IN PROGRESS。
 
 Iteration 008 暂存安全检查初次把 HTTPS 链接误判为本地路径（ERR-014），修正边界后检查通过，无固件修改。英语错误/构建记录保留失败及修复结果；暂存源文件与已编译清单一致，main.cpp 仍为 15 行。
+
+最终日志检查因 Windows 默认编码读取 UTF-8 失败，显式 UTF-8 重读通过（ERR-006 再现）；编译和 native PASS 证据不变，没有固件修改。
