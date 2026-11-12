@@ -1,0 +1,45 @@
+{
+  "baseline": "3176e766d3876c86253e7694a7694560be72d1bf",
+  "main_at_preflight": "2a7a68120552a8037d796cf61b0af11e91abd0f2",
+  "branch": "iteration-010-config-store-verification",
+  "firmware": "0.2.0-alpha.1",
+  "protocol": 1,
+  "radiolib": "7.8.1",
+  "esp32": {
+    "command": "pio run -e esp32c3_supermini",
+    "exit_code": 0,
+    "elapsed_seconds": 147.438,
+    "log": "logs/build/iteration-010-esp32.log",
+    "publication_policy": "Full stdout/stderr; machine paths redacted and EOL/trailing display whitespace normalized; raw output retained privately."
+  },
+  "native": {
+    "command": "pio test -e native",
+    "exit_code": 0,
+    "elapsed_seconds": 29.141,
+    "log": "logs/test/iteration-010-native.log",
+    "publication_policy": "Full stdout/stderr; machine paths redacted and EOL/trailing display whitespace normalized; raw output retained privately."
+  },
+  "native_passed": 219,
+  "native_failed": 0,
+  "native_skipped": 0,
+  "new_config_store_passed": 56,
+  "existing_regressions_passed": 163,
+  "existing_executed_case_list": "Identical ordered names/results to iteration 009",
+  "suites": {
+    "test_app_integration": 38,
+    "test_config_store": 56,
+    "test_frame_codec": 18,
+    "test_provisioning_console": 10,
+    "test_radio_driver": 71,
+    "test_role_config": 13,
+    "test_sequence_tracker": 7,
+    "test_serial_logger": 6
+  },
+  "new_warning_messages": [],
+  "known_warning": "ERR-005 RadioLib USB CDC warning retained",
+  "application_sha256": "5e60140692a00e4d6ea0672b17c24cf1a2e780555ba5e1e4e7d946b781ee87fa",
+  "ram_bytes": 24532,
+  "flash_bytes": 363854,
+  "coverage_limit": "Scenario counts only; defensive encode-false branches not injectable under current valid codec/buffers",
+  "physical_validation": "NOT VERIFIED"
+}

@@ -110,3 +110,9 @@ M0–M2 physical acceptance remains IN PROGRESS. No automatic retries, TDMA, ACK
 The earlier statements excluding driver poll/IRQ classification from native coverage describe iterations 006–008. Iteration 009 adds a minimal RadioHardware reference and Llcc68Hardware owner; actual production RadioDriver now executes under 71 deterministic fault cases, all PASS with the existing 92 regressions (163/163 total). ESP32 build also passes, both commands exit 0. See RADIO_DRIVER_AUDIT.md for pre-edit findings, exact state/error priorities, coverage and source-preservation evidence.
 
 Only driver policy is newly verified. Native bypasses the real adapter, RadioLib internals/SPI/BUSY/physical IRQ races and metrics; Runtime/NVS/entropy/USB and physical RF remain unverified. No existing policy defect required a correction. No later MAC feature or platform/application integration API was added.
+
+## Iteration 010 addendum — actual configuration-store policy exercised
+
+NvsConfigStore now runs natively through a five-operation ConfigStorage reference; one PreferencesConfigStorage owns and directly forwards Preferences access. Validation, codec, errors/order, cleanup and readback stay in the actual store. All 56 new cases and 163 unchanged regressions pass (219 total); ESP32 build passes, both exit 0. Pre-edit audit, A–E mapping, unreachable defensive encode branches and exact results are in CONFIG_STORE_AUDIT.md.
+
+Numeric namespace/key/schema/24-byte format and config/radio/app/console/runtime implementation remain protected. The existing output-preservation and staged-until-reboot contracts are unchanged. Native backend responses do not verify actual Preferences/NVS internals, flash/commit durability, power loss, reset/corruption recovery, wear/retention or rollback. Runtime dispatch, random source, serial timing and physical radio/RF remain unverified. Next software scope: runtime boot/provisioning/reboot orchestration.

@@ -90,3 +90,11 @@ ESP32 编译退出码 0、PASS（`logs/build/iteration-008-esp32.log`）；nativ
 Native 通过 RadioHardware 引用执行实际 RadioDriver：新增 71/71 PASS，既有 92/92 PASS，总计 **163/163 PASS**、退出 0（`logs/test/iteration-009-native.log`）；ESP32 编译退出 0（`logs/build/iteration-009-esp32.log`）。逐条名称/结果见 `logs/test/iteration-009-scenarios.md`；A–G 映射见 RADIO_DRIVER_AUDIT.md。
 
 Fake 仅注入有界 bytes/返回码、IRQ 锁存/电平/flags 和显式 uint32 时间，无 driver 状态模型。覆盖 deadline 前/恰好/之后、wrap、长度/错误/恢复和优先级；保留 read 成功但 cleanup 失败时有 metrics 且报 ERROR/FAULT 的既有行为。Host 不验证 adapter/library/SPI/BUSY/真实 ISR 时序；无行/分支百分比或实物结果声明，协议/app/NVS/pins/PHY/版本不变。
+
+## 12. Iteration 010 — 实际配置存储边界
+
+`pio test -e native` 退出 0，219/219 PASS（新 store 56、既有 regression 163），ESP32 编译退出 0。完整日志 `logs/test/iteration-010-native.log`、`logs/build/iteration-010-esp32.log`；逐条结果 `logs/test/iteration-010-scenarios.md`。
+
+CONFIG_STORE_AUDIT.md 映射 A–E：实际 store/config/codec 执行，fake 仅注入 bool/count/字节/session。断言 golden blob、数值 namespace/key、RO/W/RO、end/顺序、失败 caller 不变、写失败不读回、错误优先级、不同有效读回为 nvs_verify_failed。失败不保证回滚；不可达 encode-false 防御分支不虚称注入覆盖，无行/分支百分比。
+
+真实 Preferences/NVS/Flash commit、断电/重启/损坏恢复、磨损/保持时间均未验证。Runtime boot/暂存生效只源码核对，未由此 suite 执行。无新命令、迁移、协议/PHY 或后续 MAC。

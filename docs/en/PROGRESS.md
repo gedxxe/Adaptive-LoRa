@@ -1,6 +1,8 @@
 # Development Progress
 
-Iteration 009 software checks PASS: ESP32 build exit 0 (147.15 s), native **163/163 PASS**, exit 0 (26.04 s): 71 new production RadioDriver fault cases plus all 92 existing regressions. Pre-edit findings/coverage are in RADIO_DRIVER_AUDIT.md; exact individual results are in `logs/test/iteration-009-scenarios.md`. Dedicated branch `iteration-009-radio-driver-verification` published; implementation commit `4055a947bdfcd518cdff36d6ae76acf3fabeed93` independently matched remote branch (push/verification exit 0). Publication receipt is `logs/build/iteration-009-publication-receipt.json`, recorded in a subsequent documentation-only commit. Main remains `b040ef111b82db96ab81a3c7377efbcf46385221`; no merge or PR. Physical validation remains NOT VERIFIED.
+Iteration 010 software checks PASS: ESP32 build exit 0 (146.83 s), native **219/219 PASS**, exit 0 (28.62 s): 56 new actual NvsConfigStore cases and all 163 unchanged regressions. Baseline remote Iteration 009 is `3176e766d3876c86253e7694a7694560be72d1bf`; main at preflight is `2a7a68120552a8037d796cf61b0af11e91abd0f2` after its external merge. Dedicated branch `iteration-010-config-store-verification`; final review/commit/push pending at this checkpoint, no merge or PR. Findings/results: CONFIG_STORE_AUDIT.md and `logs/test/iteration-010-scenarios.md`. Physical validation remains NOT VERIFIED.
+
+Historical Iteration 009 software checks PASS: ESP32 build exit 0 (147.15 s), native **163/163 PASS**, exit 0 (26.04 s): 71 new production RadioDriver fault cases plus all 92 existing regressions. Pre-edit findings/coverage are in RADIO_DRIVER_AUDIT.md; exact individual results are in `logs/test/iteration-009-scenarios.md`. Dedicated branch `iteration-009-radio-driver-verification` published; implementation commit `4055a947bdfcd518cdff36d6ae76acf3fabeed93` independently matched remote branch (push/verification exit 0). Publication receipt is `logs/build/iteration-009-publication-receipt.json`, recorded in a subsequent documentation-only commit. Main remains `b040ef111b82db96ab81a3c7377efbcf46385221`; no merge or PR. Physical validation remains NOT VERIFIED.
 
 Project: **Adaptive-LoRa**. Research title: Reliability-aware TDMA Scheduling and Link Adaptation for Single-Radio LoRa Industrial Energy Monitoring Networks.
 
@@ -45,7 +47,7 @@ Corrected stock: two LLCC68 modules, one MCU, second MCU not purchased, Moxon no
 |-----|----------------------------------------------------------------|-------------|------------------------------------------|
 | M0  | Board, module, pin, power, antenna, and toolchain confirmation | IN PROGRESS | Resolved toolchain recorded; physical checks pending |
 | M1  | LLCC68 initialization on both devices                          | IN PROGRESS | Firmware compiles; physical initialization/NVS persistence pending |
-| M2  | Fixed-PHY HELLO/ACK                                            | IN PROGRESS | 163 native tests including production apps/driver pass; RF evidence pending |
+| M2  | Fixed-PHY HELLO/ACK                                            | IN PROGRESS | 219 native tests including production apps/driver/store pass; RF evidence pending |
 | M3  | Beacon and one-client TDMA                                     | NOT STARTED | Deferred until M2 passes                 |
 | M4  | ACK bitmap and selective retry                                 | NOT STARTED | Deferred until M3 passes                 |
 | M5  | Versioned ADR SF7/SF8/SF9                                      | NOT STARTED | Deferred until M4 passes                 |
@@ -84,10 +86,12 @@ ERR-007's header filter remains unchanged from iteration 005; physical IRQ behav
 
 ## Next action
 
-Next software task: configuration-store/NVS boundary verification with a minimal persistence fake, preserving the schema/key/blob and boot policy. Driver policy fault verification is complete for the documented 71 cases; resolve dependency timing/memory budgets before claiming hard guarantees. Physical gates wait for the second MCU, antenna and assembly; then follow BENCH_RUNBOOK.md for M0/M1 and >=200 actual M2 HELLO attempts. Do not start M3 until M2 acceptance evidence exists. TDMA/bitmap/retry scheduling/ADR remain unimplemented.
+Next software task: focused runtime boot/provisioning/reboot dispatch verification while preserving explicit role selection, invalid-config TX fail-safe and staged activation. Driver (71 cases) and store (56 cases) policy checks are complete for documented inputs; resolve dependency timing/memory budgets before claiming hard guarantees. Physical gates wait for the second MCU, antenna and assembly; then follow BENCH_RUNBOOK.md for M0/M1 and >=200 actual M2 HELLO attempts. Do not start M3 until M2 acceptance evidence exists. TDMA/bitmap/retry scheduling/ADR remain unimplemented.
 
 Final evidence-reader check: Windows default decoding failed on a UTF-8 build log; explicit UTF-8 succeeded (ERR-006 recurrence). Firmware/native PASS evidence is unchanged; no new firmware error.
 
 Iteration 009 preservation: RadioDriver state/deadline/error policy remains equivalent after hardware forwarding/constant substitutions; 34 protected original files unchanged. Runtime owns one Llcc68Hardware plus a reference-injected RadioDriver; main.cpp remains 15 lines. The new seam has no explicit heap allocation. RAM 24,532 / 327,680 bytes; flash 363,730 / 1,310,720. Actual adapter/SPI/BUSY/ISR races, Runtime/entropy/NVS/USB and RF remain outside native evidence; M0–M2 overall IN PROGRESS, M3–M8 NOT STARTED.
 
 Iteration 009 review note: staged log display whitespace triggered ERR-015 (check exit 2); log-format normalization is verified closed by staged check exit 0; source/build/test evidence unaffected.
+
+Iteration 010 preservation: NvsConfigStore error/count/cleanup/readback logic and numeric namespace are equivalent after reference forwarding; key `device`, schema 1 and 24-byte format unchanged. Runtime header constructs one PreferencesConfigStorage before its store; runtime implementation and 39 protected original files (including all 163 old test cases) are byte-identical. All 48 frozen inputs match. Main remains a 15-line entry point; no explicit allocation introduced. RAM 24,532 bytes unchanged, flash 363,854 (+124). No new warning messages; ERR-005/008/009/010 remain. Actual NVS/flash durability, power interruption, reboot/corruption recovery, wear/retention and physical radio/RF remain unverified; M0–M2 overall IN PROGRESS, M3–M8 NOT STARTED.

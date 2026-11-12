@@ -320,3 +320,11 @@ The Runtime reboot dispatcher, actual esp_random, NVS/Preferences/flash, RadioDr
 Native executes actual RadioDriver through one RadioHardware reference. All 71 new driver cases pass alongside the unchanged 92 regressions: **163/163 PASS**, exit 0, `logs/test/iteration-009-native.log`; ESP32 build exit 0, `logs/build/iteration-009-esp32.log`. Every individual result is in `logs/test/iteration-009-scenarios.md`; required A–G coverage and priorities are mapped in RADIO_DRIVER_AUDIT.md.
 
 Fake hardware injects fixed bytes, return codes and IRQ latch/level/flags; explicit uint32 poll times cover before/at/after deadlines and wrap. It has no driver-state model. Real adapter/library/SPI/BUSY/physical ISR timing remain untested by native; frame/application/NVS/pins/PHY/version behavior is unchanged. Successful read followed by failed cleanup preserves metrics but reports ERROR/FAULT, as before. No line/branch coverage percentage or physical result is inferred.
+
+## 17. Iteration 010 — actual configuration-store boundary
+
+`pio test -e native` exit 0: **219/219 PASS**, including 56 actual NvsConfigStore cases and all 163 unchanged regressions. `pio run -e esp32c3_supermini` exit 0, PASS. Full logs: `logs/test/iteration-010-native.log`, `logs/build/iteration-010-esp32.log`; every individual result `logs/test/iteration-010-scenarios.md`.
+
+CONFIG_STORE_AUDIT.md maps required A–E load/save/lifecycle/compatibility/consistency coverage. The bounded fake injects bool/count/byte/session results only; actual store and DeviceConfig/codec execute. Golden bytes, numeric namespace/key, RO/W/RO, exact operation/end order, caller unchanged on failure, no readback after failed write and error priority are asserted. Valid-but-different readback yields nvs_verify_failed. Failed save need not imply rollback. Unreachable encode-false defenses remain source-preserved without a fabricated injection claim; no line/branch coverage percentage.
+
+Actual Preferences/IDF/NVS, flash durability, interruption/reboot/corruption recovery and wear/retention remain physically unverified. Runtime's boot and staged activation are source-reviewed, not executed by this suite. No new command syntax, migration, protocol/PHY change or later MAC feature.

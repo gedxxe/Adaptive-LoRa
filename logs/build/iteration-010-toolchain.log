@@ -1,0 +1,65 @@
+pio --version
+exit=0
+PlatformIO Core, version 6.1.19
+
+pio pkg list -e esp32c3_supermini
+exit=0
+Resolving esp32c3_supermini dependencies...
+Platform espressif32 @ 55.3.311 (required: espressif32)
+├── contrib-piohome @ 3.4.4 (required: <PLATFORMIO_HOME>\packages\contrib-piohome)
+├── framework-arduinoespressif32 @ 3.3.11 (required: https://github.com/espressif/arduino-esp32/releases/download/3.3.11/esp32-core-3.3.11.tar.xz)
+├── framework-arduinoespressif32-libs @ 5.5.5+sha.b774170ff46 (required: https://github.com/espressif/arduino-esp32/releases/download/3.3.11/esp32-core-3.3.11-libs.tar.xz)
+├── framework-espidf @ 3.50505.0 (required: https://github.com/pioarduino/esp-idf/releases/download/v5.5.5/esp-idf-v5.5.5.tar.xz)
+├── tool-esptoolpy @ 5.3.0 (required: <PLATFORMIO_HOME>\packages\tool-esptoolpy)
+├── tool-riscv32-esp-elf-gdb @ 17.1.0+20260402 (required: <PLATFORMIO_HOME>\packages\tool-riscv32-esp-elf-gdb)
+└── toolchain-riscv32-esp @ 14.2.0+20260121 (required: <PLATFORMIO_HOME>\packages\toolchain-riscv32-esp)
+
+Libraries
+└── RadioLib @ 7.8.1 (required: jgromes/RadioLib @ 7.8.1)
+
+pio pkg list -e native
+exit=0
+Resolving native dependencies...
+Platform native @ 1.2.1 (required: native)
+├── contrib-piohome @ 3.4.4 (required: https://github.com/pioarduino/registry/releases/download/0.0.1/contrib-piohome-3.4.4.tar.gz)
+├── framework-arduino-avr @ 5.2.0 (required: platformio/framework-arduino-avr)
+├── framework-arduinoespressif32 @ 3.3.11 (required: https://github.com/espressif/arduino-esp32/releases/download/3.3.11/esp32-core-3.3.11.tar.xz)
+├── framework-arduinoespressif32-libs @ 5.5.5+sha.b774170ff46 (required: https://github.com/espressif/arduino-esp32/releases/download/3.3.11/esp32-core-3.3.11-libs.tar.xz)
+├── framework-arduinoespressif8266 @ 3.30102.0 (required: platformio/framework-arduinoespressif8266)
+├── framework-espidf @ 3.50505.0 (required: https://github.com/pioarduino/esp-idf/releases/download/v5.5.5/esp-idf-v5.5.5.tar.xz)
+├── tool-cmake @ 4.0.3 (required: file://<PLATFORMIO_HOME>\tools\tool-cmake)
+├── tool-esp-rom-elfs @ 2024.10.11 (required: file://<PLATFORMIO_HOME>\tools\tool-esp-rom-elfs)
+├── tool-esp_install @ 5.3.4 (required: tool-esp_install)
+├── tool-esptool @ 1.413.0 (required: platformio/tool-esptool)
+├── tool-esptoolpy @ 5.3.0 (required: file://<PLATFORMIO_HOME>\tools\tool-esptoolpy)
+├── tool-mkfatfs @ 2.0.1 (required: platformio/tool-mkfatfs)
+├── tool-mklittlefs @ 1.203.210628 (required: platformio/tool-mklittlefs)
+├── tool-mkspiffs @ 2.230.0 (required: platformio/tool-mkspiffs)
+├── tool-mkspiffs @ 1.200.0 (required: platformio/tool-mkspiffs)
+├── tool-ninja @ 1.13.1 (required: file://<PLATFORMIO_HOME>\tools\tool-ninja)
+├── tool-openocd-esp32 @ 2.1200.20260424 (required: file://<PLATFORMIO_HOME>\tools\tool-openocd-esp32)
+├── tool-riscv32-esp-elf-gdb @ 17.1.0+20260402 (required: file://<PLATFORMIO_HOME>\tools\tool-riscv32-esp-elf-gdb)
+├── tool-scons @ 4.40801.0 (required: https://github.com/pioarduino/scons/releases/download/4.8.1/scons-local-4.8.1.tar.gz)
+├── tool-xtensa-esp-elf-gdb @ 17.1.0+20260402 (required: file://<PLATFORMIO_HOME>\tools\tool-xtensa-esp-elf-gdb)
+├── toolchain-atmelavr @ 1.70300.191015 (required: platformio/toolchain-atmelavr)
+├── toolchain-riscv32-esp @ 14.2.0+20260121 (required: file://<PLATFORMIO_HOME>\tools\toolchain-riscv32-esp)
+├── toolchain-xtensa @ 2.100300.220621 (required: platformio/toolchain-xtensa)
+├── toolchain-xtensa-esp-elf @ 14.2.0+20260121 (required: file://<PLATFORMIO_HOME>\tools\toolchain-xtensa-esp-elf)
+├── toolchain-xtensa-esp32 @ 8.4.0+2021r2-patch5 (required: espressif/toolchain-xtensa-esp32)
+└── toolchain-xtensa-esp32s3 @ 8.4.0+2021r2-patch5 (required: espressif/toolchain-xtensa-esp32s3)
+
+
+g++ --version
+exit=0
+g++ (MinGW.org GCC-6.3.0-1) 6.3.0
+Copyright (C) 2016 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+
+<RISCV_GXX> --version
+exit=0
+riscv32-esp-elf-g++.exe (crosstool-NG esp-14.2.0_20260121) 14.2.0
+Copyright (C) 2024 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.

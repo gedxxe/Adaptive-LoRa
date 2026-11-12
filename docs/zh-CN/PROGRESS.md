@@ -1,6 +1,8 @@
 # 开发进度
 
-Iteration 009 软件检查 PASS：ESP32 编译退出 0（147.15 s），native **163/163 PASS**、退出 0（26.04 s）：新增实际生产 RadioDriver 故障用例 71 个，既有 regression 92 个全部通过。修改前审查/覆盖见 RADIO_DRIVER_AUDIT.md，逐条结果 `logs/test/iteration-009-scenarios.md`。分支 `iteration-009-radio-driver-verification` 已发布，实施提交 `4055a947bdfcd518cdff36d6ae76acf3fabeed93` 与远端分支一致（push/核实退出 0）。回执 `logs/build/iteration-009-publication-receipt.json` 在后续仅文档提交记录；main 保持 `b040ef111b82db96ab81a3c7377efbcf46385221`，无合并、无 PR。实物仍 NOT VERIFIED。
+Iteration 010 软件检查 PASS：ESP32 编译退出 0（146.83 s），native **219/219 PASS**、退出 0（28.62 s）：新增实际 NvsConfigStore 56，既有 regression 163 全部不变且通过。基线 remote Iteration 009 为 `3176e766d3876c86253e7694a7694560be72d1bf`；preflight main 已由外部合并变为 `2a7a68120552a8037d796cf61b0af11e91abd0f2`。本轮直接基于指定009，不基于 main。分支 `iteration-010-config-store-verification` 此检查点待最终审查/commit/push，无合并/PR。证据见 CONFIG_STORE_AUDIT.md、`logs/test/iteration-010-scenarios.md`；实物 NOT VERIFIED。
+
+历史 Iteration 009 软件检查 PASS：ESP32 编译退出 0（147.15 s），native **163/163 PASS**、退出 0（26.04 s）：新增实际生产 RadioDriver 故障用例 71 个，既有 regression 92 个全部通过。修改前审查/覆盖见 RADIO_DRIVER_AUDIT.md，逐条结果 `logs/test/iteration-009-scenarios.md`。分支 `iteration-009-radio-driver-verification` 已发布，实施提交 `4055a947bdfcd518cdff36d6ae76acf3fabeed93` 与远端分支一致（push/核实退出 0）。回执 `logs/build/iteration-009-publication-receipt.json` 在后续仅文档提交记录；main 保持 `b040ef111b82db96ab81a3c7377efbcf46385221`，无合并、无 PR。实物仍 NOT VERIFIED。
 
 项目：**Adaptive-LoRa**。研究标题：Reliability-aware TDMA Scheduling and Link Adaptation for Single-Radio LoRa Industrial Energy Monitoring Networks。
 
@@ -37,7 +39,7 @@ PASS。
 |-----|------------------------------------|-------------|------------------------|
 | M0  | 硬件、引脚、电源、天线和工具链确认 | IN PROGRESS | 工具链已记录；实物检查待完成 |
 | M1  | 两台设备 LLCC68 初始化             | IN PROGRESS | 固件编译通过；NVS/无线实测待完成 |
-| M2  | 固定 PHY HELLO/ACK                 | IN PROGRESS | 163 个 native 测试通过，含生产 app/driver；RF 待完成 |
+| M2  | 固定 PHY HELLO/ACK                 | IN PROGRESS | 219 个 native 测试通过，含生产 app/driver/store；RF 待完成 |
 | M3  | Beacon 和单客户端 TDMA             | NOT STARTED | 等待 M2                |
 | M4  | ACK Bitmap 和选择性重传            | NOT STARTED | 等待 M3                |
 | M5  | SF7/SF8/SF9 ADR                    | NOT STARTED | 等待 M4                |
@@ -81,6 +83,8 @@ Iteration 008 暂存安全检查初次把 HTTPS 链接误判为本地路径（ER
 
 Iteration 009 保留性：driver 仅改硬件转发/常量，状态/deadline/错误优先级不变，34 个保护文件逐字节不变；Runtime 先构造唯一 Llcc68Hardware 再构造引用注入 driver，main.cpp 仍 15 行。新 seam 无显式堆分配。RAM 24,532 / 327,680、flash 363,730 / 1,310,720 bytes。真实 adapter/SPI/BUSY/ISR 竞态、Runtime/随机源/NVS/USB/RF 不属于 native 证据，M0–M2 整体 IN PROGRESS、M3–M8 NOT STARTED。
 
-下一软件任务建议配置存储/NVS 边界验证，使用最小 persistence fake 并保持 schema/key/blob/启动策略；driver 策略在本轮 71 场景通过，依赖等待/内存预算仍需另行证据。实物工作等待第二 MCU、天线与组装。
+下一软件任务建议 runtime boot/provisioning/reboot dispatcher 验证，保留角色和无效配置 TX fail-safe/暂存生效策略；driver 71、store 56 场景已通过，依赖等待/内存预算仍需另行证据。实物工作等待第二 MCU、天线与组装。
 
 Iteration 009 审查：PlatformIO 日志显示尾空格/末尾空行使暂存检查退出 2（ERR-015）。仅规范化本轮公开日志的 EOL/显示空白，私有原输出保留，源码/编译/测试结果不变；修正后暂存检查退出 0，ERR-015 已验证关闭。
+
+Iteration 010：实际 store 只做引用转发，错误/count/end/readback、数值 namespace/device key/schema/24-byte 格式不变；Runtime header 先构造唯一 PreferencesConfigStorage 后 store，runtime 实现和 39 个保护文件（含163旧tests）逐字节不变，48 个编译输入 hash 相符，main.cpp 15 行。无显式新分配，RAM 24,532 不变，flash 363,854（+124）。无新增 warning，ERR-005/008/009/010 保留；实际 NVS/Flash commit、断电、重启/损坏恢复、磨损/保持时间及 RF 未验证，M0–M2 整体 IN PROGRESS、M3–M8 NOT STARTED。
