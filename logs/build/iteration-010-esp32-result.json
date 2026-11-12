@@ -1,0 +1,7 @@
+{
+  "command": "pio run -e esp32c3_supermini",
+  "exit_code": 0,
+  "elapsed_seconds": 147.438,
+  "log": "logs/build/iteration-010-esp32.log",
+  "publication_policy": "Full stdout/stderr; machine paths redacted and EOL/trailing display whitespace normalized; raw output retained privately."
+}

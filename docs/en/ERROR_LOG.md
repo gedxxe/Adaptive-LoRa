@@ -241,3 +241,7 @@ An artifact-presence probe during the still-running ESP32 compile found no firmw
 ### ERR-015 verification — iteration 009
 
 Status CLOSED — VERIFIED. Corrected `git diff --cached --check` exited 0 without diagnostics. Staged-blob security/history/source-hash/link/fact checks pass (`logs/build/iteration-009-review.json`); all 43 compiled source/test/config/version entries match. Only publication display formatting changed; no source rebuild/retest was necessary.
+
+### Iteration 010 verification checkpoint
+
+No firmware/native test failure or new compiler warning occurred in the first verification run: ESP32 exit 0, native 219/219 exit 0 (`logs/build/iteration-010-esp32.log`, `logs/test/iteration-010-native.log`). Warning-message comparison against iteration 009 retains only known ERR-005 USB CDC warning. ERR-008 synchronous NVS/RadioLib operations, ERR-009 dependency allocation and ERR-010 SDK serial timing remain open; store fake does not validate those dependencies. The preliminary optional lookup of a not-yet-existing fake file returned 1; the inspected inventory confirmed absence before creating it, with no source/build fix required. No physical NVS/RF test or flash-failure observation occurred.

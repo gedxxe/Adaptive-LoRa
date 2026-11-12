@@ -1,6 +1,7 @@
 #pragma once
 #include <optional>
 #include "nvs_config_store.h"
+#include "preferences_config_storage.h"
 #include "provisioning_console.h"
 #include "client/client_app.h"
 #include "gateway/gateway_app.h"
@@ -18,7 +19,8 @@ private:
     void status();
     DeviceConfig loaded_{};
     const char* loadError_ = "not_loaded";
-    NvsConfigStore store_;
+    PreferencesConfigStorage configStorage_;
+    NvsConfigStore store_{configStorage_};
     ProvisioningConsole console_;
     Llcc68Hardware radioHardware_;
     RadioDriver radio_{radioHardware_};

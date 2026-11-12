@@ -41,3 +41,9 @@
 此前 native 不覆盖 driver poll/IRQ 分类的描述对应 iteration 006–008。本轮增加最小 RadioHardware 引用和 Llcc68Hardware owner，实际生产 RadioDriver 的 71 个确定性故障用例全部通过；既有 92 个 regression 通过，总计 163/163，native/ESP32 命令退出均为 0。先审查后改源码，状态/错误优先级/逐条结果和保留性证据见 RADIO_DRIVER_AUDIT.md。
 
 新验证仅针对 driver 策略，host 绕过真实 adapter、RadioLib 内部/SPI/BUSY/实物 IRQ 竞态和指标；Runtime/NVS/随机源/USB/RF 仍未验证。未复现需修正既有策略的缺陷，不增加后续 MAC 或 platform/application API。
+
+## Iteration 010 补充 — 实际配置存储策略已执行
+
+通过五操作 ConfigStorage 引用执行实际 NvsConfigStore，单一 PreferencesConfigStorage 唯一拥有并原样转发 Preferences；验证/codec/错误顺序/清理/readback 仍在实际 store。新增 56 与既有 163 全部通过（219 总计），ESP32 编译通过，命令均退出 0。修改前审查、A–E 映射、不可注入防御性 encode 分支见 CONFIG_STORE_AUDIT.md。
+
+数值 namespace/key/schema/24-byte 格式和 config/radio/app/console/runtime 实现保持；失败输出和 staged-until-reboot 不变。Native 不验证真实 Preferences/NVS、Flash commit/断电持久性、重启/损坏恢复、wear/retention/回滚。Runtime/随机源/串口时序及物理 RF 仍未验证；建议后续验证 runtime boot/provisioning/reboot 调度。

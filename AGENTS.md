@@ -350,8 +350,10 @@ framework for hypothetical features.
 - `ClientApp` owns client application state transitions.
 - `DeviceConfig` is a pure configuration model and validator,
   independent of Arduino.
-- `NvsConfigStore` owns Preferences/NVS persistence and is not part of
-  native protocol tests.
+- `NvsConfigStore` owns configuration load/save/verification policy through
+  a non-owning `ConfigStorage` reference. `PreferencesConfigStorage` solely
+  owns Preferences/NVS access; native storage tests execute the actual store
+  using low-level responses, never a duplicate validation/store model.
 - `ProvisioningConsole` owns serial command parsing.
 - The radio module has one `RadioDriver` state owner and one injected
   `Llcc68Hardware` adapter. Only the adapter owns Module/LLCC68 and

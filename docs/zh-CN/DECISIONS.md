@@ -37,3 +37,12 @@
 - RadioTransport 应用接口不变。Native 编译实际 driver.cpp，有界 fake 仅注入返回码、IRQ 锁存/电平/flags、payload 和显式 uint32 时间，不复制 driver 状态机。生产编译用 static_assert 核对固定 status/raw IRQ 值与 RadioLib 7.8.1 一致。
 - 固定 PHY/RX 参数和只置 flag 的 ISR 原样移动。保留 HEADER_VALID 条件、timeout 优先级、再次 begin 失败后既有 initialized 标志，以及 read 成功但 finishReceive 失败时保留的 metrics；不改变恢复策略。
 - Host 不执行真实 adapter/SPI/BUSY/ISR 并发或 RadioLib 内部；同步等待/分配、NVS/RF 实物门槛仍未验证，不宣称完整通用 PHY/平台服务。
+
+## ADR-013 — 通过五个存储操作验证生产配置策略
+
+- 2026-11-12 接受，iteration 010；先审查/方案后改源码，见 CONFIG_STORE_AUDIT.md。从已核实的 Iteration 009 remote HEAD 创建分支，不从后来合并的 main 开始。
+- ConfigStorage 只有 begin/getBytesLength/getBytes/putBytes/end；NvsConfigStore 保存非拥有引用，单一 PreferencesConfigStorage 拥有 Preferences 并原样转发 namespace/key/返回值，无配置策略。Runtime 先构造 adapter 后 store；只支持现有串行非重入调用，每次成功 begin 显式 end 后才重开 readback。
+- 实际 store 保留验证、编解码、错误字符串/顺序和读回比较；native 执行生产 store/DeviceConfig。有界 fake 只有存储字节、返回计划和调用轨迹，不复制 schema/codec/load/save 模型；无堆所有权、factory/文件系统/通用框架。
+- 数值 namespace 初始化表达式保留在 NvsConfigStore 且逐字节不变，不解码历史标签。device key、schema 1、24-byte LE/FNV 格式、验证规则不变；固件 0.2.0-alpha.1、协议 1、RadioLib 7.8.1、radio/app/PHY/console/runtime dispatcher 受保护。
+- 保存失败不承诺回滚或持久性；readback 失败原样传播 load 错误，不一律改为 verify。有效但不同配置仍为 nvs_verify_failed。失败 load 不改调用方配置，运行配置仍由原重启流程生效。
+- Native 仅验证模拟响应下的 store 策略，不验证真实 Preferences/NVS/Flash commit、断电、重启/损坏恢复、磨损/保持时间。防御性 encode-false 分支保留但不虚称注入覆盖；依赖等待/分配和硬件门槛保留。

@@ -1,0 +1,169 @@
+{
+  "baseline": "3176e766d3876c86253e7694a7694560be72d1bf",
+  "main_at_preflight": "2a7a68120552a8037d796cf61b0af11e91abd0f2",
+  "staged_files_scanned": 308,
+  "changed_paths_reviewed": 38,
+  "sensitive_or_excluded_findings": [],
+  "compiled_input_entries_verified": 48,
+  "append_only_histories": "PASS",
+  "readme_relative_links_checked": 31,
+  "english_chinese_facts": "PASS",
+  "staged_whitespace": "exit 0; new logs normalize disclosed display formatting before staging",
+  "complete_diff": "All changed source/test/doc/evidence reviewed against baseline; full patch retained privately outside publication to avoid recursive patches.",
+  "physical_validation": "NOT VERIFIED",
+  "files": [
+    {
+      "path": "AGENTS.md",
+      "responsibility": "Align current storage ownership/coverage/limits; preserve historical iteration records"
+    },
+    {
+      "path": "CHANGELOG.md",
+      "responsibility": "Align current storage ownership/coverage/limits; preserve historical iteration records"
+    },
+    {
+      "path": "README.md",
+      "responsibility": "Align current storage ownership/coverage/limits; preserve historical iteration records"
+    },
+    {
+      "path": "README.zh-CN.md",
+      "responsibility": "Align current storage ownership/coverage/limits; preserve historical iteration records"
+    },
+    {
+      "path": "docs/en/ARCHITECTURE.md",
+      "responsibility": "Align current storage ownership/coverage/limits; preserve historical iteration records"
+    },
+    {
+      "path": "docs/en/BUILD_MEMORY.md",
+      "responsibility": "Align current storage ownership/coverage/limits; preserve historical iteration records"
+    },
+    {
+      "path": "docs/en/CONFIG_STORE_AUDIT.md",
+      "responsibility": "Align current storage ownership/coverage/limits; preserve historical iteration records"
+    },
+    {
+      "path": "docs/en/DECISIONS.md",
+      "responsibility": "Align current storage ownership/coverage/limits; preserve historical iteration records"
+    },
+    {
+      "path": "docs/en/ERROR_LOG.md",
+      "responsibility": "Align current storage ownership/coverage/limits; preserve historical iteration records"
+    },
+    {
+      "path": "docs/en/PROGRESS.md",
+      "responsibility": "Align current storage ownership/coverage/limits; preserve historical iteration records"
+    },
+    {
+      "path": "docs/en/SOFTWARE_AUDIT.md",
+      "responsibility": "Align current storage ownership/coverage/limits; preserve historical iteration records"
+    },
+    {
+      "path": "docs/en/TEST_PLAN.md",
+      "responsibility": "Align current storage ownership/coverage/limits; preserve historical iteration records"
+    },
+    {
+      "path": "docs/zh-CN/ARCHITECTURE.md",
+      "responsibility": "Align current storage ownership/coverage/limits; preserve historical iteration records"
+    },
+    {
+      "path": "docs/zh-CN/CONFIG_STORE_AUDIT.md",
+      "responsibility": "Align current storage ownership/coverage/limits; preserve historical iteration records"
+    },
+    {
+      "path": "docs/zh-CN/DECISIONS.md",
+      "responsibility": "Align current storage ownership/coverage/limits; preserve historical iteration records"
+    },
+    {
+      "path": "docs/zh-CN/PROGRESS.md",
+      "responsibility": "Align current storage ownership/coverage/limits; preserve historical iteration records"
+    },
+    {
+      "path": "docs/zh-CN/SOFTWARE_AUDIT.md",
+      "responsibility": "Align current storage ownership/coverage/limits; preserve historical iteration records"
+    },
+    {
+      "path": "docs/zh-CN/TEST_PLAN.md",
+      "responsibility": "Align current storage ownership/coverage/limits; preserve historical iteration records"
+    },
+    {
+      "path": "logs/build/iteration-010-esp32-result.json",
+      "responsibility": "Executed evidence/provenance and reviewed inputs/results"
+    },
+    {
+      "path": "logs/build/iteration-010-esp32.log",
+      "responsibility": "Executed evidence/provenance and reviewed inputs/results"
+    },
+    {
+      "path": "logs/build/iteration-010-source-manifest.sha256",
+      "responsibility": "Executed evidence/provenance and reviewed inputs/results"
+    },
+    {
+      "path": "logs/build/iteration-010-source-review.json",
+      "responsibility": "Executed evidence/provenance and reviewed inputs/results"
+    },
+    {
+      "path": "logs/build/iteration-010-toolchain.log",
+      "responsibility": "Executed evidence/provenance and reviewed inputs/results"
+    },
+    {
+      "path": "logs/build/iteration-010-validation.json",
+      "responsibility": "Executed evidence/provenance and reviewed inputs/results"
+    },
+    {
+      "path": "logs/test/iteration-010-native-result.json",
+      "responsibility": "Executed evidence/provenance and reviewed inputs/results"
+    },
+    {
+      "path": "logs/test/iteration-010-native.log",
+      "responsibility": "Executed evidence/provenance and reviewed inputs/results"
+    },
+    {
+      "path": "logs/test/iteration-010-scenarios.md",
+      "responsibility": "Executed evidence/provenance and reviewed inputs/results"
+    },
+    {
+      "path": "platformio.ini",
+      "responsibility": "Native filter adds actual store.cpp; firmware environment unchanged"
+    },
+    {
+      "path": "src/app/config_storage.h",
+      "responsibility": "Five-operation non-owning bool/count session interface"
+    },
+    {
+      "path": "src/app/firmware_runtime.h",
+      "responsibility": "Construct one adapter before store; implementation unchanged"
+    },
+    {
+      "path": "src/app/nvs_config_store.cpp",
+      "responsibility": "Local Preferences replaced with reference calls; actual policy/numeric namespace unchanged; clarify durability comment"
+    },
+    {
+      "path": "src/app/nvs_config_store.h",
+      "responsibility": "Reference injection; load/save API unchanged"
+    },
+    {
+      "path": "src/app/preferences_config_storage.cpp",
+      "responsibility": "Five direct Preferences calls; namespace/key/default-partition/results unchanged"
+    },
+    {
+      "path": "src/app/preferences_config_storage.h",
+      "responsibility": "Sole Preferences owner declaration; no configuration policy"
+    },
+    {
+      "path": "test/support/fake_config_storage.h",
+      "responsibility": "Fixed bytes/session response plans/traces, no configuration policy"
+    },
+    {
+      "path": "test/test_config_store/test_main.cpp",
+      "responsibility": "56 production-store load/save/lifecycle/compatibility/consistency cases"
+    },
+    {
+      "path": "logs/build/iteration-010-review.json",
+      "responsibility": "Exact reviewed path inventory and compatibility/security/history/documentation checkpoint"
+    },
+    {
+      "path": "logs/build/iteration-010-publication-receipt.json",
+      "responsibility": "Verified implementation commit/push and unchanged baseline/main reference receipt"
+    }
+  ],
+  "checkpoint": "Final iteration tree including documentation-only publication receipt; the implementation push is independently recorded in that receipt."
+}

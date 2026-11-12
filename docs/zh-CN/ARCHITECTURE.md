@@ -85,7 +85,8 @@ NvsConfigStore 使用数值常量保留原 namespace 字节，确保旧配置仍
 | `main.cpp`        | Arduino 入口，只调用 Runtime       |
 | `FirmwareRuntime` | 加载配置并分配运行角色             |
 | `DeviceConfig`    | 独立于 Arduino 的配置模型和验证    |
-| `NvsConfigStore`  | 通过 Preferences/NVS 保存配置      |
+| `NvsConfigStore`  | 通过 ConfigStorage 验证/编解码、错误分类和读回比较 |
+| `PreferencesConfigStorage` | 唯一 Preferences owner，五个直接操作 |
 | `GatewayApp`      | Gateway 应用状态机                 |
 | `ClientApp`       | Client 应用状态机                  |
 | `RadioDriver`     | 通过 RadioHardware 引用拥有状态/错误策略 |
@@ -120,7 +121,7 @@ M2 不新增自动重传；测试只重放完全相同的捕获字节验证身�
 |---|---|---|
 | 协议核 | 显式 LE FrameCodec、packet identity、sequence/session、M2 HELLO/ACK 状态机 | 无 TDMA/superframe/bitmap/selective retry/ADR/通用 DATA 服务；app 仍直接调用 ESP timer 和具体 SerialLogger，因此不是完整跨平台核心 |
 | Radio | 6 方法 RadioTransport、有界事件、RadioDriver 状态 owner 和唯一 Llcc68Hardware adapter | init/poll/stop 仍为具体 driver 入口；RadioHardware 只隔离现有固定 profile 硬件调用供测试，无通用配置服务或 SX1262 adapter |
-| Platform | ESP32/Arduino runtime、NVS、console、pins、IRQ、random/timer | 无通用 clock/random/storage/interrupt 服务接口；native header 只是测试适配，不是其他 MCU 生产端口 |
+| Platform | ESP32/Arduino runtime、NVS、console、pins、IRQ、random/timer | 已有窄 ConfigStorage session/bytes seam 供 store 故障测试；无通用 clock/random/interrupt 或其他 MCU 生产端口 |
 | Application | 当前 Client 发空 HELLO，codec 可处理有界不解释字节，serial 记录链路事件/计数 | 无 payload 提交、接收 callback、event subscriber 或通用统计接口，需另行审查实现 |
 
 Modbus、电表模型、Wi-Fi/MQTT、数据库和 dashboard 不在协议核中，源码也未实现。未来集成应通过 application 边界；工业能耗监测是通用研究动机，不是必需部署。Iteration 008 仅改身份符号及文档，Iteration 009 只增加 driver 验证 seam；不补齐通用集成 API、不实现后续 MAC。依赖同步等待/分配及实物验证限制保持。
@@ -130,3 +131,11 @@ Modbus、电表模型、Wi-Fi/MQTT、数据库和 dashboard 不在协议核中�
 实际 RadioDriver 不依赖 Arduino/RadioLib，begin/receive/transmit/stop/poll 通过非拥有 RadioHardware 引用在 native 执行。Llcc68Hardware 唯一拥有 Module/LLCC68/SPI/GPIO/IRQ，固定参数原样移动；Runtime 先构造 adapter 再 driver，应用 6 方法 RadioTransport 不变。ISR 仍只置 volatile flag，采样后清除仍依赖锁存高电平 DIO1，不能证明硬件竞态安全。
 
 有界 fake 注入返回码、IRQ 锁存/电平/flags、包字节和显式 uint32 时间，执行生产策略而非模拟状态机。Host 不执行真实 adapter、芯片命令、RadioLib 内部或延迟；生产 static_assert 核对 status/raw IRQ 常量，固定调用参数另行审查。平台/application API、同步等待/分配与实物门槛仍保留。
+
+## 9. 配置存储验证边界（ADR-013）
+
+NvsConfigStore 通过非拥有 ConfigStorage 引用执行五操作，保留实际验证/编解码、错误分类/顺序及读回比较。PreferencesConfigStorage 唯一拥有 Preferences，无配置策略；Runtime 先 adapter 后 store，无堆所有权或通用存储框架。数值 namespace 仍在 store 且原样保留；device key/schema/24-byte blob、DeviceConfig/console/runtime 实现不变。
+
+load 只读打开、查长度、最多读 24 bytes、关闭后 decode；save 先验证/encode，再可写打开/写/关闭，然后实际 load 新开只读会话并精确比较编码字节。每次成功 begin 都显式 end，失败 begin 不 end，维持现有串行非重入约定，不增加并发/嵌套事务。
+
+Native 执行实际 store/config/codec，只模拟低层响应，验证错误/清理/readback 策略，不执行真实 adapter/NVS 内部或 Flash。失败不承诺回滚，host readback 成功不证明实物 commit/断电原子性/持久性。Runtime 无效配置先于 radio.begin 返回、保存后暂存直到重启的策略仅保留/源码核对，本套件未执行 runtime dispatcher。

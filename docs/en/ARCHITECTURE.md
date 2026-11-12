@@ -115,7 +115,8 @@ The original namespace bytes are retained as a numeric compatibility constant in
 | `main.cpp`            | Arduino entry point; delegate to runtime                | Radio calls, protocol logic, app state machine     |
 | `FirmwareRuntime`     | Load config, select role, dispatch loop                 | Own a second radio                                 |
 | `DeviceConfig`        | Pure configuration model and validation                 | Access NVS or radio hardware                       |
-| `NvsConfigStore`      | Persist validated configuration through Preferences/NVS | Validate protocol frames or store packet telemetry |
+| `NvsConfigStore`      | Validate/encode/decode config, classify storage errors and verify readback | Own Preferences or store packet telemetry |
+| `PreferencesConfigStorage` | Sole Preferences owner; five direct session/byte operations | Validate, serialize or verify configurations |
 | `ProvisioningConsole` | Parse serial commands and report config                 | Run radio TX/RX                                    |
 | `GatewayApp`          | Gateway state machine and HELLO validation/ACK response | Direct SPI operations                              |
 | `ClientApp`           | Client state machine, HELLO/ACK tracking                | Direct SPI operations                              |
@@ -210,7 +211,7 @@ Adaptive-LoRa targets reusable embedded-network logic. The research title descri
 |---|---|---|
 | Protocol core | Bounded LE FrameCodec, packet identity, sequence/session helpers and M2 gateway/client HELLO/ACK states | No TDMA/superframe, bitmap, selective retry, ADR or general DATA service. Apps still directly call the ESP timer and concrete SerialLogger. Core helper modules are platform-independent; the entire role runtime is not. |
 | Radio abstraction | Six-method RadioTransport reference, bounded RadioEvent and one RadioDriver state owner with a referenced Llcc68Hardware adapter | Initialization/poll/stop remain concrete driver entry points. RadioHardware now abstracts existing fixed-profile hardware calls for fault injection, not a general adapter configuration service; no SX1262 adapter exists. |
-| Platform services | ESP32/Arduino FirmwareRuntime, NvsConfigStore, bounded console, pins, IRQ flag, hardware random and timer calls | No general clock/random/persistence/interrupt service contract. Native compatibility headers are test adapters, not production ports to other MCUs. |
+| Platform services | ESP32/Arduino FirmwareRuntime, NvsConfigStore, bounded console, pins, IRQ flag, hardware random and timer calls | A narrow ConfigStorage session/byte seam now supports store fault tests. No general clock/random/interrupt service or production port to other MCUs is implemented. |
 | Application integration | HELLO carries no application payload in the current client; codec can bound opaque payload bytes; diagnostics expose link events/counters as serial logs | No submission API, received-payload callback, link-event subscriber or reusable application statistics contract. Add these in a separate reviewed task before integrating another application. |
 
 Modbus, meter models, Wi-Fi/MQTT backhaul, databases and dashboards are outside the protocol core and absent from source. Future integrations must use the application boundary rather than introduce such dependencies into codec/state/scheduling logic. Industrial energy monitoring remains a general motivation, not a required deployment.
@@ -222,3 +223,11 @@ Keep future protocol, radio, platform and application changes milestone-scoped. 
 RadioDriver has no Arduino/RadioLib dependency. Its begin/receive/transmit/stop/poll logic runs in native tests through RadioHardware. Llcc68Hardware owns the single Module/LLCC68, fixed PHY/SPI setup, IRQ callback and GPIO sampling. The callback only sets a volatile flag; sampling then clearing still depends on latched high DIO1 as before. The six-method application transport is unchanged.
 
 The bounded hardware fake supplies operation results, IRQ latch/level/flags and packet bytes. This tests production driver policy, not the adapter, RadioLib implementation, chip commands, latency or physical ISR races. Numeric status/raw IRQ values are compile-checked against RadioLib 7.8.1; fixed arguments/call ordering are reviewed separately. All previous platform/application API and dependency timing/allocation gaps remain.
+
+## 11. Configuration-store verification boundary (ADR-013)
+
+NvsConfigStore depends on five-method ConfigStorage by reference. PreferencesConfigStorage owns the only Preferences object and forwards namespace/key, bool/count results and explicit end without config policy. Runtime constructs this adapter before the store; no heap ownership or generic persistence framework. The original numeric namespace stays in the store, device key/schema/24-byte blob remain compatible, and DeviceConfig/console/runtime implementation is unchanged.
+
+Load opens read-only, checks length, reads at most 24 bytes, closes, then decodes. Save validates/encodes before access, opens writable, writes/closes, then invokes actual load in a new read-only session and compares exact encoded bytes. All successful opens have explicit closes; failed begin requires no end. Current serialized usage is preserved; this seam does not add concurrent/nested transaction support.
+
+Native executes actual store/config/codec against bounded backend responses. It verifies classification, cleanup and readback policy, not the real adapter/NVS internals or flash. Failure does not imply rollback; successful host readback does not prove hardware commit/power-loss atomicity/durability. Runtime's invalid-config early return before radio.begin and staged-until-reboot policy are source-preserved, not newly executed by store tests.

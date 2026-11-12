@@ -5,6 +5,12 @@ changes. It is not a substitute for the append-only build memory.
 
 ## Unreleased
 
+### Configuration-store boundary verification — 2026-11-12
+
+- Added five-operation ConfigStorage reference and sole-owner PreferencesConfigStorage adapter; actual NvsConfigStore policy now runs under native fault injection.
+- Added 56 passing storage cases; all 163 existing cases pass unchanged (219 total); ESP32 build passes with no new warning messages.
+- Preserved numeric namespace, device key, schema-1 24-byte LE/FNV format, error priorities, cleanup, readback and staged boot behavior. Versions unchanged; no hardware durability/power-loss/rollback claim or later MAC feature.
+
 ### Production radio-driver fault verification — 2026-11-12
 
 - Separated unchanged RadioDriver policy from LLCC68/SPI/GPIO ownership through one non-owning RadioHardware reference and Llcc68Hardware adapter; application transport unchanged.

@@ -1,0 +1,7 @@
+{
+  "command": "pio test -e native",
+  "exit_code": 0,
+  "elapsed_seconds": 29.141,
+  "log": "logs/test/iteration-010-native.log",
+  "publication_policy": "Full stdout/stderr; machine paths redacted and EOL/trailing display whitespace normalized; raw output retained privately."
+}
