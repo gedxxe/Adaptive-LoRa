@@ -1,8 +1,8 @@
 {
   "baseline": "3176e766d3876c86253e7694a7694560be72d1bf",
   "main_at_preflight": "2a7a68120552a8037d796cf61b0af11e91abd0f2",
-  "staged_files_scanned": 307,
-  "changed_paths_reviewed": 37,
+  "staged_files_scanned": 308,
+  "changed_paths_reviewed": 38,
   "sensitive_or_excluded_findings": [],
   "compiled_input_entries_verified": 48,
   "append_only_histories": "PASS",
@@ -159,7 +159,11 @@
     {
       "path": "logs/build/iteration-010-review.json",
       "responsibility": "Exact reviewed path inventory and compatibility/security/history/documentation checkpoint"
+    },
+    {
+      "path": "logs/build/iteration-010-publication-receipt.json",
+      "responsibility": "Verified implementation commit/push and unchanged baseline/main reference receipt"
     }
   ],
-  "checkpoint": "Final pre-commit tree; subsequent publication receipt records its own scope."
+  "checkpoint": "Final iteration tree including documentation-only publication receipt; the implementation push is independently recorded in that receipt."
 }
