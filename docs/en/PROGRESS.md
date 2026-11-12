@@ -1,6 +1,6 @@
 # Development Progress
 
-Iteration 009 software checks PASS: ESP32 build exit 0 (147.15 s), native **163/163 PASS**, exit 0 (26.04 s): 71 new production RadioDriver fault cases plus all 92 existing regressions. Pre-edit findings/coverage are in RADIO_DRIVER_AUDIT.md; exact individual results are in `logs/test/iteration-009-scenarios.md`. Dedicated branch `iteration-009-radio-driver-verification`; commit/push pending final review at this checkpoint. No main merge or PR. Physical validation remains NOT VERIFIED.
+Iteration 009 software checks PASS: ESP32 build exit 0 (147.15 s), native **163/163 PASS**, exit 0 (26.04 s): 71 new production RadioDriver fault cases plus all 92 existing regressions. Pre-edit findings/coverage are in RADIO_DRIVER_AUDIT.md; exact individual results are in `logs/test/iteration-009-scenarios.md`. Dedicated branch `iteration-009-radio-driver-verification` published; implementation commit `4055a947bdfcd518cdff36d6ae76acf3fabeed93` independently matched remote branch (push/verification exit 0). Publication receipt is `logs/build/iteration-009-publication-receipt.json`, recorded in a subsequent documentation-only commit. Main remains `b040ef111b82db96ab81a3c7377efbcf46385221`; no merge or PR. Physical validation remains NOT VERIFIED.
 
 Project: **Adaptive-LoRa**. Research title: Reliability-aware TDMA Scheduling and Link Adaptation for Single-Radio LoRa Industrial Energy Monitoring Networks.
 

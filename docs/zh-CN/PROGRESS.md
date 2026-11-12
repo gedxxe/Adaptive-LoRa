@@ -1,6 +1,6 @@
 # 开发进度
 
-Iteration 009 软件检查 PASS：ESP32 编译退出 0（147.15 s），native **163/163 PASS**、退出 0（26.04 s）：新增实际生产 RadioDriver 故障用例 71 个，既有 regression 92 个全部通过。修改前审查/覆盖见 RADIO_DRIVER_AUDIT.md，逐条结果 `logs/test/iteration-009-scenarios.md`。分支 `iteration-009-radio-driver-verification`，此检查点 commit/push 待最终审查；不合并 main、不创建 PR。实物仍 NOT VERIFIED。
+Iteration 009 软件检查 PASS：ESP32 编译退出 0（147.15 s），native **163/163 PASS**、退出 0（26.04 s）：新增实际生产 RadioDriver 故障用例 71 个，既有 regression 92 个全部通过。修改前审查/覆盖见 RADIO_DRIVER_AUDIT.md，逐条结果 `logs/test/iteration-009-scenarios.md`。分支 `iteration-009-radio-driver-verification` 已发布，实施提交 `4055a947bdfcd518cdff36d6ae76acf3fabeed93` 与远端分支一致（push/核实退出 0）。回执 `logs/build/iteration-009-publication-receipt.json` 在后续仅文档提交记录；main 保持 `b040ef111b82db96ab81a3c7377efbcf46385221`，无合并、无 PR。实物仍 NOT VERIFIED。
 
 项目：**Adaptive-LoRa**。研究标题：Reliability-aware TDMA Scheduling and Link Adaptation for Single-Radio LoRa Industrial Energy Monitoring Networks。
 

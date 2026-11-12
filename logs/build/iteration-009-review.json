@@ -1,7 +1,7 @@
 {
   "baseline": "b040ef111b82db96ab81a3c7377efbcf46385221",
-  "staged_files_scanned": 289,
-  "changed_paths_reviewed": 38,
+  "staged_files_scanned": 290,
+  "changed_paths_reviewed": 39,
   "sensitive_or_excluded_findings": [],
   "compiled_source_entries_verified": 43,
   "append_only_history": "PASS",
@@ -162,7 +162,11 @@
     {
       "path": "logs/build/iteration-009-review.json",
       "responsibility": "Final reviewed file inventory and staged security/history/source/fact audit checkpoint"
+    },
+    {
+      "path": "logs/build/iteration-009-publication-receipt.json",
+      "responsibility": "Actual implementation commit/push/remote verification receipt; no physical claims"
     }
   ],
-  "checkpoint": "Final pre-commit tree; later publication receipt explicitly records its own scope."
+  "checkpoint": "Final iteration tree including documentation-only publication receipt; implementation commit is independently recorded in that receipt."
 }
