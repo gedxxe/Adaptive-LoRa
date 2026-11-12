@@ -4,7 +4,7 @@
 
 Iteration 008 建立独立仓库并按授权脱敏历史身份/路径，保留时间顺序、结果及错误解决状态。当前 ESP32 编译 PASS、退出码 0（`logs/build/iteration-008-esp32.log`）；native 92/92 PASS、退出码 0（`logs/test/iteration-008-native.log`），仍为 38 integration 场景。固件 0.2.0-alpha.1、协议 1、PHY、packet/state 和旧存储字节均不变；四个架构目标与缺口只记录，不新增实现。
 
-Git 已在本项目根初始化 main，origin 为明确授权的公共仓库；fetch 确认远端为空。此检查点暂存审查和首次发布尚待完成，实际 commit/push 证据将在执行后追加；不声称实物验证。
+Git 发布已核实：main 已推送到明确授权的公共仓库，建立提交 `1d7ab54379221dff8b4eb9347833282657b6e1dc` 与远端 main 一致（git ls-remote 退出码 0）。远端原为空，无需合并历史；暂存与安全审查通过。后续仅文档回执提交记录这一已核实 SHA，见英语 BUILD_MEMORY.md 和 logs/build/iteration-008-publication-receipt.json；不声称实物验证。
 
 当前结果（iteration 007）：ESP32 编译退出码 0，native **92/92 PASS**（实际生产状态机 38、codec 18、role/config 13、console 10、sequence/timing 7、logger 6）。首轮旧 MinGW PRI 宏问题（ERR-011）已通过 `<cinttypes>` 修复。实际库存两个模块/一个 MCU；第二个 MCU 尚未购买、Moxon 尚未制作，未组装双设备。Host 场景不是实物 NVS/RF 验证；没有完整 milestone PASS。历史记录保留。
 

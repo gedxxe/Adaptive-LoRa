@@ -4,7 +4,7 @@ Project: **Adaptive-LoRa**. Research title: Reliability-aware TDMA Scheduling an
 
 Iteration 008 establishes the independent repository. Identity/path labels in earlier publication copies were neutralized with provenance; chronology, errors and original outcomes remain. Current validation: ESP32 build PASS, exit 0 (`logs/build/iteration-008-esp32.log`), native **92/92 PASS**, exit 0 (`logs/test/iteration-008-native.log`), including 38 integration scenarios. The four-boundary architecture/gaps are documented, not newly implemented. Firmware 0.2.0-alpha.1, protocol 1, PHY, packet logic and legacy storage bytes are unchanged.
 
-Git is now initialized on `main`, origin is the authorized public Adaptive-LoRa repository, and fetch confirmed no existing remote commits. Staging/security review and initial publication are pending at this checkpoint; confirmed commit/push evidence will be appended after execution. No physical validation is claimed.
+Git publication is verified: `main` was pushed to the authorized public Adaptive-LoRa repository; establishment commit `1d7ab54379221dff8b4eb9347833282657b6e1dc` matches remote main (`git ls-remote`, exit 0). The initial remote was empty, so no history merge was needed. Staged review/security checks passed. The subsequent documentation-only receipt records the already verified establishment SHA in BUILD_MEMORY.md and `logs/build/iteration-008-publication-receipt.json`. No physical validation is claimed.
 
 This file is the current project snapshot. Detailed iteration history is
 append-only in `BUILD_MEMORY.md`; issue history is in `ERROR_LOG.md`.

@@ -502,3 +502,14 @@ Initial staged security checker exited 1: a missing token boundary classified pu
 ### ITERATION-008 pre-commit review outcome
 
 Complete staged file inventory/blob scan PASS: no detected identity, workstation-path, high-confidence credential, private-address or excluded-artifact findings. All 38 compiled source/test/config/version manifest entries match staged bytes; 35 source/header/test bodies were compared against preserved originals. `main.cpp` remains 15 lines. `git diff --cached --check` exited 0; stat and full patch reviewed. ERR-014 is closed; no source changed after the successful builds.
+
+### ITERATION-008 verified publication receipt — 2026-11-12 15:51 WIB
+
+- Establishment commit **`1d7ab54379221dff8b4eb9347833282657b6e1dc`**, exact message `chore: establish standalone Adaptive-LoRa project`; `git commit` exit 0. Audited initial tree: 269 tracked files. Final staged whitespace check exit 0.
+- `git push -u origin main` exit 0; GitHub created main. `git ls-remote origin refs/heads/main` exit 0 returned the exact establishment SHA; clean local main tracked origin/main at verification.
+- `git fetch origin` and zero-head check immediately before committing confirmed the remote remained empty. No merge, remote commit removal, force push, visibility change or tag creation occurred.
+- Actual sanitized command output: `logs/build/iteration-008-publication.log`; structured receipt: `logs/build/iteration-008-publication-receipt.json`. This receipt is recorded in a subsequent documentation-only commit because a commit cannot include its own final hash.
+- All source/test/config fingerprints still match the executed passing builds. The pre-establishment redaction manifest remains a checkpoint manifest; this later receipt changes only current records and adds publication evidence. Earlier iteration outcomes remain preserved.
+- Publication complete for the establishment tree. Next: choose project licensing, then a separately scoped driver/configuration-boundary verification iteration; await hardware completion for physical gates. Physical behavior remains NOT VERIFIED.
+
+Final receipt-tree review: all 271 staged files scanned without detected sensitive/excluded findings; all 38 compiled-manifest entries still match. The receipt commit contains only three documentation updates and two publication-evidence files; no firmware/test/config changes.

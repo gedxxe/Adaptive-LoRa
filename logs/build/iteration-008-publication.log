@@ -1,0 +1,19 @@
+git diff --cached --check
+exit=0; no diagnostics
+git diff --cached --stat
+269 files changed, 25210 insertions(+)
+git commit -m "chore: establish standalone Adaptive-LoRa project" --quiet
+exit=0
+1d7ab54379221dff8b4eb9347833282657b6e1dc
+chore: establish standalone Adaptive-LoRa project
+git push -u origin main
+exit=0
+branch 'main' set up to track 'origin/main'.
+To https://github.com/gedxxe/Adaptive-LoRa.git
+ * [new branch]      main -> main
+git ls-remote origin refs/heads/main
+exit=0
+1d7ab54379221dff8b4eb9347833282657b6e1dc	refs/heads/main
+git status --short --branch
+exit=0
+## main...origin/main
