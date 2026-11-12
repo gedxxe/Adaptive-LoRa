@@ -5,6 +5,12 @@ changes. It is not a substitute for the append-only build memory.
 
 ## Unreleased
 
+### Production radio-driver fault verification — 2026-11-12
+
+- Separated unchanged RadioDriver policy from LLCC68/SPI/GPIO ownership through one non-owning RadioHardware reference and Llcc68Hardware adapter; application transport unchanged.
+- Added 71 deterministic production-driver fault cases; all 92 existing cases remain passing (163 total); ESP32 build passed.
+- Preserved state/error/header qualification/deadline/metrics semantics, firmware 0.2.0-alpha.1, protocol 1, NVS bytes and fixed PHY. Physical adapter/IRQ/SPI/RF and dependency timing/allocation remain unverified.
+
 ### Adaptive-LoRa repository establishment — 2026-11-12
 
 - Established independent research identity and repository metadata; industrial energy monitoring remains a general application domain.

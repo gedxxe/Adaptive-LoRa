@@ -1,0 +1,7 @@
+{
+  "command": "pio test -e native",
+  "exit_code": 0,
+  "elapsed_seconds": 26.562,
+  "log": "logs/test/iteration-009-native.log",
+  "log_policy": "Full stdout/stderr; workstation paths replaced with disclosed placeholders. Raw output retained privately outside tracked tree."
+}

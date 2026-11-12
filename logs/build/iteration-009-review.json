@@ -1,0 +1,168 @@
+{
+  "baseline": "b040ef111b82db96ab81a3c7377efbcf46385221",
+  "staged_files_scanned": 289,
+  "changed_paths_reviewed": 38,
+  "sensitive_or_excluded_findings": [],
+  "compiled_source_entries_verified": 43,
+  "append_only_history": "PASS",
+  "readme_links_checked": 29,
+  "english_chinese_facts": "PASS",
+  "staged_whitespace_check": "exit 0 after ERR-015 formatting correction",
+  "complete_diff": "All changed files reviewed; full staged patch retained privately outside publication to avoid recursive evidence patches.",
+  "physical_validation": "NOT VERIFIED",
+  "files": [
+    {
+      "path": "AGENTS.md",
+      "responsibility": "Align current driver architecture/evidence/limits; preserve previous history"
+    },
+    {
+      "path": "CHANGELOG.md",
+      "responsibility": "Align current driver architecture/evidence/limits; preserve previous history"
+    },
+    {
+      "path": "README.md",
+      "responsibility": "Align current driver architecture/evidence/limits; preserve previous history"
+    },
+    {
+      "path": "README.zh-CN.md",
+      "responsibility": "Align current driver architecture/evidence/limits; preserve previous history"
+    },
+    {
+      "path": "docs/en/ARCHITECTURE.md",
+      "responsibility": "Align current driver architecture/evidence/limits; preserve previous history"
+    },
+    {
+      "path": "docs/en/BUILD_MEMORY.md",
+      "responsibility": "Align current driver architecture/evidence/limits; preserve previous history"
+    },
+    {
+      "path": "docs/en/DECISIONS.md",
+      "responsibility": "Align current driver architecture/evidence/limits; preserve previous history"
+    },
+    {
+      "path": "docs/en/ERROR_LOG.md",
+      "responsibility": "Align current driver architecture/evidence/limits; preserve previous history"
+    },
+    {
+      "path": "docs/en/PROGRESS.md",
+      "responsibility": "Align current driver architecture/evidence/limits; preserve previous history"
+    },
+    {
+      "path": "docs/en/RADIO_DRIVER_AUDIT.md",
+      "responsibility": "Align current driver architecture/evidence/limits; preserve previous history"
+    },
+    {
+      "path": "docs/en/SOFTWARE_AUDIT.md",
+      "responsibility": "Align current driver architecture/evidence/limits; preserve previous history"
+    },
+    {
+      "path": "docs/en/TEST_PLAN.md",
+      "responsibility": "Align current driver architecture/evidence/limits; preserve previous history"
+    },
+    {
+      "path": "docs/zh-CN/ARCHITECTURE.md",
+      "responsibility": "Align current driver architecture/evidence/limits; preserve previous history"
+    },
+    {
+      "path": "docs/zh-CN/DECISIONS.md",
+      "responsibility": "Align current driver architecture/evidence/limits; preserve previous history"
+    },
+    {
+      "path": "docs/zh-CN/PROGRESS.md",
+      "responsibility": "Align current driver architecture/evidence/limits; preserve previous history"
+    },
+    {
+      "path": "docs/zh-CN/RADIO_DRIVER_AUDIT.md",
+      "responsibility": "Align current driver architecture/evidence/limits; preserve previous history"
+    },
+    {
+      "path": "docs/zh-CN/SOFTWARE_AUDIT.md",
+      "responsibility": "Align current driver architecture/evidence/limits; preserve previous history"
+    },
+    {
+      "path": "docs/zh-CN/TEST_PLAN.md",
+      "responsibility": "Align current driver architecture/evidence/limits; preserve previous history"
+    },
+    {
+      "path": "logs/build/iteration-009-diff-check-initial.log",
+      "responsibility": "Build/test/review evidence with explicit provenance"
+    },
+    {
+      "path": "logs/build/iteration-009-esp32-result.json",
+      "responsibility": "Build/test/review evidence with explicit provenance"
+    },
+    {
+      "path": "logs/build/iteration-009-esp32.log",
+      "responsibility": "Build/test/review evidence with explicit provenance"
+    },
+    {
+      "path": "logs/build/iteration-009-source-manifest.sha256",
+      "responsibility": "Build/test/review evidence with explicit provenance"
+    },
+    {
+      "path": "logs/build/iteration-009-source-review.json",
+      "responsibility": "Build/test/review evidence with explicit provenance"
+    },
+    {
+      "path": "logs/build/iteration-009-toolchain.log",
+      "responsibility": "Build/test/review evidence with explicit provenance"
+    },
+    {
+      "path": "logs/build/iteration-009-validation.json",
+      "responsibility": "Build/test/review evidence with explicit provenance"
+    },
+    {
+      "path": "logs/test/iteration-009-native-result.json",
+      "responsibility": "Build/test/review evidence with explicit provenance"
+    },
+    {
+      "path": "logs/test/iteration-009-native.log",
+      "responsibility": "Build/test/review evidence with explicit provenance"
+    },
+    {
+      "path": "logs/test/iteration-009-scenarios.md",
+      "responsibility": "Build/test/review evidence with explicit provenance"
+    },
+    {
+      "path": "platformio.ini",
+      "responsibility": "Native filter adds actual production driver.cpp; firmware environment unchanged"
+    },
+    {
+      "path": "src/app/firmware_runtime.h",
+      "responsibility": "One adapter constructed before its reference-injected driver"
+    },
+    {
+      "path": "src/common/radio/llcc68_hardware.cpp",
+      "responsibility": "Original SPI/profile/IRQ wiring and compile-time constant compatibility"
+    },
+    {
+      "path": "src/common/radio/llcc68_hardware.h",
+      "responsibility": "Sole Module/LLCC68 owner and direct library forwarding"
+    },
+    {
+      "path": "src/common/radio/radio_driver.cpp",
+      "responsibility": "Unchanged transition/error policy routed through hardware calls"
+    },
+    {
+      "path": "src/common/radio/radio_driver.h",
+      "responsibility": "Hardware reference replaces concrete radio members; app API unchanged"
+    },
+    {
+      "path": "src/common/radio/radio_hardware.h",
+      "responsibility": "Non-owning hardware call contract and pinned status/raw-IRQ constants"
+    },
+    {
+      "path": "test/support/fake_radio_hardware.h",
+      "responsibility": "Bounded operation/IRQ/data stimulus and call trace; no driver-state policy"
+    },
+    {
+      "path": "test/test_radio_driver/test_main.cpp",
+      "responsibility": "71 explicit production-driver fault/regression cases"
+    },
+    {
+      "path": "logs/build/iteration-009-review.json",
+      "responsibility": "Final reviewed file inventory and staged security/history/source/fact audit checkpoint"
+    }
+  ],
+  "checkpoint": "Final pre-commit tree; later publication receipt explicitly records its own scope."
+}

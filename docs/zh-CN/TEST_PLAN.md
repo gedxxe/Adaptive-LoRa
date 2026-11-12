@@ -84,3 +84,9 @@ Host 验证了配置编码/校验、解析器和 ACK 身份等；Preferences 持
 ESP32 编译退出码 0、PASS（`logs/build/iteration-008-esp32.log`）；native 92/92 PASS、0 失败/跳过、退出码 0（`logs/test/iteration-008-native.log`），38 个 integration 与原场景相同。35 个 source/header/test 的静态等价检查通过，版本、wire/PHY、状态语句、NVS 调用及旧 namespace 字节均保留。
 
 发布检查涵盖身份、凭据、私有路径/设备标识、双语 README 事实与链接、暂存清单/内容、依赖及工件。先建立审查清单再编辑；旧记录仅脱敏并明确 hash 来源，不删除失败/解决历史。实物 NVS/重启/SPI/IRQ/RF/天线仍 NOT VERIFIED；没有后续 MAC、存储迁移或新 radio adapter 验证。
+
+## 11. Iteration 009 — 实际生产 driver 故障路径
+
+Native 通过 RadioHardware 引用执行实际 RadioDriver：新增 71/71 PASS，既有 92/92 PASS，总计 **163/163 PASS**、退出 0（`logs/test/iteration-009-native.log`）；ESP32 编译退出 0（`logs/build/iteration-009-esp32.log`）。逐条名称/结果见 `logs/test/iteration-009-scenarios.md`；A–G 映射见 RADIO_DRIVER_AUDIT.md。
+
+Fake 仅注入有界 bytes/返回码、IRQ 锁存/电平/flags 和显式 uint32 时间，无 driver 状态模型。覆盖 deadline 前/恰好/之后、wrap、长度/错误/恢复和优先级；保留 read 成功但 cleanup 失败时有 metrics 且报 ERROR/FAULT 的既有行为。Host 不验证 adapter/library/SPI/BUSY/真实 ISR 时序；无行/分支百分比或实物结果声明，协议/app/NVS/pins/PHY/版本不变。

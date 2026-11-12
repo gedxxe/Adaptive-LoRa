@@ -1,12 +1,14 @@
 # 开发进度
 
+Iteration 009 软件检查 PASS：ESP32 编译退出 0（147.15 s），native **163/163 PASS**、退出 0（26.04 s）：新增实际生产 RadioDriver 故障用例 71 个，既有 regression 92 个全部通过。修改前审查/覆盖见 RADIO_DRIVER_AUDIT.md，逐条结果 `logs/test/iteration-009-scenarios.md`。分支 `iteration-009-radio-driver-verification`，此检查点 commit/push 待最终审查；不合并 main、不创建 PR。实物仍 NOT VERIFIED。
+
 项目：**Adaptive-LoRa**。研究标题：Reliability-aware TDMA Scheduling and Link Adaptation for Single-Radio LoRa Industrial Energy Monitoring Networks。
 
-Iteration 008 建立独立仓库并按授权脱敏历史身份/路径，保留时间顺序、结果及错误解决状态。当前 ESP32 编译 PASS、退出码 0（`logs/build/iteration-008-esp32.log`）；native 92/92 PASS、退出码 0（`logs/test/iteration-008-native.log`），仍为 38 integration 场景。固件 0.2.0-alpha.1、协议 1、PHY、packet/state 和旧存储字节均不变；四个架构目标与缺口只记录，不新增实现。
+历史 Iteration 008 建立独立仓库并按授权脱敏历史身份/路径，保留时间顺序、结果及错误解决状态。该轮 ESP32 编译 PASS、退出码 0（`logs/build/iteration-008-esp32.log`）；native 92/92 PASS、退出码 0（`logs/test/iteration-008-native.log`），仍为 38 integration 场景。固件 0.2.0-alpha.1、协议 1、PHY、packet/state 和旧存储字节均不变；四个架构目标与缺口只记录，不新增实现。
 
 Git 发布已核实：main 已推送到明确授权的公共仓库，建立提交 `1d7ab54379221dff8b4eb9347833282657b6e1dc` 与远端 main 一致（git ls-remote 退出码 0）。远端原为空，无需合并历史；暂存与安全审查通过。后续仅文档回执提交记录这一已核实 SHA，见英语 BUILD_MEMORY.md 和 logs/build/iteration-008-publication-receipt.json；不声称实物验证。
 
-当前结果（iteration 007）：ESP32 编译退出码 0，native **92/92 PASS**（实际生产状态机 38、codec 18、role/config 13、console 10、sequence/timing 7、logger 6）。首轮旧 MinGW PRI 宏问题（ERR-011）已通过 `<cinttypes>` 修复。实际库存两个模块/一个 MCU；第二个 MCU 尚未购买、Moxon 尚未制作，未组装双设备。Host 场景不是实物 NVS/RF 验证；没有完整 milestone PASS。历史记录保留。
+历史结果（iteration 007）：ESP32 编译退出码 0，native **92/92 PASS**（实际生产状态机 38、codec 18、role/config 13、console 10、sequence/timing 7、logger 6）。首轮旧 MinGW PRI 宏问题（ERR-011）已通过 `<cinttypes>` 修复。实际库存两个模块/一个 MCU；第二个 MCU 尚未购买、Moxon 尚未制作，未组装双设备。Host 场景不是实物 NVS/RF 验证；没有完整 milestone PASS。历史记录保留。
 
 状态：`NOT STARTED`、`IN PROGRESS`、`BLOCKED`、`PASS`。只有记录验收标准和证据后才能标记为
 PASS。
@@ -35,7 +37,7 @@ PASS。
 |-----|------------------------------------|-------------|------------------------|
 | M0  | 硬件、引脚、电源、天线和工具链确认 | IN PROGRESS | 工具链已记录；实物检查待完成 |
 | M1  | 两台设备 LLCC68 初始化             | IN PROGRESS | 固件编译通过；NVS/无线实测待完成 |
-| M2  | 固定 PHY HELLO/ACK                 | IN PROGRESS | 92 个 native 测试通过，含生产状态机；RF 待完成 |
+| M2  | 固定 PHY HELLO/ACK                 | IN PROGRESS | 163 个 native 测试通过，含生产 app/driver；RF 待完成 |
 | M3  | Beacon 和单客户端 TDMA             | NOT STARTED | 等待 M2                |
 | M4  | ACK Bitmap 和选择性重传            | NOT STARTED | 等待 M3                |
 | M5  | SF7/SF8/SF9 ADR                    | NOT STARTED | 等待 M4                |
@@ -53,7 +55,7 @@ PASS。
 - [ ] 当地频率、信道和功率要求。
 - [x] 实际工具链版本：Core 6.1.19，已安装 pioarduino/espressif32 55.03.311，Arduino-ESP32 3.3.11，RISC-V GCC 14.2.0 (esp-14.2.0_20260121)，RadioLib 7.8.1；host GCC 6.3.0 / native 1.2.1 / Unity 2.6.1。
 
-候选固件通过编译及 92 个 native 测试，版本仍为 0.2.0-alpha.1 / 协议 1。实际 app 状态语句未改，只改 transport 构造参数及 C++ include；main.cpp 仍 15 行。同步 NVS/BUSY、库临时分配、SDK 串口等待、IRQ/随机源假设仍未验证。硬件采购/制作/组装完成前继续软件工作，不执行实物流程，不进入 M3。详细结果及所有 case 见 SOFTWARE_AUDIT.md 与 `logs/test/iteration-007-scenarios.md`。
+历史 iteration 007 候选固件通过编译及 92 个 native 测试，版本为 0.2.0-alpha.1 / 协议 1。实际 app 状态语句未改，只改 transport 构造参数及 C++ include；main.cpp 仍 15 行。同步 NVS/BUSY、库临时分配、SDK 串口等待、IRQ/随机源假设仍未验证。硬件采购/制作/组装完成前继续软件工作，不执行实物流程，不进入 M3。详细结果及所有 case 见 SOFTWARE_AUDIT.md 与 `logs/test/iteration-007-scenarios.md`。
 
 ## 2026-11-12 实现检查点（ITERATION-001）
 
@@ -76,3 +78,9 @@ ITERATION-005 最终结果：HEADER_ERR 条件已与固定版本 RadioLib 对齐
 Iteration 008 暂存安全检查初次把 HTTPS 链接误判为本地路径（ERR-014），修正边界后检查通过，无固件修改。英语错误/构建记录保留失败及修复结果；暂存源文件与已编译清单一致，main.cpp 仍为 15 行。
 
 最终日志检查因 Windows 默认编码读取 UTF-8 失败，显式 UTF-8 重读通过（ERR-006 再现）；编译和 native PASS 证据不变，没有固件修改。
+
+Iteration 009 保留性：driver 仅改硬件转发/常量，状态/deadline/错误优先级不变，34 个保护文件逐字节不变；Runtime 先构造唯一 Llcc68Hardware 再构造引用注入 driver，main.cpp 仍 15 行。新 seam 无显式堆分配。RAM 24,532 / 327,680、flash 363,730 / 1,310,720 bytes。真实 adapter/SPI/BUSY/ISR 竞态、Runtime/随机源/NVS/USB/RF 不属于 native 证据，M0–M2 整体 IN PROGRESS、M3–M8 NOT STARTED。
+
+下一软件任务建议配置存储/NVS 边界验证，使用最小 persistence fake 并保持 schema/key/blob/启动策略；driver 策略在本轮 71 场景通过，依赖等待/内存预算仍需另行证据。实物工作等待第二 MCU、天线与组装。
+
+Iteration 009 审查：PlatformIO 日志显示尾空格/末尾空行使暂存检查退出 2（ERR-015）。仅规范化本轮公开日志的 EOL/显示空白，私有原输出保留，源码/编译/测试结果不变；修正后暂存检查退出 0，ERR-015 已验证关闭。

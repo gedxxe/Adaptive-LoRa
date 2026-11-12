@@ -104,3 +104,9 @@ Complete source/document file inventory: `logs/build/iteration-007-changed-files
 - **Unverified physical/dependency behavior:** actual Runtime boot/reboot dispatch, esp_random entropy/fault liveness, Preferences/NVS durability and power loss, driver poll/IRQ/SPI/BUSY/CRC, timing under flash/USB blocking, supply/pins/antenna/RF/regulatory settings. ERR-005/008/009/010 and the audit race/random assumptions remain open.
 
 M0–M2 physical acceptance remains IN PROGRESS. No automatic retries, TDMA, ACK bitmap, selective retry scheduling, ADR or excluded integration was added. Next software work can target driver-API fault injection and config-store boundaries; physical work waits for procurement, fabrication and assembly.
+
+## Iteration 009 addendum — production driver policy now exercised
+
+The earlier statements excluding driver poll/IRQ classification from native coverage describe iterations 006–008. Iteration 009 adds a minimal RadioHardware reference and Llcc68Hardware owner; actual production RadioDriver now executes under 71 deterministic fault cases, all PASS with the existing 92 regressions (163/163 total). ESP32 build also passes, both commands exit 0. See RADIO_DRIVER_AUDIT.md for pre-edit findings, exact state/error priorities, coverage and source-preservation evidence.
+
+Only driver policy is newly verified. Native bypasses the real adapter, RadioLib internals/SPI/BUSY/physical IRQ races and metrics; Runtime/NVS/entropy/USB and physical RF remain unverified. No existing policy defect required a correction. No later MAC feature or platform/application integration API was added.
