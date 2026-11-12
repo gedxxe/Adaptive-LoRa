@@ -63,3 +63,11 @@ ACCEPTED2026-11-12，Iteration012。修改前审查/有限RED复现见DEPENDENCY
 实际延迟注入复现过期ACK被接受、ACK窗口起点偏早、reset等待缩短及检查陈旧。poll后刷新app时间，stop完成后起100ms计时，drain后用当前时间判reset；保留app先串口、stop失败仍reset、不等日志排空及driver/app调用内观察/恢复语义，依赖仍不可抢占。旧266源码/结果不变且通过，新增24通过，ESP32 PASS。静态RAM+16、flash+466，无新增显式分配/task/framework，main不变15行。
 
 wire/NVS/版本/PHY/单镜像兼容。IDF5.5.5不支持无条件熵保证，32位ID跨启动可碰撞；持久counter需另行版本化断电/磨损设计。STATIC_ONLY保持0，避免未经验证的栈/容量变更，HAL/SDK分配仍存在。上游BUSY-ramp及SDK锁/flash/USB时延未解决，未建立硬实时或实物验收。
+
+## ADR-016 - 备份门槛与采集证据契约
+
+ACCEPTED2026-11-13，Iteration013。firmware/native及53输入与012逐字节一致，无架构/协议/PHY/watchdog/库改动。流程/软件准备不等于实物验收；硬件/布线/授权、ERR-021及controlled fixture保持阻挡。无radio的合法角色仍先init LLCC68；单MCU持久性用Gateway暂存、radio物理缺席、ROM私有同板备份/恢复。无备份不擦/覆盖配置，secure/encrypted/不兼容layout另审查。ERR-023 SDK可在Runtime前格式化NVS，仅记录并设backup gate，不改SDK。
+
+Capture schema2保留pair/status-only，增加单板、DTR/RTS开口意图（不保证无reset）、time/offset journal、hash/碎行、有界metadata、初末状态/中断错误结果。13 fake-port测试针对复现的false-success和证据缺口（ERR-022），不是新增固件覆盖。末status/tail尽力，缺snapshot/歧义就阻挡，file hash不能消除host读取前丢失，私有备份/身份须审核后方能发布。
+
+CSV使用关闭HELLO cohort，区分A/T/R/ACKstart/done/C；A含启动失败，PDR以R交完成T，分母0/关联未知保留N/A。host观察时间/firmware transaction_us不是实测RF。正常>=200完整HELLO、干预和注入另跑，不虚构/覆盖历史实物记录。

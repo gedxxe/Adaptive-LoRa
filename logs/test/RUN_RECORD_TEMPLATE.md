@@ -1,10 +1,11 @@
-# Two-device M0–M2 physical test record — NOT RUN
+# Single-board / two-device M0–M2 physical test record — NOT RUN
 
 Copy into a new run directory as `RUN_RECORD.md`. Never overwrite an earlier run.
 
-- Local date/time (WIB), operator: TBD
+- Mode: MCU ONLY / TWO-DEVICE / CONTROLLED FIXTURE (select; NOT RUN)
+- Local date/time (WIB), operator alias: TBD
 - Firmware version / BUILD_ID / protocol: TBD
-- Git branch / commit: NOT AVAILABLE unless initialized later
+- Actual flashed Git branch / commit (distinct from capture script): TBD
 - Firmware binary SHA-256: TBD
 - Gateway role / network / node / gateway IDs: TBD
 - Client role / network / node / gateway IDs: TBD
@@ -15,7 +16,12 @@ Copy into a new run directory as `RUN_RECORD.md`. Never overwrite an earlier run
 - Frequency/channel/power/site authorization review: TBD
 - PHY / sync word / TX power / interval: TBD
 - Distance / LOS-NLOS / heights / polarization / orientation / machinery: TBD
-- Capture start/end / duration / port-open resets: TBD
+- Capture start/end / actual monotonic duration / final status tail / port-open/close resets: TBD
+- Backup/security/partition layout/NVS baseline SHA and restore verification (private references only): NOT RUN
+- Intentional NVS erase/write scope and operator decision, or NOT AUTHORIZED: TBD
+- MCU-only: no powered/connected radio throughout (physical inspection): NOT RUN
+- ERR-021 approved bounded recovery disposition / current hold: OPEN, NOT VERIFIED
+- Instruments/calibration/sample rate/current-limit/physical power-removal method: TBD
 
 | Check | Gateway | Client | Evidence |
 |---|---|---|---|
@@ -30,9 +36,13 @@ Copy into a new run directory as `RUN_RECORD.md`. Never overwrite an earlier run
 - HELLO attempts / gateway valid unique / duplicate / stale: NOT MEASURED
 - Gateway ACK TX starts / TX completions: NOT MEASURED
 - Client matching ACKs / ACK timeouts / TX failures: NOT MEASURED
-- ACK success = accepted / attempted; PDR = unique gateway HELLO / completed client HELLO TX (state denominator): NOT MEASURED
+- Declared closed cohort/boundary exclusions/cumulative counter reconciliation: TBD
+- A=all API attempts including failed starts; T=HELLO TX completions; R=unique Gateway receives; C=accepted ACKs: NOT MEASURED
+- ACK transaction success=|C|/|A|; PDR=|R intersect T|/|T|; unpaired anomalies separately; zero denominator=N/A: NOT MEASURED
 - RSSI/SNR distribution (per side) / transaction latency: NOT MEASURED
 - MCU resets / driver/CRC/decode errors / log drop count: NOT MEASURED
-- Raw files: `gateway.log`, `client.log`, `capture.json` (TBD)
+- Raw files: `board.log` or `gateway.log`/`client.log`, per-stream `.chunks.jsonl`, `capture.json` state/hash/offset checks (TBD)
+- Initial/final STATUS drop counts and boot/session continuity; partial-line/empty-stream/error review: TBD
+- CSV method/version, HELLO identity associations, missing/ambiguous records, normal vs intervention cohort separation: TBD
 - Negative ACK identity and duplicate RF injection fixtures/logs: NOT RUN (native results are separate)
 - Result, issue IDs, unresolved assumptions, next action: TBD

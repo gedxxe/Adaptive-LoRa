@@ -1,6 +1,14 @@
 # Development Progress
 
-## Iteration 012 software verification PASS; implementation published
+## Iteration013 physical-readiness package verified; publication pending
+
+2026-11-13 client date. Direct baseline9341e7c0016c66fd9316d489ccfca00a646ae2cb, branch iteration-013-bench-readiness; main5bc607cd1a86e5d86ff0fc95ba7a3cd31159b861 not used. ESP32 exit0 PASS13.053s; native exit0 **290/290 PASS**61.980s, all cases/source unchanged. Capture utility13/13 fake-port tests exit0; separate from native and physical counts. No source/bin/native test/pin/PHY/watchdog/library changes; RAM24,564/flash364,308 unchanged, main15 lines. Full diff/security/history/publication checks pending.
+
+PHYSICAL_ACCEPTANCE_READINESS.md links the backed-up single-MCU procedure, pair gates/instruments, ERR-021 disposition and capture/CSV spec. Module pin functions cross-checked against current official V1.1.0; proposed GPIOs/actual boards/wiring remain unverified. Only read-only enumeration (no ports); no open/upload/erase/reset/RF. Capture interrupted-success ERR-022 fixed; SDK startup may format NVS (ERR-023 source risk), so backups precede app boot. ERR-021 holds unattended/stuck-BUSY recovery acceptance; no assumed default watchdog reset. Advanced replay/negative-identity/corrupt-NVS fixtures remain unprovided/unrun.
+
+M0/M1/M2 physical status IN PROGRESS/NOT RUN, M3–M8 NOT STARTED. Next: identify a connected board and execute the protected MCU-only procedure if authorized/backups verified; procure secondMCU/RF termination/antenna and instruments, verify wiring/supply/USB/RF authorization, prepare controlled fixtures and resolve recovery holds before full pair acceptance. No further speculative abstractions/tests planned.
+
+## Historical Iteration 012 software verification PASS; implementation published
 
 Direct baseline8fa0a473b6cc0905ddff53e4b9a5f22806e058e2, branch iteration-012-runtime-reliability; main5bc607cd1a86e5d86ff0fc95ba7a3cd31159b861 unchanged at preflight. `pio test -e native` exit0 **290/290 PASS**,77.575s (266 unchanged+24 reliability). `pio run -e esp32c3_supermini` exit0 PASS31.748s. Corrected ERR-019 boundedID/zero sentinel/preserved prior session/1s retry/TX suppression; ERR-020 post-poll app time/post-stop100ms/post-drain reset check. First RED9FAIL/1PASS and focused10/10 records preserved. ERR-018 launcher/GDB corrections recorded. Complete staged review passed; implementation `bdab1cec5de6e38f84b524a8189945dec1ee7dd2` committed/pushed and independently matched remote012 (exit0). main/011 unchanged. Receipt `logs/build/iteration-012-publication-receipt.json` records verified implementation; a documentation-only follow-up preserves it. No merge/PR/tag.
 
@@ -102,7 +110,7 @@ ERR-007's header filter remains unchanged from iteration 005; physical IRQ behav
 
 ## Next action
 
-Next software task: review a bounded upstream TX BUSY-launch path and SDK allocation-failure handling using the Iteration012 source inventory; runtime dispatch and reproduced liveness/staleness fixes already pass. Dependency timing and peak-memory measurement remain acceptance limits. Physical gates wait for the second MCU, antenna and assembly; then follow BENCH_RUNBOOK.md for M0/M1 and >=200 actual M2 HELLO attempts. Do not start M3 until M2 acceptance evidence exists. TDMA/bitmap/retry scheduling/ADR remain unimplemented.
+Next physical action: use the Iteration013 backed-up MCU-only procedure once a board is identified; complete procurement/instruments and actual M0 checks. ERR-021 and controlled replay/NVS fixture gates must be resolved before full M1/M2 closure; native/software evidence is already verified. Physical gates wait for the second MCU, antenna and assembly; then follow BENCH_RUNBOOK.md for M0/M1 and >=200 actual M2 HELLO attempts. Do not start M3 until M2 acceptance evidence exists. TDMA/bitmap/retry scheduling/ADR remain unimplemented.
 
 Final evidence-reader check: Windows default decoding failed on a UTF-8 build log; explicit UTF-8 succeeded (ERR-006 recurrence). Firmware/native PASS evidence is unchanged; no new firmware error.
 

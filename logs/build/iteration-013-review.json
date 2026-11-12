@@ -1,0 +1,187 @@
+{
+  "baseline": "9341e7c0016c66fd9316d489ccfca00a646ae2cb",
+  "branch": "iteration-013-bench-readiness",
+  "file_count": 40,
+  "files": [
+    {
+      "path": "CHANGELOG.md",
+      "responsibility": "Record readiness delivery and host-capture correction; firmware version unchanged"
+    },
+    {
+      "path": "README.md",
+      "responsibility": "Link physical-readiness entry point without acceptance claims"
+    },
+    {
+      "path": "README.zh-CN.md",
+      "responsibility": "Chinese physical-readiness entry point"
+    },
+    {
+      "path": "docs/en/BENCH_RUNBOOK.md",
+      "responsibility": "Reconcile existing runbook, add protected MCU-only/restore procedure and explicit pair gates"
+    },
+    {
+      "path": "docs/en/BUILD_MEMORY.md",
+      "responsibility": "Append actual audit/reproduction/build/test/tool/resource/publication chronology"
+    },
+    {
+      "path": "docs/en/DECISIONS.md",
+      "responsibility": "AppendADR-016 operational/capture evidence policy"
+    },
+    {
+      "path": "docs/en/DEPENDENCY_BUDGET_AUDIT.md",
+      "responsibility": "Append exact ERR-021 path, watchdog defaults, bounded options and acceptance hold"
+    },
+    {
+      "path": "docs/en/ERROR_LOG.md",
+      "responsibility": "Preserve ERR-022 reproduction/fix, ERR-023 source risk and physical holds"
+    },
+    {
+      "path": "docs/en/HARDWARE.md",
+      "responsibility": "Separate vendor pin-function evidence, proposed GPIOs and unverified physical connections"
+    },
+    {
+      "path": "docs/en/LOGGING_GUIDE.md",
+      "responsibility": "Capture schema/integrity, CSV identity association and explicit denominators"
+    },
+    {
+      "path": "docs/en/PHYSICAL_ACCEPTANCE_READINESS.md",
+      "responsibility": "Concise inventory/blockers/instruments/MCU/pair/capture/readiness entry point"
+    },
+    {
+      "path": "docs/en/PROGRESS.md",
+      "responsibility": "Refresh current software/procedure readiness and remaining physical gates"
+    },
+    {
+      "path": "docs/en/TEST_PLAN.md",
+      "responsibility": "Append013 checks and planned/unrun acceptance evidence"
+    },
+    {
+      "path": "docs/zh-CN/BENCH_RUNBOOK.md",
+      "responsibility": "Reconcile existing runbook, add protected MCU-only/restore procedure and explicit pair gates (Simplified Chinese)"
+    },
+    {
+      "path": "docs/zh-CN/DECISIONS.md",
+      "responsibility": "AppendADR-016 operational/capture evidence policy (Simplified Chinese)"
+    },
+    {
+      "path": "docs/zh-CN/DEPENDENCY_BUDGET_AUDIT.md",
+      "responsibility": "Append exact ERR-021 path, watchdog defaults, bounded options and acceptance hold (Simplified Chinese)"
+    },
+    {
+      "path": "docs/zh-CN/HARDWARE.md",
+      "responsibility": "Separate vendor pin-function evidence, proposed GPIOs and unverified physical connections (Simplified Chinese)"
+    },
+    {
+      "path": "docs/zh-CN/LOGGING_GUIDE.md",
+      "responsibility": "Capture schema/integrity, CSV identity association and explicit denominators (Simplified Chinese)"
+    },
+    {
+      "path": "docs/zh-CN/PHYSICAL_ACCEPTANCE_READINESS.md",
+      "responsibility": "Concise inventory/blockers/instruments/MCU/pair/capture/readiness entry point (Simplified Chinese)"
+    },
+    {
+      "path": "docs/zh-CN/PROGRESS.md",
+      "responsibility": "Refresh current software/procedure readiness and remaining physical gates (Simplified Chinese)"
+    },
+    {
+      "path": "docs/zh-CN/TEST_PLAN.md",
+      "responsibility": "Append013 checks and planned/unrun acceptance evidence (Simplified Chinese)"
+    },
+    {
+      "path": "logs/build/iteration-013-esp32-result.json",
+      "responsibility": "Retained command, source/hash, enumeration, scenario or validation evidence: iteration-013-esp32-result.json"
+    },
+    {
+      "path": "logs/build/iteration-013-esp32.log",
+      "responsibility": "Retained command, source/hash, enumeration, scenario or validation evidence: iteration-013-esp32.log"
+    },
+    {
+      "path": "logs/build/iteration-013-readiness-sources.json",
+      "responsibility": "Retained command, source/hash, enumeration, scenario or validation evidence: iteration-013-readiness-sources.json"
+    },
+    {
+      "path": "logs/build/iteration-013-review.json",
+      "responsibility": "Exact changed-file responsibilities and complete staged review receipt"
+    },
+    {
+      "path": "logs/build/iteration-013-source-manifest.sha256",
+      "responsibility": "Retained command, source/hash, enumeration, scenario or validation evidence: iteration-013-source-manifest.sha256"
+    },
+    {
+      "path": "logs/build/iteration-013-tool-help.log",
+      "responsibility": "Retained command, source/hash, enumeration, scenario or validation evidence: iteration-013-tool-help.log"
+    },
+    {
+      "path": "logs/build/iteration-013-toolchain.log",
+      "responsibility": "Retained command, source/hash, enumeration, scenario or validation evidence: iteration-013-toolchain.log"
+    },
+    {
+      "path": "logs/build/iteration-013-validation.json",
+      "responsibility": "Retained command, source/hash, enumeration, scenario or validation evidence: iteration-013-validation.json"
+    },
+    {
+      "path": "logs/test/RUN_RECORD_TEMPLATE.md",
+      "responsibility": "Current blank template: backup/reset/RF gates, metadata/cohort/denominator evidence, no measured values"
+    },
+    {
+      "path": "logs/test/iteration-013-capture-manifest.sha256",
+      "responsibility": "Retained command, source/hash, enumeration, scenario or validation evidence: iteration-013-capture-manifest.sha256"
+    },
+    {
+      "path": "logs/test/iteration-013-capture-reproduction.log",
+      "responsibility": "Retained command, source/hash, enumeration, scenario or validation evidence: iteration-013-capture-reproduction.log"
+    },
+    {
+      "path": "logs/test/iteration-013-capture-result.json",
+      "responsibility": "Retained command, source/hash, enumeration, scenario or validation evidence: iteration-013-capture-result.json"
+    },
+    {
+      "path": "logs/test/iteration-013-capture.log",
+      "responsibility": "Retained command, source/hash, enumeration, scenario or validation evidence: iteration-013-capture.log"
+    },
+    {
+      "path": "logs/test/iteration-013-native-result.json",
+      "responsibility": "Retained command, source/hash, enumeration, scenario or validation evidence: iteration-013-native-result.json"
+    },
+    {
+      "path": "logs/test/iteration-013-native.log",
+      "responsibility": "Retained command, source/hash, enumeration, scenario or validation evidence: iteration-013-native.log"
+    },
+    {
+      "path": "logs/test/iteration-013-port-enumeration.log",
+      "responsibility": "Retained command, source/hash, enumeration, scenario or validation evidence: iteration-013-port-enumeration.log"
+    },
+    {
+      "path": "logs/test/iteration-013-scenarios.md",
+      "responsibility": "Retained command, source/hash, enumeration, scenario or validation evidence: iteration-013-scenarios.md"
+    },
+    {
+      "path": "tools/capture_bench.py",
+      "responsibility": "Single/pair bounded raw capture, timestamp/offset/hash/fragment evidence, explicit interrupted/error state"
+    },
+    {
+      "path": "tools/test_capture_bench.py",
+      "responsibility": "13 concrete acceptance-requirement fake-port tests; no real port opens"
+    }
+  ],
+  "scope": "Readiness documentation plus justified host capture fix/tests only",
+  "firmware_native_inputs_byte_identical": 53,
+  "native_cases_unchanged": 290,
+  "capture_fake_port_cases": 13,
+  "compiled_firmware_binary_identical_to_012": true,
+  "main_lines_unchanged": 15,
+  "history": "Prior memory/error/decisions exact byte prefixes; older iteration evidence untouched. RUN_RECORD_TEMPLATE is a current blank template, not an executed historical record.",
+  "physical_validation": "NOT RUN / NOT VERIFIED",
+  "hardware_observation": "Only read-only port enumeration: no ports. No physical open/upload/erase/reset/RF.",
+  "capture_limits": "Timestamps are host observations; file hashes do not detect upstream loss; no automatic RF acceptance",
+  "security_scan": {
+    "tracked_staged_blobs": 379,
+    "identified_organization_privatepath_credentials_privateaddress_matches": 0,
+    "unexpected_binaries_pdf_assets_backups": 0
+  },
+  "staged_check": "git diff --cached --check exit0, no diagnostics",
+  "relative_document_links_verified": 48,
+  "bilingual_facts": "Current English/Chinese readiness/progress agree on290 native,13 capture, unchanged firmware and unrun hardware",
+  "full_diff": "All tool/test/document/evidence changes reviewed against required012; complete patch retained privately",
+  "log_policy": "New command output retained with disclosed local-path/EOL/trailing-display cleanup; original dumps private"
+}

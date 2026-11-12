@@ -70,3 +70,13 @@ SDK含SPI mutex/bus、USB默认RX queue/TX ring各256及锁/IRQ服务、NVS hand
 组装后用GPIO/逻辑分析记录SPI/BUSY/IRQ、TX/RX start/finish、poll/app/serial/save/stop/reset，含安全fault注入及USB host阻塞/断开；在页压力与受控断电/重启下测NVS，保留raw日志。重复包/配置/冷暖启动/错误恢复前后测free/min/largest heap和task高水位；另审查OOM及主熵源冲突。硬时限宣称前先处置上游BUSY与锁/返回状态限制。本轮不声明实物可靠性。
 
 RAM口径补充：linker报告DRAM82,992/321,296，包含instruction58,428 +data7,980 +bss16,584；PlatformIO24,564摘要只计data+bss。两种剩余数均不是实测可分配/minimum heap，须考虑IRAM/DRAM别名、SDK保留、启动分配和task栈，不能再次加dummy映射段。
+
+## Iteration013 ERR-021处置（仅源码，无实物复现）
+
+准确路径：Client HELLO/Gateway ACK -> RadioDriver.transmit -> Llcc68Hardware.startTransmit ->继承的PhysicalLayer.startTransmit -> SX126x.stageMode(TX) ->launchMode(TX) ->setTx(0)成功后另一BUSY loop。此后BUSY保持高可一直yield；更早的高BUSY可触发Module前/后timeout，但未包住后续loop。TX_DONE/DIO1、串口、deadline、stop均须等返回，现有driver不能自行恢复；切断MCU及radio电源仅为bench停止，不是已验证自动恢复。
+
+实际Arduino3.3.11默认loopTaskWDTEnabled=false，project不调用enableLoopWDT；IDF5.5.5 C3有TWDT init/panic5s，但无CHECK_IDLE_TASK_CPU0定义。yield->vPortYield不证明app进展/idle调度；IWDT300ms监视interrupt tick，不保证检测此事务。未证明默认watchdog会复位。主动订阅loop/user progress watchdog可能检测未feed，仍需实际配置/时钟/panic/debug验证；[官方指南](https://docs.espressif.com/projects/esp-idf/en/v5.5.5/esp32c3/api-reference/system/wdts.html)提示OpenOCD/JTAG影响watchdog。
+
+局部上游timeout/批准的backport是可审查方案，须给出可信ramp界限、返回/清理语义、继承芯片影响和固定依赖hash，再测正常/延迟/卡住BUSY。普通wrapper返回后计时/2s poll不能抢占；adapter override/direct command需保持staging/RF-switch/敏感度/私有状态，不能假定安全。watchdog reset不等同radio ERROR，也不证明radio/PA已停，可能丢日志/重建身份；需独立审查。013不补丁第三方、不改watchdog、不加推测恢复。
+
+ERR-021 OPEN，无人值守/卡BUSY恢复和硬时限验收BLOCKED；M0后仅可限流、天线/负载就绪、有随手断电能力的有人bench观察，不能据此关闭M1/M2故障验收。源码hash/config证据见iteration-013-readiness-sources.json；无物理stall/watchdog测试。

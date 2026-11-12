@@ -5,6 +5,12 @@ changes. It is not a substitute for the append-only build memory.
 
 ## Unreleased
 
+### M0-M2 physical acceptance readiness - 2026-11-13
+
+- Prepared backed-up MCU-only and gated two-device procedures, verified vendor pin-function documentation and recorded physical wiring/USB/RF uncertainties.
+- Fixed host capture interrupted-success behavior; added single-board mode, timestamp/offset/hash/fragment metadata and13 fake-port checks. Defined explicit CSV cohorts/denominators without changing firmware logs or protocol.
+- Documented ERR-021 watchdog/bounded-path options and SDK startup NVS formatting risk. Firmware/bin and290 native cases unchanged; required builds/tests pass. No physical test or hardware acceptance claim.
+
 ### Runtime reliability and dependency budgets — 2026-11-12
 
 - Fixed reproduced unbounded boot-ID rejection: eight-call bound, explicit unavailable identity, exhausted-session preservation, TX suppression and one-second observable recovery; no predictable fallback or NVS schema change.

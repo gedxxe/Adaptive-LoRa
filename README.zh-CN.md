@@ -68,3 +68,5 @@ pio test -e native
 保留时间顺序、失败尝试、错误修复、命令、版本及 compile/host/physical 的证据区别。历史公开副本只脱敏身份和路径，不改结果；旧 hash 标识原始工件，详见 [身份审查](docs/en/IDENTITY_AUDIT.md) 和 [日志说明](logs/README.md)。公开假设、受控条件和限制，不虚构容量、天线增益或实物验证。未经授权不分发论文全文。依赖外置，许可见 [THIRD_PARTY](THIRD_PARTY.md)；本次未选择项目统一再分发许可证。
 
 修改前阅读 [AGENTS.md](AGENTS.md)。英文为主文档，简体中文为第二语言。
+
+实物准备入口：[M0-M2 readiness](docs/zh-CN/PHYSICAL_ACCEPTANCE_READINESS.md)，含备份单MCU/pair门槛、采集/CSV和ERR-021/SDK启动限制。流程未执行；上传/改配置前先私有备份，证据用新目录。

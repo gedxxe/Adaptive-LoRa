@@ -1,0 +1,75 @@
+{
+  "date": "2026-11-13 (client date)",
+  "baseline": "9341e7c0016c66fd9316d489ccfca00a646ae2cb",
+  "hardware_sources": [
+    {
+      "url": "https://docs.ai-thinker.com/en/Ra-01SCH/index.html",
+      "role": "Official product page linking current specification"
+    },
+    {
+      "url": "https://aithinker-static.oss-cn-shenzhen.aliyuncs.com/docs/Public%20Document%20Center/LoRa/lora/Specification/Ra-01SCH_V1.1.0%20Specification-20221110.pdf",
+      "version": "V1.1.0, 2022-11-10",
+      "sha256": "c16fd1ca1f1e9f23dcc82cce8a3947cea9132446c92cd8f002f4d87c8efa6079",
+      "inspected": "Pin table p9, diagrams pp9-11 rendered; software/RF switch text p14; not physical unit evidence"
+    },
+    {
+      "url": "https://documentation.espressif.com/esp32-c3_datasheet_en.html",
+      "role": "SoC pin/USB/strap functions; not a Super Mini clone schematic"
+    },
+    {
+      "url": "https://docs.espressif.com/projects/esp-idf/en/v5.5.5/esp32c3/api-reference/system/wdts.html",
+      "role": "Installed-version watchdog semantics"
+    }
+  ],
+  "source_hashes": [
+    {
+      "path": "Arduino/cores/esp32/main.cpp",
+      "sha256": "3a80fad62e9a4243aeb67ed1215fac81f47ba4ddc707db57850ec8cab68f1291"
+    },
+    {
+      "path": "Arduino/cores/esp32/esp32-hal-misc.c",
+      "sha256": "0f6057685866ce45208f1d1e5b9e81164aca1d580678b7be8c97227dacc970d9"
+    },
+    {
+      "path": "C3/qio_qspi/sdkconfig.h",
+      "sha256": "47ada0fb05a1b993e92388254ebb163c95b19341e5e5a6b24cb8b74f0b689435"
+    },
+    {
+      "path": "RadioLib/hal/Arduino/ArduinoHal.cpp",
+      "sha256": "018c2555fd5f039e1b9159eded9c18bcdce19f72cadd6a929842d55d111160d1"
+    },
+    {
+      "path": "RadioLib/protocols/PhysicalLayer/PhysicalLayer.cpp",
+      "sha256": "8c3a02e66375c9a98fd49823b86fb195bb5753ed8d2fbe761401306ce78e9968"
+    },
+    {
+      "path": "RadioLib/modules/SX126x/SX126x.cpp",
+      "sha256": "b4b82318bd68b45bfb1832698a7f33f2a0a22b5f50e0d0fdbff1a9fd87033b87"
+    },
+    {
+      "path": "RadioLib/modules/LLCC68/LLCC68.h",
+      "sha256": "655e2a85a11feed69d96620e032ae877b70858b1073c965d6a9ea43198dd4626"
+    },
+    {
+      "path": "RadioLib/Module.cpp",
+      "sha256": "6899ee39319d95fe48289b3756ed00455501456d504425ab5ca7b561272ddc05"
+    },
+    {
+      "path": "platform/builder/main.py",
+      "sha256": "928874c2a345a4093d274b0159b399f3b14716d32bddc22073ed12657f5bf1ae"
+    }
+  ],
+  "watchdog_source_findings": {
+    "loopTaskWDTEnabled": false,
+    "project_enableLoopWDT_calls": 0,
+    "CONFIG_ESP_TASK_WDT_EN": 1,
+    "CONFIG_ESP_TASK_WDT_INIT": 1,
+    "CONFIG_ESP_TASK_WDT_PANIC": 1,
+    "CONFIG_ESP_TASK_WDT_TIMEOUT_S": 5,
+    "CONFIG_ESP_TASK_WDT_CHECK_IDLE_TASK_CPU0": "not defined in inspected C3 config",
+    "CONFIG_ESP_INT_WDT_TIMEOUT_MS": 300,
+    "recovery_guarantee": "NOT ESTABLISHED; no physical WDT/stall test"
+  },
+  "physical_connections": "NONE VERIFIED",
+  "serial_observation": "Read-only enumeration exit0/no ports found; no port opened"
+}

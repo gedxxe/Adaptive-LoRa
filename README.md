@@ -87,3 +87,5 @@ Preserve chronology, failed attempts, error resolutions, exact commands, package
 Use general application payloads; keep integrations outside protocol logic. Publish assumptions, controlled test conditions and limitations. Do not claim link capacity, antenna gain or hardware validation without evidence. Do not redistribute full research papers without permission. Third-party dependencies remain external; [THIRD_PARTY.md](THIRD_PARTY.md) records their licenses. No project-wide redistribution license has been selected in this task.
 
 Read [AGENTS.md](AGENTS.md) before changes. English is canonical; [简体中文](README.zh-CN.md) is the secondary documentation language.
+
+Physical preparation: [M0-M2 readiness](docs/en/PHYSICAL_ACCEPTANCE_READINESS.md) links backed-up MCU-only and pair gates, capture/CSV rules and remaining ERR-021/SDK-startup holds. No physical procedure has been executed; use a new evidence directory and preserve private backups before upload/config changes.

@@ -1,0 +1,245 @@
+esptool --help
+exit=0
+Warning: DEPRECATED: 'esptool.py' is deprecated. Please use 'esptool' instead. The '.py' suffix will be removed in a future major release.
+
+ Usage: esptool.py [OPTIONS] COMMAND [ARGS]...
+
+ esptool v5.3.0 - serial utility for flashing, provisioning, and interacting
+ with Espressif SoCs.
+
+┌─ Options ───────────────────────────────────────────────────────────────────┐
+│ --chip              -c  [auto|esp8266|esp32|esp3  Target chip type.         │
+│                         2s2|esp32s3|esp32c3|esp3                            │
+│                         2c2|esp32c6|esp32c61|esp                            │
+│                         32c5|esp32e22|esp32h2|es                            │
+│                         p32h21|esp32p4|esp32h4|e                            │
+│                         sp32s31]                                            │
+│ --port              -p  SERIAL-PORT               Serial port device.       │
+│ --baud              -b  BAUD-RATE                 Serial port baud rate     │
+│                                                   used when                 │
+│                                                   flashing/reading.         │
+│ --port-filter           [TEXT]                    Serial port device        │
+│                                                   filter, can be            │
+│                                                   vid=NUMBER, pid=NUMBER,   │
+│                                                   name=SUBSTRING,           │
+│                                                   serial=SUBSTRING.         │
+│ --before                [default-reset|usb-reset  Which reset to perform    │
+│                         |no-reset|no-reset-no-sy  before connecting to the  │
+│                         nc]                       chip.                     │
+│ --after             -a  [hard-reset|soft-reset|n  Which reset to perform    │
+│                         o-reset|no-reset-stub|wa  after operation is        │
+│                         tchdog-reset]             finished.                 │
+│ --no-stub                                         Disable launching the     │
+│                                                   flasher stub, only talk   │
+│                                                   to ROM bootloader. Some   │
+│                                                   features will not be      │
+│                                                   available.                │
+│ --trace             -t                            Enable trace-level output │
+│                                                   of esptool interactions.  │
+│ --verbose           -v                            Print all output, disable │
+│                                                   collapsing output stages. │
+│ --silent            -s                            Silence all output except │
+│                                                   for errors.               │
+│ --override-vddsdio      [1.8V|1.9V|OFF]           Override ESP32 VDDSDIO    │
+│                                                   internal voltage          │
+│                                                   regulator (use with       │
+│                                                   care).                    │
+│ --connect-attempts      INTEGER                   Number of attempts to     │
+│                                                   connect, negative or 0    │
+│                                                   for infinite. Default: 7. │
+│ --help              -h                            Show this message and     │
+│                                                   exit.                     │
+└─────────────────────────────────────────────────────────────────────────────┘
+┌─ Basic commands ────────────────────────────────────────────────────────────┐
+│ write-flash         Write a binary blob to flash. The address is followed   │
+│                     by binary filename, separated by space.                 │
+│ read-flash          Read SPI flash memory content.                          │
+│ erase-flash         Erase the SPI flash memory.                             │
+│ erase-region        Erase a region of the SPI flash memory.                 │
+│ read-mac            Print the device MAC address.                           │
+│ flash-id            Print the SPI flash memory manufacturer and device ID.  │
+│ elf2image           Create an application image from ELF file               │
+│ image-info          Print information about a firmware image (bootloader or │
+│                     application).                                           │
+│ merge-bin           Merge multiple raw binary files into a single flashable │
+│                     file.                                                   │
+│ version             Print esptool version.                                  │
+└─────────────────────────────────────────────────────────────────────────────┘
+┌─ Advanced commands ─────────────────────────────────────────────────────────┐
+│ verify-flash        Verify a binary blob against the flash memory content.  │
+│ load-ram            Download an image to RAM and execute.                   │
+│ dump-mem            Dump arbitrary memory to a file.                        │
+│ read-mem            Read arbitrary memory location.                         │
+│ write-mem           Modify or write to arbitrary memory location.           │
+│ read-flash-status   Read SPI flash memory status register.                  │
+│ write-flash-status  Write SPI flash memory status register.                 │
+│ read-flash-sfdp     Read SPI flash SFDP (Serial Flash Discoverable          │
+│                     Parameters).                                            │
+│ get-security-info   Print security information report.                      │
+│ chip-id             Print the device chip ID.                               │
+│ run                 Run application code loaded in flash.                   │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+esptool read-flash --help
+exit=0
+Warning: DEPRECATED: 'esptool.py' is deprecated. Please use 'esptool' instead. The '.py' suffix will be removed in a future major release.
+esptool v5.3.0
+
+ Usage: esptool.py read-flash [OPTIONS] ADDRESS SIZE OUTPUT
+
+ Read SPI flash memory content.
+
+┌─ Flash options ─────────────────────────────────────────────────────────────┐
+│ --flash-size      -fs  [detect|keep|256KB|512KB|  SPI flash memory size.    │
+│                        1MB|2MB|2MB-c1|4MB|4MB-c1  ESP8266-only sizes:       │
+│                        |8MB|16MB|32MB|64MB|128MB  256KB, 512KB, 2MB-c1,     │
+│                        ]                          4MB-c1.                   │
+│ --spi-connection  -sc  SPI-CONNECTION             Override default SPI      │
+│                                                   flash memory connection.  │
+│                                                   Value can be SPI, HSPI or │
+│                                                   a comma-separated list of │
+│                                                   5 I/O numbers to use for  │
+│                                                   SPI flash                 │
+│                                                   (CLK,Q,D,HD,CS). Not      │
+│                                                   supported with ESP8266.   │
+└─────────────────────────────────────────────────────────────────────────────┘
+┌─ Arguments ─────────────────────────────────────────────────────────────────┐
+│ *  ADDRESS  INTEGER  [required]                                             │
+│ *  SIZE     INTEGER  [required]                                             │
+│ *  OUTPUT   PATH     [required]                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+┌─ Options ───────────────────────────────────────────────────────────────────┐
+│ --no-progress  -p  Suppress progress output.                                │
+│ --help         -h  Show this message and exit.                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+esptool write-flash --help
+exit=0
+Warning: DEPRECATED: 'esptool.py' is deprecated. Please use 'esptool' instead. The '.py' suffix will be removed in a future major release.
+esptool v5.3.0
+
+ Usage: esptool.py write-flash [OPTIONS] <address> <filename>...
+
+ Write a binary blob to flash. The address is followed by binary filename,
+ separated by space.
+
+┌─ Flash options ─────────────────────────────────────────────────────────────┐
+│ --flash-freq      -ff  [keep|80m|60m|48m|40m|30m  SPI flash memory          │
+│                        |26m|24m|20m|16m|15m|12m]  frequency.                │
+│ --flash-mode      -fm  [keep|qio|qout|dio|dout]   SPI flash memory mode.    │
+│ --flash-size      -fs  [detect|keep|256KB|512KB|  SPI flash memory size.    │
+│                        1MB|2MB|2MB-c1|4MB|4MB-c1  ESP8266-only sizes:       │
+│                        |8MB|16MB|32MB|64MB|128MB  256KB, 512KB, 2MB-c1,     │
+│                        ]                          4MB-c1.                   │
+│ --spi-connection  -sc  SPI-CONNECTION             Override default SPI      │
+│                                                   flash memory connection.  │
+│                                                   Value can be SPI, HSPI or │
+│                                                   a comma-separated list of │
+│                                                   5 I/O numbers to use for  │
+│                                                   SPI flash                 │
+│                                                   (CLK,Q,D,HD,CS). Not      │
+│                                                   supported with ESP8266.   │
+└─────────────────────────────────────────────────────────────────────────────┘
+┌─ Arguments ─────────────────────────────────────────────────────────────────┐
+│ *  ADDR-FILENAME  <address> <filename>...  [required]                       │
+└─────────────────────────────────────────────────────────────────────────────┘
+┌─ Options ───────────────────────────────────────────────────────────────────┐
+│ --erase-all              -e                         Erase all regions of    │
+│                                                     flash (not just write   │
+│                                                     areas) before           │
+│                                                     programming.            │
+│ --no-progress            -p                         Suppress progress       │
+│                                                     output.                 │
+│ --encrypt                                           Apply flash encryption  │
+│                                                     when writing data       │
+│                                                     (required correct eFuse │
+│                                                     settings).              │
+│ --encrypt-files              [<address>             Files to be encrypted   │
+│                              <filename>]            during flashing. The    │
+│                                                     address is followed by  │
+│                                                     binary filename,        │
+│                                                     separated by space.     │
+│ --ignore-flash-enc-efu…                             Ignore flash encryption │
+│                                                     eFuse settings.         │
+│ --diff-with                  [<filename(s)> or      Previously flashed      │
+│                              'skip']                file(s) to compare the  │
+│                                                     to-be-flashed files     │
+│                                                     with for fast           │
+│                                                     reflashing. Use 'skip'  │
+│                                                     to skip comparison for  │
+│                                                     a specific file. This   │
+│                                                     list is zipped          │
+│                                                     sequentially with the   │
+│                                                     files being flashed.    │
+│ --trust-flash-content                               Skip post-flash         │
+│                                                     verification of         │
+│                                                     unchanged files when    │
+│                                                     using --diff-with to    │
+│                                                     save time. Only         │
+│                                                     unchanged files are     │
+│                                                     skipped without an MD5  │
+│                                                     check, written data is  │
+│                                                     still verified after    │
+│                                                     write and the whole     │
+│                                                     file is reflashed if    │
+│                                                     verification fails.     │
+│                                                     Requires --diff-with.   │
+│                                                     Use only when flash has │
+│                                                     not been modified since │
+│                                                     the last flash (e.g. no │
+│                                                     other tool, app, or     │
+│                                                     manual change touched   │
+│                                                     the data in flash).     │
+│                                                     NOTE: This argument is  │
+│                                                     mutually exclusive with │
+│                                                     arguments:              │
+│                                                     --skip-flashed.         │
+│ --skip-flashed           -s                         Skip flashing if the    │
+│                                                     new binary is already   │
+│                                                     in flash. Performs MD5  │
+│                                                     checks to verify the    │
+│                                                     flash content matches   │
+│                                                     the new binary. Only    │
+│                                                     for use when no         │
+│                                                     --diff-with files are   │
+│                                                     specified (mutually     │
+│                                                     exclusive). NOTE: This  │
+│                                                     argument is mutually    │
+│                                                     exclusive with          │
+│                                                     arguments: --diff-with, │
+│                                                     --trust-flash-content.  │
+│ --force                                             Force write, skip       │
+│                                                     security and            │
+│                                                     compatibility checks.   │
+│                                                     Use with caution!       │
+│ --compress               -z                         Compress data during    │
+│                                                     transfer (default       │
+│                                                     unless --no-stub is     │
+│                                                     specified). NOTE: This  │
+│                                                     argument is mutually    │
+│                                                     exclusive with          │
+│                                                     arguments:              │
+│                                                     --no-compress.          │
+│ --no-compress            -u                         Disable data            │
+│                                                     compression during      │
+│                                                     transfer (default if    │
+│                                                     --no-stub is specified) │
+│                                                     NOTE: This argument is  │
+│                                                     mutually exclusive with │
+│                                                     arguments: --compress.  │
+│ --help                   -h                         Show this message and   │
+│                                                     exit.                   │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+gen_esp32part.py .pio/build/esp32c3_supermini/partitions.bin
+exit=0
+# ESP-IDF Partition Table
+# Name, Type, SubType, Offset, Size, Flags
+nvs,data,nvs,0x9000,20K,
+otadata,data,ota,0xe000,8K,
+app0,app,ota_0,0x10000,1280K,
+app1,app,ota_1,0x150000,1280K,
+spiffs,data,spiffs,0x290000,1408K,
+coredump,data,coredump,0x3f0000,64K,
+Parsing binary partition input...
+Verifying table...

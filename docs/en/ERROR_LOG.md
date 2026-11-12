@@ -291,3 +291,27 @@ OPEN — SOURCE-IDENTIFIED RISK, NOT PHYSICALLY REPRODUCED. RadioLib7.8.1 Physic
 ### ERR-008/009/010 dependency clarification — Iteration012
 
 Still OPEN. Installed IDF5.5.5 nvs_commit is no-op after validation; set_blob does flash work under NVS locks. HWCDC available/write mutex default100ms, connected write consecutive-failure cap20; no measured end-to-end guarantee. RadioLib repeated two-buffer new[] scratch per command, no local recoverable allocation failure handling; STATIC_ONLY moves536 bytes to automatic buffers and leaves other SDK/HAL allocations, so unchanged. Static size is not peak heap/stack. See audit for exact sources, call sites and measurement plan. ERR-005 USB physical warning remains.
+
+## ERR-022 - Capture interruption reported as successful completion
+
+REPRODUCED, correction pending, Iteration013. Exact012 tools/capture_bench.py executed with fake serial objects and an injected KeyboardInterrupt: exit0, errors=[], no interruption marker, no chunk timestamp files. No physical port opened. Evidence logs/test/iteration-013-capture-reproduction.log. Root cause: interrupt except branch passes without recording incomplete state. Missing timestamp/offset and final-fragment evidence also prevents reliable CSV extraction; bounded4096-byte raw streaming itself is preserved.
+
+### Iteration013 source-access/tool observations
+
+Legacy vendor PDF URLs returned HTML/failed fetch; current official product-page download succeeds (hash/pages in readiness record). No hardware verification inferred. Installed esptool5.3 wrapper help emits a deprecation notice for esptool.py; supported syntax used for offline help only, no flash command executed. Read-only port enumeration exit0/no ports found. Physical dependencies remain unverified.
+
+### ERR-022 verification - Iteration013
+
+CLOSED - VERIFIED for host capture behavior.13/13 focused fake-port tests exit0 (logs/test/iteration-013-capture.log). Ctrl-C now records INTERRUPTED/exit130; IO/short-write/unjoined/finalization errors cannot report COMPLETE, hard termination retains initialRUNNING. Byte/hash/offset/time/tail evidence and single-board mode added for actual acceptance requirements. No real port opened, no firmware/native change; all290 native and ESP32 reruns exit0. Raw capture can still lose bytes before host read; final status/backpressure/reset/fragment review remains mandatory, not an automatic RF PASS.
+
+## ERR-023 - SDK startup can format NVS before Runtime
+
+OPEN - SOURCE-IDENTIFIED PRESERVATION RISK, NOT PHYSICALLY EXERCISED. Installed Arduino3.3.11 initArduino (esp32-hal-misc.c331-337) calls nvs_flash_init before FirmwareRuntime and erases the NVS partition/retries on NO_FREE_PAGES or NEW_VERSION_FOUND. Store-level native tests do not execute this SDK startup. A non-overlapping upload alone cannot promise retention across first application boot. Disposition in013 is mandatory private full-flash/NVS backup and verified recovery before that boot; secure/encrypted/incompatible layouts halt the plaintext procedure. No SDK/firmware patch and no erasure performed. Physical corruption/SDK-formatting/power-loss/restore evidence remains NOT RUN; see BENCH_RUNBOOK single-board branch.
+
+### ERR-021 / hardware acceptance hold - Iteration013
+
+Still OPEN; exact path/conditions/watchdog/defaults/options documented in DEPENDENCY_BUDGET_AUDIT.md. No source risk is reclassified as a physical failure. Unattended/stuck-BUSY recovery acceptance held; normal attended observations cannot close it. All board/revision/continuity/USB/supply/oscillator/antenna/regulatory and controlled RF/NVS fixture gates remain unverified. Incremental013 build emits no warning, but ERR-005 and other dependency/physical limits are not closed.
+
+## ERR-024 - Publication auto-review did not recognize attached authorization
+
+Iteration013, environment/approval, status RETRY PENDING after evidence check. Combined preflight/commit/push request was rejected before CreateProcess; no command/commit/push executed. Review reason: no current user publication authorization recognized, citing the conditional no-commit rule. Read-only recheck of the current user attachment Stage8 explicitly confirms "After successful validation, commit and automatically push" to the authorized Adaptive-LoRa remote and the recommended docs commit. HEAD remains9341e7c0016c66fd9316d489ccfca00a646ae2cb on013, reviewed work preserved. A narrower explicit publication request will include that evidence; no force/merge/PR or indirect bypass is authorized.

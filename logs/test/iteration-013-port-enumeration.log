@@ -1,0 +1,4 @@
+Read-only enumeration; no serial port opened
+command: <PIO_PYTHON> -m serial.tools.list_ports -v
+exit=0
+no ports found

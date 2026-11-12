@@ -1,6 +1,14 @@
 # 开发进度
 
-## Iteration012软件验证PASS，实施已发布
+## Iteration013准备包验证通过，待发布
+
+2026-11-13 client date，直接基线9341e7c0016c66fd9316d489ccfca00a646ae2cb，分支iteration-013-bench-readiness，不基于main5bc607c。ESP32退出0 PASS13.053s，native退出0 **290/290 PASS**61.980s，所有旧cases/source不变；capture另有13/13 fake-port通过，不并入native/RF数。firmware/bin/native tests/pins/PHY/watchdog/库不改，RAM24,564/flash364,308，main15行。完整diff/安全/历史/发布检查待完成。
+
+PHYSICAL_ACCEPTANCE_READINESS.md串联备份单MCU、pair gates/仪器、ERR-021和采集/CSV。官方V1.1.0 module pin功能已核对；GPIO提案/手中板/continuity仍未验证。只读枚举无port，未开口/烧录/擦除/复位/RF。ERR-022中断false-success已修；ERR-023是SDK app前可能格式化NVS源码风险，backup须先于boot。ERR-021阻挡无人值守/卡BUSY恢复，不能假定默认watchdog reset；replay/错身份/corrupt-NVS fixture未提供/执行。
+
+M0/M1/M2实物IN PROGRESS/NOT RUN，M3–M8 NOT STARTED。下一步识别连接板、授权且backup verified后按单MCU流程，采购第二MCU/天线或负载/仪器，核实布线/供电/USB/合法RF，完成fixture和恢复处置再关闭pair gates；不继续推测性抽象/tests。
+
+## 历史Iteration012软件验证PASS，实施已发布
 
 直接基线8fa0a473b6cc0905ddff53e4b9a5f22806e058e2，分支iteration-012-runtime-reliability，不基于main5bc607cd1a86e5d86ff0fc95ba7a3cd31159b861。native退出0 **290/290 PASS**，77.575s（旧266不变+新24）；ESP32退出0 PASS31.748s。ERR-019以8次/0失败/保持旧session/1s恢复/禁TX修正；ERR-020刷新poll后app、stop后100ms、drain后reset。保留RED9FAIL/1PASS及修正10/10证据；ERR-018工具修正保留。完整暂存审查通过；实施 `bdab1cec5de6e38f84b524a8189945dec1ee7dd2` commit/push及独立remote012核实均退出0，main/011不变。回执 `logs/build/iteration-012-publication-receipt.json` 记录已验证实施，后续仅文档提交保存回执，无merge/PR/tag。
 
@@ -99,7 +107,7 @@ Iteration 008 暂存安全检查初次把 HTTPS 链接误判为本地路径（ER
 
 Iteration 009 保留性：driver 仅改硬件转发/常量，状态/deadline/错误优先级不变，34 个保护文件逐字节不变；Runtime 先构造唯一 Llcc68Hardware 再构造引用注入 driver，main.cpp 仍 15 行。新 seam 无显式堆分配。RAM 24,532 / 327,680、flash 363,730 / 1,310,720 bytes。真实 adapter/SPI/BUSY/ISR 竞态、Runtime/随机源/NVS/USB/RF 不属于 native 证据，M0–M2 整体 IN PROGRESS、M3–M8 NOT STARTED。
 
-下一软件任务建议根据012源码清单另行审查有界上游TX BUSY-launch及SDK分配失败；runtime协调和已复现活性/陈旧时间修正已通过，依赖时延/峰值内存仍需实测。实物工作等待第二 MCU、天线与组装。
+下一动作是013备份单MCU流程、采购/仪器及真实M0核对；ERR-021和replay/NVS fixture须在完整M1/M2验收前解决，已有software/native证据不代替实物。实物工作等待第二 MCU、天线与组装。
 
 Iteration 009 审查：PlatformIO 日志显示尾空格/末尾空行使暂存检查退出 2（ERR-015）。仅规范化本轮公开日志的 EOL/显示空白，私有原输出保留，源码/编译/测试结果不变；修正后暂存检查退出 0，ERR-015 已验证关闭。
 
