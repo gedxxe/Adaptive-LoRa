@@ -1,0 +1,86 @@
+# Exact changed-file inventory
+
+Modified existing files:
+M CHANGELOG.md
+M README.md
+M README.zh-CN.md
+M VERSION
+M docs/en/ARCHITECTURE.md
+M docs/en/BUILD_MEMORY.md
+M docs/en/DECISIONS.md
+M docs/en/ERROR_LOG.md
+M docs/en/HARDWARE.md
+M docs/en/LOGGING_GUIDE.md
+M docs/en/PROGRESS.md
+M docs/en/PROTOCOL.md
+M docs/en/TEST_PLAN.md
+M docs/zh-CN/ARCHITECTURE.md
+M docs/zh-CN/HARDWARE.md
+M docs/zh-CN/PROGRESS.md
+M docs/zh-CN/PROTOCOL.md
+M docs/zh-CN/TEST_PLAN.md
+M platformio.ini
+
+Created source/docs/tools/template files:
+A .gitignore
+A docs/en/BENCH_RUNBOOK.md
+A docs/en/IMPLEMENTATION_REPORT.md
+A docs/zh-CN/BENCH_RUNBOOK.md
+A docs/zh-CN/DECISIONS.md
+A docs/zh-CN/LOGGING_GUIDE.md
+A include/board_pins.h
+A include/project_config.h
+A include/radio_config.h
+A logs/test/RUN_RECORD_TEMPLATE.md
+A src/app/firmware_runtime.cpp
+A src/app/firmware_runtime.h
+A src/app/nvs_config_store.cpp
+A src/app/nvs_config_store.h
+A src/app/provisioning_console.cpp
+A src/app/provisioning_console.h
+A src/client/client_app.cpp
+A src/client/client_app.h
+A src/common/config/device_config.cpp
+A src/common/config/device_config.h
+A src/common/diagnostics/serial_logger.cpp
+A src/common/diagnostics/serial_logger.h
+A src/common/protocol/frame_codec.cpp
+A src/common/protocol/frame_codec.h
+A src/common/protocol/message_types.h
+A src/common/protocol/sequence_tracker.cpp
+A src/common/protocol/sequence_tracker.h
+A src/common/radio/radio_driver.cpp
+A src/common/radio/radio_driver.h
+A src/gateway/gateway_app.cpp
+A src/gateway/gateway_app.h
+A src/main.cpp
+A test/test_frame_codec/test_main.cpp
+A test/test_provisioning_console/test_main.cpp
+A test/test_role_config/test_main.cpp
+A test/test_sequence_tracker/test_main.cpp
+A tools/capture_bench.py
+
+Created evidence logs/manifests:
+A logs/build/iteration-001-dependencies-retry.log
+A logs/build/iteration-001-dependencies.log
+A logs/build/iteration-001-esp32.log
+A logs/build/iteration-004-compiler-retry.log
+A logs/build/iteration-004-compiler.log
+A logs/build/iteration-004-esp32.log
+A logs/build/iteration-004-packages-final.log
+A logs/build/iteration-004-packages-utf8.json
+A logs/build/iteration-004-packages.log
+A logs/build/iteration-004-source-manifest.sha256
+A logs/build/iteration-004-static-review.log
+A logs/build/iteration-005-esp32.log
+A logs/build/iteration-005-file-inventory.txt
+A logs/build/iteration-005-source-manifest.sha256
+A logs/build/iteration-005-static-review.log
+A logs/test/iteration-001-native.log
+A logs/test/iteration-002-native.log
+A logs/test/iteration-003-native.log
+A logs/test/iteration-004-capture-help.log
+A logs/test/iteration-004-capture-syntax.log
+A logs/test/iteration-004-host-compiler.log
+A logs/test/iteration-004-serial-ports.log
+A logs/test/iteration-005-native.log

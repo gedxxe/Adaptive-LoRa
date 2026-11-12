@@ -1,0 +1,19 @@
+6 ports found
+COM3
+    desc: Standard Serial over Bluetooth link (COM3)
+    hwid: <DEVICE_ID_REDACTED>
+COM4
+    desc: Standard Serial over Bluetooth link (COM4)
+    hwid: <DEVICE_ID_REDACTED>
+COM5
+    desc: Standard Serial over Bluetooth link (COM5)
+    hwid: <DEVICE_ID_REDACTED>
+COM6
+    desc: Standard Serial over Bluetooth link (COM6)
+    hwid: <DEVICE_ID_REDACTED>
+COM7
+    desc: Standard Serial over Bluetooth link (COM7)
+    hwid: <DEVICE_ID_REDACTED>
+COM9
+    desc: Standard Serial over Bluetooth link (COM9)
+    hwid: <DEVICE_ID_REDACTED>

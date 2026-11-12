@@ -1,0 +1,68 @@
+# 开发进度
+
+当前结果（iteration 007）：ESP32 编译退出码 0，native **92/92 PASS**（实际生产状态机 38、codec 18、role/config 13、console 10、sequence/timing 7、logger 6）。首轮旧 MinGW PRI 宏问题（ERR-011）已通过 `<cinttypes>` 修复。实际库存两个模块/一个 MCU；第二个 MCU 尚未购买、Moxon 尚未制作，未组装双设备。Host 场景不是实物 NVS/RF 验证；没有完整 milestone PASS。历史记录保留。
+
+状态：`NOT STARTED`、`IN PROGRESS`、`BLOCKED`、`PASS`。只有记录验收标准和证据后才能标记为
+PASS。
+
+## 当前基线
+
+| 项目              | 当前值                                         |
+|-------------------|------------------------------------------------|
+| 固件架构          | 一份固件，启动时从 NVS 读取角色                |
+| MCU 库存          | 1 个 ESP32-C3 Super Mini；第二个尚未购买，未组装双设备 |
+| 无线模块库存      | 2 个 RA-01SCH/LLCC68；Moxon 尚未制作 |
+| RadioLib          | 7.8.1                                          |
+| 频率              | 915.0 MHz，临时测试值                          |
+| 初始数据 PHY      | SF7 / BW125 / CR4/5                            |
+| 控制 PHY          | SF9 / BW125 / CR4/5                            |
+| 初始 TX 功率      | 10 dBm                                         |
+| Network ID        | 1                                              |
+| Gateway ID        | 1                                              |
+| Client ID         | 2                                              |
+| Firmware baseline | 0.2.0-alpha.1 实现候选                         |
+| Protocol version  | 1                                              |
+
+## Milestone 状态
+
+| ID  | Milestone                          | 状态        | 证据                   |
+|-----|------------------------------------|-------------|------------------------|
+| M0  | 硬件、引脚、电源、天线和工具链确认 | IN PROGRESS | 工具链已记录；实物检查待完成 |
+| M1  | 两台设备 LLCC68 初始化             | IN PROGRESS | 固件编译通过；NVS/无线实测待完成 |
+| M2  | 固定 PHY HELLO/ACK                 | IN PROGRESS | 92 个 native 测试通过，含生产状态机；RF 待完成 |
+| M3  | Beacon 和单客户端 TDMA             | NOT STARTED | 等待 M2                |
+| M4  | ACK Bitmap 和选择性重传            | NOT STARTED | 等待 M3                |
+| M5  | SF7/SF8/SF9 ADR                    | NOT STARTED | 等待 M4                |
+| M6  | 同步恢复和重新加入                 | NOT STARTED | 尚未开始               |
+| M7  | Moxon 射频对比                     | NOT STARTED | 尚无受控测试数据       |
+| M8  | 5–70 个逻辑节点仿真                | NOT STARTED | 尚无仿真记录           |
+
+## 待确认事项
+
+- [ ] ESP32-C3 Super Mini 实际版本和 Flash 容量。
+- [ ] Ra-01SCH 模块标记和引脚方向。
+- [ ] GPIO 连通性。
+- [ ] 无线模块 3.3 V 电源及发射时电压。
+- [ ] 天线接口和 50 欧姆馈线。
+- [ ] 当地频率、信道和功率要求。
+- [x] 实际工具链版本：Core 6.1.19，已安装 pioarduino/espressif32 55.03.311，Arduino-ESP32 3.3.11，RISC-V GCC 14.2.0 (esp-14.2.0_20260121)，RadioLib 7.8.1；host GCC 6.3.0 / native 1.2.1 / Unity 2.6.1。
+
+候选固件通过编译及 92 个 native 测试，版本仍为 0.2.0-alpha.1 / 协议 1。实际 app 状态语句未改，只改 transport 构造参数及 C++ include；main.cpp 仍 15 行。同步 NVS/BUSY、库临时分配、SDK 串口等待、IRQ/随机源假设仍未验证。硬件采购/制作/组装完成前继续软件工作，不执行实物流程，不进入 M3。详细结果及所有 case 见 SOFTWARE_AUDIT.md 与 `logs/test/iteration-007-scenarios.md`。
+
+## 2026-11-12 实现检查点（ITERATION-001）
+
+已添加 `0.2.0-alpha.1` 候选源码，协议仍为 1。M0/M1/M2 均为 IN PROGRESS，尚未通过实物验收。Native 测试因缺少标准库 include 编译失败（ERR-002）；ESP32 SDK 安装/编译仍在进行。没有执行烧录、NVS 实物测试或射频测试。
+
+NVS 使用带完整性校验的 24 字节单 blob；配置编辑只影响暂存值，保存后重启生效。新增 `config set hello-interval-ms <1000..3600000>`，默认事务结束后等待 5000 ms 再发新 HELLO。角色命令不自动修改 ID；按 README 明确设置全部 ID。Network ID 可为 65535，节点地址 65535 保留。
+
+固定数据 PHY SF7、私有 sync word 0x12；XTAL、LDO、USB CDC 和全部引脚仍需实物确认。去重缓存保留 8 个 session，每个 64 个 sequence；旧 session 淘汰和 Gateway 重启后不保留历史。状态日志报告队列丢弃计数，不能将驱动类型视为独立芯片识别。
+
+ITERATION-002：显式 include 已修复，4 个 native suite 均已编译运行；44 个测试中 43 个通过、1 个失败。失败原因是 Unity 不允许对长度为 0 的数组执行内容比较（ERR-003），将修正该测试。ESP32 SDK 安装/编译仍在进行。未执行实物测试。
+
+ITERATION-003：44/44 native 测试通过，退出码 0。第一次 ESP32 编译在并发头文件修改期间遇到 GatewayApp 缺少直接 include（ERR-004）；当前已补充直接 include，等待源码冻结后的编译验证。USB CDC 的睡眠相关依赖警告保留（ERR-005），本固件不请求 MCU 睡眠。发射失败与 ACK 超时分别计数；DIO1 卡高时仍受 TX 截止时间限制。未执行实物测试，M0/M1/M2 尚未 PASS。
+
+ITERATION-004：冻结源码 ESP32 编译成功，退出码 0（`logs/build/iteration-004-esp32.log`），ERR-004 已验证关闭。仅剩 USB CDC 实物检查和全部硬件/RF 验收未完成。包列表编码/命令选项及沙箱内 compiler 探测失败记录在 ERR-006，已用 UTF-8 普通包列表/沙箱外 compiler 输出解决。只枚举到蓝牙串口，未识别 ESP32；未执行烧录或实物测量。
+
+最终源码审查还发现 ERR-007：HEADER_ERR 必须结合 HEADER_VALID 判断，避免比 RadioLib 更严格的误拒绝；当前修正待 iteration-005 编译验证。这是静态审查发现，未声称观测到 RF 失败率。
+
+ITERATION-005 最终结果：HEADER_ERR 条件已与固定版本 RadioLib 对齐；固件编译退出码 0（`logs/build/iteration-005-esp32.log`），native 44/44 通过、退出码 0（`logs/test/iteration-005-native.log`）。源码缺陷 ERR-007 已经静态/编译验证关闭；实物 IRQ 行为仍未测试。最终文件清单、每个 cpp 职责、SHA-256 和 M3–M8 计划见英文 IMPLEMENTATION_REPORT.md；最终源码 hash 清单为 `logs/build/iteration-005-source-manifest.sha256`。USB CDC 与全部实物门槛仍待验证，M0/M1/M2 保持 IN PROGRESS。

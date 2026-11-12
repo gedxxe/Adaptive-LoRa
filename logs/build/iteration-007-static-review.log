@@ -1,0 +1,7 @@
+Production app statement bodies unchanged; only transport constructor types and C++ format-header includes differ
+main.cpp unchanged, 15 lines; driver/runtime/codec/config/NVS/tracker implementations unchanged
+One LLCC68 owner; app/logger/transport headers have no Arduino or RadioLib include
+Version 0.2.0-alpha.1 / protocol 1 / PHY / pins unchanged
+Firmware SHA256: 1eb8c7fafeb36e87035095a9c357a9f024e8164c88e43a88274831c9618a34da
+Final source manifest: logs/build/iteration-007-source-manifest.sha256
+Executed source test cases: {"test_app_integration": 38, "test_frame_codec": 18, "test_provisioning_console": 10, "test_role_config": 13, "test_sequence_tracker": 7, "test_serial_logger": 6}

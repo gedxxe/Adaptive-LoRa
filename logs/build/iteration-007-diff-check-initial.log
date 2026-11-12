@@ -1,0 +1,5 @@
+exit_code=3
+iteration-007-review-snapshot/docs/en/IMPLEMENTATION_REPORT.md:3: trailing whitespace.
++Historical iteration-005 baseline. Later behavior-preserving software verification, corrected inventory, current evidence and diffs are recorded in SOFTWARE_AUDIT.md and iterations 006–007; the earlier counts/hashes below are preserved as historical results.
+iteration-007-review-snapshot/docs/en/IMPLEMENTATION_REPORT.md:4: trailing whitespace.
++

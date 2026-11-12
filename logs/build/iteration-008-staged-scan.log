@@ -1,0 +1,2 @@
+Initial staged scanner: exit 1. Assertion reported workstation-path findings in 14 files. Inspection showed only public HTTPS URL matches. Corrected boundary scan follows in staged-review.json. No firmware change.
+Documentation lookup: two missing Chinese canonical-record counterpart reads failed; inventory verified actual filenames; no existing file removed.

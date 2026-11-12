@@ -1,0 +1,64 @@
+Resolving esp32c3_supermini dependencies...
+Warning: No internet connection detected, Python dependency check will be skipped.
+Platform espressif32 @ 55.3.311 (required: espressif32)
+UnicodeEncodeError: Traceback (most recent call last):
+  File "<PLATFORMIO_HOME>\penv\Lib\site-packages\platformio\__main__.py", line 103, in main
+    cli()  # pylint: disable=no-value-for-parameter
+    ^^^^^
+  File "<PLATFORMIO_HOME>\penv\Lib\site-packages\click\core.py", line 1514, in __call__
+    return self.main(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<PLATFORMIO_HOME>\penv\Lib\site-packages\click\core.py", line 1435, in main
+    rv = self.invoke(ctx)
+         ^^^^^^^^^^^^^^^^
+  File "<PLATFORMIO_HOME>\penv\Lib\site-packages\platformio\cli.py", line 85, in invoke
+    return super().invoke(ctx)
+           ^^^^^^^^^^^^^^^^^^^
+  File "<PLATFORMIO_HOME>\penv\Lib\site-packages\click\core.py", line 1902, in invoke
+    return _process_result(sub_ctx.command.invoke(sub_ctx))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<PLATFORMIO_HOME>\penv\Lib\site-packages\click\core.py", line 1902, in invoke
+    return _process_result(sub_ctx.command.invoke(sub_ctx))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<PLATFORMIO_HOME>\penv\Lib\site-packages\click\core.py", line 1298, in invoke
+    return ctx.invoke(self.callback, **ctx.params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<PLATFORMIO_HOME>\penv\Lib\site-packages\click\core.py", line 853, in invoke
+    return callback(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<PLATFORMIO_HOME>\penv\Lib\site-packages\platformio\package\commands\list.py", line 56, in package_list_cmd
+    list_project_packages(options)
+  File "<PLATFORMIO_HOME>\penv\Lib\site-packages\platformio\package\commands\list.py", line 179, in list_project_packages
+    _found = print_project_env_platform_packages(env, options)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<PLATFORMIO_HOME>\penv\Lib\site-packages\platformio\package\commands\list.py", line 205, in print_project_env_platform_packages
+    print_dependency_tree(
+  File "<PLATFORMIO_HOME>\penv\Lib\site-packages\platformio\package\commands\list.py", line 99, in print_dependency_tree
+    click.echo(
+  File "<PLATFORMIO_HOME>\penv\Lib\site-packages\platformio\__main__.py", line 89, in <lambda>
+    click.echo = lambda *args, **kwargs: _safe_echo(0, *args, **kwargs)
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<PLATFORMIO_HOME>\penv\Lib\site-packages\platformio\__main__.py", line 83, in _safe_echo
+    click_echo_origin[origin](*args, **kwargs)
+  File "<PLATFORMIO_HOME>\penv\Lib\site-packages\click\utils.py", line 324, in echo
+    file.write(out)  # type: ignore
+    ^^^^^^^^^^^^^^^
+  File "<PLATFORMIO_HOME>\python3\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode characters in position 0-2: character maps to <undefined>
+
+============================================================
+
+An unexpected error occurred. Further steps:
+
+* Verify that you have the latest version of PlatformIO using
+  `python -m pip install -U platformio` command
+
+* Try to find answer in FAQ Troubleshooting section
+  https://docs.platformio.org/page/faq/index.html
+
+* Report this problem to the developers
+  https://github.com/platformio/platformio-core/issues
+
+============================================================

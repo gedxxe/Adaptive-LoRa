@@ -1,0 +1,82 @@
+Verbosity level can be increased via `-v, -vv, or -vvv` option
+Collected 4 tests
+Platform Manager: Installing native
+Downloading 0% 10%
+Unpacking 0% 10% 20% 30% 40% 50% 60% 70% 80% 90% 100%
+Platform Manager: native@1.2.1 has been installed!
+
+Processing test_frame_codec in native environment
+--------------------------------------------------------------------------------
+Building...
+Library Manager: Installing throwtheswitch/Unity @ ^2.6.1
+Downloading 0% 10% 20% 30% 40% 50% 60% 70% 80% 90%
+Unpacking 0% 10% 20% 30% 40% 50% 60% 70% 80% 90% 100%
+Library Manager: Unity@2.6.1 has been installed!
+test\test_frame_codec\test_main.cpp: In function 'void {anonymous}::test_payload_minimum_and_maximum()':
+test\test_frame_codec\test_main.cpp:33:61: error: deducing from brace-enclosed initializer list requires #include <initializer_list>
+     for (uint8_t size : {uint8_t(0), uint8_t(1), uint8_t(68)}) {
+                                                             ^
+test\test_frame_codec\test_main.cpp: In function 'void {anonymous}::test_type_and_future_types()':
+test\test_frame_codec\test_main.cpp:65:103: error: deducing from brace-enclosed initializer list requires #include <initializer_list>
+     for (uint8_t type : {uint8_t(0),uint8_t(3),uint8_t(0x10),uint8_t(0x11),uint8_t(0x7F),uint8_t(0xFF)}) {
+                                                                                                       ^
+test\test_frame_codec\test_main.cpp: In function 'void {anonymous}::test_nonzero_session_and_m2_fields()':
+test\test_frame_codec\test_main.cpp:88:40: error: deducing from brace-enclosed initializer list requires #include <initializer_list>
+     for (unsigned offset : {16u,22u,24u}) { validBytes(); bytes[offset] = 1; expect(CodecResult::M2_FIELDS); }
+                                        ^
+test\test_frame_codec\test_main.cpp: In function 'void {anonymous}::test_ack_invalid_length_status_and_fields()':
+test\test_frame_codec\test_main.cpp:114:59: error: deducing from brace-enclosed initializer list requires #include <initializer_list>
+     for (uint8_t size : {uint8_t(0),uint8_t(8),uint8_t(10)}) {
+                                                           ^
+*** [.pio\build\native\test\test_frame_codec\test_main.o] Error 1
+Building stage has failed, see errors above. Use `pio test -vvv` option to enable verbose output.
+------------- native:test_frame_codec [ERRORED] Took 8.74 seconds -------------
+
+Processing test_provisioning_console in native environment
+--------------------------------------------------------------------------------
+Building...
+test\test_provisioning_console\test_main.cpp: In function 'void {anonymous}::test_invalid_numeric_input_preserves_staging()':
+test\test_provisioning_console\test_main.cpp:30:114: error: deducing from brace-enclosed initializer list requires #include <initializer_list>
+     for (const char* value : {"0", "65535", "65536", "-1", "+1", "1x", "1.0", "42949672960", "999999999999999999"}) {
+                                                                                                                  ^
+test\test_provisioning_console\test_main.cpp:32:9: error: 'snprintf' is not a member of 'std'
+         std::snprintf(command, sizeof(command), "config set node-id %s", value);
+         ^~~
+test\test_provisioning_console\test_main.cpp: In function 'void {anonymous}::test_unknown_extra_and_partial_commands()':
+test\test_provisioning_console\test_main.cpp:48:99: error: deducing from brace-enclosed initializer list requires #include <initializer_list>
+                                "config set role gateway extra", "a b c d e f g", "config save now"})
+                                                                                                   ^
+*** [.pio\build\native\test\test_provisioning_console\test_main.o] Error 1
+Building stage has failed, see errors above. Use `pio test -vvv` option to enable verbose output.
+--------- native:test_provisioning_console [ERRORED] Took 2.00 seconds ---------
+
+Processing test_role_config in native environment
+--------------------------------------------------------------------------------
+Building...
+test\test_role_config\test_main.cpp: In function 'void {anonymous}::test_reserved_ids()':
+test\test_role_config\test_main.cpp:25:52: error: deducing from brace-enclosed initializer list requires #include <initializer_list>
+     for (uint16_t id : {uint16_t(0),uint16_t(65535)}) {
+                                                    ^
+*** [.pio\build\native\test\test_role_config\test_main.o] Error 1
+Building stage has failed, see errors above. Use `pio test -vvv` option to enable verbose output.
+------------- native:test_role_config [ERRORED] Took 1.65 seconds -------------
+
+Processing test_sequence_tracker in native environment
+--------------------------------------------------------------------------------
+Building...
+test\test_sequence_tracker\test_main.cpp: In function 'void {anonymous}::test_all_identity_fields_participate()':
+test\test_sequence_tracker\test_main.cpp:14:109: error: deducing from brace-enclosed initializer list requires #include <initializer_list>
+                                    PacketIdentity{1,3,3,4}, PacketIdentity{1,2,4,4}, PacketIdentity{1,2,3,5}})
+                                                                                                             ^
+*** [.pio\build\native\test\test_sequence_tracker\test_main.o] Error 1
+Building stage has failed, see errors above. Use `pio test -vvv` option to enable verbose output.
+----------- native:test_sequence_tracker [ERRORED] Took 1.67 seconds -----------
+
+=================================== SUMMARY ===================================
+Environment    Test                       Status    Duration
+-------------  -------------------------  --------  ------------
+native         test_frame_codec           ERRORED   00:00:08.744
+native         test_provisioning_console  ERRORED   00:00:01.999
+native         test_role_config           ERRORED   00:00:01.650
+native         test_sequence_tracker      ERRORED   00:00:01.667
+================== 4 test cases: 0 succeeded in 00:00:14.060 ==================

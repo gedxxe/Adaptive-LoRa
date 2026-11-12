@@ -1,0 +1,12 @@
+{
+  "publication_candidates_scanned": 266,
+  "remaining_detected_sensitive_or_identity_findings": [],
+  "organization_site_occurrences_neutralized": 265,
+  "initial_files_with_identity_or_path_findings": 155,
+  "formatting_files_normalized_at_final_pass": 4,
+  "compiled_source_manifest_matches": "PASS",
+  "physical_validation": "NOT VERIFIED",
+  "remaining_compatibility_exception": "Original NVS namespace byte sequence retained numerically; old literal label absent from publication text.",
+  "excluded_material": "Generated SDK/cache/binaries, private originals and machine-local checkout metadata are not tracked.",
+  "license_status": "Dependencies external with notices referenced; no papers/full-text research materials or selected project-wide license."
+}

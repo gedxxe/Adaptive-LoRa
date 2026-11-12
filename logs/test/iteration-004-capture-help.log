@@ -1,0 +1,13 @@
+usage: capture_bench.py [-h] --gateway GATEWAY --client CLIENT
+                        [--seconds SECONDS] --out OUT
+
+Capture two serial ports without flashing or changing configuration. Run with
+the PlatformIO virtual-environment Python (includes pyserial). Opening a
+serial port can toggle DTR/RTS on some boards; record any reset.
+
+options:
+  -h, --help         show this help message and exit
+  --gateway GATEWAY  Gateway COM port
+  --client CLIENT    Client COM port
+  --seconds SECONDS
+  --out OUT          New run directory

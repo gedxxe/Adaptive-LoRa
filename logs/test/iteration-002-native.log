@@ -1,0 +1,81 @@
+Verbosity level can be increased via `-v, -vv, or -vvv` option
+Collected 4 tests
+
+Processing test_frame_codec in native environment
+--------------------------------------------------------------------------------
+Building...
+Testing...
+test\test_frame_codec\test_main.cpp:133: test_golden_empty_hello_layout	[PASSED]
+test\test_frame_codec\test_main.cpp:40: test_payload_minimum_and_maximum: You Asked Me To Compare Nothing, Which Was Pointless.	[FAILED]
+test\test_frame_codec\test_main.cpp:135: test_encoder_capacity_and_null	[PASSED]
+test\test_frame_codec\test_main.cpp:136: test_all_header_truncations	[PASSED]
+test\test_frame_codec\test_main.cpp:137: test_payload_truncation_and_excess	[PASSED]
+test\test_frame_codec\test_main.cpp:138: test_oversize_payload_rejected	[PASSED]
+test\test_frame_codec\test_main.cpp:139: test_magic	[PASSED]
+test\test_frame_codec\test_main.cpp:140: test_version	[PASSED]
+test\test_frame_codec\test_main.cpp:141: test_type_and_future_types	[PASSED]
+test\test_frame_codec\test_main.cpp:142: test_header_length	[PASSED]
+test\test_frame_codec\test_main.cpp:143: test_reserved_fields	[PASSED]
+test\test_frame_codec\test_main.cpp:144: test_network_filter	[PASSED]
+test\test_frame_codec\test_main.cpp:145: test_destination_and_source_ranges	[PASSED]
+test\test_frame_codec\test_main.cpp:146: test_nonzero_session_and_m2_fields	[PASSED]
+test\test_frame_codec\test_main.cpp:147: test_ack_echo_layout_and_match	[PASSED]
+test\test_frame_codec\test_main.cpp:148: test_ack_wrong_identity_and_sender	[PASSED]
+test\test_frame_codec\test_main.cpp:149: test_ack_invalid_length_status_and_fields	[PASSED]
+test\test_frame_codec\test_main.cpp:150: test_failed_decode_does_not_mutate_output	[PASSED]
+Program received signal CTRL_BREAK_EVENT (None)
+------------- native:test_frame_codec [ERRORED] Took 2.30 seconds -------------
+
+Processing test_provisioning_console in native environment
+--------------------------------------------------------------------------------
+Building...
+Testing...
+test\test_provisioning_console\test_main.cpp:93: test_command_contract	[PASSED]
+test\test_provisioning_console\test_main.cpp:93: test_gateway_and_client_workflow	[PASSED]
+test\test_provisioning_console\test_main.cpp:94: test_invalid_numeric_input_preserves_staging	[PASSED]
+test\test_provisioning_console\test_main.cpp:94: test_full_network_range_and_interval	[PASSED]
+test\test_provisioning_console\test_main.cpp:95: test_unknown_extra_and_partial_commands	[PASSED]
+test\test_provisioning_console\test_main.cpp:95: test_overflow_discards_entire_line_then_recovers	[PASSED]
+test\test_provisioning_console\test_main.cpp:96: test_crlf_empty_and_spacing	[PASSED]
+test\test_provisioning_console\test_main.cpp:96: test_staging_does_not_change_loaded_config	[PASSED]
+test\test_provisioning_console\test_main.cpp:97: test_invalid_config_cannot_encode_for_save	[PASSED]
+test\test_provisioning_console\test_main.cpp:97: test_binary_input_rejected	[PASSED]
+--------- native:test_provisioning_console [PASSED] Took 2.00 seconds ---------
+
+Processing test_role_config in native environment
+--------------------------------------------------------------------------------
+Building...
+Testing...
+test\test_role_config\test_main.cpp:73: test_unset_and_unknown_role	[PASSED]
+test\test_role_config\test_main.cpp:73: test_valid_client_and_gateway	[PASSED]
+test\test_role_config\test_main.cpp:74: test_role_id_constraints	[PASSED]
+test\test_role_config\test_main.cpp:74: test_network_full_range	[PASSED]
+test\test_role_config\test_main.cpp:75: test_reserved_ids	[PASSED]
+test\test_role_config\test_main.cpp:75: test_schema_and_interval	[PASSED]
+test\test_role_config\test_main.cpp:76: test_blob_roundtrip	[PASSED]
+test\test_role_config\test_main.cpp:76: test_blob_corruption_each_byte	[PASSED]
+test\test_role_config\test_main.cpp:77: test_blob_partial_missing_oversize_and_invalid_save	[PASSED]
+-------------- native:test_role_config [PASSED] Took 3.05 seconds --------------
+
+Processing test_sequence_tracker in native environment
+--------------------------------------------------------------------------------
+Building...
+Testing...
+test\test_sequence_tracker\test_main.cpp:62: test_duplicate_identity	[PASSED]
+test\test_sequence_tracker\test_main.cpp:62: test_all_identity_fields_participate	[PASSED]
+test\test_sequence_tracker\test_main.cpp:63: test_out_of_order_window	[PASSED]
+test\test_sequence_tracker\test_main.cpp:63: test_large_jump_and_no_wrap_in_same_session	[PASSED]
+test\test_sequence_tracker\test_main.cpp:64: test_sequence_exhaustion_requires_new_session	[PASSED]
+test\test_sequence_tracker\test_main.cpp:64: test_bounded_session_replacement	[PASSED]
+test\test_sequence_tracker\test_main.cpp:65: test_wrap_safe_deadline	[PASSED]
+----------- native:test_sequence_tracker [PASSED] Took 3.14 seconds -----------
+
+=================================== SUMMARY ===================================
+Environment    Test                       Status    Duration
+-------------  -------------------------  --------  ------------
+native         test_frame_codec           ERRORED   00:00:02.303
+native         test_provisioning_console  PASSED    00:00:02.003
+native         test_role_config           PASSED    00:00:03.050
+native         test_sequence_tracker      PASSED    00:00:03.140
+
+============ 45 test cases: 1 failed, 43 succeeded in 00:00:10.497 ============

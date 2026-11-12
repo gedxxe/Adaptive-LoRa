@@ -1,0 +1,1361 @@
+{
+  "organization_site_occurrences_neutralized": 265,
+  "initial_affected_files": 155,
+  "original_publication_candidates": 253,
+  "originals_retained_outside_publication": true,
+  "historical_hash_policy": "Original artifact/source fingerprints retained as historical; this manifest describes sanitized copies.",
+  "changed_original_files": [
+    {
+      "path": ".gitignore",
+      "original_sha256": "932b2934286ea3330969fe56ab37ef50971bf18d2bcc19133c91c7bb3f1d872d",
+      "publication_sha256": "bceb3c6e6af522146fa105d473e8f4228361f1cc168b0e3f7af88fa5d57ab71e",
+      "organization_site_occurrences": 0,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "AGENTS.md",
+      "original_sha256": "befe45c5974efffa6346cf6f4e722a00eea853697123e0098c73f939ced8d5f1",
+      "publication_sha256": "a8d47b27de1dd4698a077fa91b6a2b038ce74809d3ea12acd83ae88b2764d8ec",
+      "organization_site_occurrences": 5,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "CHANGELOG.md",
+      "original_sha256": "93c1ea65343b4ae92b2c7d7a24b6aaadd671545447264d4da4ce5ec5f9ad8483",
+      "publication_sha256": "6c6f018a72e0b47b9d35f5e7b32236fd1f538003868a559c4844357d354db30c",
+      "organization_site_occurrences": 0,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "CODEX_START_PROMPT.md",
+      "original_sha256": "47d8375334f9f2e4d1234695c81e732ca3d531666f36e13d0c943ce5ca62ff72",
+      "publication_sha256": "b484a841ff8581e47a7bf25f8e890e0e298c9bd7ca533612810d3e3bdfd267f8",
+      "organization_site_occurrences": 1,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "PACKAGE_MANIFEST.md",
+      "original_sha256": "0cc5e7807b90605158c92d850d0385c6b7a7c1b378360ee23a28154a794914f9",
+      "publication_sha256": "030efddafb5a815b5121b42e325af7660b4b8eb760b2638428b79899e0a4d8e4",
+      "organization_site_occurrences": 1,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "platformio.ini",
+      "original_sha256": "c8a078c052ecea12957072b223f41c86cc24ad9daa7df93bada29626a7ec9eff",
+      "publication_sha256": "b2802dddd5a8cca0ca8938c7365156308f953a4e910b22423a767cec94139e9c",
+      "organization_site_occurrences": 1,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "README.md",
+      "original_sha256": "558d54688d3fb3d2cef8885f323f58c3d7beb186a906cb1ddf899f5310e4a2c7",
+      "publication_sha256": "f48f9a9e7427d7535c0bed68cdc59067515dfbb446624134c153f5538df25411",
+      "organization_site_occurrences": 1,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "README.zh-CN.md",
+      "original_sha256": "336411841d2277fbab367a7bcf0a1e4e1c14b4f4b86189e66120bea77c6283a0",
+      "publication_sha256": "46875750ab11028dab4c2cc0397656e933e5d0c843dca0901f06b338f6f8b060",
+      "organization_site_occurrences": 1,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "include/board_pins.h",
+      "original_sha256": "97468e6c63a61ef721cb1d881d705530afd48cf653a570ec5a8a45e8a328b828",
+      "publication_sha256": "c9954eca92fccc1ee3521393c8a497be162d96773513f4774cb0c8facfc98d8c",
+      "organization_site_occurrences": 2,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "include/project_config.h",
+      "original_sha256": "138993106965574950511361aed83fb395bdc9e819578e4375c6b7cbae11bf1b",
+      "publication_sha256": "5ac0086c324cddfbde0bf7cb6efb3fa492587a97df9febc5d7c8f7f91708bee6",
+      "organization_site_occurrences": 2,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "include/radio_config.h",
+      "original_sha256": "0615ab81b626bcced030a38e17aa1b5ff9fe6128dbf457842d3240a4f2d1826d",
+      "publication_sha256": "47f7ecc3b1a99d2edd67f8689ef3f7b73f9535b5fa4dd5e43b9ea01447aaad09",
+      "organization_site_occurrences": 2,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/README.md",
+      "original_sha256": "68dacfc5696b82306b08c8fb23ec5528554678e646b8018e704e21db092f5fe8",
+      "publication_sha256": "3412fc9cb9f734f9944aa6edc17291ace5d330e9f0b7d2c86ebb8e6e1ce1687d",
+      "organization_site_occurrences": 0,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "src/main.cpp",
+      "original_sha256": "ae49af7933226d5ef6525fefafebb810b7667ad8ae630d1599ff06bd21d737d2",
+      "publication_sha256": "bb9c6c1bf2b794ecc828a91a7b7cfcc005910346eb153dc1bdec25d7f0b222ad",
+      "organization_site_occurrences": 1,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "test/support/fake_radio_transport.h",
+      "original_sha256": "10cc0e4cfb0f394d8a60dbc4134ed254e5efba762e6e9a57f3a88877f0bce149",
+      "publication_sha256": "4fcd925ca60d096cc477f782056652229f9a508cf43da403f6779118b1731b1a",
+      "organization_site_occurrences": 2,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "test/test_app_integration/test_main.cpp",
+      "original_sha256": "fa5b51b878db19b9f2e1638f2a911afd7c760aa565e7e96f81c1edc1b6bf3f8e",
+      "publication_sha256": "a65052810ec42567c6680a8d9ac248546390b0b0e8721b2b691427d1506ae21b",
+      "organization_site_occurrences": 2,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "test/test_frame_codec/test_main.cpp",
+      "original_sha256": "529624112dce66abb358fd331ba4eb45373c385e36d51879842cfb7c1c0e1b6d",
+      "publication_sha256": "ac2cb593b13f8c8f3f82ba861ef98ef0df70a8685973eb0607c05e12f269e1e9",
+      "organization_site_occurrences": 1,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "test/test_provisioning_console/test_main.cpp",
+      "original_sha256": "0108317c35ec133034048bb8ff3764fd79e9e2535a7263f20a1847baa52ed46a",
+      "publication_sha256": "d0381a98d786be700dfe898945facdab3b2f6bbb0ba62d67a6d88f3b6939bd17",
+      "organization_site_occurrences": 1,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "test/test_role_config/test_main.cpp",
+      "original_sha256": "633aa7583ff43ff77d1c07bb3e73eeb1adde7c08cf34cf04b6d72bcacfd0811a",
+      "publication_sha256": "c1c83d0a215a6fcaf8d5a4609b8f4c6c3d93344e0d3e1b6a25f42e61cfb3c0bf",
+      "organization_site_occurrences": 1,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "test/test_sequence_tracker/test_main.cpp",
+      "original_sha256": "fc6b84cd259cf9b4f9b9962d93c588187013bf71400f537532d8dd12ae4db742",
+      "publication_sha256": "e04fe61c947cf3f755a32b56a1cc97ca42d0bdb5930580b849a56ec57043e6e9",
+      "organization_site_occurrences": 1,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "test/test_serial_logger/test_main.cpp",
+      "original_sha256": "752172576e09b02dfae9ad6e1770941ebcc7e7fe95ca8e035f93d33de2502cd9",
+      "publication_sha256": "77705aa4236fc10aa0d8f153385ad944d47cd2a716698464ff528875c5d971a2",
+      "organization_site_occurrences": 1,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "test/support/platform/Arduino.h",
+      "original_sha256": "ca60ee4947c998f768edb4c63ba6561a82a2830b80d64b4fbbea62ef236106da",
+      "publication_sha256": "71b12145e6478d921ba61dffd88bb5bde1c625f28e1e95ab9e24fce1b6e61a1a",
+      "organization_site_occurrences": 1,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "test/support/platform/esp_timer.h",
+      "original_sha256": "3f7f3e9098d5eeada665d1aed05ab2fe40f7c91a4dc8e3c07628967926bd74e8",
+      "publication_sha256": "fd42303e15a9e106ab836d65ef0fbec23366c499ba5210364f2b3f93b4f31a09",
+      "organization_site_occurrences": 1,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "src/app/firmware_runtime.cpp",
+      "original_sha256": "bc65a7800e8dc47760e613d4bb1c1afbcb08c88f1a79599ebe04bf730ddb0c33",
+      "publication_sha256": "964153070c4991a92fda7ec376536821492c0bcfa07c029d27f8eef31bd18319",
+      "organization_site_occurrences": 2,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "src/app/firmware_runtime.h",
+      "original_sha256": "9ff848cc0a3b414541b061f96658764aa9def41c6096d67a5d57551f1e0f3343",
+      "publication_sha256": "dde9cda569680678b4db7f637866dd7d5e58973c34be43bb28419a2ece05921f",
+      "organization_site_occurrences": 1,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "src/app/nvs_config_store.cpp",
+      "original_sha256": "9bf06e812320771525c4453695f76a6c4b5e760da83bcd089c54c1d946ecacf6",
+      "publication_sha256": "7947b3c8f462d46d64243515802e288a199927f312afd875fe31c26f2201f252",
+      "organization_site_occurrences": 4,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "src/app/nvs_config_store.h",
+      "original_sha256": "09a0d367026731c555cb6503ff7a05bb3009c98a3dd7b6372d09a550d72bf5d2",
+      "publication_sha256": "be48c9eba96049c2b66abfa309fb33a09fbcbd95209e4134a5260e215e681219",
+      "organization_site_occurrences": 1,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "src/app/provisioning_console.cpp",
+      "original_sha256": "6ff2f0774ce8b15c4e71f0c875c9332eba276f41ec90440bd4b4a516f6909476",
+      "publication_sha256": "62fb729c0fc940ebc0251f93a54bfc8e49b67973ff03bcce98c29b0a74928695",
+      "organization_site_occurrences": 2,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "src/app/provisioning_console.h",
+      "original_sha256": "5130845df6bd35941e68337066890bb3fbf840bff23333e3ac9a4dc359173bd1",
+      "publication_sha256": "2a98e10ec31eb49f595c7019c312a4a7877c8cb1482b8190dbf0ecd5b4739764",
+      "organization_site_occurrences": 2,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "src/client/client_app.cpp",
+      "original_sha256": "1fe707d7463502cf6b6b722142889f12e088204e728f58d193ea023da9d853e9",
+      "publication_sha256": "b53fb9c7e514e5b9f4a00564d0a2efd8f9f832fbc91c014bb963db7ca0f457bf",
+      "organization_site_occurrences": 2,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "src/client/client_app.h",
+      "original_sha256": "43a7dbe031a06c3f06cd89f9134154efe71b1fe765d6f8050ab12a07bfe5e347",
+      "publication_sha256": "f46cea63026c18fac2bb2b8f84ab3160b3d4361b63080141adafa623a1f60d27",
+      "organization_site_occurrences": 1,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "src/gateway/gateway_app.cpp",
+      "original_sha256": "d7ae947112f4204b0fa3a8b17f7dbbe2848ea98bd5a16250802009a0024bd4c3",
+      "publication_sha256": "bb60ffd56ce3066e82d451f38aa2b2854b34c4f86fbfd23ebf433b3ba4734770",
+      "organization_site_occurrences": 2,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "src/gateway/gateway_app.h",
+      "original_sha256": "dc38f7efe1f0992e1d6802a4c4433e65db1b137ade118f08e2837d2ea8dc3f5a",
+      "publication_sha256": "3bc222d09d01fabbe53dffd92f7da5b4d4bbd08e479b16e0ba0c69acb669632d",
+      "organization_site_occurrences": 1,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "src/common/config/device_config.cpp",
+      "original_sha256": "790667c6d7000253bd04a7105d1da89e7b9d4106c8987485475463a977b7cfe5",
+      "publication_sha256": "d1206949caf46bebbb7f0a29246c93187b47e647c7410c6b9efcfe9e6a72c534",
+      "organization_site_occurrences": 2,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "src/common/config/device_config.h",
+      "original_sha256": "241ae97a38b532a0f32983a3f92644d0eebab32014b2854d43ff72ced6c6535a",
+      "publication_sha256": "3be8c150c77513db66548bc06a444bd93f7c6fe8ac5098cbdd05ff7319ca0b28",
+      "organization_site_occurrences": 2,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "src/common/diagnostics/serial_logger.cpp",
+      "original_sha256": "adffc3b28dbd51c3dbe543550606ea281c0cbacd1a4eff5d22a46d470d0f605a",
+      "publication_sha256": "a98fd1661ff0c7f92032ffac0b7de0a3110d3f7fddd76bc087918d0d9715e3a4",
+      "organization_site_occurrences": 2,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "src/common/diagnostics/serial_logger.h",
+      "original_sha256": "514c5c583d3a349f40e19a18ea8147f82e3995db377def1915e8c52968c206a8",
+      "publication_sha256": "48e5f25f1de3774890cc9f02edea8d1b72b384dc8161e613fe251e7b46f6a9bd",
+      "organization_site_occurrences": 2,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "src/common/protocol/frame_codec.cpp",
+      "original_sha256": "d04bed0e7765d2c855cdd40b5556bb596fe4d739bdcb1256bb3a973887c75f21",
+      "publication_sha256": "0d3e7ebee8a1ceb5de86775c7b08aae720f3155f2abd9caeb65498034dc1bfd1",
+      "organization_site_occurrences": 2,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "src/common/protocol/frame_codec.h",
+      "original_sha256": "22bd430043ac60153876f876e5f41286b77a8fba8a6002c577e9968d27514b3d",
+      "publication_sha256": "619a7d2984c16955f71b18cc90ffa2aec8913aa6ab8525c79dfaeb729ee5618e",
+      "organization_site_occurrences": 2,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "src/common/protocol/message_types.h",
+      "original_sha256": "75857143b39aacb10af892c841701e4e611f11ea79f2718e28d26c84b1e9bad3",
+      "publication_sha256": "74605ffc1bc4f3d41cec65a2bced4656e47f22fcbd4d239e8edeb17d4b32c8e2",
+      "organization_site_occurrences": 1,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "src/common/protocol/sequence_tracker.cpp",
+      "original_sha256": "1f5db50544afa526f6bae69662962ad1863c2e6fa8bf8efe6964eb637a6bfce2",
+      "publication_sha256": "2f7a8c52177291945486735412356adb8b2314cdb94adaf794f699d2f6e4ba94",
+      "organization_site_occurrences": 2,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "src/common/protocol/sequence_tracker.h",
+      "original_sha256": "5b939b2596d56c448d6a3a8d06c7a35817fd18042c517499c6960f599c3f642a",
+      "publication_sha256": "0acf7cbcb3f15c9cd088ba8b3d77c7a95d9f2712fd8e0561d5102bae2d6649fa",
+      "organization_site_occurrences": 2,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "src/common/radio/radio_driver.cpp",
+      "original_sha256": "4c85edfd28ba3e1759ab0cb010828538bbfc3bc6d337d9ebdaa160a27f56b7bb",
+      "publication_sha256": "a7b904594f482654a8a44ef9fd8964468ed6a8bd86e94232e74e08a9e0f1b8e6",
+      "organization_site_occurrences": 2,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "src/common/radio/radio_driver.h",
+      "original_sha256": "06c1cd054705015eb5be96e542f011ad7f073a70724546c5d8b99a3b3a48c83d",
+      "publication_sha256": "a59d4ed4578dd677afaaba430f2d69e4f21282323555b1f2a162cf0b72986cdd",
+      "organization_site_occurrences": 2,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "src/common/radio/radio_transport.h",
+      "original_sha256": "096e6d6dd8827616cfdc602d03d4eb20cae1135709801a68d90bf2e317b1aa16",
+      "publication_sha256": "64717827d21e8769a0c0bd48aab35b6e0f568ab1a5fc6b58c4134c6be84abee7",
+      "organization_site_occurrences": 2,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-001-dependencies-retry.log",
+      "original_sha256": "cf3161129b2da5eb342f257c83072c8c5dcc69be460e39fd558c7ed7a76e74bf",
+      "publication_sha256": "199733501176ee1c95a53c5b0269992ccf7c801a41208db74c755e12b0cb35d8",
+      "organization_site_occurrences": 0,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-001-dependencies.log",
+      "original_sha256": "d34e6d7579536cbd13931450206b363681893a0f1a7adb7e2ccee42cfc360122",
+      "publication_sha256": "d3cbed83e4d5e8c5ed5727493be2b7376e74b50ceadeb8c3c1524f09967c363b",
+      "organization_site_occurrences": 0,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-001-esp32.log",
+      "original_sha256": "a5c25ccf579c83db7cfeacba61efe333b299e4475b6a076c0e86985cd5b2dc19",
+      "publication_sha256": "9b3c4f88a4d9f3ac437d4e7b9f302332f5ed65c21e5a46371a51d977b7676a06",
+      "organization_site_occurrences": 2,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-004-compiler-retry.log",
+      "original_sha256": "d440ee2cb9e159f8dd817fcec5576c44b6e201b3f7a5794dff689ed7993f700e",
+      "publication_sha256": "4cee74cb0ae38b68bc2a0959f7ef1518ae7e4e764efd2b6272d25afb89541b31",
+      "organization_site_occurrences": 0,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-004-esp32.log",
+      "original_sha256": "db642f08bf310d24df4da910722d22dcf49915f70f72b448bc691e12ce671256",
+      "publication_sha256": "0ace387d542125829bdd3907218253f72eeedfa88cb8c95dfd22adc84647d833",
+      "organization_site_occurrences": 0,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-004-packages-final.log",
+      "original_sha256": "8173ed2dd142fb9ba51b193eb27a52759316d43c397074d79771d7e11a872e59",
+      "publication_sha256": "8c1790ad45bf65fdc40a6eed8e3f434cb51badbbe96f7e3837fc1d8d463c2043",
+      "organization_site_occurrences": 0,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-004-packages-utf8.json",
+      "original_sha256": "45974996587502618382ca96dc73847f56d594e2be8d0188d7c2e8992b4de446",
+      "publication_sha256": "b83d14a1d84caa8b876058189f09e7a877417b78a9c8fbddc1a1e92580c89fa4",
+      "organization_site_occurrences": 0,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-004-packages.log",
+      "original_sha256": "5888558570ce0b2c456ff20e0db971e245eb28d6d1c46ae482b3e1c7204d64ba",
+      "publication_sha256": "4d3cafefb4b798e075ddc2bdeb8244360150b3ae33c6c95784313574b783869a",
+      "organization_site_occurrences": 0,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-004-source-manifest.sha256",
+      "original_sha256": "aff2d5548492ea45933b8dfc847cd82dadf4853aac862195eb005cd29650a395",
+      "publication_sha256": "ff8fbee1dcb65cdc7299e39a4120b206300d02ed9e86cf7acd52d8d87ea9a1f1",
+      "organization_site_occurrences": 0,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-004-static-review.log",
+      "original_sha256": "6b661578db6b87ea2409fb832ce98ee68f48f455702cbbca473f4776cbf1efbe",
+      "publication_sha256": "50878ad663020d233393325a38b67ca0d9fda6f3ac398639f89c7dbf527627fd",
+      "organization_site_occurrences": 0,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-005-esp32.log",
+      "original_sha256": "ebcd7f53eee596a6e1d9bbb379ada5aa3366bb8a2a5b000cdd6430b3bb43093f",
+      "publication_sha256": "2f6b1e8d1b122515902aa620bea86884e59b37fb732601fc185390548e82d348",
+      "organization_site_occurrences": 0,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-005-file-inventory.txt",
+      "original_sha256": "4a4beef8205d4abbbd16a9751776b90d8ab017bc7b29bdaa69fa9ec32b4560c9",
+      "publication_sha256": "491651557fc57e97d3eaf24edbea724e4adb90af42d6cb3fa74e86d045b6095e",
+      "organization_site_occurrences": 0,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-005-source-manifest.sha256",
+      "original_sha256": "9361b331f6a43296cb31e43c391d4800746f03c574a680944015014e9a4e8f72",
+      "publication_sha256": "2dafa0461030d1fc57a15d6107faf26c1c4eb6c7aad1f35858d151550789441a",
+      "organization_site_occurrences": 0,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-005-static-review.log",
+      "original_sha256": "4f36b0c6c32d4271b2e707857ee1d48c9af59006baf37503432d88f22abf9b32",
+      "publication_sha256": "e85d53aeecb998dcb64e22214eab862d105df179c66664a6b5ef2086c230b5a6",
+      "organization_site_occurrences": 0,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-006-baseline-manifest.json",
+      "original_sha256": "55d5691dc2876b65d165f4308da37e96e50e99c6923bc1b7ad9096152851b542",
+      "publication_sha256": "576aa9f47e41eb11b7e903bd6ef48aaed20933751b09ee97ca85ae042a79c63d",
+      "organization_site_occurrences": 0,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-006-esp32.log",
+      "original_sha256": "c6e815a01e67b9ddeab34bd8bf51dee39fe49208e23d93b3ab6bf039b7cd2054",
+      "publication_sha256": "1de2c496c6f8e347567dce7a6c5b6833694f1a174e69be4572c4ff763d64c1bd",
+      "organization_site_occurrences": 0,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-007-changed-files.txt",
+      "original_sha256": "90f60be652aeb4fc40db7a744fbf734109abcc68f73148798f057306581dfda0",
+      "publication_sha256": "0e8be637c5708becb9d68c689185ce314b6d7e6a9c2441ae149bbbd79ba1c08a",
+      "organization_site_occurrences": 0,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-007-complete.diff",
+      "original_sha256": "c6b27cf8cacc16ddcc86dcca1f5d033494481362460410a1adbedb695369ef30",
+      "publication_sha256": "17d091f9e1f2c79da78fa61f8f0f14784e3a3308eb28feafab20c911c2f4ad56",
+      "organization_site_occurrences": 21,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-007-diff-check-initial.log",
+      "original_sha256": "da4f3e2a5b740b608bd02e1b61553e3d3791c0fb9b50e57547a2ec50a44bcab1",
+      "publication_sha256": "a0ee5a9235d992a56c1c63e2deac23c63c568a86c0a5f0fb99d15731d2d9a3f7",
+      "organization_site_occurrences": 0,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-007-esp32.log",
+      "original_sha256": "5719ce460435f33b7a4a108b90f336e4a909199fd4db5867d0d7201208cc6cfe",
+      "publication_sha256": "53367dae80e53f138fa53465cfeae8941b619b40865f5f294ccbf472c62a4b84",
+      "organization_site_occurrences": 0,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-007-git-status.log",
+      "original_sha256": "cbd7253ed1a5569e4d074e4758d98cdb50206ea818b3daba3521c86484a4fc7f",
+      "publication_sha256": "d2b35cacadc66b7fad8dedd1be5244e17150a6625978c9330f831bd7a9cd6b1e",
+      "organization_site_occurrences": 0,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-007-review.log",
+      "original_sha256": "9e30fd5db63454be6f464a1a00acbba657feeea30efb503477b3dadcfcf7b3e7",
+      "publication_sha256": "8ff8d40e779d72350a1a1d9fb265ff3390aecec7f0e365389ceea8ad64b789fb",
+      "organization_site_occurrences": 0,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-007-source-manifest.sha256",
+      "original_sha256": "2c2d1d98eb520379ce98c113b315e4189f4d62b7728abb29e8fbe9c2eff2b2c4",
+      "publication_sha256": "2bc371c39f7ba16cf02ef3d73624f41f2b142022ee6e16ad2b0429fba9e2429f",
+      "organization_site_occurrences": 0,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-007-static-review.log",
+      "original_sha256": "b7e3657fbdca3fdaf9bbfe8be914a10ce5bbd98f75f190f57158d570332834b3",
+      "publication_sha256": "ba59d2b2ab8300d58f6bd154616cea06c21a91a467dd1ee029500815b5bd620b",
+      "organization_site_occurrences": 0,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/test/iteration-001-native.log",
+      "original_sha256": "bb9bd66ec953a8cce9d770748504e186fc72cf6284fe0f6b2517736386df3ea1",
+      "publication_sha256": "e30f63e871682b5b5bdb61d344e56c59e04f706caa225cf15ab564c6118e249b",
+      "organization_site_occurrences": 0,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/test/iteration-002-native.log",
+      "original_sha256": "48e49b33fb4a42ab47386a7d5506ae71f265cb0559211acf78992f4afcab2c6b",
+      "publication_sha256": "c5f3bdcf81fb426a130f5ae608c846ef0a85f199a7a5f73cec90565314632ede",
+      "organization_site_occurrences": 0,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/test/iteration-003-native.log",
+      "original_sha256": "4acc6fef49e9111ef54f37b700878a109d31b998b9eb1033ecfdba1d00cd3e9e",
+      "publication_sha256": "23d7e50d2ed9244d868afa70b50a898137d39cc9b8830f2c20acaa37def68cd8",
+      "organization_site_occurrences": 0,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/test/iteration-004-capture-help.log",
+      "original_sha256": "f0bece0a57f15b86151c5ac7e5bba4986a7e2cf2b8f5f70f2d4e7decf3fec86c",
+      "publication_sha256": "ba9f8deadcf9e6a163341cfae7959eb3c7ca9328a64885a5684be3d95b8e3326",
+      "organization_site_occurrences": 0,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/test/iteration-004-host-compiler.log",
+      "original_sha256": "216dcd1f351c5b62bd70d566398d9d76715b2fea0b2a6ce2d60c08d2dd65b12b",
+      "publication_sha256": "861f2057875c50d486cd5bb009f7ea4f19dee6faf02c0a4c604c0df7532fed53",
+      "organization_site_occurrences": 0,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/test/iteration-004-serial-ports.log",
+      "original_sha256": "121a8937a3a4460f1a030b6298edc3bd0c7a83e64800cb25d367dd709862b852",
+      "publication_sha256": "8062a3e2ee78f377128e8372554bf8be5b0222a505ebde8093290b09ce58a0c1",
+      "organization_site_occurrences": 0,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/test/iteration-005-native.log",
+      "original_sha256": "b6a51a7f34a3e9ab9fb297d45d68d80fdb54af721570a4ea59b443167c19900d",
+      "publication_sha256": "35c19c94be063511b52260c6cea5f5cb1ad5164233112b23ec8b143cd3e41bbe",
+      "organization_site_occurrences": 0,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/test/iteration-006-native.log",
+      "original_sha256": "c5a22266b58cb8d81cb4e3afbee2e705d3978d2bf95d42d80e12e9426f7b95d6",
+      "publication_sha256": "b947d2ad358c41b905afe86bc2bea9330975268fb53b6cf850939d26be66f907",
+      "organization_site_occurrences": 30,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/test/iteration-007-native.log",
+      "original_sha256": "32c22ae6744fc78979baf407913e2abfa7a32d412282cd0f4cb15f29fd03d959",
+      "publication_sha256": "6ee27f3ff0cd9fdd7f585e495f8c80fc592bf9da773505c6d9c36e20b3ad12de",
+      "organization_site_occurrences": 0,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/test/iteration-007-scenarios.md",
+      "original_sha256": "d3c0dbec2f83c5f15826cd53f942e707570e904c5c5341304ac8618eb374baed",
+      "publication_sha256": "a5f1594f3067b39588bc296ecc80e97be231409b7d586fc9b67424cd0ee0ba90",
+      "organization_site_occurrences": 0,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-006-baseline/AGENTS.md",
+      "original_sha256": "cca829be18c8406dab83ab5f1f57788cb1eb60c7a5e7120bf5c5dbd2949eabb2",
+      "publication_sha256": "8b7686e219bafc3419ac262b08bd70009dc6a2cc05aa98bfb6a8d67ea302f124",
+      "organization_site_occurrences": 5,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-006-baseline/CODEX_START_PROMPT.md",
+      "original_sha256": "47d8375334f9f2e4d1234695c81e732ca3d531666f36e13d0c943ce5ca62ff72",
+      "publication_sha256": "2606f38ca2473a243b25144b99a7c261158e837b867dfa67d8fc74d182cf7959",
+      "organization_site_occurrences": 1,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-006-baseline/PACKAGE_MANIFEST.md",
+      "original_sha256": "0cc5e7807b90605158c92d850d0385c6b7a7c1b378360ee23a28154a794914f9",
+      "publication_sha256": "e95318aae45b3ed77ad819e9f0c8e2e3b766bcb30953de7dedb30b27d98ad0df",
+      "organization_site_occurrences": 1,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-006-baseline/README.md",
+      "original_sha256": "d57d04ee0275fe4c98674e9f8d64066d8196161a0c63182dd0e330c644b24d98",
+      "publication_sha256": "9be51d94fc59340f7029cda7390520365f4ecaae144835855b2ac8c25c9d4b7f",
+      "organization_site_occurrences": 1,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-006-baseline/README.zh-CN.md",
+      "original_sha256": "c7f5f1f171e9e9b67aee216de2ae4da7232c4a501b87e520bcd817ad95bc8fe0",
+      "publication_sha256": "a57a59aa20e22761535ef8ce3ec59d729ef958e81b71beb243e2039573b9f097",
+      "organization_site_occurrences": 1,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-007-review-snapshot/AGENTS.md",
+      "original_sha256": "befe45c5974efffa6346cf6f4e722a00eea853697123e0098c73f939ced8d5f1",
+      "publication_sha256": "c77bd8a123f93df5f7671a7180225a7f7f2a7168412fbd38a2970d42751deebb",
+      "organization_site_occurrences": 5,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-007-review-snapshot/CODEX_START_PROMPT.md",
+      "original_sha256": "47d8375334f9f2e4d1234695c81e732ca3d531666f36e13d0c943ce5ca62ff72",
+      "publication_sha256": "2606f38ca2473a243b25144b99a7c261158e837b867dfa67d8fc74d182cf7959",
+      "organization_site_occurrences": 1,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-007-review-snapshot/PACKAGE_MANIFEST.md",
+      "original_sha256": "0cc5e7807b90605158c92d850d0385c6b7a7c1b378360ee23a28154a794914f9",
+      "publication_sha256": "e95318aae45b3ed77ad819e9f0c8e2e3b766bcb30953de7dedb30b27d98ad0df",
+      "organization_site_occurrences": 1,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-007-review-snapshot/platformio.ini",
+      "original_sha256": "c8a078c052ecea12957072b223f41c86cc24ad9daa7df93bada29626a7ec9eff",
+      "publication_sha256": "4fa8dca9d3e072600c2ed9b97c417ee2cf1ab5405e07d6c8261a040e51a592f8",
+      "organization_site_occurrences": 1,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-007-review-snapshot/README.md",
+      "original_sha256": "558d54688d3fb3d2cef8885f323f58c3d7beb186a906cb1ddf899f5310e4a2c7",
+      "publication_sha256": "7447acb11cfeb1ee8b6ac71bb2b278f948dbebd64e8eeb9c9f698bbea621f04a",
+      "organization_site_occurrences": 1,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-007-review-snapshot/README.zh-CN.md",
+      "original_sha256": "336411841d2277fbab367a7bcf0a1e4e1c14b4f4b86189e66120bea77c6283a0",
+      "publication_sha256": "08696e715ae2598929840e0907b705f03a878a028d23a41ddf2aa6c9219ba905",
+      "organization_site_occurrences": 1,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-007-review-snapshot/include/board_pins.h",
+      "original_sha256": "97468e6c63a61ef721cb1d881d705530afd48cf653a570ec5a8a45e8a328b828",
+      "publication_sha256": "c9954eca92fccc1ee3521393c8a497be162d96773513f4774cb0c8facfc98d8c",
+      "organization_site_occurrences": 2,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-007-review-snapshot/include/project_config.h",
+      "original_sha256": "138993106965574950511361aed83fb395bdc9e819578e4375c6b7cbae11bf1b",
+      "publication_sha256": "5ac0086c324cddfbde0bf7cb6efb3fa492587a97df9febc5d7c8f7f91708bee6",
+      "organization_site_occurrences": 2,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-007-review-snapshot/include/radio_config.h",
+      "original_sha256": "0615ab81b626bcced030a38e17aa1b5ff9fe6128dbf457842d3240a4f2d1826d",
+      "publication_sha256": "47f7ecc3b1a99d2edd67f8689ef3f7b73f9535b5fa4dd5e43b9ea01447aaad09",
+      "organization_site_occurrences": 2,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-007-review-snapshot/src/main.cpp",
+      "original_sha256": "ae49af7933226d5ef6525fefafebb810b7667ad8ae630d1599ff06bd21d737d2",
+      "publication_sha256": "bb9c6c1bf2b794ecc828a91a7b7cfcc005910346eb153dc1bdec25d7f0b222ad",
+      "organization_site_occurrences": 1,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-007-review-snapshot/test/support/fake_radio_transport.h",
+      "original_sha256": "10cc0e4cfb0f394d8a60dbc4134ed254e5efba762e6e9a57f3a88877f0bce149",
+      "publication_sha256": "4fcd925ca60d096cc477f782056652229f9a508cf43da403f6779118b1731b1a",
+      "organization_site_occurrences": 2,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-007-review-snapshot/test/test_app_integration/test_main.cpp",
+      "original_sha256": "fa5b51b878db19b9f2e1638f2a911afd7c760aa565e7e96f81c1edc1b6bf3f8e",
+      "publication_sha256": "a65052810ec42567c6680a8d9ac248546390b0b0e8721b2b691427d1506ae21b",
+      "organization_site_occurrences": 2,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-007-review-snapshot/test/test_frame_codec/test_main.cpp",
+      "original_sha256": "529624112dce66abb358fd331ba4eb45373c385e36d51879842cfb7c1c0e1b6d",
+      "publication_sha256": "ac2cb593b13f8c8f3f82ba861ef98ef0df70a8685973eb0607c05e12f269e1e9",
+      "organization_site_occurrences": 1,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-007-review-snapshot/test/test_provisioning_console/test_main.cpp",
+      "original_sha256": "0108317c35ec133034048bb8ff3764fd79e9e2535a7263f20a1847baa52ed46a",
+      "publication_sha256": "d0381a98d786be700dfe898945facdab3b2f6bbb0ba62d67a6d88f3b6939bd17",
+      "organization_site_occurrences": 1,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-007-review-snapshot/test/test_role_config/test_main.cpp",
+      "original_sha256": "633aa7583ff43ff77d1c07bb3e73eeb1adde7c08cf34cf04b6d72bcacfd0811a",
+      "publication_sha256": "c1c83d0a215a6fcaf8d5a4609b8f4c6c3d93344e0d3e1b6a25f42e61cfb3c0bf",
+      "organization_site_occurrences": 1,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-007-review-snapshot/test/test_sequence_tracker/test_main.cpp",
+      "original_sha256": "fc6b84cd259cf9b4f9b9962d93c588187013bf71400f537532d8dd12ae4db742",
+      "publication_sha256": "e04fe61c947cf3f755a32b56a1cc97ca42d0bdb5930580b849a56ec57043e6e9",
+      "organization_site_occurrences": 1,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-007-review-snapshot/test/test_serial_logger/test_main.cpp",
+      "original_sha256": "752172576e09b02dfae9ad6e1770941ebcc7e7fe95ca8e035f93d33de2502cd9",
+      "publication_sha256": "77705aa4236fc10aa0d8f153385ad944d47cd2a716698464ff528875c5d971a2",
+      "organization_site_occurrences": 1,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-007-review-snapshot/test/support/platform/Arduino.h",
+      "original_sha256": "ca60ee4947c998f768edb4c63ba6561a82a2830b80d64b4fbbea62ef236106da",
+      "publication_sha256": "71b12145e6478d921ba61dffd88bb5bde1c625f28e1e95ab9e24fce1b6e61a1a",
+      "organization_site_occurrences": 1,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-007-review-snapshot/test/support/platform/esp_timer.h",
+      "original_sha256": "3f7f3e9098d5eeada665d1aed05ab2fe40f7c91a4dc8e3c07628967926bd74e8",
+      "publication_sha256": "fd42303e15a9e106ab836d65ef0fbec23366c499ba5210364f2b3f93b4f31a09",
+      "organization_site_occurrences": 1,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-007-review-snapshot/src/app/firmware_runtime.cpp",
+      "original_sha256": "bc65a7800e8dc47760e613d4bb1c1afbcb08c88f1a79599ebe04bf730ddb0c33",
+      "publication_sha256": "964153070c4991a92fda7ec376536821492c0bcfa07c029d27f8eef31bd18319",
+      "organization_site_occurrences": 2,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-007-review-snapshot/src/app/firmware_runtime.h",
+      "original_sha256": "9ff848cc0a3b414541b061f96658764aa9def41c6096d67a5d57551f1e0f3343",
+      "publication_sha256": "dde9cda569680678b4db7f637866dd7d5e58973c34be43bb28419a2ece05921f",
+      "organization_site_occurrences": 1,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-007-review-snapshot/src/app/nvs_config_store.cpp",
+      "original_sha256": "9bf06e812320771525c4453695f76a6c4b5e760da83bcd089c54c1d946ecacf6",
+      "publication_sha256": "7947b3c8f462d46d64243515802e288a199927f312afd875fe31c26f2201f252",
+      "organization_site_occurrences": 4,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-007-review-snapshot/src/app/nvs_config_store.h",
+      "original_sha256": "09a0d367026731c555cb6503ff7a05bb3009c98a3dd7b6372d09a550d72bf5d2",
+      "publication_sha256": "be48c9eba96049c2b66abfa309fb33a09fbcbd95209e4134a5260e215e681219",
+      "organization_site_occurrences": 1,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-007-review-snapshot/src/app/provisioning_console.cpp",
+      "original_sha256": "6ff2f0774ce8b15c4e71f0c875c9332eba276f41ec90440bd4b4a516f6909476",
+      "publication_sha256": "62fb729c0fc940ebc0251f93a54bfc8e49b67973ff03bcce98c29b0a74928695",
+      "organization_site_occurrences": 2,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-007-review-snapshot/src/app/provisioning_console.h",
+      "original_sha256": "5130845df6bd35941e68337066890bb3fbf840bff23333e3ac9a4dc359173bd1",
+      "publication_sha256": "2a98e10ec31eb49f595c7019c312a4a7877c8cb1482b8190dbf0ecd5b4739764",
+      "organization_site_occurrences": 2,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-007-review-snapshot/src/client/client_app.cpp",
+      "original_sha256": "1fe707d7463502cf6b6b722142889f12e088204e728f58d193ea023da9d853e9",
+      "publication_sha256": "b53fb9c7e514e5b9f4a00564d0a2efd8f9f832fbc91c014bb963db7ca0f457bf",
+      "organization_site_occurrences": 2,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-007-review-snapshot/src/client/client_app.h",
+      "original_sha256": "43a7dbe031a06c3f06cd89f9134154efe71b1fe765d6f8050ab12a07bfe5e347",
+      "publication_sha256": "f46cea63026c18fac2bb2b8f84ab3160b3d4361b63080141adafa623a1f60d27",
+      "organization_site_occurrences": 1,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-007-review-snapshot/src/gateway/gateway_app.cpp",
+      "original_sha256": "d7ae947112f4204b0fa3a8b17f7dbbe2848ea98bd5a16250802009a0024bd4c3",
+      "publication_sha256": "bb60ffd56ce3066e82d451f38aa2b2854b34c4f86fbfd23ebf433b3ba4734770",
+      "organization_site_occurrences": 2,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-007-review-snapshot/src/gateway/gateway_app.h",
+      "original_sha256": "dc38f7efe1f0992e1d6802a4c4433e65db1b137ade118f08e2837d2ea8dc3f5a",
+      "publication_sha256": "3bc222d09d01fabbe53dffd92f7da5b4d4bbd08e479b16e0ba0c69acb669632d",
+      "organization_site_occurrences": 1,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-007-review-snapshot/src/common/config/device_config.cpp",
+      "original_sha256": "790667c6d7000253bd04a7105d1da89e7b9d4106c8987485475463a977b7cfe5",
+      "publication_sha256": "d1206949caf46bebbb7f0a29246c93187b47e647c7410c6b9efcfe9e6a72c534",
+      "organization_site_occurrences": 2,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-007-review-snapshot/src/common/config/device_config.h",
+      "original_sha256": "241ae97a38b532a0f32983a3f92644d0eebab32014b2854d43ff72ced6c6535a",
+      "publication_sha256": "3be8c150c77513db66548bc06a444bd93f7c6fe8ac5098cbdd05ff7319ca0b28",
+      "organization_site_occurrences": 2,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-007-review-snapshot/src/common/diagnostics/serial_logger.cpp",
+      "original_sha256": "adffc3b28dbd51c3dbe543550606ea281c0cbacd1a4eff5d22a46d470d0f605a",
+      "publication_sha256": "a98fd1661ff0c7f92032ffac0b7de0a3110d3f7fddd76bc087918d0d9715e3a4",
+      "organization_site_occurrences": 2,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-007-review-snapshot/src/common/diagnostics/serial_logger.h",
+      "original_sha256": "514c5c583d3a349f40e19a18ea8147f82e3995db377def1915e8c52968c206a8",
+      "publication_sha256": "48e5f25f1de3774890cc9f02edea8d1b72b384dc8161e613fe251e7b46f6a9bd",
+      "organization_site_occurrences": 2,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-007-review-snapshot/src/common/protocol/frame_codec.cpp",
+      "original_sha256": "d04bed0e7765d2c855cdd40b5556bb596fe4d739bdcb1256bb3a973887c75f21",
+      "publication_sha256": "0d3e7ebee8a1ceb5de86775c7b08aae720f3155f2abd9caeb65498034dc1bfd1",
+      "organization_site_occurrences": 2,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-007-review-snapshot/src/common/protocol/frame_codec.h",
+      "original_sha256": "22bd430043ac60153876f876e5f41286b77a8fba8a6002c577e9968d27514b3d",
+      "publication_sha256": "619a7d2984c16955f71b18cc90ffa2aec8913aa6ab8525c79dfaeb729ee5618e",
+      "organization_site_occurrences": 2,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-007-review-snapshot/src/common/protocol/message_types.h",
+      "original_sha256": "75857143b39aacb10af892c841701e4e611f11ea79f2718e28d26c84b1e9bad3",
+      "publication_sha256": "74605ffc1bc4f3d41cec65a2bced4656e47f22fcbd4d239e8edeb17d4b32c8e2",
+      "organization_site_occurrences": 1,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-007-review-snapshot/src/common/protocol/sequence_tracker.cpp",
+      "original_sha256": "1f5db50544afa526f6bae69662962ad1863c2e6fa8bf8efe6964eb637a6bfce2",
+      "publication_sha256": "2f7a8c52177291945486735412356adb8b2314cdb94adaf794f699d2f6e4ba94",
+      "organization_site_occurrences": 2,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-007-review-snapshot/src/common/protocol/sequence_tracker.h",
+      "original_sha256": "5b939b2596d56c448d6a3a8d06c7a35817fd18042c517499c6960f599c3f642a",
+      "publication_sha256": "0acf7cbcb3f15c9cd088ba8b3d77c7a95d9f2712fd8e0561d5102bae2d6649fa",
+      "organization_site_occurrences": 2,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-007-review-snapshot/src/common/radio/radio_driver.cpp",
+      "original_sha256": "4c85edfd28ba3e1759ab0cb010828538bbfc3bc6d337d9ebdaa160a27f56b7bb",
+      "publication_sha256": "a7b904594f482654a8a44ef9fd8964468ed6a8bd86e94232e74e08a9e0f1b8e6",
+      "organization_site_occurrences": 2,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-007-review-snapshot/src/common/radio/radio_driver.h",
+      "original_sha256": "06c1cd054705015eb5be96e542f011ad7f073a70724546c5d8b99a3b3a48c83d",
+      "publication_sha256": "a59d4ed4578dd677afaaba430f2d69e4f21282323555b1f2a162cf0b72986cdd",
+      "organization_site_occurrences": 2,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-007-review-snapshot/src/common/radio/radio_transport.h",
+      "original_sha256": "096e6d6dd8827616cfdc602d03d4eb20cae1135709801a68d90bf2e317b1aa16",
+      "publication_sha256": "64717827d21e8769a0c0bd48aab35b6e0f568ab1a5fc6b58c4134c6be84abee7",
+      "organization_site_occurrences": 2,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-007-review-snapshot/docs/en/ARCHITECTURE.md",
+      "original_sha256": "2920e0712d4c689f95e18cc1005487122df32a0bd625960d8db1467202a76009",
+      "publication_sha256": "c8918c5e2348b5a735a679202f4211ab6e8e96e65c02ef3483387df2356a1039",
+      "organization_site_occurrences": 1,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-007-review-snapshot/docs/en/BENCH_RUNBOOK.md",
+      "original_sha256": "a079c5c92cdc99a8392ace2cec002f59521cd9b6547080f010627ab6ed4738c0",
+      "publication_sha256": "dd3851296431a9563e7fa8af891ab61503ed5666a9c91af01c7d45001621fb2f",
+      "organization_site_occurrences": 0,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-007-review-snapshot/docs/en/BUILD_MEMORY.md",
+      "original_sha256": "cd7ae4b1eee1359b11c76b9f7d4ab7f27cd7c88c3df60922bade5f0f7bde1a1a",
+      "publication_sha256": "fc5b54e748aaa00697ffcd8eaf8a4e8ef3a5bc76ff396e32121b87a61c8eff62",
+      "organization_site_occurrences": 0,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-007-review-snapshot/docs/en/ERROR_LOG.md",
+      "original_sha256": "e03974da5753c23e48082b7c0865ad3deab46148a91e0ec6b40882faffa51672",
+      "publication_sha256": "83e0f3e2789827425c17f72e292cf8f86cfe0d5f3312d0323795266a05760789",
+      "organization_site_occurrences": 0,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-007-review-snapshot/docs/en/IMPLEMENTATION_REPORT.md",
+      "original_sha256": "fafcaca59ad241de6f129339b41b63429aabc95fd0a0672702be98ba23310b07",
+      "publication_sha256": "8288186fcd4b1b8b902c60b0218394969d36f007701e23459491a92a0a3559a0",
+      "organization_site_occurrences": 0,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-007-review-snapshot/docs/en/PROTOCOL.md",
+      "original_sha256": "e6e834f957adbccaa75824ec135e6507273160ae972faacee7d4472020533449",
+      "publication_sha256": "3db09e733cdfd171b81fb9f694d3b283ec6504a0316592b7eefb8f2ff9204d09",
+      "organization_site_occurrences": 1,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-007-review-snapshot/docs/en/SOFTWARE_AUDIT.md",
+      "original_sha256": "42ea2ac7a2ea6c2d4099b17f9566b9c15cb6f842aee047364e7d47e4f05814fc",
+      "publication_sha256": "5131709ee4f9ffe6c14e430208cadc158b1c8f2551c96ebbbbfc07902d884b64",
+      "organization_site_occurrences": 0,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-007-review-snapshot/docs/en/VERSIONING.md",
+      "original_sha256": "30c7b3ae863872dc94dad96f6aafe800769d9833651febd467cdbb17a83ab22f",
+      "publication_sha256": "8cc5e44054fd24b9783664c92439f8e47894dcc47d48eb05b76a78bbbd0720c9",
+      "organization_site_occurrences": 1,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-007-review-snapshot/docs/zh-CN/ARCHITECTURE.md",
+      "original_sha256": "d1a5b9783121f62bfab5b733f1178356af223f7d8a50bdc80ce084400dd56099",
+      "publication_sha256": "c0dd79d54b4b7249e0313737992dee88ecc27390f9d225ec623470ddd55bdb79",
+      "organization_site_occurrences": 1,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-007-review-snapshot/docs/zh-CN/BENCH_RUNBOOK.md",
+      "original_sha256": "bd13cb53ed36341bad07e84a9ae91f5babdbb1d985c5249e7ba42fe3093b2438",
+      "publication_sha256": "9a2b378cca3686ce67f13f37811fefdb6057086fe164215bf88ba4c651053c9a",
+      "organization_site_occurrences": 0,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-007-review-snapshot/docs/zh-CN/PROTOCOL.md",
+      "original_sha256": "1b987b8f0fec4f58262211580cb08e8a637743c96df846d847ef94164e2f0ba9",
+      "publication_sha256": "993dfe3f28ac1cf21774269a4ec099c21f57dca1d4a235c8ca55d334ded4dfa5",
+      "organization_site_occurrences": 1,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-006-baseline/include/board_pins.h",
+      "original_sha256": "97468e6c63a61ef721cb1d881d705530afd48cf653a570ec5a8a45e8a328b828",
+      "publication_sha256": "c9954eca92fccc1ee3521393c8a497be162d96773513f4774cb0c8facfc98d8c",
+      "organization_site_occurrences": 2,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-006-baseline/include/project_config.h",
+      "original_sha256": "138993106965574950511361aed83fb395bdc9e819578e4375c6b7cbae11bf1b",
+      "publication_sha256": "5ac0086c324cddfbde0bf7cb6efb3fa492587a97df9febc5d7c8f7f91708bee6",
+      "organization_site_occurrences": 2,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-006-baseline/include/radio_config.h",
+      "original_sha256": "0615ab81b626bcced030a38e17aa1b5ff9fe6128dbf457842d3240a4f2d1826d",
+      "publication_sha256": "47f7ecc3b1a99d2edd67f8689ef3f7b73f9535b5fa4dd5e43b9ea01447aaad09",
+      "organization_site_occurrences": 2,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-006-baseline/src/main.cpp",
+      "original_sha256": "ae49af7933226d5ef6525fefafebb810b7667ad8ae630d1599ff06bd21d737d2",
+      "publication_sha256": "bb9c6c1bf2b794ecc828a91a7b7cfcc005910346eb153dc1bdec25d7f0b222ad",
+      "organization_site_occurrences": 1,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-006-baseline/test/test_frame_codec/test_main.cpp",
+      "original_sha256": "529624112dce66abb358fd331ba4eb45373c385e36d51879842cfb7c1c0e1b6d",
+      "publication_sha256": "ac2cb593b13f8c8f3f82ba861ef98ef0df70a8685973eb0607c05e12f269e1e9",
+      "organization_site_occurrences": 1,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-006-baseline/test/test_provisioning_console/test_main.cpp",
+      "original_sha256": "0108317c35ec133034048bb8ff3764fd79e9e2535a7263f20a1847baa52ed46a",
+      "publication_sha256": "d0381a98d786be700dfe898945facdab3b2f6bbb0ba62d67a6d88f3b6939bd17",
+      "organization_site_occurrences": 1,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-006-baseline/test/test_role_config/test_main.cpp",
+      "original_sha256": "89403bd95e56995ad6df4a9240574bad0de599b7dcfa6f86cd8cac8a3a1cf17c",
+      "publication_sha256": "78d3d834a711e08d462b83cfa7eff2f90b538d9785f674413cc8fbe1851524f4",
+      "organization_site_occurrences": 1,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-006-baseline/test/test_sequence_tracker/test_main.cpp",
+      "original_sha256": "fc6b84cd259cf9b4f9b9962d93c588187013bf71400f537532d8dd12ae4db742",
+      "publication_sha256": "e04fe61c947cf3f755a32b56a1cc97ca42d0bdb5930580b849a56ec57043e6e9",
+      "organization_site_occurrences": 1,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-006-baseline/src/app/firmware_runtime.cpp",
+      "original_sha256": "bc65a7800e8dc47760e613d4bb1c1afbcb08c88f1a79599ebe04bf730ddb0c33",
+      "publication_sha256": "964153070c4991a92fda7ec376536821492c0bcfa07c029d27f8eef31bd18319",
+      "organization_site_occurrences": 2,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-006-baseline/src/app/firmware_runtime.h",
+      "original_sha256": "4bccd34bc9a35ab0b0d9339797168cb8401f5eaa7a165c589da788a883ae078d",
+      "publication_sha256": "b8e40fb665faf21e62bac3001cb14b3f56a87134184918be72db8e368dd0e72d",
+      "organization_site_occurrences": 1,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-006-baseline/src/app/nvs_config_store.cpp",
+      "original_sha256": "9bf06e812320771525c4453695f76a6c4b5e760da83bcd089c54c1d946ecacf6",
+      "publication_sha256": "7947b3c8f462d46d64243515802e288a199927f312afd875fe31c26f2201f252",
+      "organization_site_occurrences": 4,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-006-baseline/src/app/nvs_config_store.h",
+      "original_sha256": "09a0d367026731c555cb6503ff7a05bb3009c98a3dd7b6372d09a550d72bf5d2",
+      "publication_sha256": "be48c9eba96049c2b66abfa309fb33a09fbcbd95209e4134a5260e215e681219",
+      "organization_site_occurrences": 1,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-006-baseline/src/app/provisioning_console.cpp",
+      "original_sha256": "6ff2f0774ce8b15c4e71f0c875c9332eba276f41ec90440bd4b4a516f6909476",
+      "publication_sha256": "62fb729c0fc940ebc0251f93a54bfc8e49b67973ff03bcce98c29b0a74928695",
+      "organization_site_occurrences": 2,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-006-baseline/src/app/provisioning_console.h",
+      "original_sha256": "5130845df6bd35941e68337066890bb3fbf840bff23333e3ac9a4dc359173bd1",
+      "publication_sha256": "2a98e10ec31eb49f595c7019c312a4a7877c8cb1482b8190dbf0ecd5b4739764",
+      "organization_site_occurrences": 2,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-006-baseline/src/client/client_app.cpp",
+      "original_sha256": "19304dcdc4ced40274465b208d5124116fafaf802cc00999430b7a1455199c26",
+      "publication_sha256": "32aee96728716122da286c029b01c78a1496c024a1d9282831681587ba41ac3a",
+      "organization_site_occurrences": 2,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-006-baseline/src/client/client_app.h",
+      "original_sha256": "fe971d78d87135ff153533c052f937f65132049f849af83dac2c4cd962edab7c",
+      "publication_sha256": "8b7e0fc4ab0f2239c53ddb4a08f1769b9798806c0a6d2f4aa97e1a70fe273389",
+      "organization_site_occurrences": 1,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-006-baseline/src/gateway/gateway_app.cpp",
+      "original_sha256": "91488d408231eb0fab839417d5bf98eaa1ff2d3990046e17d268612e134984bb",
+      "publication_sha256": "6e1243f827543d5fbe6eb1ef5a68c6880fdca4de03bbc47c7d50034fdb811857",
+      "organization_site_occurrences": 2,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-006-baseline/src/gateway/gateway_app.h",
+      "original_sha256": "0d6254629d527ee7c2d7c1f070c8762fbfe138394c3c2bade68c5795f52a49bb",
+      "publication_sha256": "fa08e78021e9aa7d3b5b530c8cedd8d591b3b570558ced4bf486ecd6b04013e9",
+      "organization_site_occurrences": 1,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-006-baseline/src/common/config/device_config.cpp",
+      "original_sha256": "790667c6d7000253bd04a7105d1da89e7b9d4106c8987485475463a977b7cfe5",
+      "publication_sha256": "d1206949caf46bebbb7f0a29246c93187b47e647c7410c6b9efcfe9e6a72c534",
+      "organization_site_occurrences": 2,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-006-baseline/src/common/config/device_config.h",
+      "original_sha256": "241ae97a38b532a0f32983a3f92644d0eebab32014b2854d43ff72ced6c6535a",
+      "publication_sha256": "3be8c150c77513db66548bc06a444bd93f7c6fe8ac5098cbdd05ff7319ca0b28",
+      "organization_site_occurrences": 2,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-006-baseline/src/common/diagnostics/serial_logger.cpp",
+      "original_sha256": "4cf2b8151cc5bf7f63a5e962ba91a0ab1ce19be56165f122da0527d6e738cda5",
+      "publication_sha256": "32cdc6543b58970eec7c3ba0b2a6dffb76e79beb16253df3c56cb91174b277bf",
+      "organization_site_occurrences": 2,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-006-baseline/src/common/diagnostics/serial_logger.h",
+      "original_sha256": "e6e9664595e841ee912fde149da4ba9bcc4c1c8ddbf8a99be941306b4bff8678",
+      "publication_sha256": "a944c921208646fc9bf6de5b7238d61be2025db640aa008a85dd331ae2cdc05b",
+      "organization_site_occurrences": 2,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-006-baseline/src/common/protocol/frame_codec.cpp",
+      "original_sha256": "d04bed0e7765d2c855cdd40b5556bb596fe4d739bdcb1256bb3a973887c75f21",
+      "publication_sha256": "0d3e7ebee8a1ceb5de86775c7b08aae720f3155f2abd9caeb65498034dc1bfd1",
+      "organization_site_occurrences": 2,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-006-baseline/src/common/protocol/frame_codec.h",
+      "original_sha256": "22bd430043ac60153876f876e5f41286b77a8fba8a6002c577e9968d27514b3d",
+      "publication_sha256": "619a7d2984c16955f71b18cc90ffa2aec8913aa6ab8525c79dfaeb729ee5618e",
+      "organization_site_occurrences": 2,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-006-baseline/src/common/protocol/message_types.h",
+      "original_sha256": "75857143b39aacb10af892c841701e4e611f11ea79f2718e28d26c84b1e9bad3",
+      "publication_sha256": "74605ffc1bc4f3d41cec65a2bced4656e47f22fcbd4d239e8edeb17d4b32c8e2",
+      "organization_site_occurrences": 1,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-006-baseline/src/common/protocol/sequence_tracker.cpp",
+      "original_sha256": "1f5db50544afa526f6bae69662962ad1863c2e6fa8bf8efe6964eb637a6bfce2",
+      "publication_sha256": "2f7a8c52177291945486735412356adb8b2314cdb94adaf794f699d2f6e4ba94",
+      "organization_site_occurrences": 2,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-006-baseline/src/common/protocol/sequence_tracker.h",
+      "original_sha256": "5b939b2596d56c448d6a3a8d06c7a35817fd18042c517499c6960f599c3f642a",
+      "publication_sha256": "0acf7cbcb3f15c9cd088ba8b3d77c7a95d9f2712fd8e0561d5102bae2d6649fa",
+      "organization_site_occurrences": 2,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-006-baseline/src/common/radio/radio_driver.cpp",
+      "original_sha256": "4c85edfd28ba3e1759ab0cb010828538bbfc3bc6d337d9ebdaa160a27f56b7bb",
+      "publication_sha256": "a7b904594f482654a8a44ef9fd8964468ed6a8bd86e94232e74e08a9e0f1b8e6",
+      "organization_site_occurrences": 2,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-006-baseline/src/common/radio/radio_driver.h",
+      "original_sha256": "3240062284d064acea3c5bb0145bcb3cff1bde486876789669ac8d0d5f9cd485",
+      "publication_sha256": "47e59e99e4d9d58ea81a15cbb979ab368231b4698a6aaadf89b46a7324118ce7",
+      "organization_site_occurrences": 2,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-006-baseline/docs/en/ARCHITECTURE.md",
+      "original_sha256": "8e5b7adb23e1de8f27e636a3ae76cf88d07d62875c331a1a0a3c2303d81e4155",
+      "publication_sha256": "4bd529211ae645c085f6e0c26897e9a656125259d7c9a3a0c669a2d24c6f393c",
+      "organization_site_occurrences": 1,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-006-baseline/docs/en/BENCH_RUNBOOK.md",
+      "original_sha256": "fb3df8bfae8a288c009d6d770115c25430139e69a850ec58d3ccc42543570448",
+      "publication_sha256": "9d87448186f954cb782c844f527f5b8918daab9a146dab1ec072f2c46a30c888",
+      "organization_site_occurrences": 0,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-006-baseline/docs/en/BUILD_MEMORY.md",
+      "original_sha256": "ca3cba63af4916615e4a7c925ae6ad293d07044ab9faabff46989c028d8f39fb",
+      "publication_sha256": "f4d05ac00d33c725099d05d27347c3aa1e54f5937107953a1d0b9b88302387d1",
+      "organization_site_occurrences": 0,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-006-baseline/docs/en/ERROR_LOG.md",
+      "original_sha256": "9b5855289d8af8b695081741d85e285f18c5c6d646e140a4a2d5d5c766dd37a3",
+      "publication_sha256": "461a14ae2f8738c520415981bc7efa6f400d3d114289d3eafd279255a5aa348f",
+      "organization_site_occurrences": 0,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-006-baseline/docs/en/IMPLEMENTATION_REPORT.md",
+      "original_sha256": "52174aac4447b2ecf87c274201dba57f783ed93503cbedb1f1c1e5b80bb474d8",
+      "publication_sha256": "52c120fd569e355aa46f4b686faff672bf6d03e46ad2e33d72032b0f02631598",
+      "organization_site_occurrences": 0,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-006-baseline/docs/en/PROTOCOL.md",
+      "original_sha256": "e6e834f957adbccaa75824ec135e6507273160ae972faacee7d4472020533449",
+      "publication_sha256": "3db09e733cdfd171b81fb9f694d3b283ec6504a0316592b7eefb8f2ff9204d09",
+      "organization_site_occurrences": 1,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-006-baseline/docs/en/VERSIONING.md",
+      "original_sha256": "30c7b3ae863872dc94dad96f6aafe800769d9833651febd467cdbb17a83ab22f",
+      "publication_sha256": "8cc5e44054fd24b9783664c92439f8e47894dcc47d48eb05b76a78bbbd0720c9",
+      "organization_site_occurrences": 1,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-006-baseline/docs/zh-CN/ARCHITECTURE.md",
+      "original_sha256": "7754362556c6c5b1df58a236ff1bb8e739269b5cc63f5aab9574e84dd6c24cb1",
+      "publication_sha256": "ca20f6281b36859e15f1db8ce99105284b2f0da6921604af7fb5452d481f5312",
+      "organization_site_occurrences": 1,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-006-baseline/docs/zh-CN/BENCH_RUNBOOK.md",
+      "original_sha256": "c014f4da1ee5aa0bf1908a419d5ae2a4ebb3a8f5deb949950c2a1646fd6a8a9f",
+      "publication_sha256": "41deeb193a121cd92ec741f4e7ca3ae21c6b4eb284d2b7e8197f2f01536f094c",
+      "organization_site_occurrences": 0,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "logs/build/iteration-006-baseline/docs/zh-CN/PROTOCOL.md",
+      "original_sha256": "1b987b8f0fec4f58262211580cb08e8a637743c96df846d847ef94164e2f0ba9",
+      "publication_sha256": "993dfe3f28ac1cf21774269a4ec099c21f57dca1d4a235c8ca55d334ded4dfa5",
+      "organization_site_occurrences": 1,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "docs/en/ARCHITECTURE.md",
+      "original_sha256": "2920e0712d4c689f95e18cc1005487122df32a0bd625960d8db1467202a76009",
+      "publication_sha256": "2b1143c8a4a07450900c8d4c0755e331ad1332b254075e7b6c38cbff17b38ef0",
+      "organization_site_occurrences": 1,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "docs/en/BENCH_RUNBOOK.md",
+      "original_sha256": "a079c5c92cdc99a8392ace2cec002f59521cd9b6547080f010627ab6ed4738c0",
+      "publication_sha256": "f464c020c094ddf10e490128b5b16fadc98a661a789c5d1fb39e0ef355850e8c",
+      "organization_site_occurrences": 0,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "docs/en/BUILD_MEMORY.md",
+      "original_sha256": "cd7ae4b1eee1359b11c76b9f7d4ab7f27cd7c88c3df60922bade5f0f7bde1a1a",
+      "publication_sha256": "01befbe311682d5db4fcadb0e71ef7b1ef48fc2c9908851cca3922e9808313d0",
+      "organization_site_occurrences": 0,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "docs/en/DECISIONS.md",
+      "original_sha256": "99635ebb972c2b498899cd72a6bd012f08c271c1904939bf0132bb91730a461f",
+      "publication_sha256": "a9ba9b4a17ed64bdc2cddd7e760e724e5f73a59b9bb3ad794bf8699496835923",
+      "organization_site_occurrences": 0,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "docs/en/ERROR_LOG.md",
+      "original_sha256": "e03974da5753c23e48082b7c0865ad3deab46148a91e0ec6b40882faffa51672",
+      "publication_sha256": "003bedd1afa97fc0c4a4e4e6c5a6cee01ba7895f79008c7219eb9a89ed41963d",
+      "organization_site_occurrences": 0,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "docs/en/IMPLEMENTATION_REPORT.md",
+      "original_sha256": "fafcaca59ad241de6f129339b41b63429aabc95fd0a0672702be98ba23310b07",
+      "publication_sha256": "30f022cf6aa9d763f76dccd328e0bd7fd0110780fefea4f4786deba269a19da4",
+      "organization_site_occurrences": 0,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "docs/en/MILESTONE_TASKS.md",
+      "original_sha256": "d541a7086e092053da3c1bca65602c3a725067843679acfa8465613f31fada49",
+      "publication_sha256": "00d9d053e213f7afe53d3e3186d7c34b1ce79ff11c916882af1e6e8266216136",
+      "organization_site_occurrences": 0,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "docs/en/PROGRESS.md",
+      "original_sha256": "b50f129ebcc6aaca1ea221d81b5fc73ffe2d00f6ce1487f3e47a5e8d85fe006f",
+      "publication_sha256": "d60712f3256b8d2cccc29b4970dff30cc10016d97911027db9e696289975662b",
+      "organization_site_occurrences": 0,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "docs/en/PROTOCOL.md",
+      "original_sha256": "e6e834f957adbccaa75824ec135e6507273160ae972faacee7d4472020533449",
+      "publication_sha256": "3db09e733cdfd171b81fb9f694d3b283ec6504a0316592b7eefb8f2ff9204d09",
+      "organization_site_occurrences": 1,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "docs/en/SOFTWARE_AUDIT.md",
+      "original_sha256": "42ea2ac7a2ea6c2d4099b17f9566b9c15cb6f842aee047364e7d47e4f05814fc",
+      "publication_sha256": "ffbeb6ec936f8377148e78c21ee063a01a9085d9e99f03cf5e642135cb87ace7",
+      "organization_site_occurrences": 0,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "docs/en/TEST_PLAN.md",
+      "original_sha256": "436ed8c4341efa04adc5f5bbf5d1a0956c35b945d16654af930fef1dd56f9237",
+      "publication_sha256": "dc6137dfd2d65fabdb1409646184e2e76e97b7afe9abc42adc9c4b0dd5345e50",
+      "organization_site_occurrences": 0,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "docs/en/VERSIONING.md",
+      "original_sha256": "30c7b3ae863872dc94dad96f6aafe800769d9833651febd467cdbb17a83ab22f",
+      "publication_sha256": "8cc5e44054fd24b9783664c92439f8e47894dcc47d48eb05b76a78bbbd0720c9",
+      "organization_site_occurrences": 1,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "docs/zh-CN/ARCHITECTURE.md",
+      "original_sha256": "d1a5b9783121f62bfab5b733f1178356af223f7d8a50bdc80ce084400dd56099",
+      "publication_sha256": "1806caabb9841f49ecd27c89e208e92f853aecbf542e40df7494682fe572e2af",
+      "organization_site_occurrences": 1,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "docs/zh-CN/BENCH_RUNBOOK.md",
+      "original_sha256": "bd13cb53ed36341bad07e84a9ae91f5babdbb1d985c5249e7ba42fe3093b2438",
+      "publication_sha256": "10a7917f544e9b3acf918e20b8f07728d5354fe2731e3ed6ff6c0c49dcd5eab6",
+      "organization_site_occurrences": 0,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "docs/zh-CN/DECISIONS.md",
+      "original_sha256": "0e7b33d68fbeec9d0977a57a4c1cc498548b075666a88f92c2c4c28d2c62dd2f",
+      "publication_sha256": "a6d14924d3d5013b774767aed8acedf52d6f67cf1d2a63c7c10f92bdcc241f14",
+      "organization_site_occurrences": 0,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "docs/zh-CN/PROGRESS.md",
+      "original_sha256": "1351ba428762e9c1411342836e782640823d613d55a1bcdded3524c970003332",
+      "publication_sha256": "7254f08d8c4d4faf7c516c9bfead3373049fc1d4edb353925cd88a1b25e1e48e",
+      "organization_site_occurrences": 0,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "docs/zh-CN/PROTOCOL.md",
+      "original_sha256": "1b987b8f0fec4f58262211580cb08e8a637743c96df846d847ef94164e2f0ba9",
+      "publication_sha256": "993dfe3f28ac1cf21774269a4ec099c21f57dca1d4a235c8ca55d334ded4dfa5",
+      "organization_site_occurrences": 1,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "docs/zh-CN/SOFTWARE_AUDIT.md",
+      "original_sha256": "ef1cc87ca9c2e747997e07a94439cc39fae604d3b1c2a592c7a8ddcb461d6cdc",
+      "publication_sha256": "aba4b883ebd31b5da46a1ae080a6192ff8830ec0810d2e60f383741ec381ace9",
+      "organization_site_occurrences": 0,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    },
+    {
+      "path": "docs/zh-CN/TEST_PLAN.md",
+      "original_sha256": "d761131fcdbf1095e27621a1b0cd376f9edfde89a7dfec44bb512a49ab4f0510",
+      "publication_sha256": "6a9d4a41207535e5fd4a379b2bc362f23942308e23430f87f2eccc1d9cde7a3e",
+      "organization_site_occurrences": 0,
+      "handling": "Identity/path/device neutralization, disclosed formatting normalization, or documented project/architecture updates; no historical outcome reclassification"
+    }
+  ],
+  "publication_digest_checkpoint": "Pre-establishment staging; later publication receipt changes are recorded separately."
+}

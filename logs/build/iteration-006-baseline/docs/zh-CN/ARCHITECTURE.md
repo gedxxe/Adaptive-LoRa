@@ -1,0 +1,104 @@
+# 系统架构
+
+## 1. 总体设计
+
+两台设备使用相同的 ESP32-C3 Super Mini 和 Ra-01SCH
+硬件，因此采用一份代码和一个固件镜像。
+
+``` text
+                    同一份固件镜像
+                           |
+                          Boot
+                           |
+                    从 NVS 读取配置
+                           |
+                      验证配置
+                           |
+            +--------------+--------------+
+            |              |              |
+         GATEWAY         CLIENT        配置无效
+            |              |              |
+        GatewayApp      ClientApp     Provisioning
+                                      (禁止正常 TX)
+```
+
+角色由 NVS
+配置决定，不通过硬件自动识别。两台设备硬件相同，固件无法仅凭硬件判断哪台设备应当作为
+Gateway。Gateway、Client
+和共享协议应放在同一个代码仓库中，尽量使用同一个 Codex 工作区；按
+milestone 分配任务，不要拆成两个独立且容易产生差异的代码库。
+
+## 2. 启动流程
+
+1.  初始化串口日志。
+2.  初始化 NVS 配置存储。
+3.  读取配置版本和设备参数。
+4.  验证角色、Network ID、Node ID、Gateway ID。
+5.  配置无效时进入配置模式，禁止正常无线发送。
+6.  配置有效时只创建对应的 GatewayApp 或 ClientApp。
+7.  通过唯一的 RadioDriver 初始化 LLCC68。
+8.  在主循环中调用应用的非阻塞 update 方法。
+
+配置版本不兼容时不能默认选择 Gateway 或 Client。
+
+## 3. 串口配置命令
+
+串口速率：115200 baud。
+
+``` text
+help
+status
+config show
+config set role gateway|client
+config set network-id <1..65535>
+config set node-id <1..65534>
+config set gateway-id <1..65534>
+config save
+reboot
+```
+
+初始测试配置：
+
+| 参数       | Gateway | Client |
+|------------|--------:|-------:|
+| Role       | GATEWAY | CLIENT |
+| Network ID |       1 |      1 |
+| Node ID    |       1 |      2 |
+| Gateway ID |       1 |      1 |
+
+节点/Gateway ID 0 和 65535 为保留值。Gateway 的 `node_id` 必须等于
+`gateway_id`；Client 的 `node_id` 必须与 `gateway_id`
+不同。角色变更后重启生效。
+
+实现补充（ADR-009）：128 字节行缓冲区、最多 6 个 token、每次 loop 最多处理 64 字节。超长行或控制字节使整行丢弃至换行。新增 `config set hello-interval-ms <1000..3600000>`；默认事务结束后等待 5000 ms。角色命令保留 ID；Network ID 65535 合法，65535 广播保留值只适用于节点地址。
+
+`config show` 显示暂存值，`status` 显示启动加载值；加载失败时用 `inactive_defaults` 标识默认建议值。schema 1 使用带完整性校验的 24 字节单 blob，保存后读回验证；校验不是身份认证。无效加载保留 UNSET，不初始化无线模块。重启请求停止新 TX，等待当前 TX 完成或超时，进入 standby 后重启。初始化失败须检查后重启；RX 启动最多连续恢复 3 次，间隔 1 秒。
+
+NVS namespace/key 为 `legacy schema-1 namespace` / `device`，所有多字节字段小端：offset 0/u32 magic=0x4344464D，4/u16 schema=1，6/u8 role（1 Gateway/2 Client），7/u8 reserved=0，8/u16 network，10/u16 node，12/u16 gateway，14/u16 reserved=0，16/u32 HELLO interval(ms)，20/u32 FNV-1a。FNV 覆盖字节 0–19，初值 2166136261，每字节 xor 后乘 16777619、按 2^32 取模；这不是无线协议扩展。
+
+## 4. 模块职责
+
+| 模块              | 职责                               |
+|-------------------|------------------------------------|
+| `main.cpp`        | Arduino 入口，只调用 Runtime       |
+| `FirmwareRuntime` | 加载配置并分配运行角色             |
+| `DeviceConfig`    | 独立于 Arduino 的配置模型和验证    |
+| `NvsConfigStore`  | 通过 Preferences/NVS 保存配置      |
+| `GatewayApp`      | Gateway 应用状态机                 |
+| `ClientApp`       | Client 应用状态机                  |
+| `RadioDriver`     | 唯一 LLCC68/SPI 操作模块           |
+| `FrameCodec`      | 独立于 Arduino/RadioLib 的帧编解码 |
+| `SequenceTracker` | 重复包识别                         |
+| `SerialLogger`    | 结构化日志                         |
+
+禁止将协议解析、RadioLib 调用、重传逻辑或 ADR 决策放入 `main.cpp`。
+
+## 5. 后续 MAC 设计
+
+后续采用 Gateway-Scheduled TDMA、保守 ADR、ACK Bitmap 和选择性重传。
+
+Gateway 只有一个 LLCC68，不能同时接收多个 SF。必须按照调度表逐个切换接收
+PHY。
+
+当前只有一台 Gateway 和一台 Client。两台设备的测试不能证明多节点或 70
+节点性能。

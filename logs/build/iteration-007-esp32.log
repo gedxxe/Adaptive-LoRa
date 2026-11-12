@@ -1,0 +1,67 @@
+Processing esp32c3_supermini (platform: espressif32; board: esp32-c3-devkitm-1; framework: arduino)
+--------------------------------------------------------------------------------
+Verbose mode can be enabled via `-v, --verbose` option
+CONFIGURATION: https://docs.platformio.org/page/boards/espressif32/esp32-c3-devkitm-1.html
+PLATFORM: Espressif 32 (55.3.311) > Espressif ESP32-C3-DevKitM-1
+HARDWARE: ESP32C3 160MHz, 320KB RAM, 4MB Flash
+DEBUG: Current (cmsis-dap) External (cmsis-dap, esp-bridge, esp-builtin, esp-prog, esp-prog-2, iot-bus-jtag, jlink, minimodule, olimex-arm-usb-ocd, olimex-arm-usb-ocd-h, olimex-arm-usb-tiny-h, olimex-jtag-tiny, tumpa)
+PACKAGES:
+ - contrib-piohome @ 3.4.4
+ - framework-arduinoespressif32 @ 3.3.11
+ - framework-arduinoespressif32-libs @ 5.5.5+sha.b774170ff46
+ - tool-esptoolpy @ 5.3.0
+ - tool-riscv32-esp-elf-gdb @ 17.1.0+20260402
+ - toolchain-riscv32-esp @ 14.2.0+20260121
+LDF: Library Dependency Finder -> https://bit.ly/configure-pio-ldf
+LDF Modes: Finder ~ chain, Compatibility ~ soft
+Found 45 compatible libraries
+Scanning dependencies...
+Dependency Graph
+|-- RadioLib @ 7.8.1
+|-- Preferences @ 3.3.11
+|-- SPI @ 3.3.11
+Building in release mode
+Compiling .pio\build\esp32c3_supermini\src\client\client_app.cpp.o
+Compiling .pio\build\esp32c3_supermini\src\common\diagnostics\serial_logger.cpp.o
+Linking .pio\build\esp32c3_supermini\firmware.elf
+                            Memory Type Usage Summary
+┌─────────────────────┬──────────────┬──────────┬────────────────┬───────────────┐
+│ Memory Type/Section │ Used [bytes] │ Used [%] │ Remain [bytes] │ Total [bytes] │
+├─────────────────────┼──────────────┼──────────┼────────────────┼───────────────┤
+│ Flash Code          │       225314 │          │                │               │
+│    .text            │       225314 │          │                │               │
+│ Flash Data          │        96984 │          │                │               │
+│    .rodata          │        71744 │          │                │               │
+│    .eh_frame        │        24692 │          │                │               │
+│    .init_array      │          292 │          │                │               │
+│    .appdesc         │          256 │          │                │               │
+│ DRAM                │        82944 │    25.82 │         238352 │        321296 │
+│    .text            │        58428 │    18.19 │                │               │
+│    .bss             │        16536 │     5.15 │                │               │
+│    .data            │         7980 │     2.48 │                │               │
+└─────────────────────┴──────────────┴──────────┴────────────────┴───────────────┘
+Total image size: 388706 bytes (.bin may be padded larger)
+Note: The reported total sizes may be smaller than those in the technical reference manual due to reserved memory and application configuration. The total flash size available for the application is not included by default, as it cannot be reliably determined due to the presence of other data like the bootloader, partition table, and application partition size. The total external RAM size is not included either, because the amount of RAM connected to the chip is detected at boot and is not known during the build.
+Retrieving maximum program size .pio\build\esp32c3_supermini\firmware.elf
+Checking size .pio\build\esp32c3_supermini\firmware.elf
+Advanced Memory Usage is available via "PlatformIO Home > Project Inspect"
+RAM:   [=         ]   7.5% (used 24516 bytes from 327680 bytes)
+Flash: [===       ]  27.7% (used 363466 bytes from 1310720 bytes)
+Building .pio\build\esp32c3_supermini\firmware.bin
+esptool v5.3.0
+Creating ESP32-C3 image...
+Merged 3 ELF sections.
+Successfully created ESP32-C3 image.
+Creating binary "firmware.factory.bin" with:
+    Offset   | File
+ -  0x0000   | bootloader.bin
+ -  0x8000   | partitions.bin
+ -  0xe000   | boot_app0.bin
+ -  0x10000  | firmware.bin
+Successfully created combined binary image.
+========================= [SUCCESS] Took 15.89 seconds =========================
+
+Environment        Status    Duration
+-----------------  --------  ------------
+esp32c3_supermini  SUCCESS   00:00:15.893
+========================= 1 succeeded in 00:00:15.893 =========================

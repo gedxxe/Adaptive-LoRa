@@ -1,0 +1,1790 @@
+diff --git a/iteration-006-baseline/AGENTS.md b/iteration-007-review-snapshot/AGENTS.md
+index 0d1bc31..4aa29c5 100644
+--- a/iteration-006-baseline/AGENTS.md
++++ b/iteration-007-review-snapshot/AGENTS.md
+@@ -5,15 +5,20 @@
+ Develop a small, private LoRa P2P firmware for industrial
+ energy-monitoring telemetry at independent research.
+
+-The first physical test setup contains exactly two radio devices:
++The planned first physical test setup contains exactly two radio devices:
+
+ | Role    | MCU                 | LoRa module                 | Quantity |
+ |---------|---------------------|-----------------------------|---------:|
+ | Gateway | ESP32-C3 Super Mini | Ai-Thinker Ra-01SCH, LLCC68 |        1 |
+ | Client  | ESP32-C3 Super Mini | Ai-Thinker Ra-01SCH, LLCC68 |        1 |
+
+-Both devices use the same hardware. The antenna under test is a 915 MHz
+-Moxon. The immediate objective is to establish a repeatable two-device
++Current inventory (user correction, 2026-11-12): two RA-01SCH/LLCC68
++modules, one ESP32-C3 Super Mini, second MCU not yet purchased, and
++915 MHz Moxon not yet fabricated. No two-device setup is assembled.
++Current work is software verification and M0–M2 protocol hardening.
++
++Both planned devices use the same hardware. The planned antenna is a 915 MHz
++Moxon. The first physical objective is to establish a repeatable two-device
+ radio link, then introduce gateway-scheduled communication in measured
+ stages.
+
+diff --git a/iteration-006-baseline/CHANGELOG.md b/iteration-007-review-snapshot/CHANGELOG.md
+index d38c232..bcab054 100644
+--- a/iteration-006-baseline/CHANGELOG.md
++++ b/iteration-007-review-snapshot/CHANGELOG.md
+@@ -5,6 +5,13 @@ changes. It is not a substitute for the append-only build memory.
+
+ ## Unreleased
+
++### Software verification of 0.2.0-alpha.1 — 2026-11-12
++
++- Added a six-method transport seam and host tests using actual production client/gateway/logger code; firmware state statements, PHY, provisioning and protocol v1 remain unchanged.
++- Fixed legacy MinGW format-macro compilation by using standard C++ `<cinttypes>` in client/logger. ESP32 build passed; 92 native tests passed, including 38 integration scenarios.
++- Recorded synchronous NVS/BUSY/SDK serial limits and RadioLib SPI allocation risk; no nonblocking/hardware validation claim.
++- Corrected current stock to two LLCC68 modules, one MCU and no fabricated Moxon; physical testing is deferred. No automatic retry, TDMA, bitmap, ADR or external integration added.
++
+ ### 0.2.0-alpha.1 implementation candidate — 2026-11-12
+
+ - Added one-image NVS role provisioning, staged serial configuration and controlled reboot.
+diff --git a/iteration-006-baseline/README.md b/iteration-007-review-snapshot/README.md
+index f3f5646..9bab7b4 100644
+--- a/iteration-006-baseline/README.md
++++ b/iteration-007-review-snapshot/README.md
+@@ -3,18 +3,24 @@
+ A staged firmware project for a private LoRa P2P link using ESP32-C3
+ Super Mini boards and Ai-Thinker Ra-01SCH (LLCC68) modules.
+
+-## Current bench setup
++## Current inventory and intended setup
+
+ | Device | Hardware                       | Intended role   |
+ |--------|--------------------------------|-----------------|
+ | Unit A | ESP32-C3 Super Mini + Ra-01SCH | Gateway         |
+ | Unit B | ESP32-C3 Super Mini + Ra-01SCH | Client          |
+
++The table is the intended pair, not assembled hardware. Current stock:
++**2 RA-01SCH/LLCC68 modules, 1 ESP32-C3 Super Mini**. The second MCU has
++not been purchased and the 915 MHz Moxon has not been fabricated.
++Work is temporarily limited to software verification/protocol hardening
++for M0–M2; physical NVS and RF tests have not been performed.
++
+ The same firmware image is used on both devices. The role is stored in
+ NVS and loaded at boot. A device without a valid role enters serial
+ provisioning mode and does not transmit.
+
+-The first antenna under test is a 915 MHz Moxon. Frequency, power, and
++The planned antenna is a 915 MHz Moxon. Frequency, power, and
+ antenna operation remain subject to local regulatory and RF validation.
+
+ ## Important hardware distinction
+@@ -66,7 +72,7 @@ pio run -e esp32c3_supermini -t upload
+ pio device monitor -b 115200
+ ```
+
+-Candidate `0.2.0-alpha.1`: ESP32 build passed (exit 0); 44 native tests passed (exit 0). Full evidence is in `docs/en/BUILD_MEMORY.md`. Upload, physical NVS provisioning and RF tests have NOT been performed. M0–M2 remain IN PROGRESS.
++Candidate `0.2.0-alpha.1`: ESP32 build passed (exit 0); **92 native tests passed** (exit 0), including 38 scenarios using the actual production client/gateway state machines through a bounded fake transport. See `docs/en/SOFTWARE_AUDIT.md` and `docs/en/BUILD_MEMORY.md`. These host loss/delay/reboot scenarios are simulated, not physical NVS or RF validation. M0–M2 remain IN PROGRESS; no upload or physical test has been performed.
+
+ This workstation resolves `espressif32` to installed pioarduino 55.03.311 / Arduino-ESP32 3.3.11. See the recorded package log before reproducing on a different workstation. RadioLib remains exactly 7.8.1. Native USB CDC is a provisional board assumption; verify the actual USB path.
+
+diff --git a/iteration-006-baseline/README.zh-CN.md b/iteration-007-review-snapshot/README.zh-CN.md
+index b6d4d8d..445ad0f 100644
+--- a/iteration-006-baseline/README.zh-CN.md
++++ b/iteration-007-review-snapshot/README.zh-CN.md
+@@ -3,17 +3,19 @@
+ 本项目用于开发基于 ESP32-C3 Super Mini 与 Ai-Thinker
+ Ra-01SCH（LLCC68）的私有 LoRa P2P 通信固件。
+
+-## 当前测试硬件
++## 当前库存与计划配置
+
+ | 设备   | 硬件                           | 目标角色 |
+ |--------|--------------------------------|----------|
+ | Unit A | ESP32-C3 Super Mini + Ra-01SCH | Gateway  |
+ | Unit B | ESP32-C3 Super Mini + Ra-01SCH | Client   |
+
++上表为计划中的双设备，并非已组装硬件。实际库存为 **2 个 RA-01SCH/LLCC68 模块、1 个 ESP32-C3 Super Mini**；第二个 MCU 尚未购买，915 MHz Moxon 尚未制作。当前仅进行 M0–M2 软件验证/协议加固，实物 NVS 和 RF 测试均未执行。
++
+ 两台设备使用同一份固件。设备角色保存在 NVS
+ 中，并在启动时读取。若角色配置缺失或无效，设备进入串口配置模式，不发送无线数据。
+
+-当前测试天线为 915 MHz
++计划使用的天线为 915 MHz
+ Moxon。频率、发射功率和天线使用仍需完成当地法规及射频验证。
+
+ ## 硬件注意事项
+@@ -57,7 +59,7 @@ pio run -e esp32c3_supermini -t upload
+ pio device monitor -b 115200
+ ```
+
+-候选版本 `0.2.0-alpha.1`：ESP32 编译通过（退出码 0），44 个 native 测试通过（退出码 0）。完整记录见 `docs/en/BUILD_MEMORY.md`。未执行烧录、NVS 实物配置或双设备射频测试，M0–M2 保持 IN PROGRESS。
++候选版本 `0.2.0-alpha.1`：ESP32 编译退出码 0，**92 个 native 测试通过**（退出码 0），其中 38 个场景通过有界 fake transport 执行实际生产 client/gateway 状态机。详见 SOFTWARE_AUDIT/BUILD_MEMORY。丢包、延迟、重启场景为 host 仿真，不是实物 NVS 或 RF 验证。未烧录或实测，M0–M2 保持 IN PROGRESS。
+
+ 本机安装的 `espressif32` 实际为 pioarduino 55.03.311 / Arduino-ESP32 3.3.11；跨机器复现时需核对包版本。RadioLib 固定为 7.8.1。原生 USB CDC 是待实物验证的板卡假设。
+
+diff --git a/iteration-006-baseline/docs/en/ARCHITECTURE.md b/iteration-007-review-snapshot/docs/en/ARCHITECTURE.md
+index 67452c8..0497063 100644
+--- a/iteration-006-baseline/docs/en/ARCHITECTURE.md
++++ b/iteration-007-review-snapshot/docs/en/ARCHITECTURE.md
+@@ -177,6 +177,14 @@ The superframe is planned as:
+ Control and data are logical planes that time-share the same
+ transceiver.
+
++## Software verification boundary (ADR-010)
++
++GatewayApp and ClientApp depend on the six-method RadioTransport reference; RadioDriver implements it and alone owns all LLCC68/SPI/IRQ operations. Runtime still owns the concrete driver and calls begin/poll/stop. A native fake supplies completed packet/error events to the actual production apps; test-only clock/serial headers let the actual logger run. No state-machine implementation is duplicated in tests, and no runtime heap allocation is introduced by the seam.
++
++The app logic is cooperative, but NVS commits, RadioLib BUSY waits and SDK serial calls are synchronous. A bounded logging queue is not a hard nonblocking guarantee for those dependencies. RadioLib also uses heap scratch buffers by default. Host app tests cannot validate hardware latency, ISR races, flash or RF.
++
++M2 still has no automatic retransmissions: tests replay the captured bytes unchanged to exercise identity/deduplication. New transactions after timeout use a new sequence. Inventory is two modules/one MCU/no fabricated Moxon, so physical bring-up is deferred.
++
+ ## 8. Scaling boundary
+
+ Current physical evidence can only come from one gateway and one client.
+diff --git a/iteration-006-baseline/docs/en/BENCH_RUNBOOK.md b/iteration-007-review-snapshot/docs/en/BENCH_RUNBOOK.md
+index 067c53b..aabdc3a 100644
+--- a/iteration-006-baseline/docs/en/BENCH_RUNBOOK.md
++++ b/iteration-007-review-snapshot/docs/en/BENCH_RUNBOOK.md
+@@ -2,6 +2,8 @@
+
+ This is an unexecuted procedure for two physical units. Read HARDWARE.md first. Candidate software success does not close hardware/RF acceptance.
+
++Current inventory correction: two radio modules, one MCU, second MCU not purchased, Moxon not fabricated. The pair is not assembled. This runbook is deferred; current work runs host software tests only.
++
+ ## Before power or upload
+
+ 1. Photograph both Super Mini boards and Ra-01SCH markings, revision, pad labels and numbering orientation. Verify GPIO4/5/6/7 SPI, GPIO1 RESET, GPIO0 DIO1 and GPIO10 BUSY by continuity against the proposed map. Do not use the map as measured evidence.
+diff --git a/iteration-006-baseline/docs/en/BUILD_MEMORY.md b/iteration-007-review-snapshot/docs/en/BUILD_MEMORY.md
+index c4fd917..6827660 100644
+--- a/iteration-006-baseline/docs/en/BUILD_MEMORY.md
++++ b/iteration-007-review-snapshot/docs/en/BUILD_MEMORY.md
+@@ -348,3 +348,90 @@ Earlier checkpoint headings without a time recorded only the local date, not a m
+ - Physical packets attempted/received, PDR, ACK success, RSSI/SNR, retries, latency, resets, driver/CRC counts: NOT MEASURED. Physical NVS save/reboot/corruption fixture, radio initialization and RF tests: NOT RUN. No upload or serial-device opening occurred. Only the port list was read; it contained Bluetooth ports.
+ - Final status: M0/M1/M2 IN PROGRESS (software compile/host evidence available, physical gates pending); M3–M8 NOT STARTED. Software report contains a staged M3–M8 plan without implementation.
+ - Exact next task: inspect and document both boards/modules/pin continuity/supply/antenna/USB and permitted bench RF setup, then flash the same image, verify NVS/role/LLCC68/BUSY/DIO1/reset and capture >=200 HELLO attempts with both serial logs. M2 acceptance includes exact ACK echo, timeout/duplicate handling and measured success with explicit denominators. M3 may start only after those gates pass.
++
++## ITERATION-006 — 2026-11-12 14:37 WIB — audit and production-app test seam
++
++- Author: Codex; objective: software verification/protocol hardening for M0–M2, not physical testing. Firmware remains 0.2.0-alpha.1 / protocol 1; Git branch/commits NOT AVAILABLE (no repository), no commits.
++- User inventory correction: 2 RA-01SCH/LLCC68 modules, 1 ESP32-C3 Super Mini, second MCU not purchased, Moxon not fabricated; no assembled radio pair. Earlier inventory/antenna assumptions are superseded. Planned simulated IDs remain gateway 1/1/1 and client 1/2/1; no actual NVS provisioning.
++- Read-only audit completed before source edits; inspected all seven requested modules plus tracker/console/logger and local SDK/library sources. Findings/proposal recorded in `docs/en/SOFTWARE_AUDIT.md` and commentary before implementation. Pre-edit snapshot: `logs/build/iteration-006-baseline/`; SHA-256 inventory: `logs/build/iteration-006-baseline-manifest.json`.
++- Files: new `src/common/radio/radio_transport.h` (hardware-independent events and six existing app operations); `radio_driver.h` implements the interface; app headers/constructors accept a transport reference; `serial_logger.h` uses hardware-independent events; `firmware_runtime.h` explicitly includes its concrete driver. State-machine bodies, runtime logic, driver implementation, codec and persistence were not modified in this iteration.
++- `platformio.ini`: native compiles actual app/logger sources with native-only clock/serial includes. New `test/support/platform/Arduino.h`, `esp_timer.h`, `test/support/fake_radio_transport.h`, `test/test_app_integration/test_main.cpp`, `test/test_serial_logger/test_main.cpp`; role-config suite gains four valid-integrity invalid-config fixtures. Exact test count/results not claimed until execution.
++- Command: `$env:PYTHONUTF8='1'; & <PIO_PYTHON> -m platformio test -e native`, outside sandbox, exit 1. All six suites failed compilation, zero test cases executed; log `logs/test/iteration-006-native.log`.
++- Reproduced portability issue ERR-011: old MinGW `<inttypes.h>` hides PRI* macros in C++ unless format macros are enabled; newly compiled production ClientApp/SerialLogger expose this issue. Use C++ `<cinttypes>` rather than changing log format/policy.
++- ESP32 command: `$env:PYTHONUTF8='1'; & <PIO_PYTHON> -m platformio run -e esp32c3_supermini`, outside sandbox; IN PROGRESS at this checkpoint; result will be appended to `logs/build/iteration-006-esp32.log`.
++- Toolchain baseline from iteration 005: Core 6.1.19, pioarduino/espressif32 55.03.311, Arduino-ESP32 3.3.11, RISC-V GCC 14.2.0, RadioLib 7.8.1; native 1.2.1/Unity 2.6.1/MinGW GCC 6.3.0. No dependency upgrade.
++- Audit residuals: synchronous NVS commits, bounded BUSY waits, SDK USB mutex/write waits, RadioLib default SPI scratch allocations, hardware IRQ assumptions, bounded volatile replay history and random-source liveness assumption. See ERR-008–010/SOFTWARE_AUDIT; no physical measurements or timings invented.
++- Physical setup: board/module revisions, pin continuity, distance/LOS, supply, antenna orientation/matching and RF authorization TBD/NOT AVAILABLE. Packet counts, PDR/ACK, RSSI/SNR, retries, latency, resets and driver hardware behavior NOT MEASURED. Physical NVS/RF tests NOT RUN.
++- Next: finish frozen-source ESP32 command, correct only the portable include, run all native tests to obtain real state-machine results, then review complete no-index Git diff. No scheduler/retry/ADR or external integration added. M0–M2 remain IN PROGRESS.
++
++### ITERATION-006 completion
++
++- Frozen-source ESP32 command completed with exit 0, PASS, 153.41 s: `logs/build/iteration-006-esp32.log`. RAM 24,516 bytes; flash 363,466 bytes. Only the known RadioLib USB CDC warning remains. Native command exit 1 is a separate compile failure; no native scenario was executed.
++- Documentation alignment also updated AGENTS.md, both READMEs, English/Chinese HARDWARE/ARCHITECTURE/BENCH_RUNBOOK/LOGGING_GUIDE/PROGRESS, Chinese DECISIONS/SOFTWARE_AUDIT, English BUILD_MEMORY/ERROR_LOG/DECISIONS/SOFTWARE_AUDIT. This corrects current inventory and distinguishes bounded queues from blocking SDK calls; original iteration history is preserved.
++
++## ITERATION-007 — 2026-11-12 14:51 WIB — production-app host scenarios pass
++
++### Objective and source baseline
++
++- Author Codex; milestone M0–M2 software verification/protocol hardening; firmware **0.2.0-alpha.1**, protocol **1**. No release/version bump or wire-format change. BUILD_ID remains candidate label m0-m2-source-001; exact hashes below identify this snapshot.
++- Git branch / commit before / commit after NOT AVAILABLE. `git rev-parse --show-toplevel` returned 128 because this is not a Git repository; `logs/build/iteration-007-git-status.log`. No Git repository initialized and no commits created.
++- Read-only audit and seam proposal preceded iteration-006 refactor. The immutable task baseline is `logs/build/iteration-006-baseline/` / `iteration-006-baseline-manifest.json`.
++
++### Exact files and responsibilities in this iteration
++
++- `src/client/client_app.cpp`, `src/common/diagnostics/serial_logger.cpp`: replace C `<inttypes.h>` with portable C++ `<cinttypes>`; fix reproduced ERR-011 without altering formats or state statements.
++- `test/test_app_integration/test_main.cpp`: tighten clock fixtures to cross ACK/recovery wrap and use an absolute >32-bit reporting time; actual app/codec/tracker/config/logger scenarios. `test/test_serial_logger/test_main.cpp`: distinct FIFO lines verify ordering under bounded queue/short writes.
++- `README.md`, `README.zh-CN.md`: current 92-case/software-only evidence.
++- `docs/en/PROGRESS.md`, `docs/zh-CN/PROGRESS.md`: current evidence/stock/remaining limits.
++- `docs/en/TEST_PLAN.md`, `docs/zh-CN/TEST_PLAN.md`: executed scenarios, fake scope and uncovered physical/dependency behavior.
++- `docs/en/SOFTWARE_AUDIT.md`, `docs/zh-CN/SOFTWARE_AUDIT.md`: audit findings, exact test interpretation, current results/hashes and review.
++- `docs/en/ERROR_LOG.md`: append ERR-011 verified fix. `docs/en/BUILD_MEMORY.md`: this append-only iteration. `CHANGELOG.md`: behavior-preserving verification entry. `docs/en/IMPLEMENTATION_REPORT.md`: label iteration-005 report historical and point to the new audit; original evidence retained.
++- Final entire-task inventory is `logs/build/iteration-007-changed-files.txt` (31 modified / 8 created source-document-test files; 39 total). It includes iteration-006 seam/support changes. Evidence logs/manifests and before/after review snapshots are separate under logs.
++- ADR-010 was appended in iteration 006; no additional protocol/architecture decision changed in iteration 007.
++
++### Commands and results
++
++All commands from workspace root unless stated. Builds/tests use reviewed outside-sandbox execution, necessary for the existing SDK cache/host compiler. No network dependency upgrade or serial port/device opening.
++
++| Exact command | Exit | Result | Full evidence |
++|---|---:|---|---|
++| `$env:PYTHONUTF8='1'; & <PIO_PYTHON> -m platformio test -e native` | 0 | **92/92 PASS**, 24.35 s, zero failed/skipped | `logs/test/iteration-007-native.log` |
++| `$env:PYTHONUTF8='1'; & <PIO_PYTHON> -m platformio run -e esp32c3_supermini` | 0 | PASS, 15.89 s | `logs/build/iteration-007-esp32.log` |
++| `git rev-parse --show-toplevel` | 128 | No repository; ordinary Git diff unavailable | `logs/build/iteration-007-git-status.log` |
++| `& <PIO_PYTHON> -m platformio --version` | 0 | Core 6.1.19 | tool output; build packages also recorded |
++| Python inline source-preservation/hash/scenario audit | 0 | Preserved source policies; 92 named PASS cases extracted | `logs/build/iteration-007-static-review.log`, `logs/test/iteration-007-scenarios.md` |
++| Git no-index comparison of before/after snapshots | 1 (expected differences) | Complete project change patch; no removals | `logs/build/iteration-007-complete.diff`, `iteration-007-changed-files.txt` |
++
++The comparison is generated with `git -c core.autocrlf=false -c core.quotepath=false diff --no-index --no-ext-diff iteration-006-baseline iteration-007-review-snapshot` from logs/build. Git's check return 1 under no-index reflects differences; no added-line whitespace errors are accepted. Initial comparison emitted automatic-LF/CRLF notices from global Git settings; process-local core.autocrlf=false avoids that noise without changing source line endings or Git config. Final diff refresh/review status is in `logs/build/iteration-007-review.log`.
++
++### Tests and toolchain
++
++- Suites: actual production apps 38; codec 18; role/config 13; console 10; sequence/timing 7; real logger 6. **92 cases passed / 0 failed / 0 skipped**. Exact case names and individual PASS lines in the native log/scenario inventory. These are test counts, not assertion counts or coverage percentages; instrumented line/branch coverage NOT MEASURED.
++- Integration includes packet/ACK loss; before/at/after-deadline ACKs; wrong/stale/duplicate identity; 44 malformed HELLO and 45 malformed ACK input variants; byte-identical replay; both TX-error paths; bounded RX recovery; no deadline extension; session object recreation/window behavior; 32-bit wrap/64-bit time; stop gates; 200 repeated transactions and a separate 65,537-transaction full sequence exhaustion for both senders.
++- The retransmission fixture preserves the entire serialized packet, identity and payload. M2 still has no automatic retry; a later new client transaction consumes a new sequence. No DATA, selective scheduler or M3+ behavior added.
++- Deterministic fake transport/clock/Serial are stimuli only; actual production app/codec/tracker/config/logger statements execute. Fake airtime is 1000 us, not a measured radio value. Runtime/NVS and RadioDriver poll/IRQ/SPI/BUSY are not executed by these app tests.
++- Resolved versions from actual installed/build output: Core 6.1.19; pioarduino/espressif32 55.03.311 (display 55.3.311); Arduino-ESP32 3.3.11 / libs 5.5.5+sha.b774170ff46; RISC-V GCC 14.2.0 package 14.2.0+20260121; RadioLib 7.8.1. Native 1.2.1 / Unity 2.6.1 / MinGW GCC 6.3.0. Compiler warnings are errors for native; known RadioLib CDC warning remains on ESP32.
++- Build RAM 24,516 / 327,680 bytes; flash 363,466 / 1,310,720 bytes. Final application SHA-256 **1eb8c7fafeb36e87035095a9c357a9f024e8164c88e43a88274831c9618a34da**; exact source/test/config hashes in `logs/build/iteration-007-source-manifest.sha256`.
++
++### Preservation, errors and limits
++
++- Static byte comparison: main.cpp unchanged at 15 lines; Runtime/NVS/RadioDriver/FrameCodec/DeviceConfig/SequenceTracker implementations, pins/PHY/project constants/VERSION/PROTOCOL_VERSION unchanged. App/logger statements match baseline after only expected constructor/include substitutions. Hardware owner remains one LLCC68; native adapters are scoped to native include flags.
++- No packet/state defect reproduced. ERR-011 closed by passing native and firmware checks; no other production behavior fix made. ERR-008 synchronous NVS/BUSY, ERR-009 RadioLib SPI heap scratch, ERR-010 SDK serial waiting and ERR-005 physical CDC remain open limitations. The ISR lost-edge mitigation depends on latched DIO1; random-source liveness/entropy is not tested. No timing or allocation-free proof is claimed.
++- Complete source/document diff and test additions were reviewed for unrelated changes; previous BUILD_MEMORY/ERROR_LOG/DECISIONS contents are preserved. Final no-index comparison is a snapshot review, not an invented Git commit comparison.
++
++### Hardware and current milestone
++
++- Stock per user: 2 RA-01SCH/LLCC68 modules, 1 ESP32-C3 Super Mini; second MCU NOT PURCHASED, Moxon NOT FABRICATED, pair NOT ASSEMBLED. Board/module revisions/markings/continuity/USB/flash TBD. Simulated roles GATEWAY network/node/gateway 1/1/1, CLIENT 1/2/1; no physical role provisioned.
++- PHY source unchanged: 915.0 MHz provisional, SF7/BW125/CR4/5, explicit header, PHY CRC, preamble 8, sync 0x12, 10 dBm, SPI 1 MHz. No control-SF changes. Actual supply, distance/LOS, antenna orientation/matching, permitted frequency/EIRP/access requirements: NOT MEASURED / TBD.
++- Physical packet counts/PDR/ACK success/RSSI/SNR/retries/latency/resets/errors: NOT MEASURED. Physical NVS/flash/reboot/IRQ/RF tests: NOT RUN. Simulated transactions are not physical evidence.
++- M0/M1/M2 overall IN PROGRESS; software verification evidence PASS for the named scenarios; M3–M8 NOT STARTED. No Wi-Fi, meter, database, dashboard or later MAC work.
++- Next concrete software task: targeted driver-API fault injection and configuration-store boundary verification, with explicit dependency timing/allocation budgets. Physical bring-up waits for procurement/fabrication/assembly and its documented checks; M3 remains gated on full M2 acceptance.
++
++### ITERATION-007 review correction
++
++- Final no-index --check initially returned 3 and flagged two CRLF notice lines added to the otherwise-LF historical IMPLEMENTATION_REPORT.md (ERR-012); full output retained in `logs/build/iteration-007-diff-check-initial.log`. Normalized those two added lines to the original LF style; no source change or repeated firmware/native run needed.
++- ERROR_LOG gains ERR-012; final diff refresh verifies whitespace and append-only history. This is a documentation review correction within iteration 007, not a new unexecuted firmware iteration.
++
++### ITERATION-007 final review outcome
++
++The complete no-index project comparison contains 39 files (31 modified, 8 new), no removals. The original historical report body is retained byte-for-byte; ERR-012 is verified closed. Final Git --check returns 1 for expected differences with no whitespace diagnostics; added-line checks and append-only history checks pass. Source hashes still match the successful ESP32/native snapshot. Review details and full patch are `logs/build/iteration-007-review.log` and `logs/build/iteration-007-complete.diff`. No physical validation was performed.
+diff --git a/iteration-006-baseline/docs/en/DECISIONS.md b/iteration-007-review-snapshot/docs/en/DECISIONS.md
+index 0c4cddc..15a774e 100644
+--- a/iteration-006-baseline/docs/en/DECISIONS.md
++++ b/iteration-007-review-snapshot/docs/en/DECISIONS.md
+@@ -102,3 +102,13 @@ record the reason and update all affected documents.
+ - Fixed data PHY SF7 only, private sync word 0x12, XTAL (DIO3 voltage 0), LDO mode; exact module oscillator/regulator/RF-switch behavior remains a bench check. RadioLib default internal DIO2 RF-switch handling is retained; TXEN/RXEN are not MCU-controlled.
+ - Native USB CDC enabled for the provisional C3 target; verify actual board USB path before flashing. Pins remain provisional.
+ - Logging uses a bounded 16-line queue and nonblocking drain. Overflow is counted in `status`; loss of required evidence requires repeating the run. RadioLib does not expose the matched chip ID string or status for every metric getter; report driver selection honestly, not silicon identification.
++
++## ADR-010 — Test production M2 apps through a minimal transport reference
++
++- Status: ACCEPTED; date 2026-11-12; scope software-only M0–M2 verification.
++- Context: concrete RadioDriver headers pulled Arduino/RadioLib into both apps/logger and prevented current native tests from exercising production transitions. Read-only audit and concrete seam proposal preceded edits (SOFTWARE_AUDIT.md).
++- Decision: introduce only six already-used operations in RadioTransport, with bounded hardware-independent RadioEvent. RadioDriver implements this one interface and remains the sole hardware/LLCC68/SPI owner; Runtime retains concrete begin/poll/stop. Apps use a reference, no heap ownership or framework.
++- Tests compile the actual app/codec/tracker/config/logger .cpp files. Native-only compatibility headers provide virtual ESP timer and captured Serial byte writes; fake transport injects completed packets/events and errors, not RF/IRQ/SPI behavior. Runtime/NVS are audited, not executed by these app tests.
++- No M2 retry policy is added. Test retransmission means replaying byte-identical captured packets; a new application transaction still uses a new sequence. Volatile deduplication boundaries and gateway-reboot history loss remain documented behavior.
++- Correction to ADR-009 wording: a bounded logger queue/capacity check does not establish nonblocking behavior of SDK USB calls. Synchronous NVS/BUSY/USB and RadioLib scratch allocation remain explicitly unverified dependencies, not simulated successes.
++- Inventory update: two modules/one MCU/no fabricated antenna, no assembled pair. Physical gates remain open; later MAC milestones are not started.
+diff --git a/iteration-006-baseline/docs/en/ERROR_LOG.md b/iteration-007-review-snapshot/docs/en/ERROR_LOG.md
+index c3f0a40..02df5a7 100644
+--- a/iteration-006-baseline/docs/en/ERROR_LOG.md
++++ b/iteration-007-review-snapshot/docs/en/ERROR_LOG.md
+@@ -164,3 +164,44 @@ Status CLOSED — VERIFIED for the compile failure. Frozen-source `PIO run -e es
+ ### ERR-007 verification — iteration 005
+
+ Status CLOSED — VERIFIED for the source defect. The filter now matches pinned RadioLib's condition; final static review is in `logs/build/iteration-005-static-review.log`, firmware build exit 0 in `logs/build/iteration-005-esp32.log`, native 44/44 pass exit 0 in `logs/test/iteration-005-native.log`. Native suites do not exercise the radio. Physical header/CRC IRQ behavior and RF performance remain NOT TESTED under the M1/M2 hardware gates.
++
++## ERR-008 — Synchronous operations limit cooperative-loop deadlines
++
++- First seen: 2026-11-12, iteration 006 read-only audit; severity MEDIUM; status OPEN (timing limitation, no physical failure reproduced).
++- Source evidence: NvsConfigStore::save calls Preferences::putBytes; installed Preferences commits flash synchronously. RadioLib Module::SPItransferStream yields/waits on BUSY with its own timeout. Application TX/ACK software deadlines are only evaluated after these calls return.
++- Reproduction: inspect actual SDK/library sources and the direct calls recorded in SOFTWARE_AUDIT.md. No assertion that a particular flash/BUSY duration occurred on a device.
++- Disposition: preserve M2 behavior; measure/fault-test these boundaries before claiming hard real-time/nonblocking guarantees. App fake transport tests deliberately exclude them. Physical verification NOT RUN.
++
++## ERR-009 — RadioLib default SPI path allocates scratch buffers
++
++- First seen: 2026-11-12, iteration 006; severity LOW; status OPEN (dependency allocation risk; no allocation failure observed).
++- Source evidence: RadioLib 7.8.1 BuildOpt.h defaults RADIOLIB_STATIC_ONLY=0; Module::SPItransferStream uses new[]/delete[] scratch buffers. Fixed application buffers are not a whole-firmware allocation-free guarantee.
++- Disposition: retain the pinned driver/memory mode for this behavior-preserving seam task. A future static-buffer change must review all command bounds and stack budget; no dependency upgrade or allocation-failure behavior claimed verified.
++
++## ERR-010 — Logger capacity check does not prove nonblocking SDK I/O
++
++- First seen: 2026-11-12, iteration 006; severity LOW; status OPEN (SDK timing limitation).
++- Source evidence: installed HWCDC availableForWrite/write use a mutex timeout (default 100 ms), and write can retry timed ring-buffer sends. A capacity check can race with SDK state/backpressure.
++- Disposition: correct documentation's hard nonblocking claim; test the production queue with deterministic capacity/short writes. USB/UART mutex timing and backpressure latency remain unmeasured. No serial setting changed in this task.
++
++## ERR-011 — Production log-format macros hidden by legacy MinGW header
++
++- First seen: 2026-11-12 14:37 WIB, iteration 006; severity MEDIUM; status OPEN.
++- Reproduction: compile actual ClientApp and SerialLogger via native target. MinGW 6.3.0 `<inttypes.h>` hides PRIu32/PRIu64/PRId64 in C++ unless __STDC_FORMAT_MACROS is defined; compilation fails before any tests run.
++- Log: `logs/test/iteration-006-native.log`; native command exit 1, six errored suites/zero executed cases.
++- Fix proposed: use standard C++ `<cinttypes>` in the two production .cpp files, preserving log format and state behavior. Verification pending.
++
++### ERR-011 verification — iteration 007
++
++Status CLOSED — VERIFIED. ClientApp/SerialLogger now include C++ `<cinttypes>`; no format string or application statement changed. `pio test -e native` through installed Python, exit 0, 92/92 pass in `logs/test/iteration-007-native.log`; actual formatter prefix/N/A checks pass. ESP32 build exit 0 in `logs/build/iteration-007-esp32.log`. No physical serial test performed. ERR-008/009/010 remain explicit limitations, not claimed fixed by the fake transport.
++
++## ERR-012 — Added historical notice used mixed line endings
++
++- First seen: 2026-11-12, iteration 007 diff review; severity LOW; status FIXED — UNVERIFIED at this checkpoint.
++- Reproduction: Git no-index --check with core.autocrlf=false reported two CR-at-EOL trailing-whitespace lines in the newly added IMPLEMENTATION_REPORT historical notice; exit 3 (differences plus whitespace diagnostics).
++- Exact failed-check output: `logs/build/iteration-007-diff-check-initial.log`. Source/firmware/tests were unaffected.
++- Fix: normalize the two added CRLF notice lines to the existing report's LF style; historical content retained. Final diff check/review evidence will be in `logs/build/iteration-007-review.log` and `iteration-007-diff-check.log`.
++
++### ERR-012 verification — iteration 007
++
++Status CLOSED — VERIFIED. The original historical report body is retained byte-for-byte with only the two LF notice lines inserted. Final Git no-index --check returned 1 (differences expected) with no whitespace output; explicit added-line whitespace/conflict checks passed. See `logs/build/iteration-007-review.log`. No firmware source changed.
+diff --git a/iteration-006-baseline/docs/en/HARDWARE.md b/iteration-007-review-snapshot/docs/en/HARDWARE.md
+index e6fea47..d217fc6 100644
+--- a/iteration-006-baseline/docs/en/HARDWARE.md
++++ b/iteration-007-review-snapshot/docs/en/HARDWARE.md
+@@ -4,15 +4,13 @@
+
+ | Item               | Specification                                 |         Quantity | Status     |
+ |--------------------|-----------------------------------------------|-----------------:|------------|
+-| Gateway MCU        | ESP32-C3 Super Mini                           |                1 | Available  |
+-| Client MCU         | ESP32-C3 Super Mini                           |                1 | Available  |
+-| Gateway radio      | Ai-Thinker Ra-01SCH, LLCC68                   |                1 | Available  |
+-| Client radio       | Ai-Thinker Ra-01SCH, LLCC68                   |                1 | Available  |
+-| Antenna            | 915 MHz Moxon                                 | Confirm quantity | Under test |
++| MCU stock          | ESP32-C3 Super Mini                           |                1 | Available, pair not assembled |
++| Second MCU         | ESP32-C3 Super Mini                           |                0 | Not yet purchased |
++| Radio stock        | Ai-Thinker Ra-01SCH, LLCC68                   |                2 | Available, pair not assembled |
++| Antenna            | 915 MHz Moxon                                 |                0 | Not yet fabricated |
+ | RF cable/connector | Match the actual module and antenna connector |              TBD | Verify     |
+
+-Both devices use the same hardware. Device role is selected through NVS
+-configuration.
++Inventory corrected by the user on 2026-11-12. The planned gateway and client use the same hardware; device role is selected through NVS. There is no assembled pair and current work is software-only. No physical NVS or RF validation is available.
+
+ ## 2. Module identification
+
+diff --git a/iteration-006-baseline/docs/en/IMPLEMENTATION_REPORT.md b/iteration-007-review-snapshot/docs/en/IMPLEMENTATION_REPORT.md
+index b68ffd5..1b8f8d4 100644
+--- a/iteration-006-baseline/docs/en/IMPLEMENTATION_REPORT.md
++++ b/iteration-007-review-snapshot/docs/en/IMPLEMENTATION_REPORT.md
+@@ -1,5 +1,7 @@
+ # M0–M2 implementation report — 2026-11-12
+
++Historical iteration-005 baseline. Later behavior-preserving software verification, corrected inventory, current evidence and diffs are recorded in SOFTWARE_AUDIT.md and iterations 006–007; the earlier counts/hashes below are preserved as historical results.
++
+ Candidate `0.2.0-alpha.1`, protocol `1`: one firmware image, validated NVS role loading, bounded provisioning, LLCC68 fixed-PHY HELLO/ACK, explicit v1 codec, ACK echo checks and duplicate handling are implemented. Firmware compile and native tests pass. Physical M0–M2 acceptance is pending. No commits were created; the workspace has no Git repository.
+
+ ## Executed validation
+diff --git a/iteration-006-baseline/docs/en/LOGGING_GUIDE.md b/iteration-007-review-snapshot/docs/en/LOGGING_GUIDE.md
+index 577aeca..87a79b5 100644
+--- a/iteration-006-baseline/docs/en/LOGGING_GUIDE.md
++++ b/iteration-007-review-snapshot/docs/en/LOGGING_GUIDE.md
+@@ -14,6 +14,8 @@ zero to mean unknown.
+
+ The M2 implementation emits comma-separated `key=value` fields, one event per line, and uses `N/A` for unavailable fields. Frame events include network/source/destination/session/sequence and version fields. `toa_us` is the RadioLib calculation for a TX start, not measured latency. `LINK_COUNTS` includes attempts, accepted ACKs, ACK timeouts, TX failures and transaction duration. `ACK_TX` means start; `TX_DONE` confirms completion. `status` reports the 16-line queue's `log_dropped`; preserve zero-drop capture for acceptance. The bounded queue drains at most 128 bytes per loop and never prints in ISR.
+
++Audit correction (ADR-010/ERR-010): queue processing and requested byte count are bounded, but installed SDK availableForWrite/write can wait on mutexes/ring-buffer progress. Do not describe end-to-end serial I/O as proven nonblocking. Native backpressure/short-write tests exercise queue bookkeeping only, not USB/UART latency.
++
+ ## Required events
+
+ - `BOOT`
+diff --git a/iteration-006-baseline/docs/en/PROGRESS.md b/iteration-007-review-snapshot/docs/en/PROGRESS.md
+index 3712b51..178c441 100644
+--- a/iteration-006-baseline/docs/en/PROGRESS.md
++++ b/iteration-007-review-snapshot/docs/en/PROGRESS.md
+@@ -12,15 +12,15 @@ recorded.
+ | Item                      | Current value                                             |
+ |---------------------------|-----------------------------------------------------------|
+ | Firmware architecture     | One image; role loaded from NVS at boot                   |
+-| Gateway hardware          | ESP32-C3 Super Mini + Ai-Thinker Ra-01SCH (LLCC68), qty 1 |
+-| Client hardware           | ESP32-C3 Super Mini + Ai-Thinker Ra-01SCH (LLCC68), qty 1 |
++| MCU inventory             | 1 ESP32-C3 Super Mini; second not purchased; pair not assembled |
++| Radio inventory           | 2 Ai-Thinker RA-01SCH/LLCC68 modules; pair not assembled |
+ | Radio driver              | RadioLib `LLCC68`                                         |
+ | RadioLib pin              | 7.8.1                                                     |
+ | Frequency                 | 915.0 MHz provisional bench setting                       |
+ | Initial data PHY          | SF7 / BW125 / CR4/5                                       |
+ | Common control PHY        | SF9 / BW125 / CR4/5                                       |
+ | Initial TX power          | 10 dBm                                                    |
+-| Antenna                   | 915 MHz Moxon; matching and performance not yet validated |
++| Antenna                   | 915 MHz Moxon planned, not yet fabricated               |
+ | Network ID                | 1                                                         |
+ | Gateway node ID           | 1                                                         |
+ | Initial client node ID    | 2                                                         |
+@@ -29,13 +29,15 @@ recorded.
+
+ ## Current status
+
+-M0–M2 source is implemented as candidate `0.2.0-alpha.1`. Final native tests: 44/44 PASS, exit 0 (`logs/test/iteration-005-native.log`). Final frozen-source ESP32 build: PASS, exit 0 (`logs/build/iteration-005-esp32.log`). Physical NVS/radio/RF tests: NOT RUN. Only Bluetooth ports were enumerated; no ESP32 port or hardware photographs/schematic/continuity record were available. No milestone is PASS.
++Software-only verification completed in iteration 007 for candidate `0.2.0-alpha.1` / protocol 1. ESP32 build PASS, exit 0 (`logs/build/iteration-007-esp32.log`); native **92/92 PASS**, exit 0 (`logs/test/iteration-007-native.log`): 38 production-app integration scenarios, codec 18, role/config 13, console 10, sequence/timing 7, logger 6. These are scenario counts, not line/branch coverage percentages.
++
++Corrected stock: two LLCC68 modules, one MCU, second MCU not purchased, Moxon not fabricated; no assembled pair. Physical NVS/radio/RF tests: NOT RUN. The actual app statement bodies are unchanged; only the transport constructor type and standard C++ format-header includes differ. Main remains unchanged at 15 lines. Audit/proposal/results: SOFTWARE_AUDIT.md; exact cases: `logs/test/iteration-007-scenarios.md`. No complete milestone is PASS.
+
+ | ID  | Milestone                                                      | Status      | Evidence                                 |
+ |-----|----------------------------------------------------------------|-------------|------------------------------------------|
+ | M0  | Board, module, pin, power, antenna, and toolchain confirmation | IN PROGRESS | Resolved toolchain recorded; physical checks pending |
+ | M1  | LLCC68 initialization on both devices                          | IN PROGRESS | Firmware compiles; physical initialization/NVS persistence pending |
+-| M2  | Fixed-PHY HELLO/ACK                                            | IN PROGRESS | 44 native tests pass; two-device RF evidence pending |
++| M2  | Fixed-PHY HELLO/ACK                                            | IN PROGRESS | 92 native tests including production apps pass; RF evidence pending |
+ | M3  | Beacon and one-client TDMA                                     | NOT STARTED | Deferred until M2 passes                 |
+ | M4  | ACK bitmap and selective retry                                 | NOT STARTED | Deferred until M3 passes                 |
+ | M5  | Versioned ADR SF7/SF8/SF9                                      | NOT STARTED | Deferred until M4 passes                 |
+@@ -68,10 +70,10 @@ M0–M2 source is implemented as candidate `0.2.0-alpha.1`. Final native tests:
+
+ ## Current blockers
+
+-Native ERR-002/ERR-003 and firmware ERR-004 are closed with command evidence. USB CDC warning ERR-005 requires physical serial verification. All M0 physical checks, M1 radio/NVS tests and M2 RF acceptance remain open. Environment metadata probe failures are documented as ERR-006 and resolved using UTF-8 output/outside-sandbox tool execution.
++ERR-011 (legacy MinGW format macros) is fixed by C++ `<cinttypes>` and verified by 92 passing native cases/ESP32 compile. No application packet/state defect was reproduced in those scenarios. ERR-008 synchronous NVS/BUSY, ERR-009 dependency scratch allocations, ERR-010 SDK serial waits and ERR-005 physical CDC behavior remain open limitations; hardware IRQ/random-source assumptions are also unverified. They are not covered by the fake transport.
+
+-ERR-007's header-error filter is corrected, statically aligned with pinned RadioLib and compile-verified in iteration 005; physical IRQ behavior remains an M1/M2 gate. Complete file responsibilities and M3–M8 plan: IMPLEMENTATION_REPORT.md. Final binary/source hashes: iteration-005 build records.
++ERR-007's header filter remains unchanged from iteration 005; physical IRQ behavior is still an M1/M2 gate. RadioDriver implementation, Runtime dispatch, NVS persistence implementation, codec, PHY and wire version remain unchanged. Final source/binary hash evidence: iteration-007 static review and source manifest. Current task has no ordinary Git diff because the workspace has no Git repository; a complete no-index Git comparison against the pre-edit snapshot is used.
+
+ ## Next action
+
+-Complete M0 physical inspection and permitted test setup using BENCH_RUNBOOK.md, flash the same image onto both identified units, verify missing/invalid/saved configuration, initialize both radios and record >=200 HELLO attempts with both raw serial logs. Do not start M3 until M2 acceptance evidence is complete. M3 then adds one-client beacon/slot timing with measured switching/IRQ/drift and justified guards; M4–M8 remain documentation-only plans.
++Continue software-only work with focused driver-API fault injection and configuration-store boundary tests if requested; resolve synchronous-call/memory budgets before claiming hard timing guarantees. Physical gates wait for the second MCU, antenna and assembly; then follow BENCH_RUNBOOK.md for M0/M1 and >=200 actual M2 HELLO attempts. Do not start M3 until M2 acceptance evidence exists. TDMA/bitmap/retry scheduling/ADR remain unimplemented.
+diff --git a/iteration-007-review-snapshot/docs/en/SOFTWARE_AUDIT.md b/iteration-007-review-snapshot/docs/en/SOFTWARE_AUDIT.md
+new file mode 100644
+index 0000000..781018e
+--- /dev/null
++++ b/iteration-007-review-snapshot/docs/en/SOFTWARE_AUDIT.md
+@@ -0,0 +1,102 @@
++# M0–M2 software audit and verification
++
++## Read-only audit baseline — before source edits
++
++Baseline: firmware 0.2.0-alpha.1 / protocol 1, iteration-005 evidence (ESP32 compile and 44 native tests). Canonical English records and GatewayApp, ClientApp, FirmwareRuntime, RadioDriver, FrameCodec, DeviceConfig, SequenceTracker, console, logger and NVS persistence were inspected before editing source. This workspace still has no Git repository. An exact pre-edit snapshot is saved in `logs/build/iteration-006-baseline/` with SHA-256 inventory `logs/build/iteration-006-baseline-manifest.json`; Git no-index comparison will be used without initializing Git or making commits.
++
++Inventory correction from the user: two RA-01SCH/LLCC68 modules, one ESP32-C3 Super Mini, second MCU not purchased, Moxon not fabricated, no assembled radio pair. Earlier two-unit/antenna availability statements described the intended setup and are superseded for current inventory. All physical NVS, GPIO, IRQ and RF behavior remains unverified. This task is software-only.
++
++## Findings and disposition
++
++| Area | Initial finding | Disposition |
++|---|---|---|
++| Architecture/testability | Apps and logger include RadioDriver's Arduino/RadioLib-dependent header; current native target excludes both production apps. Helper tests alone cannot verify application transitions. | Add a six-method transport seam; execute the actual app .cpp files and real codec/tracker/logger with host adapters. |
++| GatewayApp | Decode/network/destination/type validation precedes acceptance; records identity before ACK so ACK loss can be handled by idempotent re-ACK. Receive-start recovery has a three-failure/one-second bound. | Exercise these paths through fake transport; preserve policy unless a failing regression reproduces a defect. |
++| ClientApp | Stop-and-wait HELLO, timeout from TX completion, strict echoed identity, no automatic retries. Uses 64-bit timer for reporting interval and wrap-safe 32-bit ACK/recovery deadlines. | Exercise boundaries, lost/late/stale ACK, reboot and full sequence exhaustion using virtual time. |
++| FirmwareRuntime | Fresh boot validates before radio initialization/app construction; only one optional role is emplaced. Staged save does not change the running role; reboot suppresses new requests and waits for TX completion/error. | Static audit only in this change; runtime/NVS/boot control is not claimed executed by app integration tests. |
++| FrameCodec | Checks pointer/min/max/exact lengths before payload copy; explicit LE fields, bounded local frame, only publishes decoded output on success. ACK short-circuit length check precedes payload reads. | No out-of-bounds defect found in inspection; retain existing tests and add malformed frames through production apps. This is not a formal memory-safety proof. |
++| DeviceConfig/NVS | Complete validator plus one 24-byte explicit blob with integrity check and readback; writes only on operator save. Failed decode preserves caller output; Runtime's fresh output is UNSET. | Add valid-integrity incompatible-blob tests to distinguish semantic rejection from hash rejection. Preferences/flash behavior remains untested. |
++| Blocking operations | Preferences::putBytes calls nvs_set_blob/nvs_commit synchronously. Pinned RadioLib Module::SPItransferStream waits/yields for BUSY with timeout. Software TX deadline is only checked when control returns to poll. | Record timing limitation; fake transport deliberately does not verify BUSY/flash latency. No scheduler/flash-worker refactor without measured need. |
++| Serial blocking | Installed Arduino HWCDC::availableForWrite/write take a mutex using a default 100 ms timeout; write can perform repeated timed ring-buffer sends. The logger's capacity check does not establish a hard nonblocking guarantee. | Correct documentation's guarantee. Test queue/backpressure/short-write behavior using real logger logic; actual USB timing remains open. |
++| Dependency memory | RadioLib BuildOpt defaults RADIOLIB_STATIC_ONLY=0; Module::SPItransferStream allocates SPI scratch arrays with new[]. Project fixed buffers do not imply an allocation-free dependency hot path. | Record residual allocation risk. Do not silently change RadioLib memory mode/stack use in a behavior-preserving seam task. |
++| ISR/race | ISR only sets a volatile flag. Poll samples then clears it; a latched high DIO1 is also sampled on the next pass, mitigating a lost software edge under that hardware assumption. | No atomicity/hardware-timing proof claimed. BUSY/DIO1/SPI and ISR races require later driver/hardware checks. |
++| Replay/session bounds | Eight sessions with a 64-sequence window; older retained sequences are stale, evicted sessions and gateway reboot lose history. Boot-ID generator assumes a functioning ESP32 random source; its rejection loop is unbounded if that source repeats only forbidden values. | Test documented finite-window/session behavior. No authentication, persistent replay protection, entropy-failure or DATA guarantee added. |
++
++Dependency findings above come from the installed source, not physical timing measurements: Arduino-ESP32 3.3.11 `cores/esp32/HWCDC.cpp` / `libraries/Preferences/src/Preferences.cpp`; RadioLib 7.8.1 `src/Module.cpp` / `src/BuildOpt.h`. No external library upgrade is needed.
++
++## Proposed minimal seam — recorded before implementation
++
++1. Move RadioEvent values into hardware-independent `common/radio/radio_transport.h` and define only the six operations apps already use: receive, transmit, transmitting, receiving, healthy and timeOnAir.
++2. RadioDriver implements this single interface and retains sole ownership of Module/LLCC68/SPI, begin/stop/poll and ISR handling. No factories, task framework or heap-owned interface objects.
++3. GatewayApp and ClientApp accept a reference to that interface; SerialLogger references the hardware-independent event type. State logic and firmware timing policy remain unchanged initially.
++4. Native-only Arduino/esp_timer compatibility headers provide deterministic time and captured serial writes. Compile the actual production GatewayApp, ClientApp, codec, tracker, config and SerialLogger .cpp files. Fake transport models one TX/RX operation and explicit packet delivery/drop; it does not emulate LLCC68, RF propagation, airtime, hardware CRC or NVS.
++5. Replays/redeliveries use the exact captured bytes and assert unchanged network/source/boot/sequence/payload. The firmware still issues a new identity after a failed transaction; no automatic retry or later-milestone MAC is introduced.
++
++The seam is authorized by the software verification task; this document and the accompanying proposal precede any source refactor. Results, exact scenarios, diffs and remaining limitations will be appended after execution.
++
++## Executed results — iteration 007
++
++Firmware stays **0.2.0-alpha.1 / protocol 1**. No packet/state defect was reproduced in the scenarios below. The only reproduced production-source portability defect was ERR-011, fixed by replacing `<inttypes.h>` with C++ `<cinttypes>` in ClientApp and SerialLogger; formats and state statements are unchanged.
++
++Exact commands (workspace root; reviewed execution outside the restricted sandbox):
++
++```powershell
++$env:PYTHONUTF8 = '1'
++& <PIO_PYTHON> -m platformio run -e esp32c3_supermini
++& <PIO_PYTHON> -m platformio test -e native
++```
++
++| Check | Actual result | Evidence |
++|---|---|---|
++| ESP32 compilation | Exit 0, PASS, 15.89 seconds | `logs/build/iteration-007-esp32.log` |
++| All native suites | Exit 0, **92 passed / 0 failed / 0 skipped**, 24.35 seconds | `logs/test/iteration-007-native.log` |
++| Production app scenarios | 38 PASS | Same native log, test_app_integration |
++| Codec / config / console / sequence / logger | 18 / 13 / 10 / 7 / 6 PASS | Same native log |
++| Source-preservation checks | PASS: only expected constructor/header changes in app bodies; protected implementations unchanged | `logs/build/iteration-007-static-review.log` |
++| Ordinary Git comparison | Not available: no Git repository, rev-parse exit 128 | `logs/build/iteration-007-git-status.log` |
++| Physical NVS, radio or RF | NOT RUN | No physical evidence claimed |
++
++Toolchain remains Core 6.1.19, installed pioarduino/espressif32 55.03.311, Arduino-ESP32 3.3.11, RISC-V GCC 14.2.0, RadioLib 7.8.1; native 1.2.1 / Unity 2.6.1 / MinGW GCC 6.3.0. Native code builds with `-Wall -Wextra -Werror`. The ESP32 build retains RadioLib's known USB CDC warning (ERR-005).
++
++Build-reported RAM: 24,516 bytes; flash: 363,466 bytes. Application image SHA-256: `1eb8c7fafeb36e87035095a9c357a9f024e8164c88e43a88274831c9618a34da`. Exact source/test/config hashes: `logs/build/iteration-007-source-manifest.sha256`. BUILD_ID remains the earlier candidate label; use these hashes for the exact snapshot.
++
++## Exact scenario coverage and interpretation
++
++All 92 executed source-case names and PASS results are enumerated in `logs/test/iteration-007-scenarios.md`. These are test/scenario counts; instrumented line/branch coverage percentages were **NOT MEASURED**.
++
++| Production scenario group | Assertions exercised |
++|---|---|
++| Happy path / repeated operation | Correct HELLO/ACK through both actual apps; 200 complete repeated transactions; no duplicate acceptance or timeout |
++| Full sequence exhaustion | Separate 65,537 transactions; sequences 0–65535 then 0 under a fresh boot ID for both client and gateway; echoed identity remains correct |
++| Loss | Dropped HELLO; dropped ACK; timeout; no automatic retry; the next new transaction consumes a new sequence |
++| Delay / stale ACK | Acceptance one microsecond before deadline, rejection exactly at and after deadline, old ACK during a new outstanding transaction, duplicate ACK after success |
++| Wrong identity/address/type | Echoed source/boot/sequence, gateway sender, network, destination; wrong role message type |
++| Malformed inputs | 44 HELLO input variants (all 28 short-header lengths plus field/length/trailing/session errors); 45 ACK variants (37 truncations plus eight mutations); later valid packet still succeeds |
++| Duplicate/replay | Byte-identical empty and 68-byte payload replay; same logical identity/bytes; gateway accepts once, re-ACKs duplicate with correct original echo |
++| Driver-facing failures | Client/gateway TX-start errors and asynchronous TX errors; RX-start recovery spacing and three-failure limit; unavailable transport blocks new HELLO |
++| Receive errors | CRC/header-category, RX-timeout and generic transport error events do not extend the outstanding ACK deadline |
++| Session lifecycle | New ClientApp/GatewayApp objects emulate reboot; old client ACK rejected, new session starts at sequence 0, gateway restart loses its documented volatile history, retained old-session duplicate echoes original identity |
++| Ordering/window | Within-window out-of-order packet accepted once; duplicate suppressed; sequence older than the 64-entry window rejected without ACK |
++| Clock boundaries | ACK wait and receive recovery across 32-bit microsecond wrap; maximum interval at an absolute 64-bit time beyond that wrap |
++| Controlled-stop gates | No new client TX or gateway ACK with allowNew=false; active client TX completion/expiry still processed. This tests app gates, not Runtime's reboot dispatcher. |
++| Diagnostics/config | Real logger FIFO/overflow/backpressure/short/zero writes/N/A formatting; valid-integrity incompatible schema/role/IDs/reserved-byte fixtures rejected by real config decoder |
++
++The fake endpoint has one operation and one 96-byte packet capture; tests explicitly deliver or drop bytes only while RX is enabled and assert no transport-contract violation. Fake airtime is a synthetic constant (1000 us), errors are synthetic codes and the two endpoint clocks share virtual time. No RF model, real waiting, physical link margin, calibrated CRC count, PDR, latency or multi-node capacity is inferred from these tests. Object recreation does not execute an ESP32 reset or prove entropy.
++
++## Changes and preservation review
++
++Production changes are deliberately small: new 30-line `src/common/radio/radio_transport.h`; driver header implements the same six operations; app headers/constructors take RadioTransport references; logger header takes the independent event type; Runtime header directly includes its concrete driver; client/logger use `<cinttypes>`. No state-machine statement was changed, and no runtime interface allocation is added.
++
++Static comparison verifies `src/main.cpp` (15 lines), FirmwareRuntime.cpp, NvsConfigStore.cpp, RadioDriver.cpp, FrameCodec.cpp, DeviceConfig.cpp, SequenceTracker.cpp, pins, PHY, VERSION and PROTOCOL_VERSION are byte-identical to the pre-edit snapshot. App statement bodies and logger implementation are also identical after the expected signature/include substitutions. All LLCC68/SPI operations remain in the concrete RadioDriver implementation; native-only headers are not added to the firmware include path.
++
++Test additions: `test/test_app_integration/test_main.cpp` executes the real roles; `test/test_serial_logger/test_main.cpp` executes the real queue; `test/support/fake_radio_transport.h` captures bounded packets; `test/support/platform/Arduino.h` and `esp_timer.h` adapt native serial/time only; `test/test_role_config/test_main.cpp` adds four semantic blob cases. `platformio.ini` expands only the native source/include filters. Inventory corrections and audit/evidence procedures are aligned in English and Chinese.
++
++Complete source/document file inventory: `logs/build/iteration-007-changed-files.txt`. Complete Git no-index patch: `logs/build/iteration-007-complete.diff`, comparing `iteration-006-baseline` to `iteration-007-review-snapshot`. Exit 1 means differences were found, not a failed build. New raw evidence files and snapshots live under logs and are listed separately from project changes; no Git repository or commit was created.
++
++## Verified, simulated and still unverified
++
++- **Verified software:** executed production app/codec/tracker/config/console/logger behavior for the listed host inputs, plus ESP32 compile compatibility and preserved source-policy comparison.
++- **Simulated conditions:** transport delivery/loss/duplicates/delay/error events, object recreation, virtual time and Serial byte capacity. These stimulate actual production state machines; they do not replace those machines with a model.
++- **Unverified physical/dependency behavior:** actual Runtime boot/reboot dispatch, esp_random entropy/fault liveness, Preferences/NVS durability and power loss, driver poll/IRQ/SPI/BUSY/CRC, timing under flash/USB blocking, supply/pins/antenna/RF/regulatory settings. ERR-005/008/009/010 and the audit race/random assumptions remain open.
++
++M0–M2 physical acceptance remains IN PROGRESS. No automatic retries, TDMA, ACK bitmap, selective retry scheduling, ADR or excluded integration was added. Next software work can target driver-API fault injection and config-store boundaries; physical work waits for procurement, fabrication and assembly.
+diff --git a/iteration-006-baseline/docs/en/TEST_PLAN.md b/iteration-007-review-snapshot/docs/en/TEST_PLAN.md
+index b188405..3f8d0a4 100644
+--- a/iteration-006-baseline/docs/en/TEST_PLAN.md
++++ b/iteration-007-review-snapshot/docs/en/TEST_PLAN.md
+@@ -292,3 +292,17 @@ recorded in `docs/en/PROGRESS.md`.
+ - Complete M0–M2 hardware gates before M3. Negative RF identity/duplicate injection is not claimed from the pure native tests.
+
+ Final iteration-005 evidence supersedes the earlier candidate binaries: `logs/build/iteration-005-esp32.log` exit 0 and `logs/test/iteration-005-native.log` 44/44 pass, exit 0. Driver HEADER_ERR filtering is statically aligned with RadioLib HEADER_VALID qualification; no physical CRC/header test is claimed.
++
++## 14. Software-only production state-machine verification
++
++User inventory correction: two radio modules, one MCU, second MCU not purchased, Moxon not fabricated; no assembled pair. Do not execute the physical runbook yet.
++
++`logs/test/iteration-007-native.log`: **92/92 PASS**, exit 0, six suites (production apps 38, codec 18, config 13, console 10, sequence/timing 7, logger 6). `logs/build/iteration-007-esp32.log`: firmware build exit 0. Exact executed case names: `logs/test/iteration-007-scenarios.md`. These are scenario counts; instrumented line/branch coverage is NOT MEASURED.
++
++The native target compiles actual GatewayApp/ClientApp/SerialLogger plus pure codec/tracker/config/console. Fake transport is bounded to one operation and a 96-byte captured packet per endpoint; delivery is explicit. Virtual clock and Serial adapters are native-only. No application state machine is copied into a model.
++
++Required scenarios now exercised: HELLO/ACK loss; delayed ACK before/at/after deadline; wrong echo source/boot/sequence, sender, network/destination; duplicate ACK/HELLO and byte-identical payload replay; 44 malformed HELLO and 45 malformed ACK input variants; unexpected message per role; TX start/completion errors; three-attempt RX recovery/backoff; receive errors without deadline extension; stopped new-transaction gates; client/gateway object recreation; retained/stale/out-of-order sessions; 32-bit ACK/recovery wrap and a 64-bit absolute interval; 200 repeated transactions and separate 65,537 transactions proving both senders rotate session before reusing sequence.
++
++M2 has no automatic retry. Replay tests inject the identical captured bytes at the transport boundary and check re-ACK without duplicate acceptance; a new client transaction after timeout has a new sequence. This does not implement/selectively schedule retransmissions or establish DATA guarantees.
++
++The Runtime reboot dispatcher, actual esp_random, NVS/Preferences/flash, RadioDriver poll/IRQ/SPI/BUSY/hardware CRC and physical RF/USB timing are not executed by these scenarios. Host queue tests do not prove SDK calls nonblocking; open audit limits are ERR-008–010. Keep M0–M2 physical acceptance IN PROGRESS.
+diff --git a/iteration-006-baseline/docs/zh-CN/ARCHITECTURE.md b/iteration-007-review-snapshot/docs/zh-CN/ARCHITECTURE.md
+index c547819..a666c4d 100644
+--- a/iteration-006-baseline/docs/zh-CN/ARCHITECTURE.md
++++ b/iteration-007-review-snapshot/docs/zh-CN/ARCHITECTURE.md
+@@ -100,5 +100,13 @@ NVS namespace/key 为 `legacy schema-1 namespace` / `device`，所有多字节字段小端：off
+ Gateway 只有一个 LLCC68，不能同时接收多个 SF。必须按照调度表逐个切换接收
+ PHY。
+
+-当前只有一台 Gateway 和一台 Client。两台设备的测试不能证明多节点或 70
++当前库存为两个无线模块、一个 MCU，第二个 MCU 尚未购买，天线尚未制作；还没有组装双设备。未来两台设备的测试不能证明多节点或 70
+ 节点性能。
++
++## 6. 软件验证边界（ADR-010）
++
++GatewayApp/ClientApp 只依赖 6 方法 RadioTransport 引用，RadioDriver 实现接口并唯一拥有 LLCC68/SPI/IRQ；Runtime 继续调用具体 driver 的 begin/poll/stop。Native 使用有界 fake transport、虚拟时钟和 Serial 适配，编译实际生产 app/codec/tracker/config/logger，不复制状态机逻辑，也不为接口引入运行时堆分配。
++
++应用采用协作式推进，但 NVS commit、RadioLib BUSY 等待和 SDK 串口调用仍是同步操作；有界日志队列不代表 SDK 硬实时非阻塞。RadioLib 默认也会分配 SPI 临时缓冲区。Host 测试不验证硬件延迟、ISR 竞态、Flash 或 RF。
++
++M2 不新增自动重传；测试只重放完全相同的捕获字节验证身份/去重。超时后的新事务仍使用新 sequence。
+diff --git a/iteration-006-baseline/docs/zh-CN/BENCH_RUNBOOK.md b/iteration-007-review-snapshot/docs/zh-CN/BENCH_RUNBOOK.md
+index b52ca4e..e786bd8 100644
+--- a/iteration-006-baseline/docs/zh-CN/BENCH_RUNBOOK.md
++++ b/iteration-007-review-snapshot/docs/zh-CN/BENCH_RUNBOOK.md
+@@ -2,6 +2,8 @@
+
+ 这是尚未执行的实物流程。英文规范见 `docs/en/BENCH_RUNBOOK.md`。编译和 host 测试通过不等于硬件或 RF 验收。
+
++库存更正：两个无线模块、一个 MCU，第二个 MCU 尚未购买，Moxon 尚未制作，双设备未组装。本手册暂缓执行，当前只做 host 软件测试。
++
+ ## 上电/烧录前
+
+ 1. 拍摄两台 Super Mini、Ra-01SCH 标记/版本、焊盘标签和引脚方向。按建议图逐项确认 GPIO4/5/6/7（SPI）、GPIO1（RESET）、GPIO0（DIO1）、GPIO10（BUSY）的实际连通性，不能把建议图当成实测。
+diff --git a/iteration-006-baseline/docs/zh-CN/DECISIONS.md b/iteration-007-review-snapshot/docs/zh-CN/DECISIONS.md
+index f73c07a..69b2000 100644
+--- a/iteration-006-baseline/docs/zh-CN/DECISIONS.md
++++ b/iteration-007-review-snapshot/docs/zh-CN/DECISIONS.md
+@@ -11,3 +11,11 @@
+ - 去重：8 个 session，每个 64 sequence 窗口；更旧序号视为 stale。旧 session 淘汰或 Gateway 重启会丢历史，不提供持久化/认证重放保护，不实现 DATA。
+ - 固定 SF7、sync 0x12、XTAL、LDO，保留默认内部 DIO2 RF-switch 控制；TXEN/RXEN 不接 MCU，须核实实际模块。原生 USB CDC 和全部引脚仍为暂定。
+ - 日志：16 行有界队列，非阻塞排空；status 报告丢弃计数。丢日志时重做验收。库未公开匹配芯片标识字符串，不能伪造检测结果；未知指标使用 N/A。
++
++## ADR-010 — 用最小 transport 引用验证生产 M2 状态机
++
++- 接受日期 2026-11-12。先只读审查和提出方案，再实现 6 个现有 radio 方法的 RadioTransport；RadioDriver 保持唯一 LLCC68/SPI/IRQ owner，Runtime 保持具体 driver 的 begin/poll/stop。无 factory、堆所有权或额外调度框架。
++- Native 编译实际 app/codec/tracker/config/logger；只替换 transport 完成事件、ESP 计时及 Serial 字节适配。它不是 LLCC68/RF/ISR/NVS 仿真。Runtime/NVS 本次为静态审查，不声称被 app integration tests 执行。
++- 不添加 M2 自动重传。测试重放完全相同字节；超时后的新事务使用新序号。去重缓存和 Gateway 重启丢历史的现有边界保持。
++- 更正 ADR-009 非阻塞表述：有界队列不证明 SDK USB 调用非阻塞；NVS/BUSY/USB 延迟、RadioLib 临时堆分配仍是未验证的边界。
++- 实际库存两个模块/一个 MCU/无制作天线，未组装双设备。全部实物门槛保留，后续 MAC 不实施。
+diff --git a/iteration-006-baseline/docs/zh-CN/HARDWARE.md b/iteration-007-review-snapshot/docs/zh-CN/HARDWARE.md
+index 7ed69b6..de06692 100644
+--- a/iteration-006-baseline/docs/zh-CN/HARDWARE.md
++++ b/iteration-007-review-snapshot/docs/zh-CN/HARDWARE.md
+@@ -4,9 +4,12 @@
+
+ | 设备    | 硬件                                                |       数量 |
+ |---------|-----------------------------------------------------|-----------:|
+-| Gateway | ESP32-C3 Super Mini + Ai-Thinker Ra-01SCH（LLCC68） |          1 |
+-| Client  | ESP32-C3 Super Mini + Ai-Thinker Ra-01SCH（LLCC68） |          1 |
+-| 天线    | 915 MHz Moxon                                       | 数量待确认 |
++| MCU 库存 | ESP32-C3 Super Mini | 1 |
++| 第二个 MCU | ESP32-C3 Super Mini，尚未购买 | 0 |
++| 模块库存 | Ai-Thinker RA-01SCH（LLCC68） | 2 |
++| 天线 | 915 MHz Moxon，尚未制作 | 0 |
++
++用户于 2026-11-12 更正库存：没有组装好的双设备，当前仅做软件验证。计划中的 Gateway/Client 仍使用相同硬件、一份固件及 NVS 选角色。实物 NVS 和 RF 均未验证。
+
+ ## 2. 模块识别
+
+diff --git a/iteration-006-baseline/docs/zh-CN/LOGGING_GUIDE.md b/iteration-007-review-snapshot/docs/zh-CN/LOGGING_GUIDE.md
+index 36c4c8e..bb39597 100644
+--- a/iteration-006-baseline/docs/zh-CN/LOGGING_GUIDE.md
++++ b/iteration-007-review-snapshot/docs/zh-CN/LOGGING_GUIDE.md
+@@ -5,3 +5,5 @@
+ `TX_START`/`ACK_TX` 表示开始，`TX_DONE` 才表示完成。`toa_us` 是 RadioLib 计算的空中时间，不是实测延迟。Client `LINK_COUNTS` 分别报告尝试、成功 ACK、ACK 超时、TX 失败和事务耗时。Header sequence 属于各发送方；Gateway ACK_TX 额外记录原 HELLO 身份。
+
+ 16 行队列每 loop 最多排空 128 字节，不在 ISR 打印。`status` 中 `log_dropped` 不为零时应重做完整捕获。`CRC_ERROR` 仅代表已暴露的 CRC/Header IRQ，不能声称完整 CRC 失败计数。所有原始日志和测量条件应存入独立 run 目录。
++
++审查更正（ADR-010/ERR-010）：队列处理和单次请求字节数有界，但 SDK availableForWrite/write 可能等待 mutex/ring buffer，不能声称端到端已证明非阻塞。Native 回压/短写测试只验证队列，不验证 USB/UART 延迟。
+diff --git a/iteration-006-baseline/docs/zh-CN/PROGRESS.md b/iteration-007-review-snapshot/docs/zh-CN/PROGRESS.md
+index 1e0f29a..d2e910f 100644
+--- a/iteration-006-baseline/docs/zh-CN/PROGRESS.md
++++ b/iteration-007-review-snapshot/docs/zh-CN/PROGRESS.md
+@@ -1,5 +1,7 @@
+ # 开发进度
+
++当前结果（iteration 007）：ESP32 编译退出码 0，native **92/92 PASS**（实际生产状态机 38、codec 18、role/config 13、console 10、sequence/timing 7、logger 6）。首轮旧 MinGW PRI 宏问题（ERR-011）已通过 `<cinttypes>` 修复。实际库存两个模块/一个 MCU；第二个 MCU 尚未购买、Moxon 尚未制作，未组装双设备。Host 场景不是实物 NVS/RF 验证；没有完整 milestone PASS。历史记录保留。
++
+ 状态：`NOT STARTED`、`IN PROGRESS`、`BLOCKED`、`PASS`。只有记录验收标准和证据后才能标记为
+ PASS。
+
+@@ -8,8 +10,8 @@ PASS。
+ | 项目              | 当前值                                         |
+ |-------------------|------------------------------------------------|
+ | 固件架构          | 一份固件，启动时从 NVS 读取角色                |
+-| Gateway           | ESP32-C3 Super Mini + Ra-01SCH（LLCC68），1 台 |
+-| Client            | ESP32-C3 Super Mini + Ra-01SCH（LLCC68），1 台 |
++| MCU 库存          | 1 个 ESP32-C3 Super Mini；第二个尚未购买，未组装双设备 |
++| 无线模块库存      | 2 个 RA-01SCH/LLCC68；Moxon 尚未制作 |
+ | RadioLib          | 7.8.1                                          |
+ | 频率              | 915.0 MHz，临时测试值                          |
+ | 初始数据 PHY      | SF7 / BW125 / CR4/5                            |
+@@ -27,7 +29,7 @@ PASS。
+ |-----|------------------------------------|-------------|------------------------|
+ | M0  | 硬件、引脚、电源、天线和工具链确认 | IN PROGRESS | 工具链已记录；实物检查待完成 |
+ | M1  | 两台设备 LLCC68 初始化             | IN PROGRESS | 固件编译通过；NVS/无线实测待完成 |
+-| M2  | 固定 PHY HELLO/ACK                 | IN PROGRESS | 44 个 native 测试通过；双设备 RF 待完成 |
++| M2  | 固定 PHY HELLO/ACK                 | IN PROGRESS | 92 个 native 测试通过，含生产状态机；RF 待完成 |
+ | M3  | Beacon 和单客户端 TDMA             | NOT STARTED | 等待 M2                |
+ | M4  | ACK Bitmap 和选择性重传            | NOT STARTED | 等待 M3                |
+ | M5  | SF7/SF8/SF9 ADR                    | NOT STARTED | 等待 M4                |
+@@ -45,7 +47,7 @@ PASS。
+ - [ ] 当地频率、信道和功率要求。
+ - [x] 实际工具链版本：Core 6.1.19，已安装 pioarduino/espressif32 55.03.311，Arduino-ESP32 3.3.11，RISC-V GCC 14.2.0 (esp-14.2.0_20260121)，RadioLib 7.8.1；host GCC 6.3.0 / native 1.2.1 / Unity 2.6.1。
+
+-候选固件已实现并通过编译及 44 个 native 测试；不代表实物 NVS、无线初始化或 RF 验收。按 BENCH_RUNBOOK.md 关闭 M0 硬件前置项，再烧录同一镜像、验证两端配置/初始化并保存 >=200 次 HELLO 尝试。未验收前不进入 M3。
++候选固件通过编译及 92 个 native 测试，版本仍为 0.2.0-alpha.1 / 协议 1。实际 app 状态语句未改，只改 transport 构造参数及 C++ include；main.cpp 仍 15 行。同步 NVS/BUSY、库临时分配、SDK 串口等待、IRQ/随机源假设仍未验证。硬件采购/制作/组装完成前继续软件工作，不执行实物流程，不进入 M3。详细结果及所有 case 见 SOFTWARE_AUDIT.md 与 `logs/test/iteration-007-scenarios.md`。
+
+ ## 2026-11-12 实现检查点（ITERATION-001）
+
+diff --git a/iteration-007-review-snapshot/docs/zh-CN/SOFTWARE_AUDIT.md b/iteration-007-review-snapshot/docs/zh-CN/SOFTWARE_AUDIT.md
+new file mode 100644
+index 0000000..d05628b
+--- /dev/null
++++ b/iteration-007-review-snapshot/docs/zh-CN/SOFTWARE_AUDIT.md
+@@ -0,0 +1,35 @@
++# M0–M2 软件审查与验证
++
++英文完整报告为 `docs/en/SOFTWARE_AUDIT.md`。源码修改前已完成只读审查：GatewayApp、ClientApp、FirmwareRuntime、RadioDriver、FrameCodec、DeviceConfig、NVS，以及 sequence/console/logger 和本机依赖源码。修改前快照为 `logs/build/iteration-006-baseline/`，hash 清单为 `logs/build/iteration-006-baseline-manifest.json`。当前目录无 Git 仓库，将使用 Git no-index 比较，不初始化 Git、不提交。
++
++实际库存：2 个 RA-01SCH/LLCC68、1 个 ESP32-C3 Super Mini；第二个 MCU 尚未购买，Moxon 尚未制作，未组装双设备。此前库存描述为计划配置，现已更正。当前仅做 M0–M2 软件验证。
++
++## 主要结论与边界
++
++- FrameCodec 先检查长度再复制，ACK 长度短路检查先于字段读取；配置有完整校验和有界 blob，暂未在审查中发现越界缺陷。这不是形式化内存安全证明。
++- 原 native 只测 helper，不运行两个生产状态机。已先提出最小 seam，再实现 6 方法 RadioTransport 引用；RadioDriver 仍唯一拥有 LLCC68/SPI/IRQ，Runtime 保留具体 begin/poll/stop。无框架、factory 或堆所有权。
++- 测试编译实际 app/codec/tracker/config/logger .cpp；只有时钟、Serial 和 transport 是测试适配。Fake transport 只产生完成的包/错误事件，不模拟 RF、SPI、IRQ、硬件 CRC 或 NVS。
++- M2 不新增自动重传；测试重放捕获的完全相同字节，核对 network/source/boot/sequence/payload。超时后新事务仍使用新序号。
++- Gateway 去重先于 ACK，ACK 丢失后允许重复 HELLO 再 ACK；缓存仍为 8 个 session、每个 64 序号窗口。淘汰和 Gateway 重启会丢历史，不提供认证或持久化重放保护。
++- Client 使用 64 位报告间隔、32 位 wrap-safe ACK/恢复截止时间；将通过虚拟时间测试边界、迟到/旧 ACK、重启、重复事务和完整序号耗尽。
++- Runtime 和实际 Preferences/NVS 本次只做静态审查，不声称被 app integration tests 执行。NVS commit 是同步调用，BUSY 等待也有依赖内超时；控制返回前不能执行应用 deadline 检查（ERR-008）。
++- 本机 HWCDC availableForWrite/write 可等待 mutex，默认超时 100 ms，write 可多次等待 ring buffer。有界日志队列不能证明端到端非阻塞（ERR-010）。Native 只测队列回压和短写，不测 USB 延迟。
++- RadioLib 默认 SPI 临时缓冲区使用 new[]；应用固定数组不代表整个依赖热路径无分配。本次不暗改内存模式/栈预算（ERR-009）。
++- ISR 只置 volatile flag；清除标志的窗口依赖下一次对锁存高电平 DIO1 的采样，不能用 host 测试证明硬件竞态安全。随机 boot ID 生成也假设硬件随机源可前进；故障常量源可能阻塞拒绝循环。均保留为审查边界。
++- 第一轮 native 编译暴露旧 MinGW 隐藏 PRI* 宏的问题（ERR-011），尚未执行新测试；计划使用 C++ `<cinttypes>` 修正兼容性，保持格式及状态行为不变。
++
++最终测试数、结果、完整 diff 和仍未验证的边界将在英文报告及 PROGRESS/BUILD_MEMORY 中记录。无物理 NVS 或 RF 验证，M0–M2 不能标记完整 PASS；不启动 TDMA/bitmap/retry scheduler/ADR 或外部集成。
++
++## iteration-007 实际结果
++
++版本保持 0.2.0-alpha.1 / 协议 1。ESP32 编译退出码 0（15.89 秒，`logs/build/iteration-007-esp32.log`）；native 92/92 PASS、0 失败/跳过、退出码 0（24.35 秒，`logs/test/iteration-007-native.log`）：生产状态机 38、codec 18、config 13、console 10、sequence/timing 7、logger 6。全部 case 名称见 `logs/test/iteration-007-scenarios.md`，未测量行/分支覆盖百分比。
++
++38 个 integration 场景通过：200 次重复事务及独立 65,537 次完整序号耗尽（两端均换 session 后才复用序号）；丢包/ACK 丢失；ACK deadline 前 1 us、恰好和之后；旧/重复/错误身份 ACK；44 种畸形 HELLO、45 种畸形 ACK；相同字节最大 Payload 重放；TX/RX 故障和三次恢复上限；接收错误不延长 deadline；对象重建；旧 session/乱序/stale；32 位 wrap 与 64 位间隔；停止新事务门控。
++
++本轮没有复现应用包处理/状态缺陷；唯一复现的生产源码可移植问题为 `<inttypes.h>`，已在 client/logger 改为 `<cinttypes>`，格式和状态语句不变。新 transport header 30 行，其余生产修改仅签名/依赖/override/include。静态比较确认 main.cpp（15 行）、Runtime/NVS/driver/codec/config/tracker 实现、PHY/pins/版本均与修改前相同。接口不引入运行时堆分配。
++
++真实 app/codec/tracker/config/console/logger 的列举行为以及 ESP32 编译属于软件证据；包投递/丢失/错误、对象重建、虚拟时钟、Serial 字节容量属于测试刺激仿真。Fake airtime 固定 1000 us，不是实测；没有 RF/IRQ/SPI/NVS 模型或多节点容量结论。
++
++实际 Runtime 重启、随机源、NVS/掉电、driver poll/IRQ/SPI/BUSY/CRC、Flash/USB 延迟以及全部电气/RF/合规事项均未验证；ERR-005/008/009/010 保留。两个模块/一个 MCU/无制作天线，未组装双设备，M0–M2 仍 IN PROGRESS。
++
++当前无 Git 仓库（rev-parse 128）；没有初始化或提交。完整 no-index diff 为 `logs/build/iteration-007-complete.diff`，清单为 `logs/build/iteration-007-changed-files.txt`，修改前/后快照保留在 logs/build。最终 source hash 清单为 `logs/build/iteration-007-source-manifest.sha256`，二进制 SHA-256 为 `1eb8c7fafeb36e87035095a9c357a9f024e8164c88e43a88274831c9618a34da`。没有增加自动重传或后续 MAC。
+diff --git a/iteration-006-baseline/docs/zh-CN/TEST_PLAN.md b/iteration-007-review-snapshot/docs/zh-CN/TEST_PLAN.md
+index 86c5dcc..bca9585 100644
+--- a/iteration-006-baseline/docs/zh-CN/TEST_PLAN.md
++++ b/iteration-007-review-snapshot/docs/zh-CN/TEST_PLAN.md
+@@ -68,3 +68,13 @@ commit、设备角色/ID、硬件版本、PHY、天线、位置、包数量、
+ Host 验证了配置编码/校验、解析器和 ACK 身份等；Preferences 持久化、断电重启、损坏/不兼容 NVS 启动、LLCC68 实物初始化及 RF 测试均未执行。按 `BENCH_RUNBOOK.md`、`tools/capture_bench.py` 和 `logs/test/RUN_RECORD_TEMPLATE.md` 记录双设备测试。捕获工具的 help/语法检查不代表实物串口捕获成功。M0–M2 验收完成后才能进入 M3。
+
+ 最终 iteration-005：`logs/build/iteration-005-esp32.log` 退出码 0；`logs/test/iteration-005-native.log` 44/44 通过、退出码 0，替代此前候选二进制。HEADER_ERR/HEADER_VALID 条件已静态对齐依赖库，但未执行实物 CRC/Header IRQ 测试。
++
++## 9. iteration-007 软件验证
++
++实际库存两个模块/一个 MCU，第二个 MCU 尚未购买，Moxon 尚未制作，未组装双设备。只执行软件测试。
++
++`logs/test/iteration-007-native.log`：92/92 PASS、退出码 0（生产状态机 38、codec 18、config 13、console 10、sequence/timing 7、logger 6）；`logs/build/iteration-007-esp32.log` 编译退出码 0。全部 case 见 `logs/test/iteration-007-scenarios.md`。这是场景计数，未测量行/分支覆盖率。
++
++实际 GatewayApp/ClientApp/SerialLogger 与纯协议/config/console 编译执行；native-only 时钟/Serial/fake transport 提供刺激，不复制状态机。覆盖 HELLO/ACK 丢失、ACK 截止前/恰好/之后、错误身份/发送者/网络/目的、重复包、44 种畸形 HELLO 和 45 种畸形 ACK、TX 失败、RX 三次恢复/回退、deadline 不延长、停止新事务、对象重建、旧 session/stale/乱序、32 位计时 wrap/64 位间隔、200 次重复及独立 65,537 次完整序号耗尽事务。
++
++不新增自动重传；测试重放完全相同字节并验证不重复接受。超时后新事务用新序号。不声称 Runtime 重启调度、真实随机源、NVS/Flash、RadioDriver poll/IRQ/SPI/BUSY/硬件 CRC、RF/USB 延迟已验证。物理门槛保持 IN PROGRESS。
+diff --git a/iteration-006-baseline/platformio.ini b/iteration-007-review-snapshot/platformio.ini
+index 9fd97ca..4cac4c5 100644
+--- a/iteration-006-baseline/platformio.ini
++++ b/iteration-007-review-snapshot/platformio.ini
+@@ -26,8 +26,13 @@ build_flags =
+     -Wall
+     -Wextra
+     -Werror
++    -I test/support/platform
++    -D ADAPTIVE_LORA_NATIVE_TEST=1
+ build_src_filter =
+     -<*>
+     +<common/protocol/>
+     +<common/config/>
+     +<app/provisioning_console.cpp>
++    +<gateway/gateway_app.cpp>
++    +<client/client_app.cpp>
++    +<common/diagnostics/serial_logger.cpp>
+diff --git a/iteration-006-baseline/src/app/firmware_runtime.h b/iteration-007-review-snapshot/src/app/firmware_runtime.h
+index e90f92b..4e9e288 100644
+--- a/iteration-006-baseline/src/app/firmware_runtime.h
++++ b/iteration-007-review-snapshot/src/app/firmware_runtime.h
+@@ -4,6 +4,7 @@
+ #include "provisioning_console.h"
+ #include "client/client_app.h"
+ #include "gateway/gateway_app.h"
++#include "common/radio/radio_driver.h"
+
+ namespace adaptive_lora {
+ class FirmwareRuntime {
+diff --git a/iteration-006-baseline/src/client/client_app.cpp b/iteration-007-review-snapshot/src/client/client_app.cpp
+index b22e5e9..36b40cf 100644
+--- a/iteration-006-baseline/src/client/client_app.cpp
++++ b/iteration-007-review-snapshot/src/client/client_app.cpp
+@@ -1,10 +1,10 @@
+ #include "client_app.h"
+ #include <cstdio>
+-#include <inttypes.h>
++#include <cinttypes>
+ #include <esp_timer.h>
+
+ namespace adaptive_lora {
+-ClientApp::ClientApp(const DeviceConfig& config, RadioDriver& radio, SerialLogger& log, BootIdGenerator generate)
++ClientApp::ClientApp(const DeviceConfig& config, RadioTransport& radio, SerialLogger& log, BootIdGenerator generate)
+     : config_(config), radio_(radio), log_(log), generate_(generate) {}
+ void ClientApp::begin(uint32_t now) {
+     sequence_.begin(generate_(0));
+diff --git a/iteration-006-baseline/src/client/client_app.h b/iteration-007-review-snapshot/src/client/client_app.h
+index 6e16fb7..8906ed6 100644
+--- a/iteration-006-baseline/src/client/client_app.h
++++ b/iteration-007-review-snapshot/src/client/client_app.h
+@@ -5,14 +5,14 @@
+ namespace adaptive_lora {
+ class ClientApp {
+ public:
+-    ClientApp(const DeviceConfig& config, RadioDriver& radio, SerialLogger& log, BootIdGenerator generate);
++    ClientApp(const DeviceConfig& config, RadioTransport& radio, SerialLogger& log, BootIdGenerator generate);
+     void begin(uint32_t now);
+     void update(uint32_t now, const RadioEvent& event, bool allowNew = true);
+ private:
+     enum class State { IDLE, TRANSMITTING, WAIT_ACK };
+     void finish(const char* result, const RadioEvent* event = nullptr, bool txFailure = false);
+     DeviceConfig config_;
+-    RadioDriver& radio_;
++    RadioTransport& radio_;
+     SerialLogger& log_;
+     BootIdGenerator generate_;
+     SequenceCounter sequence_;
+diff --git a/iteration-006-baseline/src/common/diagnostics/serial_logger.cpp b/iteration-007-review-snapshot/src/common/diagnostics/serial_logger.cpp
+index eeb961e..89607ce 100644
+--- a/iteration-006-baseline/src/common/diagnostics/serial_logger.cpp
++++ b/iteration-007-review-snapshot/src/common/diagnostics/serial_logger.cpp
+@@ -2,7 +2,7 @@
+ #include <Arduino.h>
+ #include <cstdio>
+ #include <cstring>
+-#include <inttypes.h>
++#include <cinttypes>
+ #include <esp_timer.h>
+ #include "radio_config.h"
+
+diff --git a/iteration-006-baseline/src/common/diagnostics/serial_logger.h b/iteration-007-review-snapshot/src/common/diagnostics/serial_logger.h
+index 63f71a9..9ceebf4 100644
+--- a/iteration-006-baseline/src/common/diagnostics/serial_logger.h
++++ b/iteration-007-review-snapshot/src/common/diagnostics/serial_logger.h
+@@ -1,7 +1,7 @@
+ #pragma once
+ #include "common/config/device_config.h"
+ #include "common/protocol/frame_codec.h"
+-#include "common/radio/radio_driver.h"
++#include "common/radio/radio_transport.h"
+
+ namespace adaptive_lora {
+ class SerialLogger {
+diff --git a/iteration-006-baseline/src/common/radio/radio_driver.h b/iteration-007-review-snapshot/src/common/radio/radio_driver.h
+index 202d004..3d91b5d 100644
+--- a/iteration-006-baseline/src/common/radio/radio_driver.h
++++ b/iteration-007-review-snapshot/src/common/radio/radio_driver.h
+@@ -1,33 +1,23 @@
+ #pragma once
+ #include <Arduino.h>
+ #include <RadioLib.h>
+-#include "project_config.h"
++#include "radio_transport.h"
+
+ namespace adaptive_lora {
+-enum class RadioEventType { NONE, TX_DONE, RX_DONE, RX_TIMEOUT, CRC_ERROR, ERROR };
+-struct RadioEvent {
+-    RadioEventType type = RadioEventType::NONE;
+-    int16_t code = 0;
+-    size_t length = 0;
+-    uint8_t bytes[kMaxFrameSize]{};
+-    float rssi = 0;
+-    float snr = 0;
+-    bool metrics = false;
+-};
+-class RadioDriver {
++class RadioDriver final : public RadioTransport {
+ public:
+     RadioDriver();
+     int16_t begin();
+-    int16_t receive();
+-    int16_t transmit(const uint8_t* bytes, size_t length, uint32_t now);
++    int16_t receive() override;
++    int16_t transmit(const uint8_t* bytes, size_t length, uint32_t now) override;
+     int16_t stop();
+     RadioEvent poll(uint32_t now);
+-    bool transmitting() const { return state_ == State::TX; }
+-    bool receiving() const { return state_ == State::RX; }
+-    bool healthy() const { return initialized_ && state_ != State::FAULT; }
++    bool transmitting() const override { return state_ == State::TX; }
++    bool receiving() const override { return state_ == State::RX; }
++    bool healthy() const override { return initialized_ && state_ != State::FAULT; }
+     bool initialized() const { return initialized_; }
+     const char* chip() const { return "LLCC68_driver_id_not_exposed"; }
+-    uint32_t timeOnAir(size_t length) { return radio_.getTimeOnAir(length); }
++    uint32_t timeOnAir(size_t length) override { return radio_.getTimeOnAir(length); }
+ private:
+     enum class State { OFF, IDLE, RX, TX, FAULT };
+     static void IRAM_ATTR onDio1();
+diff --git a/iteration-007-review-snapshot/src/common/radio/radio_transport.h b/iteration-007-review-snapshot/src/common/radio/radio_transport.h
+new file mode 100644
+index 0000000..187acdd
+--- /dev/null
++++ b/iteration-007-review-snapshot/src/common/radio/radio_transport.h
+@@ -0,0 +1,30 @@
++#pragma once
++#include <cstddef>
++#include <cstdint>
++#include "project_config.h"
++
++namespace adaptive_lora {
++enum class RadioEventType { NONE, TX_DONE, RX_DONE, RX_TIMEOUT, CRC_ERROR, ERROR };
++struct RadioEvent {
++    RadioEventType type = RadioEventType::NONE;
++    int16_t code = 0;
++    size_t length = 0;
++    uint8_t bytes[kMaxFrameSize]{};
++    float rssi = 0;
++    float snr = 0;
++    bool metrics = false;
++};
++
++// Application boundary only. RadioDriver owns hardware initialization, polling
++// and IRQ handling; host tests supply packet delivery and error events.
++class RadioTransport {
++public:
++    virtual ~RadioTransport() = default;
++    virtual int16_t receive() = 0;
++    virtual int16_t transmit(const uint8_t* bytes, size_t length, uint32_t now) = 0;
++    virtual bool transmitting() const = 0;
++    virtual bool receiving() const = 0;
++    virtual bool healthy() const = 0;
++    virtual uint32_t timeOnAir(size_t length) = 0;
++};
++}  // namespace adaptive_lora
+diff --git a/iteration-006-baseline/src/gateway/gateway_app.cpp b/iteration-007-review-snapshot/src/gateway/gateway_app.cpp
+index 866db47..fe21fd2 100644
+--- a/iteration-006-baseline/src/gateway/gateway_app.cpp
++++ b/iteration-007-review-snapshot/src/gateway/gateway_app.cpp
+@@ -1,7 +1,7 @@
+ #include "gateway_app.h"
+
+ namespace adaptive_lora {
+-GatewayApp::GatewayApp(const DeviceConfig& config, RadioDriver& radio, SerialLogger& log, BootIdGenerator generate)
++GatewayApp::GatewayApp(const DeviceConfig& config, RadioTransport& radio, SerialLogger& log, BootIdGenerator generate)
+     : config_(config), radio_(radio), log_(log), generate_(generate) {}
+ void GatewayApp::begin(uint32_t now) {
+     sequence_.begin(generate_(0));
+diff --git a/iteration-006-baseline/src/gateway/gateway_app.h b/iteration-007-review-snapshot/src/gateway/gateway_app.h
+index 4671cd5..f371a30 100644
+--- a/iteration-006-baseline/src/gateway/gateway_app.h
++++ b/iteration-007-review-snapshot/src/gateway/gateway_app.h
+@@ -5,13 +5,13 @@
+ namespace adaptive_lora {
+ class GatewayApp {
+ public:
+-    GatewayApp(const DeviceConfig& config, RadioDriver& radio, SerialLogger& log, BootIdGenerator generate);
++    GatewayApp(const DeviceConfig& config, RadioTransport& radio, SerialLogger& log, BootIdGenerator generate);
+     void begin(uint32_t now);
+     void update(uint32_t now, const RadioEvent& event, bool allowNew = true);
+ private:
+     void listen(uint32_t now);
+     DeviceConfig config_;
+-    RadioDriver& radio_;
++    RadioTransport& radio_;
+     SerialLogger& log_;
+     BootIdGenerator generate_;
+     SequenceCounter sequence_;
+diff --git a/iteration-007-review-snapshot/test/support/fake_radio_transport.h b/iteration-007-review-snapshot/test/support/fake_radio_transport.h
+new file mode 100644
+index 0000000..a713e26
+--- /dev/null
++++ b/iteration-007-review-snapshot/test/support/fake_radio_transport.h
+@@ -0,0 +1,81 @@
++#pragma once
++#include <cstring>
++#include "common/radio/radio_transport.h"
++
++namespace adaptive_lora::test {
++struct CapturedPacket {
++    size_t length = 0;
++    uint8_t bytes[kMaxFrameSize]{};
++};
++
++// One operation and one captured packet per endpoint. Delivery is explicit:
++// packets cannot queue through half-duplex TX or reach a receiver that is off.
++class FakeRadioTransport final : public RadioTransport {
++public:
++    enum class Mode { IDLE, RX, TX, FAULT };
++    Mode mode = Mode::IDLE;
++    bool ready = true;  // Apps are constructed only after successful real begin.
++    unsigned rxFailuresLeft = 0;
++    bool failNextTx = false;
++    unsigned rxCalls = 0;
++    unsigned txCalls = 0;
++    unsigned successfulTxStarts = 0;
++    unsigned dropped = 0;
++    unsigned contractViolations = 0;
++    CapturedPacket lastTx;
++
++    int16_t receive() override {
++        ++rxCalls;
++        if (transmitting()) { ++contractViolations; return -901; }
++        if (!ready || rxFailuresLeft) {
++            if (rxFailuresLeft) --rxFailuresLeft;
++            mode = Mode::FAULT;
++            return -902;
++        }
++        mode = Mode::RX;
++        return 0;
++    }
++    int16_t transmit(const uint8_t* bytes, size_t length, uint32_t) override {
++        ++txCalls;
++        if (!bytes || length < kHeaderSize || length > kMaxFrameSize || transmitting() || !healthy()) {
++            ++contractViolations;
++            return -903;
++        }
++        lastTx.length = length;
++        std::memcpy(lastTx.bytes, bytes, length);
++        if (failNextTx) { failNextTx = false; mode = Mode::FAULT; return -904; }
++        ++successfulTxStarts;
++        mode = Mode::TX;
++        return 0;
++    }
++    bool transmitting() const override { return mode == Mode::TX; }
++    bool receiving() const override { return mode == Mode::RX; }
++    bool healthy() const override { return ready && mode != Mode::FAULT; }
++    uint32_t timeOnAir(size_t) override { return 1000; }  // Synthetic, never RF evidence.
++
++    RadioEvent completeTx() {
++        if (!transmitting()) { ++contractViolations; return {}; }
++        mode = Mode::IDLE;
++        RadioEvent event;
++        event.type = RadioEventType::TX_DONE;
++        return event;
++    }
++    RadioEvent deliver(const CapturedPacket& packet) {
++        if (!receiving() || !ready) { ++dropped; return {}; }
++        if (packet.length > kMaxFrameSize) { ++contractViolations; return {}; }
++        mode = Mode::IDLE;
++        RadioEvent event;
++        event.type = RadioEventType::RX_DONE;
++        event.length = packet.length;
++        std::memcpy(event.bytes, packet.bytes, packet.length);
++        return event;
++    }
++    RadioEvent error(RadioEventType type, int16_t code) {
++        mode = type == RadioEventType::ERROR ? Mode::FAULT : Mode::IDLE;
++        RadioEvent event;
++        event.type = type;
++        event.code = code;
++        return event;
++    }
++};
++}  // namespace adaptive_lora::test
+diff --git a/iteration-007-review-snapshot/test/support/platform/Arduino.h b/iteration-007-review-snapshot/test/support/platform/Arduino.h
+new file mode 100644
+index 0000000..74161a7
+--- /dev/null
++++ b/iteration-007-review-snapshot/test/support/platform/Arduino.h
+@@ -0,0 +1,31 @@
++#pragma once
++#ifndef ADAPTIVE_LORA_NATIVE_TEST
++#error "Native serial adapter must never be used in firmware"
++#endif
++#include <cstddef>
++#include <cstdint>
++#include <string>
++
++// Captures the real SerialLogger's output. This models byte capacity/short
++// writes only, not USB, interrupts, locks, a UART or elapsed write latency.
++class HostSerial {
++public:
++    std::string output;
++    int capacity = 64;
++    size_t writeLimit = 128;
++    size_t calls = 0;
++    size_t largestWrite = 0;
++    int availableForWrite() const { return capacity; }
++    size_t write(const uint8_t* bytes, size_t length) {
++        ++calls;
++        if (length > largestWrite) largestWrite = length;
++        size_t count = length < writeLimit ? length : writeLimit;
++        if (capacity <= 0) count = 0;
++        else if (count > static_cast<size_t>(capacity)) count = static_cast<size_t>(capacity);
++        output.append(reinterpret_cast<const char*>(bytes), count);
++        return count;
++    }
++    void reset() { output.clear(); capacity = 64; writeLimit = 128; calls = 0; largestWrite = 0; }
++};
++inline HostSerial& hostSerial() { static HostSerial serial; return serial; }
++#define Serial (hostSerial())
+diff --git a/iteration-007-review-snapshot/test/support/platform/esp_timer.h b/iteration-007-review-snapshot/test/support/platform/esp_timer.h
+new file mode 100644
+index 0000000..9da97ea
+--- /dev/null
++++ b/iteration-007-review-snapshot/test/support/platform/esp_timer.h
+@@ -0,0 +1,11 @@
++#pragma once
++#ifndef ADAPTIVE_LORA_NATIVE_TEST
++#error "Native clock adapter must never be used in firmware"
++#endif
++#include <cstdint>
++
++namespace host_clock {
++inline int64_t& value() { static int64_t now = 0; return now; }
++inline void set(uint64_t now) { value() = static_cast<int64_t>(now); }
++}
++inline int64_t esp_timer_get_time() { return host_clock::value(); }
+diff --git a/iteration-007-review-snapshot/test/test_app_integration/test_main.cpp b/iteration-007-review-snapshot/test/test_app_integration/test_main.cpp
+new file mode 100644
+index 0000000..a180d98
+--- /dev/null
++++ b/iteration-007-review-snapshot/test/test_app_integration/test_main.cpp
+@@ -0,0 +1,554 @@
++#include <unity.h>
++#include <Arduino.h>
++#include <esp_timer.h>
++#include <cstring>
++#include <string>
++#include <initializer_list>
++#include "client/client_app.h"
++#include "gateway/gateway_app.h"
++#include "../support/fake_radio_transport.h"
++
++using namespace adaptive_lora;
++using namespace adaptive_lora::test;
++namespace {
++uint32_t clientBoot = 1000;
++uint32_t gatewayBoot = 2000;
++uint32_t nextClientBoot(uint32_t previous) { if (++clientBoot == previous) ++clientBoot; return clientBoot; }
++uint32_t nextGatewayBoot(uint32_t previous) { if (++gatewayBoot == previous) ++gatewayBoot; return gatewayBoot; }
++DeviceConfig configuration(DeviceRole role) {
++    DeviceConfig c;
++    c.role = role;
++    c.nodeId = role == DeviceRole::CLIENT ? 2 : 1;
++    c.helloIntervalMs = 1000;
++    return c;
++}
++unsigned occurrences(const std::string& lines, const char* event) {
++    const std::string pattern = std::string("event=") + event + ",";
++    unsigned count = 0;
++    for (size_t at = 0; (at = lines.find(pattern, at)) != std::string::npos; at += pattern.size()) ++count;
++    return count;
++}
++std::string drain(SerialLogger& log) {
++    Serial.output.clear();
++    for (unsigned budget = 0; !log.empty() && budget < 512; ++budget) log.drain();
++    TEST_ASSERT_TRUE(log.empty());
++    TEST_ASSERT_EQUAL_UINT32(0, log.dropped());
++    return Serial.output;
++}
++CapturedPacket encoded(const Frame& frame) {
++    CapturedPacket packet;
++    TEST_ASSERT_EQUAL(int(CodecResult::OK), int(encodeFrame(frame, packet.bytes, sizeof(packet.bytes), packet.length)));
++    return packet;
++}
++Frame decoded(const CapturedPacket& packet, uint16_t destination) {
++    Frame frame;
++    TEST_ASSERT_EQUAL(int(CodecResult::OK), int(decodeFrame(packet.bytes, packet.length, 1, destination, frame)));
++    return frame;
++}
++void samePacket(const CapturedPacket& a, const CapturedPacket& b) {
++    TEST_ASSERT_EQUAL_UINT(a.length, b.length);
++    TEST_ASSERT_EQUAL_UINT8_ARRAY(a.bytes, b.bytes, a.length);
++}
++
++struct Link {
++    DeviceConfig clientConfig = configuration(DeviceRole::CLIENT);
++    DeviceConfig gatewayConfig = configuration(DeviceRole::GATEWAY);
++    FakeRadioTransport clientRadio;
++    FakeRadioTransport gatewayRadio;
++    SerialLogger clientLog;
++    SerialLogger gatewayLog;
++    ClientApp client{clientConfig, clientRadio, clientLog, nextClientBoot};
++    GatewayApp gateway{gatewayConfig, gatewayRadio, gatewayLog, nextGatewayBoot};
++    ClientApp* activeClient = &client;
++    GatewayApp* activeGateway = &gateway;
++    uint64_t now = 0;
++    uint64_t helloDone = 0;
++    unsigned accepted = 0, timeouts = 0, txFailed = 0;
++    unsigned gatewayAccepted = 0, duplicates = 0, clientRejected = 0, gatewayRejected = 0;
++    std::string lastClientLog, lastGatewayLog;
++
++    explicit Link(unsigned clientRxFailures = 0, unsigned gatewayRxFailures = 0, uint64_t start = 0) : now(start) {
++        host_clock::set(now);
++        clientRadio.rxFailuresLeft = clientRxFailures;
++        gatewayRadio.rxFailuresLeft = gatewayRxFailures;
++        clientLog.begin(clientConfig);
++        gatewayLog.begin(gatewayConfig);
++        client.begin(static_cast<uint32_t>(now));
++        gateway.begin(static_cast<uint32_t>(now));
++        flush();
++    }
++    void flush() {
++        lastClientLog = drain(clientLog);
++        lastGatewayLog = drain(gatewayLog);
++        accepted += occurrences(lastClientLog, "ACK_RX");
++        timeouts += occurrences(lastClientLog, "ACK_TIMEOUT");
++        txFailed += occurrences(lastClientLog, "HELLO_FAILED");
++        clientRejected += occurrences(lastClientLog, "FRAME_REJECT");
++        gatewayRejected += occurrences(lastGatewayLog, "FRAME_REJECT");
++        gatewayAccepted += occurrences(lastGatewayLog, "HELLO_RX");
++        duplicates += occurrences(lastGatewayLog, "DUPLICATE");
++        TEST_ASSERT_EQUAL_UINT(0, clientRadio.contractViolations);
++        TEST_ASSERT_EQUAL_UINT(0, gatewayRadio.contractViolations);
++    }
++    void clockOnly(uint64_t value) { now = value; host_clock::set(now); }
++    void advanceTo(uint64_t value) {
++        TEST_ASSERT_TRUE(value >= now);
++        clockOnly(value);
++        activeClient->update(static_cast<uint32_t>(now), {});
++        activeGateway->update(static_cast<uint32_t>(now), {});
++        flush();
++    }
++    void startHello() {
++        advanceTo(now + uint64_t(clientConfig.helloIntervalMs) * 1000);
++        TEST_ASSERT_TRUE(clientRadio.transmitting());
++    }
++    CapturedPacket completeHello(bool deliver = true) {
++        TEST_ASSERT_TRUE(clientRadio.transmitting());
++        const CapturedPacket hello = clientRadio.lastTx;
++        clockOnly(now + 1000);
++        helloDone = now;
++        activeClient->update(static_cast<uint32_t>(now), clientRadio.completeTx());
++        TEST_ASSERT_TRUE(clientRadio.receiving());
++        if (deliver) activeGateway->update(static_cast<uint32_t>(now), gatewayRadio.deliver(hello));
++        flush();
++        return hello;
++    }
++    CapturedPacket completeAck(bool deliver = true) {
++        TEST_ASSERT_TRUE(gatewayRadio.transmitting());
++        const CapturedPacket ack = gatewayRadio.lastTx;
++        clockOnly(now + 1000);
++        activeGateway->update(static_cast<uint32_t>(now), gatewayRadio.completeTx());
++        if (deliver) activeClient->update(static_cast<uint32_t>(now), clientRadio.deliver(ack));
++        flush();
++        return ack;
++    }
++    void deliverClient(const CapturedPacket& packet) {
++        activeClient->update(static_cast<uint32_t>(now), clientRadio.deliver(packet));
++        flush();
++    }
++    void deliverGateway(const CapturedPacket& packet) {
++        activeGateway->update(static_cast<uint32_t>(now), gatewayRadio.deliver(packet));
++        flush();
++    }
++    void transaction() { startHello(); completeHello(); completeAck(); }
++};
++
++void test_matching_transaction() {
++    Link f;
++    f.startHello();
++    const auto hello = f.completeHello();
++    const auto ack = f.completeAck();
++    const Frame h = decoded(hello, 1), a = decoded(ack, 2);
++    TEST_ASSERT_TRUE(ackMatches(a, h, 1));
++    TEST_ASSERT_EQUAL_UINT(1, f.accepted);
++    TEST_ASSERT_EQUAL_UINT(1, f.gatewayAccepted);
++    TEST_ASSERT_EQUAL_UINT(0, f.timeouts);
++    TEST_ASSERT_TRUE(f.gatewayRadio.receiving());
++    TEST_ASSERT_TRUE(f.clientRadio.receiving());
++}
++void test_hello_loss_timeout_and_next_new_identity() {
++    Link f; f.startHello();
++    const Frame first = decoded(f.completeHello(false), 1);
++    f.advanceTo(f.helloDone + kAckTimeoutUs);
++    TEST_ASSERT_EQUAL_UINT(1, f.timeouts);
++    TEST_ASSERT_EQUAL_UINT(0, f.gatewayAccepted);
++    TEST_ASSERT_EQUAL_UINT(1, f.clientRadio.txCalls);
++    f.advanceTo(f.now + 999999);
++    TEST_ASSERT_EQUAL_UINT(1, f.clientRadio.txCalls);
++    f.advanceTo(f.now + 1);
++    const Frame second = decoded(f.clientRadio.lastTx, 1);
++    TEST_ASSERT_EQUAL_UINT32(first.bootId, second.bootId);
++    TEST_ASSERT_EQUAL_UINT16(first.sequence + 1, second.sequence);
++    f.completeHello(); f.completeAck();
++    TEST_ASSERT_EQUAL_UINT(1, f.accepted);
++}
++void test_ack_loss_has_no_automatic_retry() {
++    Link f; f.startHello(); f.completeHello(); f.completeAck(false);
++    f.advanceTo(f.helloDone + kAckTimeoutUs);
++    TEST_ASSERT_EQUAL_UINT(1, f.timeouts);
++    TEST_ASSERT_EQUAL_UINT(0, f.accepted);
++    TEST_ASSERT_EQUAL_UINT(1, f.gatewayAccepted);
++    TEST_ASSERT_EQUAL_UINT(1, f.clientRadio.txCalls);
++    TEST_ASSERT_EQUAL_UINT(1, f.gatewayRadio.txCalls);
++}
++void test_same_packet_replay_preserves_identity_and_reacks_once() {
++    Link f; f.startHello();
++    const auto original = f.completeHello();
++    const auto firstAck = f.completeAck(false);
++    const CapturedPacket retransmission = original;
++    samePacket(original, retransmission);  // Header identity and all payload bytes.
++    f.deliverGateway(retransmission);
++    const Frame secondAck = decoded(f.completeAck(), 2);
++    TEST_ASSERT_TRUE(ackMatches(secondAck, decoded(original, 1), 1));
++    TEST_ASSERT_NOT_EQUAL(decoded(firstAck, 2).sequence, secondAck.sequence);
++    TEST_ASSERT_EQUAL_UINT(1, f.gatewayAccepted);
++    TEST_ASSERT_EQUAL_UINT(1, f.duplicates);
++    TEST_ASSERT_EQUAL_UINT(1, f.accepted);
++    TEST_ASSERT_EQUAL_UINT(1, f.clientRadio.txCalls);  // Replay is test transport injection.
++}
++void test_delayed_ack_before_deadline() {
++    Link f; f.startHello(); f.completeHello(); const auto ack = f.completeAck(false);
++    f.advanceTo(f.helloDone + kAckTimeoutUs - 1);
++    f.deliverClient(ack);
++    TEST_ASSERT_EQUAL_UINT(1, f.accepted);
++    TEST_ASSERT_EQUAL_UINT(0, f.timeouts);
++}
++void test_ack_at_deadline_is_rejected() {
++    Link f; f.startHello(); f.completeHello(); const auto ack = f.completeAck(false);
++    f.clockOnly(f.helloDone + kAckTimeoutUs);
++    f.deliverClient(ack);  // RX event and timeout processed in the same production update.
++    TEST_ASSERT_EQUAL_UINT(0, f.accepted);
++    TEST_ASSERT_EQUAL_UINT(1, f.clientRejected);
++    TEST_ASSERT_EQUAL_UINT(1, f.timeouts);
++}
++void test_ack_after_deadline_is_rejected() {
++    Link f; f.startHello(); f.completeHello(); const auto ack = f.completeAck(false);
++    f.advanceTo(f.helloDone + kAckTimeoutUs + 1); f.deliverClient(ack);
++    TEST_ASSERT_EQUAL_UINT(0, f.accepted);
++    TEST_ASSERT_EQUAL_UINT(1, f.clientRejected);
++    TEST_ASSERT_EQUAL_UINT(1, f.timeouts);
++}
++void test_previous_ack_during_new_transaction_is_rejected() {
++    Link f; f.startHello(); f.completeHello(); const auto old = f.completeAck(false);
++    f.advanceTo(f.helloDone + kAckTimeoutUs);
++    f.startHello(); f.completeHello();
++    f.deliverClient(old);
++    TEST_ASSERT_EQUAL_UINT(0, f.accepted);
++    f.completeAck();
++    TEST_ASSERT_EQUAL_UINT(1, f.accepted);
++    TEST_ASSERT_EQUAL_UINT(1, f.clientRejected);
++}
++void test_duplicate_ack_does_not_complete_twice() {
++    Link f; f.startHello(); f.completeHello(); const auto ack = f.completeAck();
++    f.deliverClient(ack);
++    TEST_ASSERT_EQUAL_UINT(1, f.accepted);
++    TEST_ASSERT_EQUAL_UINT(1, f.clientRejected);
++}
++void wrongAck(unsigned offset, uint8_t value) {
++    Link f; f.startHello(); f.completeHello(); auto ack = f.completeAck(false);
++    auto wrong = ack; wrong.bytes[offset] = value;
++    f.deliverClient(wrong);
++    TEST_ASSERT_EQUAL_UINT(0, f.accepted);
++    TEST_ASSERT_EQUAL_UINT(1, f.clientRejected);
++    f.deliverClient(ack);
++    TEST_ASSERT_EQUAL_UINT(1, f.accepted);
++}
++void test_wrong_echo_source() { wrongAck(28, 3); }
++void test_wrong_echo_boot() { wrongAck(30, 42); }
++void test_wrong_echo_sequence() { wrongAck(34, 42); }
++void test_wrong_gateway_sender() { wrongAck(8, 3); }
++void test_wrong_ack_network_or_destination() { wrongAck(6, 2); wrongAck(10, 3); }
++
++void test_malformed_hellos_rejected_then_valid_recovers() {
++    Link f; f.startHello(); const auto hello = f.completeHello(false);
++    unsigned rejected = 0;
++    for (size_t size = 0; size < kHeaderSize; ++size) {
++        auto packet = hello; packet.length = size; f.deliverGateway(packet); ++rejected;
++    }
++    struct Mutation { unsigned offset; uint8_t value; };
++    const Mutation mutations[] = {{0,0},{2,2},{3,0x10},{4,1},{5,27},{6,2},{8,0},{10,3},
++        {16,1},{22,1},{24,1},{26,1},{26,69},{27,1}};
++    for (const auto& mutation : mutations) {
++        auto packet = hello; packet.bytes[mutation.offset] = mutation.value;
++        f.deliverGateway(packet); ++rejected;
++    }
++    auto trailing = hello; trailing.bytes[trailing.length++] = 0;
++    f.deliverGateway(trailing); ++rejected;
++    auto noSession = hello; put32(noSession.bytes + 12, 0);
++    f.deliverGateway(noSession); ++rejected;
++    TEST_ASSERT_EQUAL_UINT(rejected, f.gatewayRejected);
++    TEST_ASSERT_EQUAL_UINT(0, f.gatewayRadio.txCalls);
++    f.deliverGateway(hello); f.completeAck();
++    TEST_ASSERT_EQUAL_UINT(1, f.accepted);
++    TEST_ASSERT_EQUAL_UINT(1, f.gatewayAccepted);
++}
++void test_malformed_acks_do_not_cancel_outstanding_identity() {
++    Link f; f.startHello(); f.completeHello(); const auto ack = f.completeAck(false);
++    unsigned rejected = 0;
++    for (size_t size = 0; size < ack.length; ++size) {
++        auto packet = ack; packet.length = size; f.deliverClient(packet); ++rejected;
++    }
++    for (unsigned offset : {0u,2u,3u,4u,5u,26u,27u,36u}) {
++        auto packet = ack; packet.bytes[offset] ^= 0x80;
++        f.deliverClient(packet); ++rejected;
++    }
++    TEST_ASSERT_EQUAL_UINT(rejected, f.clientRejected);
++    TEST_ASSERT_EQUAL_UINT(0, f.accepted);
++    f.deliverClient(ack);
++    TEST_ASSERT_EQUAL_UINT(1, f.accepted);
++    TEST_ASSERT_EQUAL_UINT(0, f.timeouts);
++}
++void test_wrong_message_for_each_role() {
++    Link f;
++    Frame h; h.networkId = 1; h.sourceId = 1; h.destinationId = 2; h.bootId = 9;
++    Frame a; a.type = MessageType::ACK; a.networkId = 1; a.sourceId = 2; a.destinationId = 1; a.bootId = 10;
++    setAckPayload(a, h);
++    f.deliverGateway(encoded(a));
++    TEST_ASSERT_EQUAL_UINT(1, f.gatewayRejected);
++    TEST_ASSERT_EQUAL_UINT(0, f.gatewayRadio.txCalls);
++    f.startHello(); f.completeHello(false);
++    f.deliverClient(encoded(h));
++    TEST_ASSERT_EQUAL_UINT(1, f.clientRejected);
++    TEST_ASSERT_EQUAL_UINT(0, f.accepted);
++}
++void test_client_tx_start_failure_uses_new_identity_next_time() {
++    Link f; f.clientRadio.failNextTx = true;
++    f.advanceTo(1000000);
++    const Frame first = decoded(f.clientRadio.lastTx, 1);
++    TEST_ASSERT_EQUAL_UINT(1, f.txFailed);
++    TEST_ASSERT_EQUAL_UINT(0, f.timeouts);
++    f.startHello();
++    const Frame next = decoded(f.clientRadio.lastTx, 1);
++    TEST_ASSERT_EQUAL_UINT32(first.bootId, next.bootId);
++    TEST_ASSERT_EQUAL_UINT16(first.sequence + 1, next.sequence);
++    f.completeHello(); f.completeAck();
++    TEST_ASSERT_EQUAL_UINT(1, f.accepted);
++}
++void test_client_tx_error_never_counts_as_ack_success() {
++    Link f; f.startHello();
++    f.client.update(static_cast<uint32_t>(f.now), f.clientRadio.error(RadioEventType::ERROR, -905)); f.flush();
++    TEST_ASSERT_EQUAL_UINT(1, f.txFailed);
++    TEST_ASSERT_EQUAL_UINT(0, f.timeouts);
++    TEST_ASSERT_EQUAL_UINT(0, f.accepted);
++    f.transaction(); TEST_ASSERT_EQUAL_UINT(1, f.accepted);
++}
++void test_gateway_ack_start_failure_then_same_hello_recovery() {
++    Link f; f.gatewayRadio.failNextTx = true; f.startHello(); const auto hello = f.completeHello();
++    TEST_ASSERT_EQUAL_UINT(1, f.gatewayAccepted);
++    TEST_ASSERT_TRUE(f.gatewayRadio.receiving());
++    f.deliverGateway(hello); f.completeAck();
++    TEST_ASSERT_EQUAL_UINT(1, f.gatewayAccepted);
++    TEST_ASSERT_EQUAL_UINT(1, f.duplicates);
++    TEST_ASSERT_EQUAL_UINT(1, f.accepted);
++}
++void test_gateway_tx_error_then_same_hello_recovery() {
++    Link f; f.startHello(); const auto hello = f.completeHello();
++    f.gateway.update(static_cast<uint32_t>(f.now), f.gatewayRadio.error(RadioEventType::ERROR, -906)); f.flush();
++    f.deliverGateway(hello); f.completeAck();
++    TEST_ASSERT_EQUAL_UINT(1, f.gatewayAccepted);
++    TEST_ASSERT_EQUAL_UINT(1, f.duplicates);
++    TEST_ASSERT_EQUAL_UINT(1, f.accepted);
++}
++void test_client_rx_recovery_backoff_and_limit() {
++    Link f(3, 0); f.advanceTo(0);
++    TEST_ASSERT_EQUAL_UINT(1, f.clientRadio.rxCalls);
++    f.advanceTo(999999); TEST_ASSERT_EQUAL_UINT(1, f.clientRadio.rxCalls);
++    f.advanceTo(1000000); TEST_ASSERT_EQUAL_UINT(2, f.clientRadio.rxCalls);
++    f.advanceTo(2000000); TEST_ASSERT_EQUAL_UINT(3, f.clientRadio.rxCalls);
++    f.advanceTo(10000000); TEST_ASSERT_EQUAL_UINT(3, f.clientRadio.rxCalls);
++    TEST_ASSERT_EQUAL_UINT(0, f.clientRadio.txCalls);
++}
++void test_gateway_rx_recovery_backoff_and_limit() {
++    Link f(0, 3);
++    TEST_ASSERT_EQUAL_UINT(1, f.gatewayRadio.rxCalls);
++    f.advanceTo(999999); TEST_ASSERT_EQUAL_UINT(1, f.gatewayRadio.rxCalls);
++    f.advanceTo(1000000); TEST_ASSERT_EQUAL_UINT(2, f.gatewayRadio.rxCalls);
++    f.advanceTo(2000000); TEST_ASSERT_EQUAL_UINT(3, f.gatewayRadio.rxCalls);
++    f.advanceTo(10000000); TEST_ASSERT_EQUAL_UINT(3, f.gatewayRadio.rxCalls);
++    TEST_ASSERT_EQUAL_UINT(0, f.gatewayRadio.txCalls);
++}
++void test_receive_errors_preserve_ack_deadline() {
++    Link f; f.startHello(); f.completeHello(); const auto ack = f.completeAck(false);
++    for (auto type : {RadioEventType::CRC_ERROR,RadioEventType::RX_TIMEOUT,RadioEventType::ERROR}) {
++        f.clockOnly(f.now + 1000);
++        f.client.update(static_cast<uint32_t>(f.now), f.clientRadio.error(type, -907)); f.flush();
++        TEST_ASSERT_TRUE(f.clientRadio.receiving());
++    }
++    f.advanceTo(f.helloDone + kAckTimeoutUs);
++    TEST_ASSERT_EQUAL_UINT(1, f.timeouts); f.deliverClient(ack);
++    TEST_ASSERT_EQUAL_UINT(0, f.accepted);
++    TEST_ASSERT_EQUAL_UINT(1, f.clientRejected);
++}
++void test_repeated_transactions_200() {
++    Link f;
++    for (unsigned n = 0; n < 200; ++n) {
++        f.transaction(); const Frame hello = decoded(f.clientRadio.lastTx, 1);
++        TEST_ASSERT_EQUAL_UINT16(n, hello.sequence);
++    }
++    TEST_ASSERT_EQUAL_UINT(200, f.accepted);
++    TEST_ASSERT_EQUAL_UINT(200, f.gatewayAccepted);
++    TEST_ASSERT_EQUAL_UINT(0, f.timeouts);
++    TEST_ASSERT_EQUAL_UINT(0, f.duplicates);
++}
++void test_client_reboot_rejects_prior_session_ack() {
++    Link f; f.startHello(); const Frame oldHello = decoded(f.completeHello(), 1);
++    const auto oldAck = f.completeAck(false);
++    f.clientRadio.mode = FakeRadioTransport::Mode::IDLE;
++    ClientApp rebooted(f.clientConfig, f.clientRadio, f.clientLog, nextClientBoot);
++    f.activeClient = &rebooted; rebooted.begin(static_cast<uint32_t>(f.now));
++    f.startHello(); const Frame next = decoded(f.completeHello(), 1);
++    TEST_ASSERT_NOT_EQUAL(oldHello.bootId, next.bootId);
++    TEST_ASSERT_EQUAL_UINT16(0, next.sequence);
++    f.deliverClient(oldAck); TEST_ASSERT_EQUAL_UINT(0, f.accepted);
++    f.completeAck(); TEST_ASSERT_EQUAL_UINT(1, f.accepted);
++    TEST_ASSERT_EQUAL_UINT(2, f.gatewayAccepted);
++}
++void test_gateway_reboot_loses_volatile_history_but_echo_stays_correct() {
++    Link f; f.startHello(); const auto hello = f.completeHello(); const auto oldAck = f.completeAck(false);
++    f.gatewayRadio.mode = FakeRadioTransport::Mode::IDLE;
++    GatewayApp rebooted(f.gatewayConfig, f.gatewayRadio, f.gatewayLog, nextGatewayBoot);
++    f.activeGateway = &rebooted; rebooted.begin(static_cast<uint32_t>(f.now));
++    f.deliverGateway(hello); const auto newAck = f.completeAck();
++    TEST_ASSERT_NOT_EQUAL(decoded(oldAck, 2).bootId, decoded(newAck, 2).bootId);
++    TEST_ASSERT_TRUE(ackMatches(decoded(newAck, 2), decoded(hello, 1), 1));
++    TEST_ASSERT_EQUAL_UINT(2, f.gatewayAccepted);  // Documented reboot loss of replay history.
++    TEST_ASSERT_EQUAL_UINT(0, f.duplicates);
++    TEST_ASSERT_EQUAL_UINT(1, f.accepted);
++}
++void test_retained_old_session_duplicate_keeps_original_echo() {
++    Link f; f.startHello(); const auto oldHello = f.completeHello(); f.completeAck();
++    const Frame original = decoded(oldHello, 1);
++    Frame newHello = original; ++newHello.bootId;
++    f.deliverGateway(encoded(newHello)); f.completeAck(false);
++    f.deliverGateway(oldHello); const auto ack = f.completeAck(false);
++    TEST_ASSERT_TRUE(ackMatches(decoded(ack, 2), original, 1));
++    TEST_ASSERT_EQUAL_UINT(2, f.gatewayAccepted);
++    TEST_ASSERT_EQUAL_UINT(1, f.duplicates);
++}
++void test_32_bit_microsecond_wrap_during_ack_wait() {
++    Link f(0, 0, uint64_t(0xFFFFFFFFu) - 1500000);
++    f.startHello(); f.completeHello();
++    const auto ack = f.completeAck(false);
++    f.advanceTo(f.helloDone + kAckTimeoutUs - 1); f.deliverClient(ack);
++    TEST_ASSERT_TRUE(f.now > uint64_t(0xFFFFFFFFu));
++    TEST_ASSERT_EQUAL_UINT(1, f.accepted);
++    TEST_ASSERT_EQUAL_UINT(0, f.timeouts);
++}
++void test_maximum_interval_uses_64_bit_time() {
++    DeviceConfig c = configuration(DeviceRole::CLIENT); c.helloIntervalMs = kMaxHelloIntervalMs;
++    FakeRadioTransport radio; SerialLogger log; log.begin(c);
++    const uint64_t start = uint64_t(0xFFFFFFFFu) + 500000;
++    host_clock::set(start); ClientApp client(c, radio, log, nextClientBoot); client.begin(static_cast<uint32_t>(start));
++    const uint64_t sent = start + 1000000;
++    host_clock::set(sent); client.update(static_cast<uint32_t>(sent), {});
++    TEST_ASSERT_TRUE(radio.transmitting());
++    client.update(static_cast<uint32_t>(sent), radio.error(RadioEventType::ERROR, -908)); drain(log);
++    const uint64_t next = sent + uint64_t(kMaxHelloIntervalMs) * 1000;
++    host_clock::set(next - 1); client.update(static_cast<uint32_t>(next - 1), {}); drain(log);
++    TEST_ASSERT_EQUAL_UINT(1, radio.txCalls);
++    host_clock::set(next); client.update(static_cast<uint32_t>(next), {}); drain(log);
++    TEST_ASSERT_EQUAL_UINT(2, radio.txCalls);
++}
++void test_32_bit_microsecond_wrap_during_receive_recovery() {
++    const uint64_t start = uint64_t(0xFFFFFFFFu) - 500000;
++    Link f(3, 3, start); f.advanceTo(start);
++    f.advanceTo(start + kRadioRecoveryUs - 1);
++    TEST_ASSERT_EQUAL_UINT(1, f.clientRadio.rxCalls); TEST_ASSERT_EQUAL_UINT(1, f.gatewayRadio.rxCalls);
++    f.advanceTo(start + kRadioRecoveryUs);
++    TEST_ASSERT_EQUAL_UINT(2, f.clientRadio.rxCalls); TEST_ASSERT_EQUAL_UINT(2, f.gatewayRadio.rxCalls);
++    f.advanceTo(start + 2 * kRadioRecoveryUs);
++    TEST_ASSERT_EQUAL_UINT(3, f.clientRadio.rxCalls); TEST_ASSERT_EQUAL_UINT(3, f.gatewayRadio.rxCalls);
++}
++void test_stop_gate_prevents_new_client_tx_and_finishes_active_tx() {
++    Link f; f.clockOnly(1000000);
++    f.client.update(static_cast<uint32_t>(f.now), {}, false); f.flush();
++    TEST_ASSERT_EQUAL_UINT(0, f.clientRadio.txCalls);
++    f.client.update(static_cast<uint32_t>(f.now), {}); f.flush();
++    TEST_ASSERT_TRUE(f.clientRadio.transmitting());
++    f.client.update(static_cast<uint32_t>(f.now), f.clientRadio.completeTx(), false); f.flush();
++    TEST_ASSERT_FALSE(f.clientRadio.transmitting());
++    f.clockOnly(f.now + kAckTimeoutUs);
++    f.client.update(static_cast<uint32_t>(f.now), {}, false); f.flush();
++    TEST_ASSERT_EQUAL_UINT(1, f.timeouts);
++    f.clockOnly(f.now + 2000000); f.client.update(static_cast<uint32_t>(f.now), {}, false); f.flush();
++    TEST_ASSERT_EQUAL_UINT(1, f.clientRadio.txCalls);
++}
++void test_stop_gate_prevents_gateway_ack() {
++    Link f; f.startHello(); const auto hello = f.completeHello(false);
++    f.gateway.update(static_cast<uint32_t>(f.now), f.gatewayRadio.deliver(hello), false); f.flush();
++    TEST_ASSERT_EQUAL_UINT(0, f.gatewayRadio.txCalls);
++    TEST_ASSERT_EQUAL_UINT(0, f.gatewayAccepted);
++}
++void test_sequence_exhaustion_in_actual_apps_changes_both_sessions() {
++    Link f; uint32_t initialClient = 0, initialGateway = 0;
++    for (uint32_t n = 0; n <= 65536; ++n) {
++        f.transaction();
++        const Frame h = decoded(f.clientRadio.lastTx, 1), a = decoded(f.gatewayRadio.lastTx, 2);
++        if (!n) { initialClient = h.bootId; initialGateway = a.bootId; }
++        TEST_ASSERT_EQUAL_UINT16(n & 0xFFFFu, h.sequence);
++        TEST_ASSERT_EQUAL_UINT16(n & 0xFFFFu, a.sequence);
++        TEST_ASSERT_TRUE(ackMatches(a, h, 1));
++        if (n < 65536) {
++            TEST_ASSERT_EQUAL_UINT32(initialClient, h.bootId); TEST_ASSERT_EQUAL_UINT32(initialGateway, a.bootId);
++        } else {
++            TEST_ASSERT_NOT_EQUAL(initialClient, h.bootId); TEST_ASSERT_NOT_EQUAL(initialGateway, a.bootId);
++        }
++    }
++    TEST_ASSERT_EQUAL_UINT(65537, f.accepted);
++    TEST_ASSERT_EQUAL_UINT(65537, f.gatewayAccepted);
++    TEST_ASSERT_EQUAL_UINT(0, f.duplicates);
++}
++void test_stale_sequence_is_not_accepted_or_reacked() {
++    Link f; f.startHello(); Frame h = decoded(f.completeHello(false), 1);
++    h.sequence = 100; f.deliverGateway(encoded(h)); f.completeAck(false);
++    h.sequence = 0; f.deliverGateway(encoded(h));
++    TEST_ASSERT_EQUAL_UINT(1, f.gatewayAccepted);
++    TEST_ASSERT_EQUAL_UINT(1, f.gatewayRejected);
++    TEST_ASSERT_EQUAL_UINT(1, f.gatewayRadio.txCalls);
++}
++void test_out_of_order_sequence_accepted_once() {
++    Link f; f.startHello(); Frame h = decoded(f.completeHello(false), 1);
++    h.sequence = 10; f.deliverGateway(encoded(h)); f.completeAck(false);
++    h.sequence = 8; const auto packet = encoded(h);
++    f.deliverGateway(packet); f.completeAck(false); f.deliverGateway(packet); f.completeAck(false);
++    TEST_ASSERT_EQUAL_UINT(2, f.gatewayAccepted); TEST_ASSERT_EQUAL_UINT(1, f.duplicates);
++}
++void test_unavailable_transport_never_starts_hello() {
++    Link f; f.clientRadio.ready = false;
++    f.advanceTo(1000000); f.advanceTo(2000000); f.advanceTo(3000000); f.advanceTo(4000000);
++    TEST_ASSERT_EQUAL_UINT(0, f.clientRadio.txCalls);
++    TEST_ASSERT_EQUAL_UINT(3, f.clientRadio.rxCalls);
++}
++void test_max_payload_replay_is_byte_identical() {
++    Link f; Frame h; h.networkId = 1; h.sourceId = 2; h.destinationId = 1; h.bootId = 123;
++    h.payloadLength = kMaxPayloadSize;
++    for (unsigned n = 0; n < kMaxPayloadSize; ++n) h.payload[n] = static_cast<uint8_t>(n ^ 0xA5);
++    const auto first = encoded(h), replay = first;
++    samePacket(first, replay); TEST_ASSERT_EQUAL_UINT(96, replay.length);
++    f.deliverGateway(first); const Frame a = decoded(f.completeAck(false), 2);
++    f.deliverGateway(replay); const Frame b = decoded(f.completeAck(false), 2);
++    TEST_ASSERT_TRUE(ackMatches(a, h, 1)); TEST_ASSERT_TRUE(ackMatches(b, h, 1));
++    TEST_ASSERT_EQUAL_UINT(1, f.gatewayAccepted); TEST_ASSERT_EQUAL_UINT(1, f.duplicates);
++}
++}
++void setUp() { Serial.reset(); host_clock::set(0); clientBoot = 1000; gatewayBoot = 2000; }
++void tearDown() {}
++int main() {
++    UNITY_BEGIN();
++    RUN_TEST(test_matching_transaction);
++    RUN_TEST(test_hello_loss_timeout_and_next_new_identity);
++    RUN_TEST(test_ack_loss_has_no_automatic_retry);
++    RUN_TEST(test_same_packet_replay_preserves_identity_and_reacks_once);
++    RUN_TEST(test_delayed_ack_before_deadline);
++    RUN_TEST(test_ack_at_deadline_is_rejected);
++    RUN_TEST(test_ack_after_deadline_is_rejected);
++    RUN_TEST(test_previous_ack_during_new_transaction_is_rejected);
++    RUN_TEST(test_duplicate_ack_does_not_complete_twice);
++    RUN_TEST(test_wrong_echo_source); RUN_TEST(test_wrong_echo_boot); RUN_TEST(test_wrong_echo_sequence);
++    RUN_TEST(test_wrong_gateway_sender); RUN_TEST(test_wrong_ack_network_or_destination);
++    RUN_TEST(test_malformed_hellos_rejected_then_valid_recovers);
++    RUN_TEST(test_malformed_acks_do_not_cancel_outstanding_identity);
++    RUN_TEST(test_wrong_message_for_each_role);
++    RUN_TEST(test_client_tx_start_failure_uses_new_identity_next_time);
++    RUN_TEST(test_client_tx_error_never_counts_as_ack_success);
++    RUN_TEST(test_gateway_ack_start_failure_then_same_hello_recovery);
++    RUN_TEST(test_gateway_tx_error_then_same_hello_recovery);
++    RUN_TEST(test_client_rx_recovery_backoff_and_limit);
++    RUN_TEST(test_gateway_rx_recovery_backoff_and_limit);
++    RUN_TEST(test_receive_errors_preserve_ack_deadline);
++    RUN_TEST(test_repeated_transactions_200);
++    RUN_TEST(test_client_reboot_rejects_prior_session_ack);
++    RUN_TEST(test_gateway_reboot_loses_volatile_history_but_echo_stays_correct);
++    RUN_TEST(test_retained_old_session_duplicate_keeps_original_echo);
++    RUN_TEST(test_32_bit_microsecond_wrap_during_ack_wait);
++    RUN_TEST(test_maximum_interval_uses_64_bit_time);
++    RUN_TEST(test_32_bit_microsecond_wrap_during_receive_recovery);
++    RUN_TEST(test_stop_gate_prevents_new_client_tx_and_finishes_active_tx);
++    RUN_TEST(test_stop_gate_prevents_gateway_ack);
++    RUN_TEST(test_sequence_exhaustion_in_actual_apps_changes_both_sessions);
++    RUN_TEST(test_stale_sequence_is_not_accepted_or_reacked);
++    RUN_TEST(test_out_of_order_sequence_accepted_once);
++    RUN_TEST(test_unavailable_transport_never_starts_hello);
++    RUN_TEST(test_max_payload_replay_is_byte_identical);
++    return UNITY_END();
++}
+diff --git a/iteration-006-baseline/test/test_role_config/test_main.cpp b/iteration-007-review-snapshot/test/test_role_config/test_main.cpp
+index 1ecad8e..a866cf5 100644
+--- a/iteration-006-baseline/test/test_role_config/test_main.cpp
++++ b/iteration-007-review-snapshot/test/test_role_config/test_main.cpp
+@@ -1,6 +1,7 @@
+ #include <unity.h>
+ #include <initializer_list>
+ #include "common/config/device_config.h"
++#include "common/protocol/frame_codec.h"
+ using namespace adaptive_lora;
+ namespace {
+ DeviceConfig client() { DeviceConfig c; c.role = DeviceRole::CLIENT; return c; }
+@@ -65,6 +66,45 @@ void test_blob_partial_missing_oversize_and_invalid_save() {
+     auto c = client(); TEST_ASSERT_FALSE(encodeConfig(c, bytes, 23));
+     TEST_ASSERT_FALSE(encodeConfig(c, nullptr, 24));
+ }
++void fixtureIntegrity(uint8_t* bytes) {
++    uint32_t hash = 2166136261u;
++    for (unsigned n = 0; n < 20; ++n) hash = (hash ^ bytes[n]) * 16777619u;
++    put32(bytes + 20, hash);
++}
++void test_valid_integrity_blob_unsupported_schema() {
++    uint8_t bytes[kConfigBlobSize]; DeviceConfig out;
++    TEST_ASSERT_TRUE(encodeConfig(client(), bytes, sizeof(bytes)));
++    put16(bytes + 4, kConfigSchema + 1); fixtureIntegrity(bytes);
++    TEST_ASSERT_EQUAL_STRING("unsupported_schema", decodeConfig(bytes, sizeof(bytes), out));
++    TEST_ASSERT_EQUAL_UINT8(uint8_t(DeviceRole::UNSET), uint8_t(out.role));
++}
++void test_valid_integrity_blob_unsupported_role() {
++    uint8_t bytes[kConfigBlobSize]; DeviceConfig out;
++    TEST_ASSERT_TRUE(encodeConfig(client(), bytes, sizeof(bytes)));
++    bytes[6] = 0xFF; fixtureIntegrity(bytes);
++    TEST_ASSERT_EQUAL_STRING("invalid_role", decodeConfig(bytes, sizeof(bytes), out));
++    TEST_ASSERT_EQUAL_UINT8(uint8_t(DeviceRole::UNSET), uint8_t(out.role));
++}
++void test_valid_integrity_blob_invalid_ids() {
++    uint8_t bytes[kConfigBlobSize]; DeviceConfig out;
++    TEST_ASSERT_TRUE(encodeConfig(client(), bytes, sizeof(bytes)));
++    bytes[6] = uint8_t(DeviceRole::GATEWAY); fixtureIntegrity(bytes);
++    TEST_ASSERT_EQUAL_STRING("gateway_id_mismatch", decodeConfig(bytes, sizeof(bytes), out));
++    TEST_ASSERT_TRUE(encodeConfig(client(), bytes, sizeof(bytes)));
++    put16(bytes + 10, 1); fixtureIntegrity(bytes);
++    TEST_ASSERT_EQUAL_STRING("client_id_conflict", decodeConfig(bytes, sizeof(bytes), out));
++    TEST_ASSERT_TRUE(encodeConfig(client(), bytes, sizeof(bytes)));
++    put16(bytes + 8, 0); fixtureIntegrity(bytes);
++    TEST_ASSERT_EQUAL_STRING("invalid_network_id", decodeConfig(bytes, sizeof(bytes), out));
++}
++void test_valid_integrity_blob_reserved_bytes() {
++    uint8_t bytes[kConfigBlobSize]; DeviceConfig out;
++    for (unsigned offset : {7u,14u,15u}) {
++        TEST_ASSERT_TRUE(encodeConfig(client(), bytes, sizeof(bytes)));
++        bytes[offset] = 1; fixtureIntegrity(bytes);
++        TEST_ASSERT_EQUAL_STRING("config_corrupt", decodeConfig(bytes, sizeof(bytes), out));
++    }
++}
+ }
+ void setUp() {}
+ void tearDown() {}
+@@ -75,5 +115,9 @@ int main() {
+     RUN_TEST(test_reserved_ids); RUN_TEST(test_schema_and_interval);
+     RUN_TEST(test_blob_roundtrip); RUN_TEST(test_blob_corruption_each_byte);
+     RUN_TEST(test_blob_partial_missing_oversize_and_invalid_save);
++    RUN_TEST(test_valid_integrity_blob_unsupported_schema);
++    RUN_TEST(test_valid_integrity_blob_unsupported_role);
++    RUN_TEST(test_valid_integrity_blob_invalid_ids);
++    RUN_TEST(test_valid_integrity_blob_reserved_bytes);
+     return UNITY_END();
+ }
+diff --git a/iteration-007-review-snapshot/test/test_serial_logger/test_main.cpp b/iteration-007-review-snapshot/test/test_serial_logger/test_main.cpp
+new file mode 100644
+index 0000000..12554f8
+--- /dev/null
++++ b/iteration-007-review-snapshot/test/test_serial_logger/test_main.cpp
+@@ -0,0 +1,78 @@
++#include <unity.h>
++#include <Arduino.h>
++#include <esp_timer.h>
++#include <string>
++#include <cstring>
++#include <cstdio>
++#include "common/diagnostics/serial_logger.h"
++using namespace adaptive_lora;
++namespace {
++void finish(SerialLogger& log) {
++    for (unsigned n = 0; !log.empty() && n < 512; ++n) log.drain();
++    TEST_ASSERT_TRUE(log.empty());
++}
++void test_queue_bound_and_fifo() {
++    SerialLogger log;
++    std::string expected;
++    for (unsigned i = 0; i < 16; ++i) {
++        char line[24]; std::snprintf(line, sizeof(line), "line-%u", i);
++        log.text(line); expected += std::string(line) + "\n";
++    }
++    TEST_ASSERT_EQUAL_UINT32(0, log.dropped());
++    log.text("overflow"); TEST_ASSERT_EQUAL_UINT32(1, log.dropped());
++    finish(log);
++    TEST_ASSERT_EQUAL_STRING(expected.c_str(), Serial.output.c_str());
++    TEST_ASSERT_TRUE(Serial.output.find("overflow") == std::string::npos);
++    unsigned lines = 0;
++    for (char ch : Serial.output) if (ch == '\n') ++lines;
++    TEST_ASSERT_EQUAL_UINT(16, lines);
++    log.text("after"); finish(log);
++    TEST_ASSERT_TRUE(Serial.output.find("after\n") != std::string::npos);
++}
++void test_backpressure_retains_queued_line_without_write() {
++    SerialLogger log; log.text("blocked"); Serial.capacity = 0;
++    for (unsigned n = 0; n < 100; ++n) log.drain();
++    TEST_ASSERT_EQUAL_UINT(0, Serial.calls); TEST_ASSERT_FALSE(log.empty());
++    Serial.capacity = 64; finish(log);
++    TEST_ASSERT_EQUAL_STRING("blocked\n", Serial.output.c_str());
++}
++void test_short_writes_preserve_bytes_and_128_byte_budget() {
++    SerialLogger log; char line[301]; std::memset(line, 'x', 300); line[300] = '\0';
++    log.text(line); Serial.capacity = 1024; Serial.writeLimit = 3;
++    finish(log);
++    TEST_ASSERT_EQUAL_STRING((std::string(line) + "\n").c_str(), Serial.output.c_str());
++    TEST_ASSERT_TRUE(Serial.largestWrite <= 128);
++    TEST_ASSERT_TRUE(Serial.calls > 1);
++}
++void test_zero_byte_write_does_not_discard_line() {
++    SerialLogger log; log.text("retry drain"); Serial.writeLimit = 0;
++    log.drain(); TEST_ASSERT_FALSE(log.empty()); TEST_ASSERT_TRUE(Serial.output.empty());
++    Serial.writeLimit = 128; finish(log);
++    TEST_ASSERT_EQUAL_STRING("retry drain\n", Serial.output.c_str());
++}
++void test_oversized_text_counted_without_partial_line() {
++    SerialLogger log; char huge[600]; std::memset(huge, 'x', sizeof(huge) - 1); huge[sizeof(huge) - 1] = '\0';
++    log.text(huge); TEST_ASSERT_TRUE(log.empty()); TEST_ASSERT_EQUAL_UINT32(1, log.dropped());
++    log.text("valid"); finish(log); TEST_ASSERT_EQUAL_STRING("valid\n", Serial.output.c_str());
++}
++void test_unavailable_metrics_are_na_and_real_formatter_is_used() {
++    DeviceConfig c; c.role = DeviceRole::CLIENT; c.nodeId = 2;
++    SerialLogger log; log.begin(c); host_clock::set(123456789);
++    log.event("FRAME_REJECT", "test"); finish(log);
++    TEST_ASSERT_TRUE(Serial.output.find("uptime_us=123456789,role=CLIENT,network_id=1,node_id=2,event=FRAME_REJECT,") == 0);
++    TEST_ASSERT_TRUE(Serial.output.find("rssi_dbm=N/A,snr_db=N/A,toa_us=N/A") != std::string::npos);
++    TEST_ASSERT_EQUAL_UINT32(0, log.dropped());
++}
++}
++void setUp() { Serial.reset(); host_clock::set(0); }
++void tearDown() {}
++int main() {
++    UNITY_BEGIN();
++    RUN_TEST(test_queue_bound_and_fifo);
++    RUN_TEST(test_backpressure_retains_queued_line_without_write);
++    RUN_TEST(test_short_writes_preserve_bytes_and_128_byte_budget);
++    RUN_TEST(test_zero_byte_write_does_not_discard_line);
++    RUN_TEST(test_oversized_text_counted_without_partial_line);
++    RUN_TEST(test_unavailable_metrics_are_na_and_real_formatter_is_used);
++    return UNITY_END();
++}

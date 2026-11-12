@@ -1,0 +1,301 @@
+Verbosity level can be increased via `-v, -vv, or -vvv` option
+Collected 6 tests
+
+Processing test_app_integration in native environment
+--------------------------------------------------------------------------------
+Building...
+src\client\client_app.cpp: In member function 'void adaptive_lora::ClientApp::finish(const char*, const adaptive_lora::RadioEvent*, bool)':
+src\client\client_app.cpp:20:70: error: expected ')' before 'PRIu32'
+     std::snprintf(line, sizeof(line), "event=LINK_COUNTS,attempts=%" PRIu32 ",ack_success=%" PRIu32 ",timeouts=%" PRIu32
+                                                                      ^~~~~~
+src\client\client_app.cpp:22:121: error: spurious trailing '%' in format [-Werror=format=]
+                   attempts_, successes_, timeouts_, txFailures_, static_cast<uint64_t>(esp_timer_get_time()) - sentAtUs_);
+                                                                                                                         ^
+src\client\client_app.cpp:22:121: error: too many arguments for format [-Werror=format-extra-args]
+src\client\client_app.cpp:22:121: error: spurious trailing '%' in format [-Werror=format=]
+src\client\client_app.cpp:22:121: error: too many arguments for format [-Werror=format-extra-args]
+cc1plus.exe: all warnings being treated as errors
+*** [.pio\build\native\src\client\client_app.o] Error 1
+src\common\diagnostics\serial_logger.cpp: In member function 'void adaptive_lora::SerialLogger::event(const char*, const char*, const adaptive_lora::Frame*, const adaptive_lora::RadioEvent*, int16_t, uint32_t)':
+src\common\diagnostics\serial_logger.cpp:22:64: error: expected ')' before 'PRIu32'
+         "source_id=%u,destination_id=%u,sequence=%u,boot_id=%" PRIu32 ",frame_id=%" PRIu32 ",config_version=%u,schedule_version=%u",
+                                                                ^~~~~~
+src\common\diagnostics\serial_logger.cpp:23:140: error: spurious trailing '%' in format [-Werror=format=]
+         frame->sourceId, frame->destinationId, frame->sequence, frame->bootId, frame->frameId, frame->configVersion, frame->scheduleVersion);
+                                                                                                                                            ^
+src\common\diagnostics\serial_logger.cpp:23:140: error: too many arguments for format [-Werror=format-extra-args]
+src\common\diagnostics\serial_logger.cpp:23:140: error: spurious trailing '%' in format [-Werror=format=]
+src\common\diagnostics\serial_logger.cpp:23:140: error: too many arguments for format [-Werror=format-extra-args]
+src\common\diagnostics\serial_logger.cpp:29:58: error: expected ')' before 'PRIu32'
+     if (toa) std::snprintf(airtime, sizeof(airtime), "%" PRIu32, toa);
+                                                          ^~~~~~
+src\common\diagnostics\serial_logger.cpp:29:69: error: spurious trailing '%' in format [-Werror=format=]
+     if (toa) std::snprintf(airtime, sizeof(airtime), "%" PRIu32, toa);
+                                                                     ^
+src\common\diagnostics\serial_logger.cpp:29:69: error: too many arguments for format [-Werror=format-extra-args]
+src\common\diagnostics\serial_logger.cpp:29:69: error: spurious trailing '%' in format [-Werror=format=]
+src\common\diagnostics\serial_logger.cpp:29:69: error: too many arguments for format [-Werror=format-extra-args]
+src\common\diagnostics\serial_logger.cpp:32:23: error: expected ')' before 'PRId64'
+         "uptime_us=%" PRId64 ",role=%s,network_id=%u,node_id=%u,event=%s,%s,sf=%u,bw_khz=%.0f,freq_mhz=%.3f,%s,toa_us=%s,code=%d,result=%s",
+                       ^~~~~~
+src\common\diagnostics\serial_logger.cpp:34:90: error: spurious trailing '%' in format [-Werror=format=]
+         phy::dataSf, phy::bandwidthKhz, phy::frequencyMhz, metrics, airtime, code, result);
+                                                                                          ^
+src\common\diagnostics\serial_logger.cpp:34:90: error: too many arguments for format [-Werror=format-extra-args]
+src\common\diagnostics\serial_logger.cpp:34:90: error: spurious trailing '%' in format [-Werror=format=]
+src\common\diagnostics\serial_logger.cpp:34:90: error: too many arguments for format [-Werror=format-extra-args]
+cc1plus.exe: all warnings being treated as errors
+*** [.pio\build\native\src\common\diagnostics\serial_logger.o] Error 1
+Building stage has failed, see errors above. Use `pio test -vvv` option to enable verbose output.
+----------- native:test_app_integration [ERRORED] Took 2.17 seconds -----------
+
+Processing test_frame_codec in native environment
+--------------------------------------------------------------------------------
+Building...
+src\client\client_app.cpp: In member function 'void adaptive_lora::ClientApp::finish(const char*, const adaptive_lora::RadioEvent*, bool)':
+src\client\client_app.cpp:20:70: error: expected ')' before 'PRIu32'
+     std::snprintf(line, sizeof(line), "event=LINK_COUNTS,attempts=%" PRIu32 ",ack_success=%" PRIu32 ",timeouts=%" PRIu32
+                                                                      ^~~~~~
+src\client\client_app.cpp:22:121: error: spurious trailing '%' in format [-Werror=format=]
+                   attempts_, successes_, timeouts_, txFailures_, static_cast<uint64_t>(esp_timer_get_time()) - sentAtUs_);
+                                                                                                                         ^
+src\client\client_app.cpp:22:121: error: too many arguments for format [-Werror=format-extra-args]
+src\client\client_app.cpp:22:121: error: spurious trailing '%' in format [-Werror=format=]
+src\client\client_app.cpp:22:121: error: too many arguments for format [-Werror=format-extra-args]
+cc1plus.exe: all warnings being treated as errors
+*** [.pio\build\native\src\client\client_app.o] Error 1
+src\common\diagnostics\serial_logger.cpp: In member function 'void adaptive_lora::SerialLogger::event(const char*, const char*, const adaptive_lora::Frame*, const adaptive_lora::RadioEvent*, int16_t, uint32_t)':
+src\common\diagnostics\serial_logger.cpp:22:64: error: expected ')' before 'PRIu32'
+         "source_id=%u,destination_id=%u,sequence=%u,boot_id=%" PRIu32 ",frame_id=%" PRIu32 ",config_version=%u,schedule_version=%u",
+                                                                ^~~~~~
+src\common\diagnostics\serial_logger.cpp:23:140: error: spurious trailing '%' in format [-Werror=format=]
+         frame->sourceId, frame->destinationId, frame->sequence, frame->bootId, frame->frameId, frame->configVersion, frame->scheduleVersion);
+                                                                                                                                            ^
+src\common\diagnostics\serial_logger.cpp:23:140: error: too many arguments for format [-Werror=format-extra-args]
+src\common\diagnostics\serial_logger.cpp:23:140: error: spurious trailing '%' in format [-Werror=format=]
+src\common\diagnostics\serial_logger.cpp:23:140: error: too many arguments for format [-Werror=format-extra-args]
+src\common\diagnostics\serial_logger.cpp:29:58: error: expected ')' before 'PRIu32'
+     if (toa) std::snprintf(airtime, sizeof(airtime), "%" PRIu32, toa);
+                                                          ^~~~~~
+src\common\diagnostics\serial_logger.cpp:29:69: error: spurious trailing '%' in format [-Werror=format=]
+     if (toa) std::snprintf(airtime, sizeof(airtime), "%" PRIu32, toa);
+                                                                     ^
+src\common\diagnostics\serial_logger.cpp:29:69: error: too many arguments for format [-Werror=format-extra-args]
+src\common\diagnostics\serial_logger.cpp:29:69: error: spurious trailing '%' in format [-Werror=format=]
+src\common\diagnostics\serial_logger.cpp:29:69: error: too many arguments for format [-Werror=format-extra-args]
+src\common\diagnostics\serial_logger.cpp:32:23: error: expected ')' before 'PRId64'
+         "uptime_us=%" PRId64 ",role=%s,network_id=%u,node_id=%u,event=%s,%s,sf=%u,bw_khz=%.0f,freq_mhz=%.3f,%s,toa_us=%s,code=%d,result=%s",
+                       ^~~~~~
+src\common\diagnostics\serial_logger.cpp:34:90: error: spurious trailing '%' in format [-Werror=format=]
+         phy::dataSf, phy::bandwidthKhz, phy::frequencyMhz, metrics, airtime, code, result);
+                                                                                          ^
+src\common\diagnostics\serial_logger.cpp:34:90: error: too many arguments for format [-Werror=format-extra-args]
+src\common\diagnostics\serial_logger.cpp:34:90: error: spurious trailing '%' in format [-Werror=format=]
+src\common\diagnostics\serial_logger.cpp:34:90: error: too many arguments for format [-Werror=format-extra-args]
+cc1plus.exe: all warnings being treated as errors
+*** [.pio\build\native\src\common\diagnostics\serial_logger.o] Error 1
+Building stage has failed, see errors above. Use `pio test -vvv` option to enable verbose output.
+------------- native:test_frame_codec [ERRORED] Took 1.87 seconds -------------
+
+Processing test_provisioning_console in native environment
+--------------------------------------------------------------------------------
+Building...
+src\client\client_app.cpp: In member function 'void adaptive_lora::ClientApp::finish(const char*, const adaptive_lora::RadioEvent*, bool)':
+src\client\client_app.cpp:20:70: error: expected ')' before 'PRIu32'
+     std::snprintf(line, sizeof(line), "event=LINK_COUNTS,attempts=%" PRIu32 ",ack_success=%" PRIu32 ",timeouts=%" PRIu32
+                                                                      ^~~~~~
+src\client\client_app.cpp:22:121: error: spurious trailing '%' in format [-Werror=format=]
+                   attempts_, successes_, timeouts_, txFailures_, static_cast<uint64_t>(esp_timer_get_time()) - sentAtUs_);
+                                                                                                                         ^
+src\client\client_app.cpp:22:121: error: too many arguments for format [-Werror=format-extra-args]
+src\client\client_app.cpp:22:121: error: spurious trailing '%' in format [-Werror=format=]
+src\client\client_app.cpp:22:121: error: too many arguments for format [-Werror=format-extra-args]
+cc1plus.exe: all warnings being treated as errors
+*** [.pio\build\native\src\client\client_app.o] Error 1
+src\common\diagnostics\serial_logger.cpp: In member function 'void adaptive_lora::SerialLogger::event(const char*, const char*, const adaptive_lora::Frame*, const adaptive_lora::RadioEvent*, int16_t, uint32_t)':
+src\common\diagnostics\serial_logger.cpp:22:64: error: expected ')' before 'PRIu32'
+         "source_id=%u,destination_id=%u,sequence=%u,boot_id=%" PRIu32 ",frame_id=%" PRIu32 ",config_version=%u,schedule_version=%u",
+                                                                ^~~~~~
+src\common\diagnostics\serial_logger.cpp:23:140: error: spurious trailing '%' in format [-Werror=format=]
+         frame->sourceId, frame->destinationId, frame->sequence, frame->bootId, frame->frameId, frame->configVersion, frame->scheduleVersion);
+                                                                                                                                            ^
+src\common\diagnostics\serial_logger.cpp:23:140: error: too many arguments for format [-Werror=format-extra-args]
+src\common\diagnostics\serial_logger.cpp:23:140: error: spurious trailing '%' in format [-Werror=format=]
+src\common\diagnostics\serial_logger.cpp:23:140: error: too many arguments for format [-Werror=format-extra-args]
+src\common\diagnostics\serial_logger.cpp:29:58: error: expected ')' before 'PRIu32'
+     if (toa) std::snprintf(airtime, sizeof(airtime), "%" PRIu32, toa);
+                                                          ^~~~~~
+src\common\diagnostics\serial_logger.cpp:29:69: error: spurious trailing '%' in format [-Werror=format=]
+     if (toa) std::snprintf(airtime, sizeof(airtime), "%" PRIu32, toa);
+                                                                     ^
+src\common\diagnostics\serial_logger.cpp:29:69: error: too many arguments for format [-Werror=format-extra-args]
+src\common\diagnostics\serial_logger.cpp:29:69: error: spurious trailing '%' in format [-Werror=format=]
+src\common\diagnostics\serial_logger.cpp:29:69: error: too many arguments for format [-Werror=format-extra-args]
+src\common\diagnostics\serial_logger.cpp:32:23: error: expected ')' before 'PRId64'
+         "uptime_us=%" PRId64 ",role=%s,network_id=%u,node_id=%u,event=%s,%s,sf=%u,bw_khz=%.0f,freq_mhz=%.3f,%s,toa_us=%s,code=%d,result=%s",
+                       ^~~~~~
+src\common\diagnostics\serial_logger.cpp:34:90: error: spurious trailing '%' in format [-Werror=format=]
+         phy::dataSf, phy::bandwidthKhz, phy::frequencyMhz, metrics, airtime, code, result);
+                                                                                          ^
+src\common\diagnostics\serial_logger.cpp:34:90: error: too many arguments for format [-Werror=format-extra-args]
+src\common\diagnostics\serial_logger.cpp:34:90: error: spurious trailing '%' in format [-Werror=format=]
+src\common\diagnostics\serial_logger.cpp:34:90: error: too many arguments for format [-Werror=format-extra-args]
+cc1plus.exe: all warnings being treated as errors
+*** [.pio\build\native\src\common\diagnostics\serial_logger.o] Error 1
+Building stage has failed, see errors above. Use `pio test -vvv` option to enable verbose output.
+--------- native:test_provisioning_console [ERRORED] Took 1.83 seconds ---------
+
+Processing test_role_config in native environment
+--------------------------------------------------------------------------------
+Building...
+src\client\client_app.cpp: In member function 'void adaptive_lora::ClientApp::finish(const char*, const adaptive_lora::RadioEvent*, bool)':
+src\client\client_app.cpp:20:70: error: expected ')' before 'PRIu32'
+     std::snprintf(line, sizeof(line), "event=LINK_COUNTS,attempts=%" PRIu32 ",ack_success=%" PRIu32 ",timeouts=%" PRIu32
+                                                                      ^~~~~~
+src\client\client_app.cpp:22:121: error: spurious trailing '%' in format [-Werror=format=]
+                   attempts_, successes_, timeouts_, txFailures_, static_cast<uint64_t>(esp_timer_get_time()) - sentAtUs_);
+                                                                                                                         ^
+src\client\client_app.cpp:22:121: error: too many arguments for format [-Werror=format-extra-args]
+src\client\client_app.cpp:22:121: error: spurious trailing '%' in format [-Werror=format=]
+src\client\client_app.cpp:22:121: error: too many arguments for format [-Werror=format-extra-args]
+cc1plus.exe: all warnings being treated as errors
+*** [.pio\build\native\src\client\client_app.o] Error 1
+src\common\diagnostics\serial_logger.cpp: In member function 'void adaptive_lora::SerialLogger::event(const char*, const char*, const adaptive_lora::Frame*, const adaptive_lora::RadioEvent*, int16_t, uint32_t)':
+src\common\diagnostics\serial_logger.cpp:22:64: error: expected ')' before 'PRIu32'
+         "source_id=%u,destination_id=%u,sequence=%u,boot_id=%" PRIu32 ",frame_id=%" PRIu32 ",config_version=%u,schedule_version=%u",
+                                                                ^~~~~~
+src\common\diagnostics\serial_logger.cpp:23:140: error: spurious trailing '%' in format [-Werror=format=]
+         frame->sourceId, frame->destinationId, frame->sequence, frame->bootId, frame->frameId, frame->configVersion, frame->scheduleVersion);
+                                                                                                                                            ^
+src\common\diagnostics\serial_logger.cpp:23:140: error: too many arguments for format [-Werror=format-extra-args]
+src\common\diagnostics\serial_logger.cpp:23:140: error: spurious trailing '%' in format [-Werror=format=]
+src\common\diagnostics\serial_logger.cpp:23:140: error: too many arguments for format [-Werror=format-extra-args]
+src\common\diagnostics\serial_logger.cpp:29:58: error: expected ')' before 'PRIu32'
+     if (toa) std::snprintf(airtime, sizeof(airtime), "%" PRIu32, toa);
+                                                          ^~~~~~
+src\common\diagnostics\serial_logger.cpp:29:69: error: spurious trailing '%' in format [-Werror=format=]
+     if (toa) std::snprintf(airtime, sizeof(airtime), "%" PRIu32, toa);
+                                                                     ^
+src\common\diagnostics\serial_logger.cpp:29:69: error: too many arguments for format [-Werror=format-extra-args]
+src\common\diagnostics\serial_logger.cpp:29:69: error: spurious trailing '%' in format [-Werror=format=]
+src\common\diagnostics\serial_logger.cpp:29:69: error: too many arguments for format [-Werror=format-extra-args]
+src\common\diagnostics\serial_logger.cpp:32:23: error: expected ')' before 'PRId64'
+         "uptime_us=%" PRId64 ",role=%s,network_id=%u,node_id=%u,event=%s,%s,sf=%u,bw_khz=%.0f,freq_mhz=%.3f,%s,toa_us=%s,code=%d,result=%s",
+                       ^~~~~~
+src\common\diagnostics\serial_logger.cpp:34:90: error: spurious trailing '%' in format [-Werror=format=]
+         phy::dataSf, phy::bandwidthKhz, phy::frequencyMhz, metrics, airtime, code, result);
+                                                                                          ^
+src\common\diagnostics\serial_logger.cpp:34:90: error: too many arguments for format [-Werror=format-extra-args]
+src\common\diagnostics\serial_logger.cpp:34:90: error: spurious trailing '%' in format [-Werror=format=]
+src\common\diagnostics\serial_logger.cpp:34:90: error: too many arguments for format [-Werror=format-extra-args]
+cc1plus.exe: all warnings being treated as errors
+*** [.pio\build\native\src\common\diagnostics\serial_logger.o] Error 1
+Building stage has failed, see errors above. Use `pio test -vvv` option to enable verbose output.
+------------- native:test_role_config [ERRORED] Took 1.74 seconds -------------
+
+Processing test_sequence_tracker in native environment
+--------------------------------------------------------------------------------
+Building...
+src\client\client_app.cpp: In member function 'void adaptive_lora::ClientApp::finish(const char*, const adaptive_lora::RadioEvent*, bool)':
+src\client\client_app.cpp:20:70: error: expected ')' before 'PRIu32'
+     std::snprintf(line, sizeof(line), "event=LINK_COUNTS,attempts=%" PRIu32 ",ack_success=%" PRIu32 ",timeouts=%" PRIu32
+                                                                      ^~~~~~
+src\client\client_app.cpp:22:121: error: spurious trailing '%' in format [-Werror=format=]
+                   attempts_, successes_, timeouts_, txFailures_, static_cast<uint64_t>(esp_timer_get_time()) - sentAtUs_);
+                                                                                                                         ^
+src\client\client_app.cpp:22:121: error: too many arguments for format [-Werror=format-extra-args]
+src\client\client_app.cpp:22:121: error: spurious trailing '%' in format [-Werror=format=]
+src\client\client_app.cpp:22:121: error: too many arguments for format [-Werror=format-extra-args]
+cc1plus.exe: all warnings being treated as errors
+*** [.pio\build\native\src\client\client_app.o] Error 1
+src\common\diagnostics\serial_logger.cpp: In member function 'void adaptive_lora::SerialLogger::event(const char*, const char*, const adaptive_lora::Frame*, const adaptive_lora::RadioEvent*, int16_t, uint32_t)':
+src\common\diagnostics\serial_logger.cpp:22:64: error: expected ')' before 'PRIu32'
+         "source_id=%u,destination_id=%u,sequence=%u,boot_id=%" PRIu32 ",frame_id=%" PRIu32 ",config_version=%u,schedule_version=%u",
+                                                                ^~~~~~
+src\common\diagnostics\serial_logger.cpp:23:140: error: spurious trailing '%' in format [-Werror=format=]
+         frame->sourceId, frame->destinationId, frame->sequence, frame->bootId, frame->frameId, frame->configVersion, frame->scheduleVersion);
+                                                                                                                                            ^
+src\common\diagnostics\serial_logger.cpp:23:140: error: too many arguments for format [-Werror=format-extra-args]
+src\common\diagnostics\serial_logger.cpp:23:140: error: spurious trailing '%' in format [-Werror=format=]
+src\common\diagnostics\serial_logger.cpp:23:140: error: too many arguments for format [-Werror=format-extra-args]
+src\common\diagnostics\serial_logger.cpp:29:58: error: expected ')' before 'PRIu32'
+     if (toa) std::snprintf(airtime, sizeof(airtime), "%" PRIu32, toa);
+                                                          ^~~~~~
+src\common\diagnostics\serial_logger.cpp:29:69: error: spurious trailing '%' in format [-Werror=format=]
+     if (toa) std::snprintf(airtime, sizeof(airtime), "%" PRIu32, toa);
+                                                                     ^
+src\common\diagnostics\serial_logger.cpp:29:69: error: too many arguments for format [-Werror=format-extra-args]
+src\common\diagnostics\serial_logger.cpp:29:69: error: spurious trailing '%' in format [-Werror=format=]
+src\common\diagnostics\serial_logger.cpp:29:69: error: too many arguments for format [-Werror=format-extra-args]
+src\common\diagnostics\serial_logger.cpp:32:23: error: expected ')' before 'PRId64'
+         "uptime_us=%" PRId64 ",role=%s,network_id=%u,node_id=%u,event=%s,%s,sf=%u,bw_khz=%.0f,freq_mhz=%.3f,%s,toa_us=%s,code=%d,result=%s",
+                       ^~~~~~
+src\common\diagnostics\serial_logger.cpp:34:90: error: spurious trailing '%' in format [-Werror=format=]
+         phy::dataSf, phy::bandwidthKhz, phy::frequencyMhz, metrics, airtime, code, result);
+                                                                                          ^
+src\common\diagnostics\serial_logger.cpp:34:90: error: too many arguments for format [-Werror=format-extra-args]
+src\common\diagnostics\serial_logger.cpp:34:90: error: spurious trailing '%' in format [-Werror=format=]
+src\common\diagnostics\serial_logger.cpp:34:90: error: too many arguments for format [-Werror=format-extra-args]
+cc1plus.exe: all warnings being treated as errors
+*** [.pio\build\native\src\common\diagnostics\serial_logger.o] Error 1
+Building stage has failed, see errors above. Use `pio test -vvv` option to enable verbose output.
+----------- native:test_sequence_tracker [ERRORED] Took 1.65 seconds -----------
+
+Processing test_serial_logger in native environment
+--------------------------------------------------------------------------------
+Building...
+src\client\client_app.cpp: In member function 'void adaptive_lora::ClientApp::finish(const char*, const adaptive_lora::RadioEvent*, bool)':
+src\client\client_app.cpp:20:70: error: expected ')' before 'PRIu32'
+     std::snprintf(line, sizeof(line), "event=LINK_COUNTS,attempts=%" PRIu32 ",ack_success=%" PRIu32 ",timeouts=%" PRIu32
+                                                                      ^~~~~~
+src\client\client_app.cpp:22:121: error: spurious trailing '%' in format [-Werror=format=]
+                   attempts_, successes_, timeouts_, txFailures_, static_cast<uint64_t>(esp_timer_get_time()) - sentAtUs_);
+                                                                                                                         ^
+src\client\client_app.cpp:22:121: error: too many arguments for format [-Werror=format-extra-args]
+src\client\client_app.cpp:22:121: error: spurious trailing '%' in format [-Werror=format=]
+src\client\client_app.cpp:22:121: error: too many arguments for format [-Werror=format-extra-args]
+cc1plus.exe: all warnings being treated as errors
+*** [.pio\build\native\src\client\client_app.o] Error 1
+src\common\diagnostics\serial_logger.cpp: In member function 'void adaptive_lora::SerialLogger::event(const char*, const char*, const adaptive_lora::Frame*, const adaptive_lora::RadioEvent*, int16_t, uint32_t)':
+src\common\diagnostics\serial_logger.cpp:22:64: error: expected ')' before 'PRIu32'
+         "source_id=%u,destination_id=%u,sequence=%u,boot_id=%" PRIu32 ",frame_id=%" PRIu32 ",config_version=%u,schedule_version=%u",
+                                                                ^~~~~~
+src\common\diagnostics\serial_logger.cpp:23:140: error: spurious trailing '%' in format [-Werror=format=]
+         frame->sourceId, frame->destinationId, frame->sequence, frame->bootId, frame->frameId, frame->configVersion, frame->scheduleVersion);
+                                                                                                                                            ^
+src\common\diagnostics\serial_logger.cpp:23:140: error: too many arguments for format [-Werror=format-extra-args]
+src\common\diagnostics\serial_logger.cpp:23:140: error: spurious trailing '%' in format [-Werror=format=]
+src\common\diagnostics\serial_logger.cpp:23:140: error: too many arguments for format [-Werror=format-extra-args]
+src\common\diagnostics\serial_logger.cpp:29:58: error: expected ')' before 'PRIu32'
+     if (toa) std::snprintf(airtime, sizeof(airtime), "%" PRIu32, toa);
+                                                          ^~~~~~
+src\common\diagnostics\serial_logger.cpp:29:69: error: spurious trailing '%' in format [-Werror=format=]
+     if (toa) std::snprintf(airtime, sizeof(airtime), "%" PRIu32, toa);
+                                                                     ^
+src\common\diagnostics\serial_logger.cpp:29:69: error: too many arguments for format [-Werror=format-extra-args]
+src\common\diagnostics\serial_logger.cpp:29:69: error: spurious trailing '%' in format [-Werror=format=]
+src\common\diagnostics\serial_logger.cpp:29:69: error: too many arguments for format [-Werror=format-extra-args]
+src\common\diagnostics\serial_logger.cpp:32:23: error: expected ')' before 'PRId64'
+         "uptime_us=%" PRId64 ",role=%s,network_id=%u,node_id=%u,event=%s,%s,sf=%u,bw_khz=%.0f,freq_mhz=%.3f,%s,toa_us=%s,code=%d,result=%s",
+                       ^~~~~~
+src\common\diagnostics\serial_logger.cpp:34:90: error: spurious trailing '%' in format [-Werror=format=]
+         phy::dataSf, phy::bandwidthKhz, phy::frequencyMhz, metrics, airtime, code, result);
+                                                                                          ^
+src\common\diagnostics\serial_logger.cpp:34:90: error: too many arguments for format [-Werror=format-extra-args]
+src\common\diagnostics\serial_logger.cpp:34:90: error: spurious trailing '%' in format [-Werror=format=]
+src\common\diagnostics\serial_logger.cpp:34:90: error: too many arguments for format [-Werror=format-extra-args]
+cc1plus.exe: all warnings being treated as errors
+*** [.pio\build\native\src\common\diagnostics\serial_logger.o] Error 1
+Building stage has failed, see errors above. Use `pio test -vvv` option to enable verbose output.
+------------ native:test_serial_logger [ERRORED] Took 1.67 seconds ------------
+
+=================================== SUMMARY ===================================
+Environment    Test                       Status    Duration
+-------------  -------------------------  --------  ------------
+native         test_app_integration       ERRORED   00:00:02.170
+native         test_frame_codec           ERRORED   00:00:01.867
+native         test_provisioning_console  ERRORED   00:00:01.825
+native         test_role_config           ERRORED   00:00:01.740
+native         test_sequence_tracker      ERRORED   00:00:01.650
+native         test_serial_logger         ERRORED   00:00:01.666
+================== 6 test cases: 0 succeeded in 00:00:10.918 ==================

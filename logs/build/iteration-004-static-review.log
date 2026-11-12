@@ -1,0 +1,6 @@
+Reviewed 29 C++ source/header/test files
+main.cpp: 15 lines; setup/loop delegation only
+LLCC68 owners: 1; SX1262 objects: 0; Arduino String/new/delay in project source: 0
+Conflict markers/trailing whitespace: 0
+Source manifest: logs/build/iteration-004-source-manifest.sha256
+Firmware SHA256: bddc5e79a6865bd4c8cc3983adb595dfe1b21a332d6b5792d98d27d9e7d6e393

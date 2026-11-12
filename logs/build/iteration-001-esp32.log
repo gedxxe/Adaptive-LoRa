@@ -1,0 +1,204 @@
+Processing esp32c3_supermini (platform: espressif32; board: esp32-c3-devkitm-1; framework: arduino)
+--------------------------------------------------------------------------------
+Verbose mode can be enabled via `-v, --verbose` option
+CONFIGURATION: https://docs.platformio.org/page/boards/espressif32/esp32-c3-devkitm-1.html
+PLATFORM: Espressif 32 (55.3.311) > Espressif ESP32-C3-DevKitM-1
+HARDWARE: ESP32C3 160MHz, 320KB RAM, 4MB Flash
+DEBUG: Current (cmsis-dap) External (cmsis-dap, esp-bridge, esp-builtin, esp-prog, esp-prog-2, iot-bus-jtag, jlink, minimodule, olimex-arm-usb-ocd, olimex-arm-usb-ocd-h, olimex-arm-usb-tiny-h, olimex-jtag-tiny, tumpa)
+PACKAGES:
+ - contrib-piohome @ 3.4.4
+ - framework-arduinoespressif32 @ 3.3.11
+ - framework-arduinoespressif32-libs @ 5.5.5+sha.b774170ff46
+ - tool-esptoolpy @ 5.3.0
+ - tool-riscv32-esp-elf-gdb @ 17.1.0+20260402
+ - toolchain-riscv32-esp @ 14.2.0+20260121
+*** Reinstall Arduino framework ***
+Tool Manager: Installing https://github.com/espressif/arduino-esp32/releases/download/3.3.11/esp32-core-3.3.11.tar.xz
+Unpacking 0% 10% 20% 30% 40% 50% 60% 70% 80% 90% 100%
+Tool Manager: framework-arduinoespressif32@3.3.11 has been installed!
+Tool Manager: Installing https://github.com/espressif/arduino-esp32/releases/download/3.3.11/esp32-core-3.3.11-libs.tar.xz
+Unpacking 0% 10% 20% 30% 40% 50% 60% 70% 80% 90% 100%
+Tool Manager: framework-arduinoespressif32-libs@5.5.5+sha.b774170ff46 has been installed!
+LDF: Library Dependency Finder -> https://bit.ly/configure-pio-ldf
+LDF Modes: Finder ~ chain, Compatibility ~ soft
+Found 45 compatible libraries
+Scanning dependencies...
+Dependency Graph
+|-- RadioLib @ 7.8.1
+|-- Preferences @ 3.3.11
+|-- SPI @ 3.3.11
+Building in release mode
+Compiling .pio\build\esp32c3_supermini\libcc9\SPI\SPI.cpp.o
+Compiling .pio\build\esp32c3_supermini\lib6da\RadioLib\Hal.cpp.o
+Compiling .pio\build\esp32c3_supermini\lib6da\RadioLib\Module.cpp.o
+Compiling .pio\build\esp32c3_supermini\lib6da\RadioLib\hal\Arduino\ArduinoHal.cpp.o
+Compiling .pio\build\esp32c3_supermini\lib6da\RadioLib\hal\ESP-IDF\EspHal.cpp.o
+Compiling .pio\build\esp32c3_supermini\lib6da\RadioLib\hal\RPiPico\PicoHal.cpp.o
+Compiling .pio\build\esp32c3_supermini\lib6da\RadioLib\hal\Stm32duino\Stm32wlHal.cpp.o
+Compiling .pio\build\esp32c3_supermini\lib6da\RadioLib\modules\CC1101\CC1101.cpp.o
+Compiling .pio\build\esp32c3_supermini\lib6da\RadioLib\modules\LLCC68\LLCC68.cpp.o
+Compiling .pio\build\esp32c3_supermini\lib6da\RadioLib\modules\LR11x0\LR1110.cpp.o
+Compiling .pio\build\esp32c3_supermini\lib6da\RadioLib\modules\LR11x0\LR1120.cpp.o
+Compiling .pio\build\esp32c3_supermini\lib6da\RadioLib\modules\LR11x0\LR1121.cpp.o
+Compiling .pio\build\esp32c3_supermini\lib6da\RadioLib\modules\LR11x0\LR11x0.cpp.o
+Compiling .pio\build\esp32c3_supermini\lib6da\RadioLib\modules\LR11x0\LR11x0_commands.cpp.o
+Compiling .pio\build\esp32c3_supermini\lib6da\RadioLib\modules\LR11x0\LR11x0_crypto.cpp.o
+Compiling .pio\build\esp32c3_supermini\lib6da\RadioLib\modules\LR11x0\LR11x0_gnss.cpp.o
+Compiling .pio\build\esp32c3_supermini\lib6da\RadioLib\modules\LR11x0\LR11x0_wifi.cpp.o
+Compiling .pio\build\esp32c3_supermini\lib6da\RadioLib\modules\LR11x0\LR_common.cpp.o
+Compiling .pio\build\esp32c3_supermini\lib6da\RadioLib\modules\LR2021\LR2021.cpp.o
+Compiling .pio\build\esp32c3_supermini\lib6da\RadioLib\modules\LR2021\LR2021_cmds_chip_control.cpp.o
+Compiling .pio\build\esp32c3_supermini\lib6da\RadioLib\modules\LR2021\LR2021_cmds_flrc.cpp.o
+Compiling .pio\build\esp32c3_supermini\lib6da\RadioLib\modules\LR2021\LR2021_cmds_gfsk.cpp.o
+Compiling .pio\build\esp32c3_supermini\lib6da\RadioLib\modules\LR2021\LR2021_cmds_lora.cpp.o
+Compiling .pio\build\esp32c3_supermini\lib6da\RadioLib\modules\LR2021\LR2021_cmds_misc.cpp.o
+Compiling .pio\build\esp32c3_supermini\lib6da\RadioLib\modules\LR2021\LR2021_cmds_ook.cpp.o
+Compiling .pio\build\esp32c3_supermini\lib6da\RadioLib\modules\LR2021\LR2021_cmds_oqpsk.cpp.o
+Compiling .pio\build\esp32c3_supermini\lib6da\RadioLib\modules\LR2021\LR2021_cmds_radio.cpp.o
+Compiling .pio\build\esp32c3_supermini\lib6da\RadioLib\modules\LR2021\LR2021_cmds_ranging.cpp.o
+Compiling .pio\build\esp32c3_supermini\lib6da\RadioLib\modules\LR2021\LR2021_config.cpp.o
+Compiling .pio\build\esp32c3_supermini\lib6da\RadioLib\modules\RF69\RF69.cpp.o
+Compiling .pio\build\esp32c3_supermini\lib6da\RadioLib\modules\SX123x\SX1231.cpp.o
+Compiling .pio\build\esp32c3_supermini\lib6da\RadioLib\modules\SX123x\SX1233.cpp.o
+Compiling .pio\build\esp32c3_supermini\lib6da\RadioLib\modules\SX126x\STM32WLx.cpp.o
+Compiling .pio\build\esp32c3_supermini\lib6da\RadioLib\modules\SX126x\SX1261.cpp.o
+Compiling .pio\build\esp32c3_supermini\lib6da\RadioLib\modules\SX126x\SX1262.cpp.o
+Compiling .pio\build\esp32c3_supermini\lib6da\RadioLib\modules\SX126x\SX1268.cpp.o
+Compiling .pio\build\esp32c3_supermini\lib6da\RadioLib\modules\SX126x\SX126x.cpp.o
+Compiling .pio\build\esp32c3_supermini\lib6da\RadioLib\modules\SX126x\SX126x_LR_FHSS.cpp.o
+Compiling .pio\build\esp32c3_supermini\lib6da\RadioLib\modules\SX126x\SX126x_commands.cpp.o
+Compiling .pio\build\esp32c3_supermini\lib6da\RadioLib\modules\SX126x\SX126x_config.cpp.o
+Compiling .pio\build\esp32c3_supermini\lib6da\RadioLib\modules\SX127x\SX1272.cpp.o
+Compiling .pio\build\esp32c3_supermini\lib6da\RadioLib\modules\SX127x\SX1273.cpp.o
+Compiling .pio\build\esp32c3_supermini\lib6da\RadioLib\modules\SX127x\SX1276.cpp.o
+Compiling .pio\build\esp32c3_supermini\lib6da\RadioLib\modules\SX127x\SX1277.cpp.o
+Compiling .pio\build\esp32c3_supermini\lib6da\RadioLib\modules\SX127x\SX1278.cpp.o
+Compiling .pio\build\esp32c3_supermini\lib6da\RadioLib\modules\SX127x\SX1279.cpp.o
+Compiling .pio\build\esp32c3_supermini\lib6da\RadioLib\modules\SX127x\SX127x.cpp.o
+Compiling .pio\build\esp32c3_supermini\lib6da\RadioLib\modules\SX128x\SX1280.cpp.o
+Compiling .pio\build\esp32c3_supermini\lib6da\RadioLib\modules\SX128x\SX1281.cpp.o
+Compiling .pio\build\esp32c3_supermini\lib6da\RadioLib\modules\SX128x\SX1282.cpp.o
+Compiling .pio\build\esp32c3_supermini\lib6da\RadioLib\modules\SX128x\SX128x.cpp.o
+Compiling .pio\build\esp32c3_supermini\lib6da\RadioLib\modules\Si443x\Si4430.cpp.o
+Compiling .pio\build\esp32c3_supermini\lib6da\RadioLib\modules\Si443x\Si4431.cpp.o
+Compiling .pio\build\esp32c3_supermini\lib6da\RadioLib\modules\Si443x\Si4432.cpp.o
+Compiling .pio\build\esp32c3_supermini\lib6da\RadioLib\modules\Si443x\Si443x.cpp.o
+Compiling .pio\build\esp32c3_supermini\lib6da\RadioLib\modules\nRF24\nRF24.cpp.o
+Compiling .pio\build\esp32c3_supermini\lib6da\RadioLib\protocols\ADSB\ADSB.cpp.o
+Compiling .pio\build\esp32c3_supermini\lib6da\RadioLib\protocols\AFSK\AFSK.cpp.o
+Compiling .pio\build\esp32c3_supermini\lib6da\RadioLib\protocols\APRS\APRS.cpp.o
+Compiling .pio\build\esp32c3_supermini\lib6da\RadioLib\protocols\AX25\AX25.cpp.o
+Compiling .pio\build\esp32c3_supermini\lib6da\RadioLib\protocols\BellModem\BellModem.cpp.o
+Compiling .pio\build\esp32c3_supermini\lib6da\RadioLib\protocols\ExternalRadio\ExternalRadio.cpp.o
+Compiling .pio\build\esp32c3_supermini\lib6da\RadioLib\protocols\FSK4\FSK4.cpp.o
+Compiling .pio\build\esp32c3_supermini\lib6da\RadioLib\protocols\Hellschreiber\Hellschreiber.cpp.o
+Compiling .pio\build\esp32c3_supermini\lib6da\RadioLib\protocols\LoRaWAN\LoRaWAN.cpp.o
+Compiling .pio\build\esp32c3_supermini\lib6da\RadioLib\protocols\LoRaWAN\LoRaWANBands.cpp.o
+Compiling .pio\build\esp32c3_supermini\lib6da\RadioLib\protocols\LoRaWAN\LoRaWANPacMan.cpp.o
+Compiling .pio\build\esp32c3_supermini\lib6da\RadioLib\protocols\LoRaWAN\LoRaWANPackageTS003.cpp.o
+Compiling .pio\build\esp32c3_supermini\lib6da\RadioLib\protocols\LoRaWAN\LoRaWANPackageTS009.cpp.o
+Compiling .pio\build\esp32c3_supermini\lib6da\RadioLib\protocols\Morse\Morse.cpp.o
+Compiling .pio\build\esp32c3_supermini\lib6da\RadioLib\protocols\Pager\Pager.cpp.o
+Compiling .pio\build\esp32c3_supermini\lib6da\RadioLib\protocols\PhysicalLayer\PhysicalLayer.cpp.o
+Compiling .pio\build\esp32c3_supermini\lib6da\RadioLib\protocols\Print\ITA2String.cpp.o
+Compiling .pio\build\esp32c3_supermini\lib6da\RadioLib\protocols\Print\Print.cpp.o
+Compiling .pio\build\esp32c3_supermini\lib6da\RadioLib\protocols\RTTY\RTTY.cpp.o
+Compiling .pio\build\esp32c3_supermini\lib6da\RadioLib\protocols\SSTV\SSTV.cpp.o
+Compiling .pio\build\esp32c3_supermini\lib6da\RadioLib\utils\BCH.cpp.o
+Compiling .pio\build\esp32c3_supermini\lib6da\RadioLib\utils\CRC.cpp.o
+Compiling .pio\build\esp32c3_supermini\lib6da\RadioLib\utils\ConvCode.cpp.o
+Compiling .pio\build\esp32c3_supermini\lib6da\RadioLib\utils\Cryptography.cpp.o
+Compiling .pio\build\esp32c3_supermini\lib6da\RadioLib\utils\Utils.cpp.o
+Compiling .pio\build\esp32c3_supermini\libdc0\Preferences\Preferences.cpp.o
+Compiling .pio\build\esp32c3_supermini\src\app\firmware_runtime.cpp.o
+Compiling .pio\build\esp32c3_supermini\src\app\nvs_config_store.cpp.o
+Compiling .pio\build\esp32c3_supermini\src\app\provisioning_console.cpp.o
+Compiling .pio\build\esp32c3_supermini\src\client\client_app.cpp.o
+Compiling .pio\build\esp32c3_supermini\src\common\config\device_config.cpp.o
+Compiling .pio\build\esp32c3_supermini\src\common\diagnostics\serial_logger.cpp.o
+Compiling .pio\build\esp32c3_supermini\src\common\protocol\frame_codec.cpp.o
+Compiling .pio\build\esp32c3_supermini\src\common\protocol\sequence_tracker.cpp.o
+Compiling .pio\build\esp32c3_supermini\src\common\radio\radio_driver.cpp.o
+Compiling .pio\build\esp32c3_supermini\src\gateway\gateway_app.cpp.o
+Compiling .pio\build\esp32c3_supermini\src\main.cpp.o
+Building .pio\build\esp32c3_supermini\bootloader.bin
+esptool v5.3.0
+Creating ESP32-C3 image...
+Merged 2 ELF sections.
+Successfully created ESP32-C3 image.
+Generating partitions .pio\build\esp32c3_supermini\partitions.bin
+Compiling .pio\build\esp32c3_supermini\FrameworkArduino\ColorFormat.c.o
+Compiling .pio\build\esp32c3_supermini\FrameworkArduino\Esp.cpp.o
+Compiling .pio\build\esp32c3_supermini\FrameworkArduino\FirmwareMSC.cpp.o
+Compiling .pio\build\esp32c3_supermini\FrameworkArduino\FunctionalInterrupt.cpp.o
+Compiling .pio\build\esp32c3_supermini\FrameworkArduino\HEXBuilder.cpp.o
+Compiling .pio\build\esp32c3_supermini\FrameworkArduino\HWCDC.cpp.o
+Compiling .pio\build\esp32c3_supermini\FrameworkArduino\HardwareSerial.cpp.o
+Compiling .pio\build\esp32c3_supermini\FrameworkArduino\HashBuilder.cpp.o
+In file included from src/common/radio/radio_driver.h:3,
+                 from src/common/diagnostics/serial_logger.h:4,
+                 from src/client/client_app.h:2,
+                 from src/app/firmware_runtime.h:5,
+                 from src/app/firmware_runtime.cpp:1:
+.pio/libdeps/esp32c3_supermini/RadioLib/src/RadioLib.h:69:4: warning: #warning "Use of USB CDC for debug output is not recommended (might stop on first sleep). Use hardware UART instead." [-Wcpp]
+   69 |   #warning "Use of USB CDC for debug output is not recommended (might stop on first sleep). Use hardware UART instead."
+      |    ^~~~~~~
+In file included from src/common/radio/radio_driver.h:3,
+                 from src/common/diagnostics/serial_logger.h:4,
+                 from src/gateway/gateway_app.h:2,
+                 from src/client/client_app.h:2,
+                 from src/client/client_app.cpp:1:
+.pio/libdeps/esp32c3_supermini/RadioLib/src/RadioLib.h:69:4: warning: #warning "Use of USB CDC for debug output is not recommended (might stop on first sleep). Use hardware UART instead." [-Wcpp]
+   69 |   #warning "Use of USB CDC for debug output is not recommended (might stop on first sleep). Use hardware UART instead."
+      |    ^~~~~~~
+In file included from src/common/radio/radio_driver.h:3,
+                 from src/common/diagnostics/serial_logger.h:4,
+                 from src/common/diagnostics/serial_logger.cpp:1:
+.pio/libdeps/esp32c3_supermini/RadioLib/src/RadioLib.h:69:4: warning: #warning "Use of USB CDC for debug output is not recommended (might stop on first sleep). Use hardware UART instead." [-Wcpp]
+   69 |   #warning "Use of USB CDC for debug output is not recommended (might stop on first sleep). Use hardware UART instead."
+      |    ^~~~~~~
+Compiling .pio\build\esp32c3_supermini\FrameworkArduino\IPAddress.cpp.o
+In file included from src/common/radio/radio_driver.h:3,
+                 from src/common/radio/radio_driver.cpp:1:
+.pio/libdeps/esp32c3_supermini/RadioLib/src/RadioLib.h:69:4: warning: #warning "Use of USB CDC for debug output is not recommended (might stop on first sleep). Use hardware UART instead." [-Wcpp]
+   69 |   #warning "Use of USB CDC for debug output is not recommended (might stop on first sleep). Use hardware UART instead."
+      |    ^~~~~~~
+src/app/firmware_runtime.h:22:19: error: 'GatewayApp' was not declared in this scope
+   22 |     SerialLogger log_;
+      |                   ^~~~
+src/app/firmware_runtime.h:22:29: error: template argument 1 is invalid
+   22 |     SerialLogger log_;
+      |                             ^
+src/app/firmware_runtime.h:22:10: error: '<expression error>' in namespace 'std' does not name a type
+   22 |     SerialLogger log_;
+      |          ^~~~~~~~~~~~~
+src/app/firmware_runtime.cpp: In member function 'void adaptive_lora::FirmwareRuntime::setup()':
+src/app/firmware_runtime.cpp:51:13: error: 'gateway_' was not declared in this scope
+   51 |             gateway_.emplace(loaded_, radio_, log_, freshBootId);
+      |             ^~~~~~~~
+src/app/firmware_runtime.cpp: In member function 'void adaptive_lora::FirmwareRuntime::loop()':
+src/app/firmware_runtime.cpp:93:9: error: 'gateway_' was not declared in this scope
+   93 |     if (gateway_) gateway_->update(now, event, !rebootPending_);
+      |         ^~~~~~~~
+In file included from src/common/radio/radio_driver.h:3,
+                 from src/common/diagnostics/serial_logger.h:4,
+                 from src/gateway/gateway_app.h:2,
+                 from src/gateway/gateway_app.cpp:1:
+.pio/libdeps/esp32c3_supermini/RadioLib/src/RadioLib.h:69:4: warning: #warning "Use of USB CDC for debug output is not recommended (might stop on first sleep). Use hardware UART instead." [-Wcpp]
+   69 |   #warning "Use of USB CDC for debug output is not recommended (might stop on first sleep). Use hardware UART instead."
+      |    ^~~~~~~
+*** [.pio\build\esp32c3_supermini\src\app\firmware_runtime.cpp.o] Error 1
+In file included from src/common/radio/radio_driver.h:3,
+                 from src/common/diagnostics/serial_logger.h:4,
+                 from src/client/client_app.h:2,
+                 from src/app/firmware_runtime.h:5,
+                 from src/main.cpp:3:
+.pio/libdeps/esp32c3_supermini/RadioLib/src/RadioLib.h:69:4: warning: #warning "Use of USB CDC for debug output is not recommended (might stop on first sleep). Use hardware UART instead." [-Wcpp]
+   69 |   #warning "Use of USB CDC for debug output is not recommended (might stop on first sleep). Use hardware UART instead."
+      |    ^~~~~~~
+========================= [FAILED] Took 619.62 seconds =========================
+
+Environment        Status    Duration
+-----------------  --------  ------------
+esp32c3_supermini  FAILED    00:10:19.621
+==================== 1 failed, 0 succeeded in 00:10:19.621 ====================

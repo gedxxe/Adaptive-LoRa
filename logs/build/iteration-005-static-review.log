@@ -1,0 +1,6 @@
+WIB: 2026-11-12T13:46:54.458989+07:00
+Reviewed 29 C++ source/header/test files; no conflict markers or trailing whitespace
+main.cpp: 15-line delegation; one LLCC68 owner; no SX1262 objects/String/new/delay
+Header-error prefilter matches pinned RadioLib HEADER_VALID qualification (static review only)
+Firmware SHA256: d5cc157843dd895a51f0b26a20f0a3e0ecbe461a8886d2e457f1c423f0e878b7
+Final source manifest: logs/build/iteration-005-source-manifest.sha256

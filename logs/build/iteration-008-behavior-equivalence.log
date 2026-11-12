@@ -1,0 +1,4 @@
+PASS: 35 production/header/test files differ only by audited symbol names and numeric storage-namespace representation
+PASS: legacy on-device namespace bytes, storage calls, wire format, PHY, state logic, versions and test scenarios preserved
+PASS: main.cpp 15 lines; build flags/dependencies preserved except native macro spelling and project description
+Initial checker failure was an incorrect expectation that renamed a preserved string; checker corrected, no source repair needed

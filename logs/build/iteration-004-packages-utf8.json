@@ -1,0 +1,4 @@
+Usage: python -m platformio pkg list [OPTIONS]
+Try 'python -m platformio pkg list -h' for help.
+
+Error: No such option: --json-output
