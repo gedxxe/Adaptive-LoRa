@@ -517,3 +517,67 @@ Final receipt-tree review: all 271 staged files scanned without detected sensiti
 ### ITERATION-008 final evidence-reader correction
 
 The post-push log-tail inspection used Python's Windows default cp1252 and exited 1 on the UTF-8 ESP32 log (ERR-006 recurrence). Explicit UTF-8 read exited 0, showing the recorded 156.00-second SUCCESS. No build, source, test or stored log was changed. The documentation receipt commit `eb008cbc010eef75c91cd108c8d064acf49da3ba` was already pushed with exit 0 and independently matched remote main; this final record correction is documentation-only.
+
+## ITERATION-009 — 2026-11-12 16:16 WIB — radio-driver fault-path verification
+
+- Author: Codex; M0–M2 software verification only. Baseline local/fetched main `b040ef111b82db96ab81a3c7377efbcf46385221`, clean tree, expected origin; created dedicated `iteration-009-radio-driver-verification`. Firmware 0.2.0-alpha.1 / protocol 1 / BUILD_ID m0-m2-source-001 unchanged.
+- Read-only audit and minimal seam proposal preceded source edits: `docs/en/RADIO_DRIVER_AUDIT.md`. Inspected pinned RadioLib 7.8.1 API/implementation.
+- Source changes: RadioHardware non-owning reference and named status/raw-IRQ constants; Llcc68Hardware owns the original Module/LLCC68/SPI/GPIO/ISR calls; RadioDriver retains all transition/validation/priority logic. Runtime header constructs one adapter before its driver; native filter compiles actual driver.cpp. Application-facing RadioTransport and all role/protocol/storage/PHY behavior remain unchanged.
+- New `test/support/fake_radio_hardware.h`: fixed packet buffers, return-code/IRQ/data injection and bounded call trace, no driver-state model. New `test/test_radio_driver/test_main.cpp`: 71 explicit cases before first run, covering requested A–G fault categories, priorities, bounds, recovery, repeated operation and wrapping deadlines. Results PENDING until executed.
+- Source now frozen for build/test. Planned commands `pio run -e esp32c3_supermini`, `pio test -e native`, process-local PYTHONUTF8=1/PATH; complete sanitized logs will be retained under iteration-009 names. No passing result is inferred at this checkpoint.
+- Hardware inventory unchanged: two RA-01SCH/LLCC68 modules, one ESP32-C3 Super Mini, second MCU and planned 915 MHz Moxon pending, pair unassembled. Driver tests have no roles/IDs; existing app simulation uses gateway 1/1/1 and client 1/2/1. Physical provisioning NOT RUN.
+- Provisional PHY SF7/BW125/CR4/5, 915.0 MHz, explicit header, CRC, preamble 8, sync 0x12, 10 dBm, SPI 1 MHz unchanged. Board/module revision, continuity, USB/flash, supply, antenna orientation/matching, distance/LOS and RF permission TBD/NOT MEASURED. Physical packet count/PDR/ACK/RSSI/SNR/retries/latency/resets NOT MEASURED. NVS/reboot/SPI/IRQ/RF/antenna NOT VERIFIED.
+- Existing ERR-005/008/009/010 remain limitations. Pinned getters expose no separate status; tests must not invent getter-error codes. ISR interleavings, actual SPI/BUSY latency and RadioLib internal allocation are not modeled.
+- Final exact changed-file list, executed results, diff review and publication status will be appended. No merge into main or PR is authorized.
+
+### ITERATION-009 ESP32 command completion
+
+`pio run -e esp32c3_supermini` exited 0, PASS, 147.15 s (runner wall time 147.797 s); full sanitized output `logs/build/iteration-009-esp32.log`, metadata `iteration-009-esp32-result.json`. Source remained frozen. Static baseline review passed: 34 protected original files byte-identical; driver policy matches after forwarding/constant substitutions; original adapter arguments retained (`iteration-009-source-review.json`). Native execution is next; no native result claimed yet. A concurrent artifact-presence probe failed because firmware.bin was not yet produced during compilation; later successful build produced it, with no source fix.
+
+### ITERATION-009 native completion and software results
+
+| Executed command | Exit | Actual result | Full output |
+|---|---:|---|---|
+| `pio run -e esp32c3_supermini` | 0 | PASS, 147.15 s | `logs/build/iteration-009-esp32.log` |
+| `pio test -e native` | 0 | **163 passed / 0 failed / 0 skipped**, 26.04 s (runner 26.562 s) | `logs/test/iteration-009-native.log` |
+| `pio --version` | 0 | Core 6.1.19 | `logs/build/iteration-009-toolchain.log` |
+| `pio pkg list -e esp32c3_supermini` | 0 | espressif32 55.03.311, Arduino 3.3.11, RadioLib 7.8.1 | Same toolchain log |
+| `pio pkg list -e native` | 0 | native 1.2.1, Unity 2.6.1 | Same toolchain log |
+| `g++ --version` | 0 | MinGW GCC 6.3.0 | Same toolchain log |
+| `<RISCV_GXX> --version` | 0 | RISC-V GCC 14.2.0, esp-14.2.0_20260121 | Same toolchain log |
+| Inline Python source-preservation/hash/scenario review | 0 | Policy normalization/forwarding/34 protected files; all 163 executed PASS names extracted | `logs/build/iteration-009-source-review.json`, `logs/test/iteration-009-scenarios.md` |
+
+All build/test source inputs remained frozen. The installed PlatformIO environment was prepended only to process PATH with PYTHONUTF8=1; placeholder <RISCV_GXX> denotes the installed compiler executable, not a literal executed path. Full logs retain stdout/stderr with only machine paths replaced by disclosed placeholders; unredacted outputs retained privately outside publication. No new build/test error occurred. A premature missing-artifact inspection is recorded in ERROR_LOG; ERR-005 USB CDC warning remains unsuppressed. ERR-008/009/010 remain open limitations.
+
+New suite: **71/71 PASS**, actual RadioDriver, grouped initialization 8 / receive 5 / transmit+airtime 10 / poll+IRQ+TX 11 / timing 8 / RX+metrics 22 / stop+repeated 7. All requested A–G fault categories are mapped in RADIO_DRIVER_AUDIT.md. Each injected code has an expected result; ordered/forbidden calls, public state, bytes and metrics are asserted. Includes all invalid short lengths 0..27, oversized 97/256/SIZE_MAX, valid 28/96, cleanup/code priorities, uint32 before/at/after/wrap, 32 repeated RX/TX pairs. No production-state duplicate in fake; -701/-702 are synthetic opaque errors, not observed hardware codes.
+
+All **92 existing regression cases unchanged and passing**: app integration 38, codec 18, config 13, console 10, sequence/timing 7, logger 6. No assertions weakened, no failing cases hidden. Scenario counts are not instrumented line/branch percentages; no sanitizer or physical concurrency proof claimed.
+
+Toolchain unchanged: Core 6.1.19; installed pioarduino/espressif32 55.03.311 / display 55.3.311; Arduino-ESP32 3.3.11 / libs 5.5.5+sha.b774170ff46; toolchain package 14.2.0+20260121; RadioLib 7.8.1. RAM 24,532 / 327,680; flash 363,730 / 1,310,720 bytes (+16 RAM/+264 flash versus iteration 008). Application SHA-256 `4ab5f019bfbb90af9f93218e82a59e56dfb7fe9ab5c70d352f480556fb11c0b8`; source/test/config hashes `logs/build/iteration-009-source-manifest.sha256`; results `logs/build/iteration-009-validation.json`.
+
+No confirmed production defect required a policy change. Every driver condition/state/deadline/error priority matches the baseline after explicit hardware forwarding/constants. Fixed Module/SPI/profile/RX flags and minimal ISR are retained; compile-time assertions bind seam constants to pinned RadioLib. Firmware environment unchanged, only native filter gains driver.cpp. Thirty-four protected original source/header/test/version files are byte-identical, including application state machines, main.cpp (15 lines), runtime.cpp, NVS bytes/model, codec, RadioTransport, PHY/pins and versions. New non-owning reference/adapter has no explicit allocation; dependency scratch allocation/latency remains unverified. Binary identity/timing equivalence is not claimed.
+
+ADR-012 records the hardware seam; AGENTS ownership and both language architecture/audit/progress/test documents/READMEs align. CHANGELOG records this verification delivery without a version bump. Historical BUILD_MEMORY/ERROR_LOG/DECISIONS entries remain intact. Final exact file inventory/review/publication result follows after inspection; publication still pending at this checkpoint.
+
+Simulated stimuli: return codes, packet bytes, IRQ latch/level/raw flags and explicit poll timestamps. Verified software: production driver policy for those inputs, original regression behavior and ESP32 adapter/API compile compatibility. Unverified physical/dependency behavior: real Llcc68Hardware/RadioLib SPI commands, BUSY/ISR timing/races, timeout latency under blocking calls, getter transport failures without exposed status, MCU/runtime/entropy/USB/NVS durability/reboot, pins/power/antenna/RF/regulatory settings. No uploads or serial-device access. All physical metrics NOT MEASURED.
+
+Next recommended software iteration: configuration-store/NVS boundary verification while preserving stored schema/key/blob and explicit boot-role policy; then separately budget dependency timing/memory. M0–M2 physical acceptance remains IN PROGRESS until assembled-unit tests; M3–M8 remain NOT STARTED.
+
+### ITERATION-009 staged-log whitespace correction
+
+Initial `git diff --cached --check` exited 2 on PlatformIO's own trailing display spaces/blank EOF (ERR-015); diagnostics retained in `logs/build/iteration-009-diff-check-initial.log`. Normalize only the three new public command logs' EOL/trailing display whitespace; raw command output is retained privately. This supplements the earlier path-redaction log policy and changes no command/result/record value or source. Final staging check will verify the correction; native/ESP32 builds need no repeat for this formatting-only change.
+
+### ITERATION-009 final review checkpoint
+
+- `git diff --cached --check` exit 0 after disclosed log formatting; ERR-015 CLOSED — VERIFIED. Complete source/test/config/documentation/evidence diff inspected; no unrelated changes. Full patch retained privately outside publication to avoid self-referential evidence diffs.
+- Staged-blob scan of the whole publication tree detected no known private identity/path/credential/private-address/excluded-artifact finding. All 43 frozen compiled inputs match; previous English BUILD_MEMORY/ERROR_LOG/DECISIONS and Chinese DECISIONS remain byte-prefix intact. Both READMEs align on versions/hardware/163/71/38/physical limits, 29 relative links resolve.
+- Exact per-file responsibilities and security/history/fact results: `logs/build/iteration-009-review.json`. Production files changed: radio_driver.h/.cpp (forwarding only), new radio_hardware.h and llcc68_hardware.h/.cpp (existing hardware ownership), firmware_runtime.h (construction order), platformio.ini (native filter). Tests: new fake_radio_hardware.h and test_radio_driver/test_main.cpp.
+- Docs changed: AGENTS.md, CHANGELOG.md, both READMEs; English ARCHITECTURE/BUILD_MEMORY/DECISIONS/ERROR_LOG/PROGRESS/RADIO_DRIVER_AUDIT/SOFTWARE_AUDIT/TEST_PLAN; Chinese ARCHITECTURE/DECISIONS/PROGRESS/RADIO_DRIVER_AUDIT/SOFTWARE_AUDIT/TEST_PLAN. Logs/manifests under iteration-009 paths are listed individually in review.json.
+- Firmware/software acceptance for this iteration is satisfied; no physical acceptance claim. Commit/push to the dedicated branch follows review; actual SHA and remote verification will be recorded after execution. No merge/PR is performed.
+
+### ITERATION-009 verified implementation publication — 2026-11-12 16:31 WIB
+
+- Commit **`4055a947bdfcd518cdff36d6ae76acf3fabeed93`**: `test: verify production radio driver fault paths`; commit exit 0. Reviewed implementation tree: 38 changed files, staged whitespace check exit 0; 163 native cases and ESP32 compile PASS as recorded above.
+- `git push -u origin iteration-009-radio-driver-verification` exit 0, new branch created and tracking configured. `git ls-remote --heads origin main iteration-009-radio-driver-verification` exit 0 independently returned the exact implementation SHA for the dedicated branch and unchanged `b040ef111b82db96ab81a3c7377efbcf46385221` for main. No merge, PR, force push, history rewrite or tag. GitHub's suggested PR URL was only an automatic push message; no PR was created.
+- Structured actual receipt: `logs/build/iteration-009-publication-receipt.json`. This evidence plus current progress is recorded in a separate documentation-only commit; a commit cannot include its own final SHA. Final iteration file inventory adds this receipt to `logs/build/iteration-009-review.json` (39 total changed paths versus baseline).
+- Source/test/config fingerprints remain the tested snapshot; no additional firmware edit, build or test is inferred from publication. Physical NVS/SPI/LLCC68/ISR/RF/antenna remain NOT VERIFIED. Next task remains a separately scoped configuration-store boundary verification iteration.

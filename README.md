@@ -12,11 +12,11 @@ The research direction is reliability-aware gateway scheduling and conservative 
 |---|---|
 | Firmware / protocol | `0.2.0-alpha.1` / `1` |
 | ESP32 compilation | PASS |
-| Native tests | 92/92 PASS, including 38 production-state-machine integration scenarios |
+| Native tests | 163/163 PASS: 92 existing cases (38 app integration), plus 71 production-driver fault cases |
 | Implemented | Explicit bounded frames, provisioned roles, HELLO/ACK identity checks, duplicate suppression, timeout/recovery and sequence/session handling |
 | Physical NVS/reboot/SPI/IRQ/RF/antenna | NOT VERIFIED |
 
-Host integration tests use the actual client/gateway state machines with bounded fake transport, clock and serial adapters. Simulated loss, delay and object recreation are not physical measurements. The [progress snapshot](docs/en/PROGRESS.md), [software audit](docs/en/SOFTWARE_AUDIT.md) and [build memory](docs/en/BUILD_MEMORY.md) record exact evidence and limitations.
+Host integration tests use the actual client/gateway state machines with bounded fake transport, clock and serial adapters. Simulated loss, delay, object recreation, radio-operation failures and IRQ inputs are not physical measurements. See the [driver audit and coverage](docs/en/RADIO_DRIVER_AUDIT.md). The [progress snapshot](docs/en/PROGRESS.md), [software audit](docs/en/SOFTWARE_AUDIT.md) and [build memory](docs/en/BUILD_MEMORY.md) record exact evidence and limitations.
 
 ## Hardware and provisional PHY
 
@@ -29,7 +29,7 @@ Host integration tests use the actual client/gateway state machines with bounded
 
 One image loads a validated `GATEWAY` or `CLIENT` role from NVS. Missing, corrupt or unsupported configuration enters provisioning mode with application TX disabled. Role edits apply only after save and controlled reboot; identical hardware is not used to infer roles.
 
-The implemented `RadioTransport` reference separates application state machines from the sole LLCC68/SPI owner, `RadioDriver`. The codec/config/sequence modules are host-testable. `main.cpp` is a 15-line entry point.
+The implemented `RadioTransport` reference separates application state machines from `RadioDriver` state policy. Its non-owning `RadioHardware` reference delegates to the sole LLCC68/SPI/GPIO owner, `Llcc68Hardware`; native fault tests execute the actual driver. The codec/config/sequence modules are host-testable. `main.cpp` is a 15-line entry point.
 
 Four target boundaries are documented in [ARCHITECTURE.md](docs/en/ARCHITECTURE.md): protocol core, radio adapters, platform services and an application payload/event interface. Platform services are currently ESP32/Arduino-specific; a general application submission/delivery API is still absent. The protocol core contains no Modbus, meter-model, Wi-Fi/MQTT, PostgreSQL or dashboard integration. Do not treat the target architecture as fully implemented.
 

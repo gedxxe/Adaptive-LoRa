@@ -5,6 +5,7 @@
 #include "client/client_app.h"
 #include "gateway/gateway_app.h"
 #include "common/radio/radio_driver.h"
+#include "common/radio/llcc68_hardware.h"
 
 namespace adaptive_lora {
 class FirmwareRuntime {
@@ -19,7 +20,8 @@ private:
     const char* loadError_ = "not_loaded";
     NvsConfigStore store_;
     ProvisioningConsole console_;
-    RadioDriver radio_;
+    Llcc68Hardware radioHardware_;
+    RadioDriver radio_{radioHardware_};
     SerialLogger log_;
     std::optional<GatewayApp> gateway_;
     std::optional<ClientApp> client_;

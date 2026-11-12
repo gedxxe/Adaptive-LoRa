@@ -29,3 +29,11 @@
 - 保持现有 RadioTransport/LLCC68 owner，明确 platform/application API 缺口，不声称已有通用 payload/event、跨 MCU 服务或 SX1262 实现；电表/回传/数据库/UI 必须在协议外。
 - 只在项目根初始化 main，保留远端已有提交，审查全部脱敏暂存文件后发布到明确授权仓库。远端当前为空，不需要 unrelated-history merge；不强推、不改可见性、不自动打 tag。
 - 排除 SDK/二进制/本地配置/私有原件，保留开发日志；项目许可证待选择，保留依赖许可，不上传无再分发授权的论文全文。
+
+## ADR-012 — 以单一硬件引用验证生产 RadioDriver
+
+- 2026-11-12 接受，iteration 009；固件 0.2.0-alpha.1 / 协议 1 不变。先完成只读审查/方案，见英语 RADIO_DRIVER_AUDIT.md。
+- RadioDriver 保留状态、长度校验、deadline 和事件/错误优先级；Llcc68Hardware 唯一拥有 Module/LLCC68/SPI/GPIO/ISR。RadioHardware 是非拥有引用，Runtime 先构造唯一 adapter 再构造 driver；无堆所有权、factory/task 或第二种 radio。
+- RadioTransport 应用接口不变。Native 编译实际 driver.cpp，有界 fake 仅注入返回码、IRQ 锁存/电平/flags、payload 和显式 uint32 时间，不复制 driver 状态机。生产编译用 static_assert 核对固定 status/raw IRQ 值与 RadioLib 7.8.1 一致。
+- 固定 PHY/RX 参数和只置 flag 的 ISR 原样移动。保留 HEADER_VALID 条件、timeout 优先级、再次 begin 失败后既有 initialized 标志，以及 read 成功但 finishReceive 失败时保留的 metrics；不改变恢复策略。
+- Host 不执行真实 adapter/SPI/BUSY/ISR 并发或 RadioLib 内部；同步等待/分配、NVS/RF 实物门槛仍未验证，不宣称完整通用 PHY/平台服务。

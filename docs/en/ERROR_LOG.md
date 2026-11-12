@@ -225,3 +225,19 @@ Status CLOSED — VERIFIED. The original historical report body is retained byte
 ### ERR-006 recurrence — iteration 008 final log inspection
 
 A final Python `Path.read_text()` inspection without an encoding returned exit 1 while reading the UTF-8 ESP32 log under the Windows cp1252 default: UnicodeDecodeError, byte 0x90 at offset 15464. This was a log-reader failure, not a firmware build/test failure. Re-reading with `Get-Content -Encoding utf8 logs/build/iteration-008-esp32.log -Tail 11` exited 0 and showed SUCCESS / one environment succeeded. Keep explicit UTF-8 for evidence readers; the original successful log remains unchanged.
+
+### Iteration 009 inspection note
+
+An artifact-presence probe during the still-running ESP32 compile found no firmware.bin yet. It was a premature inspection, not a compiler error; the subsequent build exited 0 and generated the application/factory binaries (`logs/build/iteration-009-esp32.log`). No repair was needed. Known ERR-005 CDC warning remains present; physical serial verification is still open.
+
+## ERR-015 — Captured PlatformIO display whitespace failed staging check
+
+- First seen 2026-11-12, iteration 009; severity LOW; status FIXED — UNVERIFIED at this checkpoint.
+- Reproduction: `git diff --cached --check` returned 2 for trailing display spaces in ESP32 package/metrics output and a final blank line in the toolchain log. Native/ESP32 commands had already passed; source was unaffected.
+- Initial diagnostics: `logs/build/iteration-009-diff-check-initial.log` (only incidental display whitespace normalized); exact original command outputs remain privately retained outside publication.
+- Fix: normalize line endings/trailing display spaces/blank EOF in the three new command logs; retain all output lines, codes, values, warnings and PASS/FAIL evidence. No historical log or production/test source modified.
+- Verification: final staged check and publication audit pending below; no repeat compile needed for log formatting.
+
+### ERR-015 verification — iteration 009
+
+Status CLOSED — VERIFIED. Corrected `git diff --cached --check` exited 0 without diagnostics. Staged-blob security/history/source-hash/link/fact checks pass (`logs/build/iteration-009-review.json`); all 43 compiled source/test/config/version entries match. Only publication display formatting changed; no source rebuild/retest was necessary.

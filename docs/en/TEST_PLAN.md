@@ -314,3 +314,9 @@ The Runtime reboot dispatcher, actual esp_random, NVS/Preferences/flash, RadioDr
 - Static equivalence verifies all 35 production/header/test files after only identity substitutions and numeric representation of the unchanged storage namespace. Versions, wire layout/bytes, PHY, state statements and persistence calls are preserved; `logs/build/iteration-008-behavior-equivalence.log`.
 - Publication checks cover identity/credentials/private paths/device IDs, current English/Chinese README facts and relative links, staged filenames/content, dependencies and artifacts. The audit inventory was created before edits (IDENTITY_AUDIT.md); previous iterations/errors/resolutions remain as sanitized copies with original hashes disclosed as historical.
 - Physical NVS durability/reboot/SPI/IRQ/RF/antenna remains NOT VERIFIED. No later MAC implementation, storage migration or new adapter is validated by this task.
+
+## 16. Iteration 009 — actual production driver fault paths
+
+Native executes actual RadioDriver through one RadioHardware reference. All 71 new driver cases pass alongside the unchanged 92 regressions: **163/163 PASS**, exit 0, `logs/test/iteration-009-native.log`; ESP32 build exit 0, `logs/build/iteration-009-esp32.log`. Every individual result is in `logs/test/iteration-009-scenarios.md`; required A–G coverage and priorities are mapped in RADIO_DRIVER_AUDIT.md.
+
+Fake hardware injects fixed bytes, return codes and IRQ latch/level/flags; explicit uint32 poll times cover before/at/after deadlines and wrap. It has no driver-state model. Real adapter/library/SPI/BUSY/physical ISR timing remain untested by native; frame/application/NVS/pins/PHY/version behavior is unchanged. Successful read followed by failed cleanup preserves metrics but reports ERROR/FAULT, as before. No line/branch coverage percentage or physical result is inferred.

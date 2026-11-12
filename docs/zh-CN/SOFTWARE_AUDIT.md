@@ -35,3 +35,9 @@
 实际 Runtime 重启、随机源、NVS/掉电、driver poll/IRQ/SPI/BUSY/CRC、Flash/USB 延迟以及全部电气/RF/合规事项均未验证；ERR-005/008/009/010 保留。两个模块/一个 MCU/无制作天线，未组装双设备，M0–M2 仍 IN PROGRESS。
 
 当前无 Git 仓库（rev-parse 128）；没有初始化或提交。完整 no-index diff 为 `logs/build/iteration-007-complete.diff`，清单为 `logs/build/iteration-007-changed-files.txt`，修改前/后快照保留在 logs/build。最终 source hash 清单为 `logs/build/iteration-007-source-manifest.sha256`，二进制 SHA-256 为 `1eb8c7fafeb36e87035095a9c357a9f024e8164c88e43a88274831c9618a34da`。没有增加自动重传或后续 MAC。
+
+## Iteration 009 补充 — 已执行生产 driver 策略
+
+此前 native 不覆盖 driver poll/IRQ 分类的描述对应 iteration 006–008。本轮增加最小 RadioHardware 引用和 Llcc68Hardware owner，实际生产 RadioDriver 的 71 个确定性故障用例全部通过；既有 92 个 regression 通过，总计 163/163，native/ESP32 命令退出均为 0。先审查后改源码，状态/错误优先级/逐条结果和保留性证据见 RADIO_DRIVER_AUDIT.md。
+
+新验证仅针对 driver 策略，host 绕过真实 adapter、RadioLib 内部/SPI/BUSY/实物 IRQ 竞态和指标；Runtime/NVS/随机源/USB/RF 仍未验证。未复现需修正既有策略的缺陷，不增加后续 MAC 或 platform/application API。

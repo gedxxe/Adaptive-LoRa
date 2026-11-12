@@ -1,8 +1,10 @@
 # Development Progress
 
+Iteration 009 software checks PASS: ESP32 build exit 0 (147.15 s), native **163/163 PASS**, exit 0 (26.04 s): 71 new production RadioDriver fault cases plus all 92 existing regressions. Pre-edit findings/coverage are in RADIO_DRIVER_AUDIT.md; exact individual results are in `logs/test/iteration-009-scenarios.md`. Dedicated branch `iteration-009-radio-driver-verification` published; implementation commit `4055a947bdfcd518cdff36d6ae76acf3fabeed93` independently matched remote branch (push/verification exit 0). Publication receipt is `logs/build/iteration-009-publication-receipt.json`, recorded in a subsequent documentation-only commit. Main remains `b040ef111b82db96ab81a3c7377efbcf46385221`; no merge or PR. Physical validation remains NOT VERIFIED.
+
 Project: **Adaptive-LoRa**. Research title: Reliability-aware TDMA Scheduling and Link Adaptation for Single-Radio LoRa Industrial Energy Monitoring Networks.
 
-Iteration 008 establishes the independent repository. Identity/path labels in earlier publication copies were neutralized with provenance; chronology, errors and original outcomes remain. Current validation: ESP32 build PASS, exit 0 (`logs/build/iteration-008-esp32.log`), native **92/92 PASS**, exit 0 (`logs/test/iteration-008-native.log`), including 38 integration scenarios. The four-boundary architecture/gaps are documented, not newly implemented. Firmware 0.2.0-alpha.1, protocol 1, PHY, packet logic and legacy storage bytes are unchanged.
+Historical iteration 008 established the independent repository. Identity/path labels in earlier publication copies were neutralized with provenance; chronology, errors and original outcomes remain. Its validation: ESP32 build PASS, exit 0 (`logs/build/iteration-008-esp32.log`), native **92/92 PASS**, exit 0 (`logs/test/iteration-008-native.log`), including 38 integration scenarios. The four-boundary architecture/gaps are documented, not newly implemented. Firmware 0.2.0-alpha.1, protocol 1, PHY, packet logic and legacy storage bytes are unchanged.
 
 Git publication is verified: `main` was pushed to the authorized public Adaptive-LoRa repository; establishment commit `1d7ab54379221dff8b4eb9347833282657b6e1dc` matches remote main (`git ls-remote`, exit 0). The initial remote was empty, so no history merge was needed. Staged review/security checks passed. The subsequent documentation-only receipt records the already verified establishment SHA in BUILD_MEMORY.md and `logs/build/iteration-008-publication-receipt.json`. No physical validation is claimed.
 
@@ -43,7 +45,7 @@ Corrected stock: two LLCC68 modules, one MCU, second MCU not purchased, Moxon no
 |-----|----------------------------------------------------------------|-------------|------------------------------------------|
 | M0  | Board, module, pin, power, antenna, and toolchain confirmation | IN PROGRESS | Resolved toolchain recorded; physical checks pending |
 | M1  | LLCC68 initialization on both devices                          | IN PROGRESS | Firmware compiles; physical initialization/NVS persistence pending |
-| M2  | Fixed-PHY HELLO/ACK                                            | IN PROGRESS | 92 native tests including production apps pass; RF evidence pending |
+| M2  | Fixed-PHY HELLO/ACK                                            | IN PROGRESS | 163 native tests including production apps/driver pass; RF evidence pending |
 | M3  | Beacon and one-client TDMA                                     | NOT STARTED | Deferred until M2 passes                 |
 | M4  | ACK bitmap and selective retry                                 | NOT STARTED | Deferred until M3 passes                 |
 | M5  | Versioned ADR SF7/SF8/SF9                                      | NOT STARTED | Deferred until M4 passes                 |
@@ -76,12 +78,16 @@ Corrected stock: two LLCC68 modules, one MCU, second MCU not purchased, Moxon no
 
 ## Current blockers
 
-ERR-011 (legacy MinGW format macros) is fixed by C++ `<cinttypes>` and verified by 92 passing native cases/ESP32 compile. No application packet/state defect was reproduced in those scenarios. ERR-008 synchronous NVS/BUSY, ERR-009 dependency scratch allocations, ERR-010 SDK serial waits and ERR-005 physical CDC behavior remain open limitations; hardware IRQ/random-source assumptions are also unverified. They are not covered by the fake transport.
+ERR-011 (legacy MinGW format macros) is fixed by C++ `<cinttypes>` and verified by 92 passing native cases/ESP32 compile. No application packet/state defect was reproduced in those scenarios. ERR-008 synchronous NVS/BUSY, ERR-009 dependency scratch allocations, ERR-010 SDK serial waits and ERR-005 physical CDC behavior remain open limitations; hardware IRQ/random-source assumptions are also unverified. Native driver fault tests cover policy around returned operations, not the actual dependency timing/allocation or ISR interleavings.
 
 ERR-007's header filter remains unchanged from iteration 005; physical IRQ behavior is still an M1/M2 gate. Migration changes are mechanical namespace/macro labels and a byte-equivalent storage namespace representation; behavior equivalence is checked across 35 source/header/test files. New source/binary fingerprints are in iteration-008 records; older hashes identify original artifacts. Git was initialized only after the pre-edit identity audit. No new scheduler, bitmap, selective retry or ADR code exists.
 
 ## Next action
 
-Continue software-only work with focused driver-API fault injection and configuration-store boundary tests if requested; resolve synchronous-call/memory budgets before claiming hard timing guarantees. Physical gates wait for the second MCU, antenna and assembly; then follow BENCH_RUNBOOK.md for M0/M1 and >=200 actual M2 HELLO attempts. Do not start M3 until M2 acceptance evidence exists. TDMA/bitmap/retry scheduling/ADR remain unimplemented.
+Next software task: configuration-store/NVS boundary verification with a minimal persistence fake, preserving the schema/key/blob and boot policy. Driver policy fault verification is complete for the documented 71 cases; resolve dependency timing/memory budgets before claiming hard guarantees. Physical gates wait for the second MCU, antenna and assembly; then follow BENCH_RUNBOOK.md for M0/M1 and >=200 actual M2 HELLO attempts. Do not start M3 until M2 acceptance evidence exists. TDMA/bitmap/retry scheduling/ADR remain unimplemented.
 
 Final evidence-reader check: Windows default decoding failed on a UTF-8 build log; explicit UTF-8 succeeded (ERR-006 recurrence). Firmware/native PASS evidence is unchanged; no new firmware error.
+
+Iteration 009 preservation: RadioDriver state/deadline/error policy remains equivalent after hardware forwarding/constant substitutions; 34 protected original files unchanged. Runtime owns one Llcc68Hardware plus a reference-injected RadioDriver; main.cpp remains 15 lines. The new seam has no explicit heap allocation. RAM 24,532 / 327,680 bytes; flash 363,730 / 1,310,720. Actual adapter/SPI/BUSY/ISR races, Runtime/entropy/NVS/USB and RF remain outside native evidence; M0–M2 overall IN PROGRESS, M3–M8 NOT STARTED.
+
+Iteration 009 review note: staged log display whitespace triggered ERR-015 (check exit 2); log-format normalization is verified closed by staged check exit 0; source/build/test evidence unaffected.

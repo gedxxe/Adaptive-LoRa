@@ -122,3 +122,12 @@ record the reason and update all affected documents.
 - Retain current RadioTransport/LLCC68 ownership and document platform/application gaps. No generic application payload/event or complete platform-service API is claimed, and no SX1262 implementation exists. Meter/backhaul/database/UI dependencies must stay outside core protocol logic.
 - Initialize main only at the project root, retain any fetched remote commits, review sanitized staged files and publish only to the explicitly authorized repository. The remote is currently empty, so no unrelated-history merge is required. No force push, visibility change or automatic tag.
 - SDKs/binaries/local configuration/private originals are excluded; technical development records remain tracked. Project license selection is deferred, dependency license references retained, and unlicensed full-text research papers are not included.
+
+## ADR-012 — Verify production RadioDriver through one hardware reference
+
+- Status ACCEPTED; date 2026-11-12; iteration 009, firmware 0.2.0-alpha.1 / protocol 1 unchanged. Pre-edit audit/proposal: RADIO_DRIVER_AUDIT.md.
+- Split only the existing radio module: RadioDriver retains all state, bounds, deadline and event/error policy; Llcc68Hardware owns Module/LLCC68/SPI/GPIO/ISR. A non-owning RadioHardware reference exposes only existing hardware calls; Runtime owns exactly one adapter before one driver. No heap/factory/tasks or second adapter.
+- Application-facing RadioTransport remains unchanged. Native tests compile actual RadioDriver.cpp and inject return codes, IRQ latch/level/raw flags, payload bytes and explicit uint32 timestamps through a bounded fake, without duplicating driver state logic.
+- Numeric status/raw-IRQ values are checked against pinned RadioLib with production compile-time assertions. Fixed initialization/receive arguments and one-flag ISR are moved unchanged. No general PHY/lifecycle configuration service or physical-driver emulator is claimed.
+- Preserve existing priorities and lifecycle semantics, including HEADER_VALID qualification, timeout precedence, retained initialized flag after a repeated begin failure, and metrics from a successful read even if final cleanup fails. This task changes testability, not recovery policy.
+- Host tests do not run the real adapter, SPI/BUSY/ISR interleavings or RadioLib internals; synchronous waits/allocations, physical NVS/RF and other hardware gates remain open.

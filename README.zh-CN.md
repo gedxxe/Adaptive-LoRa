@@ -12,11 +12,11 @@ Adaptive-LoRa 是独立的单射频 LoRa P2P 网络研究与嵌入式固件项�
 |---|---|
 | 固件 / 协议 | `0.2.0-alpha.1` / `1` |
 | ESP32 编译 | PASS |
-| Native 测试 | 92/92 PASS，含 38 个实际生产状态机 integration 场景 |
+| Native 测试 | 163/163 PASS：92 个既有用例（含 38 个 app integration）及 71 个生产 driver 故障用例 |
 | 已实现 | 有界显式帧、角色配置、HELLO/ACK 身份检查、去重、超时/恢复、sequence/session 处理 |
 | 实物 NVS/重启/SPI/IRQ/RF/天线 | NOT VERIFIED |
 
-Host 执行实际 Client/Gateway 状态机，使用有界 fake transport、时钟及串口适配。丢包、延迟和对象重建不等于实测。精确证据见 [进度](docs/zh-CN/PROGRESS.md)、[软件审查](docs/zh-CN/SOFTWARE_AUDIT.md) 及英文 [BUILD_MEMORY](docs/en/BUILD_MEMORY.md)。
+Host 执行实际 Client/Gateway 状态机，使用有界 fake transport、时钟及串口适配。丢包、延迟、对象重建、radio 返回码与 IRQ 输入均不等于实测，见 [driver 审查](docs/zh-CN/RADIO_DRIVER_AUDIT.md)。精确证据见 [进度](docs/zh-CN/PROGRESS.md)、[软件审查](docs/zh-CN/SOFTWARE_AUDIT.md) 及英文 [BUILD_MEMORY](docs/en/BUILD_MEMORY.md)。
 
 ## 硬件和暂定 PHY
 
@@ -29,7 +29,7 @@ Host 执行实际 Client/Gateway 状态机，使用有界 fake transport、时�
 
 一份镜像从 NVS 加载有效 GATEWAY/CLIENT 角色。配置缺失、损坏或不支持时进入 provisioning，禁止应用 TX。保存并受控重启后才应用编辑，不通过相同硬件自动推断角色。
 
-RadioTransport 引用已分离 app 状态机与唯一 LLCC68/SPI owner RadioDriver；codec/config/sequence 可在 host 测试，main.cpp 为 15 行入口。[架构文档](docs/zh-CN/ARCHITECTURE.md) 区分协议核、radio adapter、platform 服务和应用 payload/event 接口四个目标边界。当前 platform 仍依赖 ESP32/Arduino，通用应用提交/交付 API 尚不存在。协议核没有 Modbus、电表模型、Wi-Fi/MQTT、PostgreSQL 或 dashboard 集成；不能声称目标架构已经完成。
+RadioTransport 引用分离 app 与 RadioDriver 状态策略；非拥有 RadioHardware 引用指向唯一 LLCC68/SPI/GPIO owner Llcc68Hardware，native 故障测试执行实际 driver；codec/config/sequence 可在 host 测试，main.cpp 为 15 行入口。[架构文档](docs/zh-CN/ARCHITECTURE.md) 区分协议核、radio adapter、platform 服务和应用 payload/event 接口四个目标边界。当前 platform 仍依赖 ESP32/Arduino，通用应用提交/交付 API 尚不存在。协议核没有 Modbus、电表模型、Wi-Fi/MQTT、PostgreSQL 或 dashboard 集成；不能声称目标架构已经完成。
 
 ## 仓库结构
 

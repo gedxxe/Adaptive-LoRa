@@ -1,0 +1,17 @@
+git diff --cached --check
+exit=2
+logs/build/iteration-009-esp32.log:8: trailing whitespace.
++PACKAGES:
+logs/build/iteration-009-esp32.log:9: trailing whitespace.
++ - contrib-piohome @ 3.4.4
+logs/build/iteration-009-esp32.log:10: trailing whitespace.
++ - framework-arduinoespressif32 @ 3.3.11
+logs/build/iteration-009-esp32.log:11: trailing whitespace.
++ - framework-arduinoespressif32-libs @ 5.5.5+sha.b774170ff46
+logs/build/iteration-009-esp32.log:12: trailing whitespace.
++ - tool-esptoolpy @ 5.3.0
+logs/build/iteration-009-esp32.log:13: trailing whitespace.
++ - tool-riscv32-esp-elf-gdb @ 17.1.0+20260402
+logs/build/iteration-009-esp32.log:203: trailing whitespace.
++                            Memory Type Usage Summary
+logs/build/iteration-009-toolchain.log:66: new blank line at EOF.

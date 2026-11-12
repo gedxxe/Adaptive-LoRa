@@ -24,6 +24,8 @@ ESP32-C3 + Ra-01SCH devices.
                                 |
                          RadioDriver
                                 |
+                       Llcc68Hardware
+                                |
                        RadioLib LLCC68
                                 |
                          Ra-01SCH module
@@ -117,7 +119,8 @@ The original namespace bytes are retained as a numeric compatibility constant in
 | `ProvisioningConsole` | Parse serial commands and report config                 | Run radio TX/RX                                    |
 | `GatewayApp`          | Gateway state machine and HELLO validation/ACK response | Direct SPI operations                              |
 | `ClientApp`           | Client state machine, HELLO/ACK tracking                | Direct SPI operations                              |
-| `RadioDriver`         | Own LLCC68 instance, SPI, TX/RX, IRQ events             | Decide application protocol policy                 |
+| `RadioDriver`         | TX/RX state, deadlines, validation and event policy     | Direct RadioLib/SPI/GPIO access                    |
+| `Llcc68Hardware`      | Sole Module/LLCC68/SPI/GPIO/ISR adapter                 | Own driver or application state transitions        |
 | `FrameCodec`          | Serialize/deserialize bounded frames                    | Depend on Arduino or RadioLib                      |
 | `SequenceTracker`     | Track duplicate packet identities                       | Perform radio operations                           |
 | `SerialLogger`        | Format structured diagnostics                           | Block timing-critical radio work                   |
@@ -127,8 +130,9 @@ concrete responsibility, not because every function needs a class.
 
 ## 5. Radio ownership
 
-Only `RadioDriver` may access RadioLib or the SPI peripheral used by the
-LoRa module.
+Only `Llcc68Hardware` within the radio module may access RadioLib, SPI or
+the radio GPIOs. `RadioDriver` owns state policy through a non-owning
+`RadioHardware` reference (ADR-012); Runtime constructs one adapter and driver.
 
 The first release should use one cooperative event-driven loop. The
 radio driver reports events such as `TX_DONE`, `RX_DONE`, `RX_TIMEOUT`,
@@ -181,7 +185,7 @@ transceiver.
 
 ## Software verification boundary (ADR-010)
 
-GatewayApp and ClientApp depend on the six-method RadioTransport reference; RadioDriver implements it and alone owns all LLCC68/SPI/IRQ operations. Runtime still owns the concrete driver and calls begin/poll/stop. A native fake supplies completed packet/error events to the actual production apps; test-only clock/serial headers let the actual logger run. No state-machine implementation is duplicated in tests, and no runtime heap allocation is introduced by the seam.
+GatewayApp and ClientApp depend on the six-method RadioTransport reference; RadioDriver implements it and delegates LLCC68/SPI/IRQ operations to the sole Llcc68Hardware adapter. Runtime still owns the concrete driver and calls begin/poll/stop. A native fake supplies completed packet/error events to the actual production apps; test-only clock/serial headers let the actual logger run. No state-machine implementation is duplicated in tests, and no runtime heap allocation is introduced by the seam.
 
 The app logic is cooperative, but NVS commits, RadioLib BUSY waits and SDK serial calls are synchronous. A bounded logging queue is not a hard nonblocking guarantee for those dependencies. RadioLib also uses heap scratch buffers by default. Host app tests cannot validate hardware latency, ISR races, flash or RF.
 
@@ -205,10 +209,16 @@ Adaptive-LoRa targets reusable embedded-network logic. The research title descri
 | Boundary | Verified current implementation | Target and remaining gap |
 |---|---|---|
 | Protocol core | Bounded LE FrameCodec, packet identity, sequence/session helpers and M2 gateway/client HELLO/ACK states | No TDMA/superframe, bitmap, selective retry, ADR or general DATA service. Apps still directly call the ESP timer and concrete SerialLogger. Core helper modules are platform-independent; the entire role runtime is not. |
-| Radio abstraction | Six-method RadioTransport reference, bounded RadioEvent and one RadioDriver with RadioLib LLCC68/SPI ownership | Initialization, poll/stop and PHY control are concrete-driver functions. General adapter lifecycle/configuration is not abstracted; no SX1262 adapter exists. |
+| Radio abstraction | Six-method RadioTransport reference, bounded RadioEvent and one RadioDriver state owner with a referenced Llcc68Hardware adapter | Initialization/poll/stop remain concrete driver entry points. RadioHardware now abstracts existing fixed-profile hardware calls for fault injection, not a general adapter configuration service; no SX1262 adapter exists. |
 | Platform services | ESP32/Arduino FirmwareRuntime, NvsConfigStore, bounded console, pins, IRQ flag, hardware random and timer calls | No general clock/random/persistence/interrupt service contract. Native compatibility headers are test adapters, not production ports to other MCUs. |
 | Application integration | HELLO carries no application payload in the current client; codec can bound opaque payload bytes; diagnostics expose link events/counters as serial logs | No submission API, received-payload callback, link-event subscriber or reusable application statistics contract. Add these in a separate reviewed task before integrating another application. |
 
 Modbus, meter models, Wi-Fi/MQTT backhaul, databases and dashboards are outside the protocol core and absent from source. Future integrations must use the application boundary rather than introduce such dependencies into codec/state/scheduling logic. Industrial energy monitoring remains a general motivation, not a required deployment.
 
-Keep future protocol, radio, platform and application changes milestone-scoped. This identity task only renames internal identifiers and documents gaps; it does not add the missing APIs or later MAC features. Synchronous SDK waits/allocation and physical validation limits remain in SOFTWARE_AUDIT.md and ERROR_LOG.md.
+Keep future protocol, radio, platform and application changes milestone-scoped. Iteration 008 renamed internal identifiers and documented gaps; iteration 009 adds only the driver verification seam, not the missing integration APIs or later MAC features. Synchronous SDK waits/allocation and physical validation limits remain in SOFTWARE_AUDIT.md and ERROR_LOG.md.
+
+## 10. Radio-driver verification boundary (ADR-012)
+
+RadioDriver has no Arduino/RadioLib dependency. Its begin/receive/transmit/stop/poll logic runs in native tests through RadioHardware. Llcc68Hardware owns the single Module/LLCC68, fixed PHY/SPI setup, IRQ callback and GPIO sampling. The callback only sets a volatile flag; sampling then clearing still depends on latched high DIO1 as before. The six-method application transport is unchanged.
+
+The bounded hardware fake supplies operation results, IRQ latch/level/flags and packet bytes. This tests production driver policy, not the adapter, RadioLib implementation, chip commands, latency or physical ISR races. Numeric status/raw IRQ values are compile-checked against RadioLib 7.8.1; fixed arguments/call ordering are reviewed separately. All previous platform/application API and dependency timing/allocation gaps remain.

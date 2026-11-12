@@ -88,7 +88,8 @@ NvsConfigStore 使用数值常量保留原 namespace 字节，确保旧配置仍
 | `NvsConfigStore`  | 通过 Preferences/NVS 保存配置      |
 | `GatewayApp`      | Gateway 应用状态机                 |
 | `ClientApp`       | Client 应用状态机                  |
-| `RadioDriver`     | 唯一 LLCC68/SPI 操作模块           |
+| `RadioDriver`     | 通过 RadioHardware 引用拥有状态/错误策略 |
+| `Llcc68Hardware`  | 唯一 Module/LLCC68/SPI/GPIO/ISR adapter |
 | `FrameCodec`      | 独立于 Arduino/RadioLib 的帧编解码 |
 | `SequenceTracker` | 重复包识别                         |
 | `SerialLogger`    | 结构化日志                         |
@@ -107,7 +108,7 @@ PHY。
 
 ## 6. 软件验证边界（ADR-010）
 
-GatewayApp/ClientApp 只依赖 6 方法 RadioTransport 引用，RadioDriver 实现接口并唯一拥有 LLCC68/SPI/IRQ；Runtime 继续调用具体 driver 的 begin/poll/stop。Native 使用有界 fake transport、虚拟时钟和 Serial 适配，编译实际生产 app/codec/tracker/config/logger，不复制状态机逻辑，也不为接口引入运行时堆分配。
+GatewayApp/ClientApp 只依赖 6 方法 RadioTransport 引用，RadioDriver 实现接口并通过唯一 Llcc68Hardware adapter 操作 LLCC68/SPI/IRQ；Runtime 继续调用具体 driver 的 begin/poll/stop。Native 使用有界 fake transport、虚拟时钟和 Serial 适配，编译实际生产 app/codec/tracker/config/logger，不复制状态机逻辑，也不为接口引入运行时堆分配。
 
 应用采用协作式推进，但 NVS commit、RadioLib BUSY 等待和 SDK 串口调用仍是同步操作；有界日志队列不代表 SDK 硬实时非阻塞。RadioLib 默认也会分配 SPI 临时缓冲区。Host 测试不验证硬件延迟、ISR 竞态、Flash 或 RF。
 
@@ -118,8 +119,14 @@ M2 不新增自动重传；测试只重放完全相同的捕获字节验证身�
 | 边界 | 当前可从源码确认的实现 | 尚未实现的目标 |
 |---|---|---|
 | 协议核 | 显式 LE FrameCodec、packet identity、sequence/session、M2 HELLO/ACK 状态机 | 无 TDMA/superframe/bitmap/selective retry/ADR/通用 DATA 服务；app 仍直接调用 ESP timer 和具体 SerialLogger，因此不是完整跨平台核心 |
-| Radio | 6 方法 RadioTransport、有界事件、唯一 LLCC68/SPI RadioDriver | init/poll/stop/PHY 仍是具体 driver；无通用 adapter 生命周期配置，也无 SX1262 adapter |
+| Radio | 6 方法 RadioTransport、有界事件、RadioDriver 状态 owner 和唯一 Llcc68Hardware adapter | init/poll/stop 仍为具体 driver 入口；RadioHardware 只隔离现有固定 profile 硬件调用供测试，无通用配置服务或 SX1262 adapter |
 | Platform | ESP32/Arduino runtime、NVS、console、pins、IRQ、random/timer | 无通用 clock/random/storage/interrupt 服务接口；native header 只是测试适配，不是其他 MCU 生产端口 |
 | Application | 当前 Client 发空 HELLO，codec 可处理有界不解释字节，serial 记录链路事件/计数 | 无 payload 提交、接收 callback、event subscriber 或通用统计接口，需另行审查实现 |
 
-Modbus、电表模型、Wi-Fi/MQTT、数据库和 dashboard 不在协议核中，源码也未实现。未来集成应通过 application 边界；工业能耗监测是通用研究动机，不是必需部署。本次仅改身份符号及文档，不补齐这些 API、不实现后续 MAC。依赖同步等待/分配及实物验证限制保持。
+Modbus、电表模型、Wi-Fi/MQTT、数据库和 dashboard 不在协议核中，源码也未实现。未来集成应通过 application 边界；工业能耗监测是通用研究动机，不是必需部署。Iteration 008 仅改身份符号及文档，Iteration 009 只增加 driver 验证 seam；不补齐通用集成 API、不实现后续 MAC。依赖同步等待/分配及实物验证限制保持。
+
+## 8. Driver 故障验证边界（ADR-012）
+
+实际 RadioDriver 不依赖 Arduino/RadioLib，begin/receive/transmit/stop/poll 通过非拥有 RadioHardware 引用在 native 执行。Llcc68Hardware 唯一拥有 Module/LLCC68/SPI/GPIO/IRQ，固定参数原样移动；Runtime 先构造 adapter 再 driver，应用 6 方法 RadioTransport 不变。ISR 仍只置 volatile flag，采样后清除仍依赖锁存高电平 DIO1，不能证明硬件竞态安全。
+
+有界 fake 注入返回码、IRQ 锁存/电平/flags、包字节和显式 uint32 时间，执行生产策略而非模拟状态机。Host 不执行真实 adapter、芯片命令、RadioLib 内部或延迟；生产 static_assert 核对 status/raw IRQ 常量，固定调用参数另行审查。平台/application API、同步等待/分配与实物门槛仍保留。

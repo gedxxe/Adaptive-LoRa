@@ -353,8 +353,10 @@ framework for hypothetical features.
 - `NvsConfigStore` owns Preferences/NVS persistence and is not part of
   native protocol tests.
 - `ProvisioningConsole` owns serial command parsing.
-- `RadioDriver` is the only module that owns the LLCC68 object and
-  performs RadioLib/SPI operations.
+- The radio module has one `RadioDriver` state owner and one injected
+  `Llcc68Hardware` adapter. Only the adapter owns Module/LLCC68 and
+  performs RadioLib/SPI/GPIO operations. Native tests execute the actual
+  driver through RadioHardware; do not duplicate transition logic.
 - `FrameCodec` is independent of Arduino and RadioLib.
 - `SequenceTracker` handles bounded sequence/deduplication state.
 - Diagnostics code formats logs; it must not operate the radio.
