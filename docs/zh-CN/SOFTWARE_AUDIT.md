@@ -47,3 +47,9 @@
 通过五操作 ConfigStorage 引用执行实际 NvsConfigStore，单一 PreferencesConfigStorage 唯一拥有并原样转发 Preferences；验证/codec/错误顺序/清理/readback 仍在实际 store。新增 56 与既有 163 全部通过（219 总计），ESP32 编译通过，命令均退出 0。修改前审查、A–E 映射、不可注入防御性 encode 分支见 CONFIG_STORE_AUDIT.md。
 
 数值 namespace/key/schema/24-byte 格式和 config/radio/app/console/runtime 实现保持；失败输出和 staged-until-reboot 不变。Native 不验证真实 Preferences/NVS、Flash commit/断电持久性、重启/损坏恢复、wear/retention/回滚。Runtime/随机源/串口时序及物理 RF 仍未验证；建议后续验证 runtime boot/provisioning/reboot 调度。
+
+## Iteration 011 补充 — 实际runtime生命周期
+
+前述runtime未执行的限制属于旧轮次。本轮以已有引用seam/native SDK shim执行实际FirmwareRuntime、store/driver/apps/console/logger，Esp32Firmware拥有唯一concrete adapters。新增47加旧219全部通过，共266；最终ESP32与native均退出0。修改前顺序、A–G覆盖、寿命/资源、失败与修复见RUNTIME_AUDIT.md；不需要生产策略修正。
+
+保留失败stop仍reset、app先于命令、未排空日志可reset。runtime实现仅cinttypes include变更，wire/NVS/PHY/角色不变。Host reset/clock/raw RNG/backend不证明真实重启/NVS/USB/SPI/IRQ/RF/熵。同步依赖、库分配、捕获时间陈旧及永久坏RNG拒绝loop仍有限制。下一软件范围建议时延/分配与RNG故障活性分析；M0–M2实物未验收，后续MAC未启动。

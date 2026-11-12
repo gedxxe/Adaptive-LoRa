@@ -345,7 +345,10 @@ framework for hypothetical features.
   the runtime and delegate `setup()` / `loop()`; it must not contain
   application logic.
 - `FirmwareRuntime` loads configuration, selects the operating mode, and
-  delegates to `GatewayApp`, `ClientApp`, or provisioning mode.
+  delegates to `GatewayApp`, `ClientApp`, or provisioning mode. It receives
+  the existing ConfigStorage/RadioHardware references; Esp32Firmware owns
+  the concrete adapters before and beyond the coordinator lifetime. Main
+  constructs only that composition and delegates setup/loop.
 - `GatewayApp` owns gateway application state transitions.
 - `ClientApp` owns client application state transitions.
 - `DeviceConfig` is a pure configuration model and validator,

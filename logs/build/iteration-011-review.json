@@ -1,0 +1,211 @@
+{
+  "baseline": "3902de90058ec775587105c5c3edb4914853a9d8",
+  "branch": "iteration-011-runtime-verification",
+  "review_scope": "Complete production/test/config/document diffs and all command/scenario artifacts against specified baseline",
+  "file_count": 47,
+  "files": [
+    {
+      "path": "AGENTS.md",
+      "responsibility": "Update composition ownership instructions"
+    },
+    {
+      "path": "CHANGELOG.md",
+      "responsibility": "Record runtime verification delivery without version/policy change"
+    },
+    {
+      "path": "README.md",
+      "responsibility": "Current 266-case evidence and runtime seam/limitations"
+    },
+    {
+      "path": "README.zh-CN.md",
+      "responsibility": "Chinese current evidence and runtime seam/limitations"
+    },
+    {
+      "path": "docs/en/ARCHITECTURE.md",
+      "responsibility": "Document implemented runtime composition boundary"
+    },
+    {
+      "path": "docs/en/BUILD_MEMORY.md",
+      "responsibility": "Append-only iteration chronology, errors and exact results"
+    },
+    {
+      "path": "docs/en/DECISIONS.md",
+      "responsibility": "Append ADR-014 seam, lifetimes and compatibility"
+    },
+    {
+      "path": "docs/en/ERROR_LOG.md",
+      "responsibility": "Append runner and Unity configuration failures/resolution"
+    },
+    {
+      "path": "docs/en/PROGRESS.md",
+      "responsibility": "Refresh current evidence, limits and next work"
+    },
+    {
+      "path": "docs/en/RUNTIME_AUDIT.md",
+      "responsibility": "Audit policy/order, A-G coverage, resources and limits"
+    },
+    {
+      "path": "docs/en/SOFTWARE_AUDIT.md",
+      "responsibility": "Append actual runtime verification scope"
+    },
+    {
+      "path": "docs/en/TEST_PLAN.md",
+      "responsibility": "Append runtime scenarios, commands and physical exclusions"
+    },
+    {
+      "path": "docs/zh-CN/ARCHITECTURE.md",
+      "responsibility": "Document implemented runtime composition boundary (Simplified Chinese)"
+    },
+    {
+      "path": "docs/zh-CN/DECISIONS.md",
+      "responsibility": "Append ADR-014 seam, lifetimes and compatibility (Simplified Chinese)"
+    },
+    {
+      "path": "docs/zh-CN/PROGRESS.md",
+      "responsibility": "Refresh current evidence, limits and next work (Simplified Chinese)"
+    },
+    {
+      "path": "docs/zh-CN/RUNTIME_AUDIT.md",
+      "responsibility": "Audit policy/order, A-G coverage, resources and limits (Simplified Chinese)"
+    },
+    {
+      "path": "docs/zh-CN/SOFTWARE_AUDIT.md",
+      "responsibility": "Append actual runtime verification scope (Simplified Chinese)"
+    },
+    {
+      "path": "docs/zh-CN/TEST_PLAN.md",
+      "responsibility": "Append runtime scenarios, commands and physical exclusions (Simplified Chinese)"
+    },
+    {
+      "path": "logs/build/iteration-011-esp32-final-result.json",
+      "responsibility": "Retained iteration011 command, fingerprint, scenario or verification evidence: iteration-011-esp32-final-result.json"
+    },
+    {
+      "path": "logs/build/iteration-011-esp32-final.log",
+      "responsibility": "Retained iteration011 command, fingerprint, scenario or verification evidence: iteration-011-esp32-final.log"
+    },
+    {
+      "path": "logs/build/iteration-011-esp32-result.json",
+      "responsibility": "Retained iteration011 command, fingerprint, scenario or verification evidence: iteration-011-esp32-result.json"
+    },
+    {
+      "path": "logs/build/iteration-011-esp32.log",
+      "responsibility": "Retained iteration011 command, fingerprint, scenario or verification evidence: iteration-011-esp32.log"
+    },
+    {
+      "path": "logs/build/iteration-011-review.json",
+      "responsibility": "Exact file responsibilities and complete staged review receipt"
+    },
+    {
+      "path": "logs/build/iteration-011-runner-preflight.log",
+      "responsibility": "Retained iteration011 command, fingerprint, scenario or verification evidence: iteration-011-runner-preflight.log"
+    },
+    {
+      "path": "logs/build/iteration-011-source-manifest-initial.sha256",
+      "responsibility": "Retained iteration011 command, fingerprint, scenario or verification evidence: iteration-011-source-manifest-initial.sha256"
+    },
+    {
+      "path": "logs/build/iteration-011-source-manifest-native-pass.sha256",
+      "responsibility": "Retained iteration011 command, fingerprint, scenario or verification evidence: iteration-011-source-manifest-native-pass.sha256"
+    },
+    {
+      "path": "logs/build/iteration-011-source-manifest.sha256",
+      "responsibility": "Retained iteration011 command, fingerprint, scenario or verification evidence: iteration-011-source-manifest.sha256"
+    },
+    {
+      "path": "logs/build/iteration-011-source-review.json",
+      "responsibility": "Retained iteration011 command, fingerprint, scenario or verification evidence: iteration-011-source-review.json"
+    },
+    {
+      "path": "logs/build/iteration-011-toolchain.log",
+      "responsibility": "Retained iteration011 command, fingerprint, scenario or verification evidence: iteration-011-toolchain.log"
+    },
+    {
+      "path": "logs/build/iteration-011-validation.json",
+      "responsibility": "Retained iteration011 command, fingerprint, scenario or verification evidence: iteration-011-validation.json"
+    },
+    {
+      "path": "logs/test/iteration-011-native-result.json",
+      "responsibility": "Retained iteration011 command, fingerprint, scenario or verification evidence: iteration-011-native-result.json"
+    },
+    {
+      "path": "logs/test/iteration-011-native-retry-result.json",
+      "responsibility": "Retained iteration011 command, fingerprint, scenario or verification evidence: iteration-011-native-retry-result.json"
+    },
+    {
+      "path": "logs/test/iteration-011-native-retry.log",
+      "responsibility": "Retained iteration011 command, fingerprint, scenario or verification evidence: iteration-011-native-retry.log"
+    },
+    {
+      "path": "logs/test/iteration-011-native.log",
+      "responsibility": "Retained iteration011 command, fingerprint, scenario or verification evidence: iteration-011-native.log"
+    },
+    {
+      "path": "logs/test/iteration-011-scenarios.md",
+      "responsibility": "Retained iteration011 command, fingerprint, scenario or verification evidence: iteration-011-scenarios.md"
+    },
+    {
+      "path": "platformio.ini",
+      "responsibility": "Native runtime compilation and full-width Unity assertions; firmware env unchanged"
+    },
+    {
+      "path": "src/app/esp32_firmware.h",
+      "responsibility": "Own concrete storage/radio adapters before coordinator, delegate setup/loop"
+    },
+    {
+      "path": "src/app/firmware_runtime.cpp",
+      "responsibility": "C++ cinttypes include compatibility only; coordinator policy unchanged"
+    },
+    {
+      "path": "src/app/firmware_runtime.h",
+      "responsibility": "Inject existing service references; host optional compatibility"
+    },
+    {
+      "path": "src/app/preferences_config_storage.h",
+      "responsibility": "Comment-only concrete owner clarification"
+    },
+    {
+      "path": "src/common/radio/llcc68_hardware.h",
+      "responsibility": "Comment-only concrete owner clarification"
+    },
+    {
+      "path": "src/main.cpp",
+      "responsibility": "15-line Arduino delegate constructing sole ESP32 composition"
+    },
+    {
+      "path": "test/support/fake_radio_hardware.h",
+      "responsibility": "Default-null initialization-order observer"
+    },
+    {
+      "path": "test/support/platform/Arduino.h",
+      "responsibility": "Bounded serial input/observation and virtual micros; output semantics retained"
+    },
+    {
+      "path": "test/support/platform/esp_random.h",
+      "responsibility": "Scripted native raw RNG with exhaustion assertion support"
+    },
+    {
+      "path": "test/support/platform/esp_system.h",
+      "responsibility": "Observe native reset requests and reset reason"
+    },
+    {
+      "path": "test/test_firmware_runtime/test_main.cpp",
+      "responsibility": "47 actual production-runtime integration cases"
+    }
+  ],
+  "source_evidence": "iteration-011-source-review.json and iteration-011-validation.json",
+  "history": "Prior canonical BUILD_MEMORY/ERROR_LOG/DECISIONS and Chinese DECISIONS are exact byte prefixes; all older logs untouched",
+  "behavior": "No production coordinator/app/driver/store policy change; no versions/storage/wire/PHY change",
+  "staging_check": "git diff --cached --check exit0, no diagnostics",
+  "security_scan": {
+    "tracked_staged_blobs": 331,
+    "organization_localpath_credential_privateaddress_matches": 0,
+    "unexpected_binaries": 0
+  },
+  "physical_validation": "NOT VERIFIED",
+  "source_hashes_verified": 52,
+  "bilingual_facts": "Both current snapshots and READMEs agree on266/versions/unverified physical evidence",
+  "relative_markdown_links_verified": 33,
+  "full_diff": "Reviewed policy/code/document changes and entire retained stdout/stderr/scenario/fingerprint artifacts; complete patch retained privately",
+  "normalization": "Git CRLF-to-LF notices on new documentation working copies resolved by LF normalization; staged historical prefixes/source hashes preserved"
+}

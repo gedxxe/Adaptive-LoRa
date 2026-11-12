@@ -5,6 +5,12 @@ changes. It is not a substitute for the append-only build memory.
 
 ## Unreleased
 
+### Production runtime lifecycle verification — 2026-11-12
+
+- Injected existing storage/radio references into FirmwareRuntime; ESP32 composition owns the concrete adapters. main remains 15 lines; coordinator policy unchanged.
+- Added 47 production-runtime boot/provisioning/serial/radio/reboot/session/diagnostic cases. All219 regressions remain passing (266 total); ESP32 build PASS with no new warning messages.
+- Documented existing stop-failure/reset and undrained-log behavior, deterministic SDK boundaries, reference lifetimes and +16 RAM/-12 flash bytes. Versions, NVS/wire/PHY and app policy unchanged. No physical NVS/reset/USB/SPI/RF or entropy validation.
+
 ### Configuration-store boundary verification — 2026-11-12
 
 - Added five-operation ConfigStorage reference and sole-owner PreferencesConfigStorage adapter; actual NvsConfigStore policy now runs under native fault injection.

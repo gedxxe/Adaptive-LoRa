@@ -1,9 +1,9 @@
 #include <Arduino.h>
 
-#include "app/firmware_runtime.h"
+#include "app/esp32_firmware.h"
 
 namespace {
-adaptive_lora::FirmwareRuntime runtime;
+adaptive_lora::Esp32Firmware runtime;
 }
 
 void setup() {

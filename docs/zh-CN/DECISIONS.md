@@ -46,3 +46,12 @@
 - 数值 namespace 初始化表达式保留在 NvsConfigStore 且逐字节不变，不解码历史标签。device key、schema 1、24-byte LE/FNV 格式、验证规则不变；固件 0.2.0-alpha.1、协议 1、RadioLib 7.8.1、radio/app/PHY/console/runtime dispatcher 受保护。
 - 保存失败不承诺回滚或持久性；readback 失败原样传播 load 错误，不一律改为 verify。有效但不同配置仍为 nvs_verify_failed。失败 load 不改调用方配置，运行配置仍由原重启流程生效。
 - Native 仅验证模拟响应下的 store 策略，不验证真实 Preferences/NVS/Flash commit、断电、重启/损坏恢复、磨损/保持时间。防御性 encode-false 分支保留但不虚称注入覆盖；依赖等待/分配和硬件门槛保留。
+
+## ADR-014 - 用 native SDK 适配执行唯一生产协调器
+
+- 2026-11-12 接受，iteration011；先审查/方案后修改，见 RUNTIME_AUDIT.md。固件0.2.0-alpha.1/协议1不变。
+- FirmwareRuntime 接受现有 ConfigStorage/RadioHardware 引用，仍拥有实际 store/driver/console/logger/可选 role apps；无新 lifecycle/platform 接口、factory/task 或第二协调器。Esp32Firmware 先构造具体 Preferences/LLCC68 owner，再构造唯一 runtime，生命周期覆盖引用；main 15行仅委托。
+- runtime.cpp/freshBootId 策略原样保留，仅换 C++ cinttypes 兼容旧 host；扩展 native Arduino/esp_timer 适配，提供有界串口输入、micros、reset/reason/raw random。同一生产 app/store/driver/codec/logger 执行；这些 header 不是硬件模型或通用生产 MCU 端口。
+- 固件使用标准 optional；已安装 GCC6.3 缺少该 header 时由项目 namespace alias 选择 experimental optional，仍原地 emplace/bool/dereference，无 namespace std 改写或堆所有权。复现 ERR-017 后在 native 全局启用 UNITY_SUPPORT_64，保留完整64位断言，不截断/删除。
+- 保留既有策略：app update 先于串口解析，未 init 的 poll/stop 不访问硬件，save 仅暂存直到新启动，stop失败仍可 reset，100ms捕获时间 deadline 不等待日志排空，以及非零/previous-ID 拒绝循环；随机源失败活性/跨启动碰撞未解决。
+- 低层响应+实际协调器仅证明软件顺序；对象重建/虚拟reset/raw random/串口容量不证明真实 NVS/重启/USB/熵/SPI/IRQ/RF，不增加后续 MAC 或外部集成。

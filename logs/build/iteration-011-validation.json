@@ -1,0 +1,35 @@
+{
+  "baseline": "3902de90058ec775587105c5c3edb4914853a9d8",
+  "firmware": "0.2.0-alpha.1",
+  "protocol": 1,
+  "source_manifest": "logs/build/iteration-011-source-manifest.sha256",
+  "source_inputs": 52,
+  "esp32": {
+    "command": "pio run -e esp32c3_supermini",
+    "exit_code": 0,
+    "elapsed_seconds": 143.563,
+    "log": "logs/build/iteration-011-esp32-final.log",
+    "publication_policy": "Complete stdout/stderr except disclosed path/EOL/trailing-display normalization; raw retained privately."
+  },
+  "native": {
+    "command": "pio test -e native",
+    "exit_code": 0,
+    "elapsed_seconds": 37.234,
+    "log": "logs/test/iteration-011-native-retry.log",
+    "publication_policy": "Complete stdout/stderr except disclosed path/EOL/trailing-display normalization; raw retained privately."
+  },
+  "native_cases": 266,
+  "new_runtime_cases": 47,
+  "unchanged_regression_cases": 219,
+  "results_match_previous_order_and_names": true,
+  "original_test_cpp_byte_identical": true,
+  "warnings": "Only existing ERR-005 RadioLib USB CDC message, two occurrences; no native warning",
+  "ram_bytes": 24548,
+  "ram_delta_from_010": 16,
+  "flash_bytes": 363842,
+  "flash_delta_from_010": -12,
+  "main_lines": 15,
+  "firmware_bin_sha256": "f0372a79007df26b2069e314612a374e4ee3b8948c4a198628b8eae37648ab2b",
+  "physical_validation": "NOT VERIFIED",
+  "review_time_local": "2026-11-12T19:02:50"
+}

@@ -3,7 +3,7 @@
 #include <esp_system.h>
 #include <esp_random.h>
 #include <cstdio>
-#include <inttypes.h>
+#include <cinttypes>
 
 namespace adaptive_lora {
 namespace {

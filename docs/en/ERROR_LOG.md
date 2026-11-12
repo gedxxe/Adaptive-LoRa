@@ -245,3 +245,21 @@ Status CLOSED — VERIFIED. Corrected `git diff --cached --check` exited 0 witho
 ### Iteration 010 verification checkpoint
 
 No firmware/native test failure or new compiler warning occurred in the first verification run: ESP32 exit 0, native 219/219 exit 0 (`logs/build/iteration-010-esp32.log`, `logs/test/iteration-010-native.log`). Warning-message comparison against iteration 009 retains only known ERR-005 USB CDC warning. ERR-008 synchronous NVS/RadioLib operations, ERR-009 dependency allocation and ERR-010 SDK serial timing remain open; store fake does not validate those dependencies. The preliminary optional lookup of a not-yet-existing fake file returned 1; the inspected inventory confirmed absence before creating it, with no source/build fix required. No physical NVS/RF test or flash-failure observation occurred.
+
+## ERR-016 - Restricted shell read requests stalled before output
+
+- First seen 2026-11-12, iteration011; severity LOW; environment issue, root cause UNKNOWN; status WORKAROUND VERIFIED, underlying cause unresolved.
+- Reproduction: restricted request-attachment/repository reads with default and login=false invocation returned running sessions but no output; interrupted both with Ctrl-C, each exit1. Whether individual shell commands began is NOT AVAILABLE; no source was modified by these read requests.
+- Normal host-shell retry of the same read-only inspection exited0 and exposed the expected baseline. Subsequent work uses reviewed host execution for existing SDK/tool access. No approval review rejection or bypass was involved.
+- Evidence: `logs/build/iteration-011-runner-preflight.log`; no build/test/physical result inferred.
+
+## ERR-017 - Native Unity did not enable requested 64-bit assertions
+
+- First seen iteration011, 2026-11-12; severity LOW, test environment; status FIXED - UNVERIFIED at this checkpoint.
+- Reproduction: native runtime suite compiles with TEST_ASSERT_EQUAL_UINT64 while Unity on this 32-bit MinGW defaults to no UNITY_SUPPORT_64. Macro expands to UnityStrErr64 failure without reading expected/actual, producing -Werror unused-variable for rx. Runtime tests did not execute; all219 old cases passed.
+- Evidence: `logs/test/iteration-011-native.log` exit1; actual installed Unity unity_internals.h support guard and unsupported-64 macro inspected.
+- Fix: define UNITY_SUPPORT_64 for the native environment (framework and tests consistently), retain full-width comparisons and every case; add fixture lifecycle invariants. Production and ESP32 flags unchanged. Verification pending corrected native rerun; no application defect claimed.
+
+### ERR-017 verification - iteration011
+
+Status CLOSED - VERIFIED. With native UNITY_SUPPORT_64 applied consistently, the unchanged full-width assertions compile and all47 runtime cases plus219 regressions pass, exit0 (`logs/test/iteration-011-native-retry.log`). No case or assertion removed; initial failed log retained. No firmware policy fix or physical claim.

@@ -113,7 +113,8 @@ The original namespace bytes are retained as a numeric compatibility constant in
 | Module                | Responsibility                                          | Must not do                                        |
 |-----------------------|---------------------------------------------------------|----------------------------------------------------|
 | `main.cpp`            | Arduino entry point; delegate to runtime                | Radio calls, protocol logic, app state machine     |
-| `FirmwareRuntime`     | Load config, select role, dispatch loop                 | Own a second radio                                 |
+| `FirmwareRuntime`     | Load config, select role, dispatch loop via existing injected storage/radio boundaries | Duplicate role/state policy |
+| `Esp32Firmware`       | Own concrete ESP32 adapters before the single coordinator | Contain protocol or runtime policy |
 | `DeviceConfig`        | Pure configuration model and validation                 | Access NVS or radio hardware                       |
 | `NvsConfigStore`      | Validate/encode/decode config, classify storage errors and verify readback | Own Preferences or store packet telemetry |
 | `PreferencesConfigStorage` | Sole Preferences owner; five direct session/byte operations | Validate, serialize or verify configurations |
@@ -133,7 +134,7 @@ concrete responsibility, not because every function needs a class.
 
 Only `Llcc68Hardware` within the radio module may access RadioLib, SPI or
 the radio GPIOs. `RadioDriver` owns state policy through a non-owning
-`RadioHardware` reference (ADR-012); Runtime constructs one adapter and driver.
+`RadioHardware` reference (ADR-012); Esp32Firmware constructs the sole concrete adapter before the reference-injected runtime/driver.
 
 The first release should use one cooperative event-driven loop. The
 radio driver reports events such as `TX_DONE`, `RX_DONE`, `RX_TIMEOUT`,
@@ -226,8 +227,16 @@ The bounded hardware fake supplies operation results, IRQ latch/level/flags and 
 
 ## 11. Configuration-store verification boundary (ADR-013)
 
-NvsConfigStore depends on five-method ConfigStorage by reference. PreferencesConfigStorage owns the only Preferences object and forwards namespace/key, bool/count results and explicit end without config policy. Runtime constructs this adapter before the store; no heap ownership or generic persistence framework. The original numeric namespace stays in the store, device key/schema/24-byte blob remain compatible, and DeviceConfig/console/runtime implementation is unchanged.
+NvsConfigStore depends on five-method ConfigStorage by reference. PreferencesConfigStorage owns the only Preferences object and forwards namespace/key, bool/count results and explicit end without config policy. Esp32Firmware constructs this adapter before the reference-injected runtime/store; no heap ownership or generic persistence framework. The original numeric namespace stays in the store, device key/schema/24-byte blob remain compatible, and DeviceConfig/console/runtime implementation is unchanged.
 
 Load opens read-only, checks length, reads at most 24 bytes, closes, then decodes. Save validates/encodes before access, opens writable, writes/closes, then invokes actual load in a new read-only session and compares exact encoded bytes. All successful opens have explicit closes; failed begin requires no end. Current serialized usage is preserved; this seam does not add concurrent/nested transaction support.
 
 Native executes actual store/config/codec against bounded backend responses. It verifies classification, cleanup and readback policy, not the real adapter/NVS internals or flash. Failure does not imply rollback; successful host readback does not prove hardware commit/power-loss atomicity/durability. Runtime's invalid-config early return before radio.begin and staged-until-reboot policy are source-preserved, not newly executed by store tests.
+
+## 12. Runtime composition and verification (ADR-014)
+
+Esp32Firmware owns PreferencesConfigStorage, Llcc68Hardware and then FirmwareRuntime in that declaration order; destruction reverses it. Runtime owns actual NvsConfigStore and RadioDriver through the existing lower-level references, plus the existing console/logger/apps. One image, one coordinator, one radio and one storage owner. Main's only change is composition include/type; it remains15 lines.
+
+Native compiles the real coordinator with the existing actual components. SDK header adapters supply bounded serial input, shared virtual time/micros, observed reset/reason and scripted raw random values; actual freshBootId rejection and app session behavior execute. There is no new radio/store interface or separate runtime model. Header availability selects standard optional on firmware, experimental optional on the legacy host; native enables full-width Unity assertions. These adapters do not constitute a general platform-service API.
+
+Verified policy retains app-before-command dispatch, <=64 input bytes and <=128 logger drain per loop, invalid config early return before radio/app/entropy, radio before role activation, staged versus loaded config, TX-done/deadline handling and100ms reboot arming. Stop failure still logs and proceeds; reset does not wait for queue/USB drain. Both are existing observed policies, not fixed by this task. Hardware blocking/entropy/liveness and real physical lifecycle remain unverified.

@@ -4,7 +4,7 @@
 #include "radio_hardware.h"
 
 namespace adaptive_lora {
-// Exactly one instance in FirmwareRuntime. All RadioLib/SPI/GPIO access stays
+// Exactly one instance in Esp32Firmware composition. RadioLib/SPI/GPIO stays
 // here; the ISR only latches a signal for the cooperative driver poll.
 class Llcc68Hardware final : public RadioHardware {
 public:

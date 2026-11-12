@@ -12,7 +12,7 @@ Adaptive-LoRa 是独立的单射频 LoRa P2P 网络研究与嵌入式固件项�
 |---|---|
 | 固件 / 协议 | `0.2.0-alpha.1` / `1` |
 | ESP32 编译 | PASS |
-| Native 测试 | 219/219 PASS：163 个既有用例（含 app 38、driver 71）及 56 个配置存储故障用例 |
+| Native 测试 | 266/266 PASS：既有 219 个全部通过，新增实际 runtime 生命周期 47 个 |
 | 已实现 | 有界显式帧、角色配置、HELLO/ACK 身份检查、去重、超时/恢复、sequence/session 处理 |
 | 实物 NVS/重启/SPI/IRQ/RF/天线 | NOT VERIFIED |
 
@@ -29,7 +29,7 @@ Host 执行实际 Client/Gateway 状态机，使用有界 fake transport、时�
 
 一份镜像从 NVS 加载有效 GATEWAY/CLIENT 角色。配置缺失、损坏或不支持时进入 provisioning，禁止应用 TX。保存并受控重启后才应用编辑，不通过相同硬件自动推断角色。
 
-RadioTransport 引用分离 app 与 RadioDriver 状态策略；非拥有 RadioHardware 引用指向唯一 LLCC68/SPI/GPIO owner Llcc68Hardware，native 故障测试执行实际 driver；NvsConfigStore 也通过五操作 ConfigStorage 在 native 执行，PreferencesConfigStorage 唯一拥有实际 Preferences，见 [存储审查](docs/zh-CN/CONFIG_STORE_AUDIT.md)，host readback 不证明实物持久性；codec/config/sequence 可在 host 测试，main.cpp 为 15 行入口。[架构文档](docs/zh-CN/ARCHITECTURE.md) 区分协议核、radio adapter、platform 服务和应用 payload/event 接口四个目标边界。当前 platform 仍依赖 ESP32/Arduino，通用应用提交/交付 API 尚不存在。协议核没有 Modbus、电表模型、Wi-Fi/MQTT、PostgreSQL 或 dashboard 集成；不能声称目标架构已经完成。
+RadioTransport 引用分离 app 与 RadioDriver 状态策略；非拥有 RadioHardware 引用指向唯一 LLCC68/SPI/GPIO owner Llcc68Hardware，native 故障测试执行实际 driver；NvsConfigStore 也通过五操作 ConfigStorage 在 native 执行，PreferencesConfigStorage 唯一拥有实际 Preferences，见 [存储审查](docs/zh-CN/CONFIG_STORE_AUDIT.md)，host readback 不证明实物持久性；Esp32Firmware先拥有两个concrete adapter，再构造引用注入FirmwareRuntime，native执行实际协调器/store/driver/apps/console，见 [runtime审查](docs/zh-CN/RUNTIME_AUDIT.md)；SDK shim仅模拟时钟/串口/reset/raw RNG，不证明实物熵或重启。codec/config/sequence 可在 host 测试，main.cpp 为 15 行入口。[架构文档](docs/zh-CN/ARCHITECTURE.md) 区分协议核、radio adapter、platform 服务和应用 payload/event 接口四个目标边界。当前 platform 仍依赖 ESP32/Arduino，通用应用提交/交付 API 尚不存在。协议核没有 Modbus、电表模型、Wi-Fi/MQTT、PostgreSQL 或 dashboard 集成；不能声称目标架构已经完成。
 
 ## 仓库结构
 

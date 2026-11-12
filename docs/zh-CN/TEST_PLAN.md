@@ -98,3 +98,11 @@ Fake 仅注入有界 bytes/返回码、IRQ 锁存/电平/flags 和显式 uint32 
 CONFIG_STORE_AUDIT.md 映射 A–E：实际 store/config/codec 执行，fake 仅注入 bool/count/字节/session。断言 golden blob、数值 namespace/key、RO/W/RO、end/顺序、失败 caller 不变、写失败不读回、错误优先级、不同有效读回为 nvs_verify_failed。失败不保证回滚；不可达 encode-false 防御分支不虚称注入覆盖，无行/分支百分比。
 
 真实 Preferences/NVS/Flash commit、断电/重启/损坏恢复、磨损/保持时间均未验证。Runtime boot/暂存生效只源码核对，未由此 suite 执行。无新命令、迁移、协议/PHY 或后续 MAC。
+
+## Iteration 011 — 实际runtime生命周期
+
+`pio test -e native` 退出0：**266/266 PASS**，新增runtime47和原219全部通过。`pio run -e esp32c3_supermini`退出0、PASS。最终完整日志 `logs/test/iteration-011-native-retry.log`、`logs/build/iteration-011-esp32-final.log`；首次native编译失败与修复（ERR-017）分开保留，未删除断言。逐条结果 `logs/test/iteration-011-scenarios.md`。
+
+RUNTIME_AUDIT.md映射A–G：boot11、provision8、serial7、radio4、reboot10、session3、diagnostics4。实际协调器/store/driver/apps/console/logger执行，观察器断言已关闭config read先于radio、radio先于app RNG、无效启动零硬件访问。暂存save不切换已加载角色/ID，新实例才生效；虚拟deadline验证before/at/after、TX完成/超时和uint32 wrap；容量0/1与queue drop证明reset可遗留诊断；Gateway65,537次验证实际generator/session轮换，通过实际帧/日志验证角色与callback。
+
+没有第二协调器模型，不声明覆盖百分比、熵、硬实时或实物验证。脚本只模拟返回/输入/time/reset；真实adapter/SDK/NVS/flash/USB/IRQ/RF/断电语义待验证。失败stop继续reset、app先输入与日志未排空reset均保留。下一步建议依赖时延/分配与永久坏RNG活性评估，不启动M3–M8。

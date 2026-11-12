@@ -1,6 +1,14 @@
 # 开发进度
 
-Iteration 010 软件检查 PASS：ESP32 编译退出 0（146.83 s），native **219/219 PASS**、退出 0（28.62 s）：新增实际 NvsConfigStore 56，既有 regression 163 全部不变且通过。基线 remote Iteration 009 为 `3176e766d3876c86253e7694a7694560be72d1bf`；preflight main 已由外部合并变为 `2a7a68120552a8037d796cf61b0af11e91abd0f2`。本轮直接基于指定009，不基于 main。分支 `iteration-010-config-store-verification` 已发布，实施提交 `01370ac3a6fcc04e9b2bd626a46c9c1b95eb73d4` 与 remote010 一致（push/核实退出 0），remote009 保持 `3176e766d3876c86253e7694a7694560be72d1bf`，main 保持 `2a7a68120552a8037d796cf61b0af11e91abd0f2`。回执 `logs/build/iteration-010-publication-receipt.json` 在仅文档后续提交记录，无合并/PR。证据见 CONFIG_STORE_AUDIT.md、`logs/test/iteration-010-scenarios.md`；实物 NOT VERIFIED。
+## Iteration 011 软件验证PASS，发布审查进行中
+
+最终 `pio run -e esp32c3_supermini` 退出0，PASS（143.01s）；`pio test -e native` 退出0，**266/266 PASS**（36.68s），实际runtime新增47，既有219全部不变且通过。直接基线 `3902de90058ec775587105c5c3edb4914853a9d8`，分支 `iteration-011-runtime-verification`；main是外部合并 `5bc607cd1a86e5d86ff0fc95ba7a3cd31159b861`。本检查点实施已验证，commit/push待完成。
+
+固件0.2.0-alpha.1/协议1/RadioLib7.8.1、NVS/wire/pins/PHY/app策略不变。仅引用seam与Esp32Firmware组合，main15行。RAM24,548（+16）、flash363,842（-12）。首次native配置失败ERR-017保留，启用完整64位Unity断言后CLOSED；ERR-016 runner workaround已验证、根因未知。无新增warning，ERR-005/008/009/010保留。细节见RUNTIME_AUDIT.md及 `logs/test/iteration-011-scenarios.md`。
+
+协调器顺序/分派/deadline/预算为实际生产软件验证；storage/radio/串口/时钟/reset/raw RNG为模拟。真实NVS/USB/重启/SPI/IRQ/RF/熵均NOT VERIFIED。stop失败仍可reset，日志可未排空，永久坏随机源可无限loop。M0–M2实物门槛IN PROGRESS，M3–M8 NOT STARTED。下一软件任务建议依赖时延/分配预算和boot-ID故障活性分析；采购/组装/全部物理测量待完成。
+
+历史 Iteration 010 软件检查 PASS：ESP32 编译退出 0（146.83 s），native **219/219 PASS**、退出 0（28.62 s）：新增实际 NvsConfigStore 56，既有 regression 163 全部不变且通过。基线 remote Iteration 009 为 `3176e766d3876c86253e7694a7694560be72d1bf`；preflight main 已由外部合并变为 `2a7a68120552a8037d796cf61b0af11e91abd0f2`。本轮直接基于指定009，不基于 main。分支 `iteration-010-config-store-verification` 已发布，实施提交 `01370ac3a6fcc04e9b2bd626a46c9c1b95eb73d4` 与 remote010 一致（push/核实退出 0），remote009 保持 `3176e766d3876c86253e7694a7694560be72d1bf`，main 保持 `2a7a68120552a8037d796cf61b0af11e91abd0f2`。回执 `logs/build/iteration-010-publication-receipt.json` 在仅文档后续提交记录，无合并/PR。证据见 CONFIG_STORE_AUDIT.md、`logs/test/iteration-010-scenarios.md`；实物 NOT VERIFIED。
 
 历史 Iteration 009 软件检查 PASS：ESP32 编译退出 0（147.15 s），native **163/163 PASS**、退出 0（26.04 s）：新增实际生产 RadioDriver 故障用例 71 个，既有 regression 92 个全部通过。修改前审查/覆盖见 RADIO_DRIVER_AUDIT.md，逐条结果 `logs/test/iteration-009-scenarios.md`。分支 `iteration-009-radio-driver-verification` 已发布，实施提交 `4055a947bdfcd518cdff36d6ae76acf3fabeed93` 与远端分支一致（push/核实退出 0）。回执 `logs/build/iteration-009-publication-receipt.json` 在后续仅文档提交记录；main 保持 `b040ef111b82db96ab81a3c7377efbcf46385221`，无合并、无 PR。实物仍 NOT VERIFIED。
 
