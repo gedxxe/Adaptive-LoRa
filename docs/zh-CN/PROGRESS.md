@@ -1,8 +1,8 @@
 # 开发进度
 
-## Iteration013准备包验证通过，待发布
+## Iteration013准备包验证通过，实施已发布
 
-2026-11-13 client date，直接基线9341e7c0016c66fd9316d489ccfca00a646ae2cb，分支iteration-013-bench-readiness，不基于main5bc607c。ESP32退出0 PASS13.053s，native退出0 **290/290 PASS**61.980s，所有旧cases/source不变；capture另有13/13 fake-port通过，不并入native/RF数。firmware/bin/native tests/pins/PHY/watchdog/库不改，RAM24,564/flash364,308，main15行。完整diff/安全/历史/发布检查待完成。
+2026-11-13 client date，直接基线9341e7c0016c66fd9316d489ccfca00a646ae2cb，分支iteration-013-bench-readiness，不基于main5bc607c。ESP32退出0 PASS13.053s，native退出0 **290/290 PASS**61.980s，所有旧cases/source不变；capture另有13/13 fake-port通过，不并入native/RF数。firmware/bin/native tests/pins/PHY/watchdog/库不改，RAM24,564/flash364,308，main15行。完整diff/安全/历史检查通过；实施 `1343e45ae642d0de7c4015ae19575e4e005f1646` commit/push及独立remote013核实均退出0，main/012不变，回执iteration-013-publication-receipt.json在仅文档后续提交保存。ERR-024初次review拒绝经重读Stage8明确授权后重试获批，无merge/PR/tag。
 
 PHYSICAL_ACCEPTANCE_READINESS.md串联备份单MCU、pair gates/仪器、ERR-021和采集/CSV。官方V1.1.0 module pin功能已核对；GPIO提案/手中板/continuity仍未验证。只读枚举无port，未开口/烧录/擦除/复位/RF。ERR-022中断false-success已修；ERR-023是SDK app前可能格式化NVS源码风险，backup须先于boot。ERR-021阻挡无人值守/卡BUSY恢复，不能假定默认watchdog reset；replay/错身份/corrupt-NVS fixture未提供/执行。
 

@@ -1,7 +1,7 @@
 {
   "baseline": "9341e7c0016c66fd9316d489ccfca00a646ae2cb",
   "branch": "iteration-013-bench-readiness",
-  "file_count": 40,
+  "file_count": 41,
   "files": [
     {
       "path": "CHANGELOG.md",
@@ -96,6 +96,10 @@
       "responsibility": "Retained command, source/hash, enumeration, scenario or validation evidence: iteration-013-esp32.log"
     },
     {
+      "path": "logs/build/iteration-013-publication-receipt.json",
+      "responsibility": "Verified implementation commit/push and independently observed remote refs, authorization-review chronology; docs-only receipt"
+    },
+    {
       "path": "logs/build/iteration-013-readiness-sources.json",
       "responsibility": "Retained command, source/hash, enumeration, scenario or validation evidence: iteration-013-readiness-sources.json"
     },
@@ -175,7 +179,7 @@
   "hardware_observation": "Only read-only port enumeration: no ports. No physical open/upload/erase/reset/RF.",
   "capture_limits": "Timestamps are host observations; file hashes do not detect upstream loss; no automatic RF acceptance",
   "security_scan": {
-    "tracked_staged_blobs": 379,
+    "tracked_staged_blobs": 380,
     "identified_organization_privatepath_credentials_privateaddress_matches": 0,
     "unexpected_binaries_pdf_assets_backups": 0
   },
@@ -183,5 +187,7 @@
   "relative_document_links_verified": 48,
   "bilingual_facts": "Current English/Chinese readiness/progress agree on290 native,13 capture, unchanged firmware and unrun hardware",
   "full_diff": "All tool/test/document/evidence changes reviewed against required012; complete patch retained privately",
-  "log_policy": "New command output retained with disclosed local-path/EOL/trailing-display cleanup; original dumps private"
+  "log_policy": "New command output retained with disclosed local-path/EOL/trailing-display cleanup; original dumps private",
+  "implementation_file_count": 40,
+  "publication_followup": "Receipt, memory/error, bilingual current snapshots and file inventory only; no firmware/tool/test input changes"
 }

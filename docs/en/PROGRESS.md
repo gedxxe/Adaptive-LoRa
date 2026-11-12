@@ -1,8 +1,8 @@
 # Development Progress
 
-## Iteration013 physical-readiness package verified; publication pending
+## Iteration013 physical-readiness package verified; implementation published
 
-2026-11-13 client date. Direct baseline9341e7c0016c66fd9316d489ccfca00a646ae2cb, branch iteration-013-bench-readiness; main5bc607cd1a86e5d86ff0fc95ba7a3cd31159b861 not used. ESP32 exit0 PASS13.053s; native exit0 **290/290 PASS**61.980s, all cases/source unchanged. Capture utility13/13 fake-port tests exit0; separate from native and physical counts. No source/bin/native test/pin/PHY/watchdog/library changes; RAM24,564/flash364,308 unchanged, main15 lines. Full diff/security/history/publication checks pending.
+2026-11-13 client date. Direct baseline9341e7c0016c66fd9316d489ccfca00a646ae2cb, branch iteration-013-bench-readiness; main5bc607cd1a86e5d86ff0fc95ba7a3cd31159b861 not used. ESP32 exit0 PASS13.053s; native exit0 **290/290 PASS**61.980s, all cases/source unchanged. Capture utility13/13 fake-port tests exit0; separate from native and physical counts. No source/bin/native test/pin/PHY/watchdog/library changes; RAM24,564/flash364,308 unchanged, main15 lines. Full diff/security/history checks passed; implementation `1343e45ae642d0de7c4015ae19575e4e005f1646` committed/pushed and independently matched remote013 (exit0). main/012 unchanged. Receipt `logs/build/iteration-013-publication-receipt.json` is recorded in a documentation-only follow-up. ERR-024 initial approval rejection resolved by rechecking explicit Stage8 authorization; no merge/PR/tag.
 
 PHYSICAL_ACCEPTANCE_READINESS.md links the backed-up single-MCU procedure, pair gates/instruments, ERR-021 disposition and capture/CSV spec. Module pin functions cross-checked against current official V1.1.0; proposed GPIOs/actual boards/wiring remain unverified. Only read-only enumeration (no ports); no open/upload/erase/reset/RF. Capture interrupted-success ERR-022 fixed; SDK startup may format NVS (ERR-023 source risk), so backups precede app boot. ERR-021 holds unattended/stuck-BUSY recovery acceptance; no assumed default watchdog reset. Advanced replay/negative-identity/corrupt-NVS fixtures remain unprovided/unrun.
 

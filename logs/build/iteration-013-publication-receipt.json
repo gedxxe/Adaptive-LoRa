@@ -1,0 +1,36 @@
+{
+  "repository": "https://github.com/gedxxe/Adaptive-LoRa.git",
+  "branch": "iteration-013-bench-readiness",
+  "baseline": "9341e7c0016c66fd9316d489ccfca00a646ae2cb",
+  "implementation_commit": "1343e45ae642d0de7c4015ae19575e4e005f1646",
+  "implementation_message": "docs: prepare M0-M2 physical acceptance",
+  "verification_date": "2026-11-13 (client date)",
+  "commands": [
+    {
+      "command": "git diff --cached --check",
+      "exit_code": 0
+    },
+    {
+      "command": "git commit -m \"docs: prepare M0-M2 physical acceptance\"",
+      "exit_code": 0
+    },
+    {
+      "command": "git push -u origin iteration-013-bench-readiness",
+      "exit_code": 0
+    },
+    {
+      "command": "git ls-remote --heads origin main iteration-012-runtime-reliability iteration-013-bench-readiness",
+      "exit_code": 0,
+      "refs": {
+        "refs/heads/iteration-012-runtime-reliability": "9341e7c0016c66fd9316d489ccfca00a646ae2cb",
+        "refs/heads/iteration-013-bench-readiness": "1343e45ae642d0de7c4015ae19575e4e005f1646",
+        "refs/heads/main": "5bc607cd1a86e5d86ff0fc95ba7a3cd31159b861"
+      }
+    }
+  ],
+  "publication_authorization": "Current user attachment Stage8 explicitly requests commit and automatic push after validation. Initial combined request rejected for unrecognized authorization; re-read evidence and explicit actions were approved, with no indirect bypass. ERR-024 records chronology.",
+  "software_evidence": "ESP32 exit0;290 unchanged native exit0;13 capture fake-port checks exit0; firmware binary identical to012",
+  "physical_validation": "NOT RUN / NOT VERIFIED",
+  "main_unchanged": true,
+  "scope": "Dedicated branch only, no merge/PR/force/history rewrite/tag/release. Receipt records verified implementation, not its own documentation-followup SHA."
+}

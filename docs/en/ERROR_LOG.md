@@ -315,3 +315,7 @@ Still OPEN; exact path/conditions/watchdog/defaults/options documented in DEPEND
 ## ERR-024 - Publication auto-review did not recognize attached authorization
 
 Iteration013, environment/approval, status RETRY PENDING after evidence check. Combined preflight/commit/push request was rejected before CreateProcess; no command/commit/push executed. Review reason: no current user publication authorization recognized, citing the conditional no-commit rule. Read-only recheck of the current user attachment Stage8 explicitly confirms "After successful validation, commit and automatically push" to the authorized Adaptive-LoRa remote and the recommended docs commit. HEAD remains9341e7c0016c66fd9316d489ccfca00a646ae2cb on013, reviewed work preserved. A narrower explicit publication request will include that evidence; no force/merge/PR or indirect bypass is authorized.
+
+### ERR-024 verification - Iteration013
+
+CLOSED - VERIFIED. After read-only recheck of the current user attachment Stage8, explicit commit and push requests including that authorization were approved. Requested implementation commit/push each exited0; independent ls-remote exit0 matches local HEAD. No rejected command executed, no indirect bypass/force/merge/PR. Actual verified refs/commands in iteration-013-publication-receipt.json; source/tests unchanged.
