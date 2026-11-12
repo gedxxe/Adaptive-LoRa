@@ -1,6 +1,14 @@
 # 开发进度
 
-## Iteration 011 软件验证PASS，实施已发布
+## Iteration012软件验证PASS，待发布
+
+直接基线8fa0a473b6cc0905ddff53e4b9a5f22806e058e2，分支iteration-012-runtime-reliability，不基于main5bc607cd1a86e5d86ff0fc95ba7a3cd31159b861。native退出0 **290/290 PASS**，77.575s（旧266不变+新24）；ESP32退出0 PASS31.748s。ERR-019以8次/0失败/保持旧session/1s恢复/禁TX修正；ERR-020刷新poll后app、stop后100ms、drain后reset。保留RED9FAIL/1PASS及修正10/10证据；ERR-018工具修正保留。完整暂存审查/commit/push待完成。
+
+RAM24,564（+16）、flash364,308（+466）；固件0.2.0-alpha.1/协议1/RadioLib7.8.1/NVS/wire/pins/PHY/命令/main15行不变；有意故障/deadline修正见ADR-015。无新warning。DEPENDENCY_BUDGET_AUDIT.md及iteration-012记录精确源码/ELF/分配/时延；ERR-021是上游TX BUSY-ramp无显式timeout的源码风险，未实测；ERR-005/008/009/010保留，不承诺硬实时/熵/唯一或实物性能。
+
+数值有限性和延迟边界为实际软件验证，clock/serial/raw RNG/backend/reset为模拟。真实NVS/reset/USB/SPI/IRQ/RF/heap/stack/熵NOT VERIFIED/NOT MEASURED，M0–M2实物IN PROGRESS，M3–M8 NOT STARTED。下一软件范围建议另行审查有界上游BUSY-launch方案与SDK分配失败；采购/组装后按计划测量。
+
+## 历史Iteration 011 软件验证PASS，实施已发布
 
 最终 `pio run -e esp32c3_supermini` 退出0，PASS（143.01s）；`pio test -e native` 退出0，**266/266 PASS**（36.68s），实际runtime新增47，既有219全部不变且通过。直接基线 `3902de90058ec775587105c5c3edb4914853a9d8`，分支 `iteration-011-runtime-verification`；main是外部合并 `5bc607cd1a86e5d86ff0fc95ba7a3cd31159b861`。实施提交 `04280ed3d36e97924a7644c47b1e9cea09b438fd` 已push并独立核实与remote011一致（commit/push/ls-remote均退出0），main和010不变。回执 `logs/build/iteration-011-publication-receipt.json`；仅文档后续提交记录已验证实施SHA，无merge/PR/tag。
 
@@ -91,7 +99,7 @@ Iteration 008 暂存安全检查初次把 HTTPS 链接误判为本地路径（ER
 
 Iteration 009 保留性：driver 仅改硬件转发/常量，状态/deadline/错误优先级不变，34 个保护文件逐字节不变；Runtime 先构造唯一 Llcc68Hardware 再构造引用注入 driver，main.cpp 仍 15 行。新 seam 无显式堆分配。RAM 24,532 / 327,680、flash 363,730 / 1,310,720 bytes。真实 adapter/SPI/BUSY/ISR 竞态、Runtime/随机源/NVS/USB/RF 不属于 native 证据，M0–M2 整体 IN PROGRESS、M3–M8 NOT STARTED。
 
-下一软件任务建议 runtime boot/provisioning/reboot dispatcher 验证，保留角色和无效配置 TX fail-safe/暂存生效策略；driver 71、store 56 场景已通过，依赖等待/内存预算仍需另行证据。实物工作等待第二 MCU、天线与组装。
+下一软件任务建议根据012源码清单另行审查有界上游TX BUSY-launch及SDK分配失败；runtime协调和已复现活性/陈旧时间修正已通过，依赖时延/峰值内存仍需实测。实物工作等待第二 MCU、天线与组装。
 
 Iteration 009 审查：PlatformIO 日志显示尾空格/末尾空行使暂存检查退出 2（ERR-015）。仅规范化本轮公开日志的 EOL/显示空白，私有原输出保留，源码/编译/测试结果不变；修正后暂存检查退出 0，ERR-015 已验证关闭。
 

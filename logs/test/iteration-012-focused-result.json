@@ -1,0 +1,7 @@
+{
+  "command": "pio test -e native -f test_runtime_reliability",
+  "exit_code": 0,
+  "elapsed_seconds": 3.455,
+  "log": "logs/test/iteration-012-focused.log",
+  "publication_policy": "Full stdout/stderr except disclosed local-path/EOL/trailing-display normalization; raw retained privately."
+}

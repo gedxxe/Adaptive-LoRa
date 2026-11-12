@@ -55,3 +55,11 @@
 - 固件使用标准 optional；已安装 GCC6.3 缺少该 header 时由项目 namespace alias 选择 experimental optional，仍原地 emplace/bool/dereference，无 namespace std 改写或堆所有权。复现 ERR-017 后在 native 全局启用 UNITY_SUPPORT_64，保留完整64位断言，不截断/删除。
 - 保留既有策略：app update 先于串口解析，未 init 的 poll/stop 不访问硬件，save 仅暂存直到新启动，stop失败仍可 reset，100ms捕获时间 deadline 不等待日志排空，以及非零/previous-ID 拒绝循环；随机源失败活性/跨启动碰撞未解决。
 - 低层响应+实际协调器仅证明软件顺序；对象重建/虚拟reset/raw random/串口容量不证明真实 NVS/重启/USB/熵/SPI/IRQ/RF，不增加后续 MAC 或外部集成。
+
+## ADR-015 — 有界session更新与runtime边界时间刷新
+
+ACCEPTED2026-11-12，Iteration012。修改前审查/有限RED复现见DEPENDENCY_BUDGET_AUDIT.md与ERR-019/020。生产generator每次最多8次raw调用，失败返回0；保留uint32(previous)签名，明确0为失败，不增加平台接口层。SequenceCounter.renew拒绝0/previous，失败保持旧boot与已耗尽计数。两个app记录SESSION_ERROR/boot_id_unavailable、禁止普通TX，每1s按尝试开始时间重试；恢复记录identity_recovered。pending reboot禁恢复。无可预测fallback、逐包NVS写、schema/boot-counter变更或自动熵源启用。有限调用数假设SDK调用返回，不等于实测WCET/唯一性/认证。
+
+实际延迟注入复现过期ACK被接受、ACK窗口起点偏早、reset等待缩短及检查陈旧。poll后刷新app时间，stop完成后起100ms计时，drain后用当前时间判reset；保留app先串口、stop失败仍reset、不等日志排空及driver/app调用内观察/恢复语义，依赖仍不可抢占。旧266源码/结果不变且通过，新增24通过，ESP32 PASS。静态RAM+16、flash+466，无新增显式分配/task/framework，main不变15行。
+
+wire/NVS/版本/PHY/单镜像兼容。IDF5.5.5不支持无条件熵保证，32位ID跨启动可碰撞；持久counter需另行版本化断电/磨损设计。STATIC_ONLY保持0，避免未经验证的栈/容量变更，HAL/SDK分配仍存在。上游BUSY-ramp及SDK锁/flash/USB时延未解决，未建立硬实时或实物验收。

@@ -9,6 +9,9 @@ public:
     void begin(uint32_t now);
     void update(uint32_t now, const RadioEvent& event, bool allowNew = true);
 private:
+    bool renewSession(uint32_t now);
+    bool sessionFailed_ = false;
+    uint32_t sessionRetryAt_ = 0;
     enum class State { IDLE, TRANSMITTING, WAIT_ACK };
     void finish(const char* result, const RadioEvent* event = nullptr, bool txFailure = false);
     DeviceConfig config_;

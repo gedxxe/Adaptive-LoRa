@@ -6,8 +6,21 @@
 namespace adaptive_lora {
 ClientApp::ClientApp(const DeviceConfig& config, RadioTransport& radio, SerialLogger& log, BootIdGenerator generate)
     : config_(config), radio_(radio), log_(log), generate_(generate) {}
+bool ClientApp::renewSession(uint32_t now) {
+    if (sessionFailed_ && !deadlineReached(now, sessionRetryAt_)) return false;
+    const bool recovering = sessionFailed_;
+    if (!sequence_.renew(generate_)) {
+        sessionFailed_ = true;
+        sessionRetryAt_ = now + kSessionRecoveryUs;
+        log_.event("SESSION_ERROR", "boot_id_unavailable");
+        return false;
+    }
+    sessionFailed_ = false;
+    if (recovering) log_.event("SESSION_NEW", "identity_recovered");
+    return true;
+}
 void ClientApp::begin(uint32_t now) {
-    sequence_.begin(generate_(0));
+    renewSession(now);
     nextHelloUs_ = static_cast<uint64_t>(esp_timer_get_time()) + 1000000;
     recoverAt_ = now;
 }
@@ -25,6 +38,7 @@ void ClientApp::finish(const char* result, const RadioEvent* event, bool txFailu
     nextHelloUs_ = static_cast<uint64_t>(esp_timer_get_time()) + uint64_t(config_.helloIntervalMs) * 1000;
 }
 void ClientApp::update(uint32_t now, const RadioEvent& event, bool allowNew) {
+    if (allowNew && sessionFailed_) renewSession(now);
     if (event.type == RadioEventType::TX_DONE && state_ == State::TRANSMITTING) {
         log_.event("TX_DONE", "hello_sent", &outstanding_);
         state_ = State::WAIT_ACK;
@@ -62,7 +76,7 @@ void ClientApp::update(uint32_t now, const RadioEvent& event, bool allowNew) {
     outstanding_.sourceId = config_.nodeId;
     outstanding_.destinationId = config_.gatewayId;
     if (!sequence_.take(outstanding_.sequence)) {
-        sequence_.begin(generate_(sequence_.bootId()));
+        if (!renewSession(now)) return;
         log_.event("SESSION_NEW", "sequence_exhausted");
         if (!sequence_.take(outstanding_.sequence)) return;
     }

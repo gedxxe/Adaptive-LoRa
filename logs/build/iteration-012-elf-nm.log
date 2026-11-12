@@ -1,0 +1,3246 @@
+nm -S --size-sort -C firmware.elf, exit0
+3fc943a6 00000001 B _bleLibraryInUse
+3fc943a4 00000001 b _bleMemReleased
+3fc943a5 00000001 B _btClassicLibraryInUse
+3fc8e618 00000001 d _classicMemReleased
+3fc94364 00000001 b connected
+3fc9435a 00000001 B adaptive_lora::Llcc68Hardware::irq_
+3fc945d8 00000001 B __eh_globals_init::_S_init
+3c0507e4 00000001 R std::nothrow
+3fc9435d 00000001 b HWCDC::deinit(void*)::running
+3fc9435c 00000001 B ESP
+3fc9437e 00000001 b fade_initialized
+3fc8e645 00000001 d first_call.0
+3fc943c9 00000001 b flash_brownout_needs_reset
+3fc943c8 00000001 b flash_erasing
+3fc943f0 00000001 B g_panic_abort
+3fc943d8 00000001 B g_twdt_isr
+3fc943a7 00000001 b initialized.2
+3fc9437c 00000001 b interrupt_initialized.3
+3c0504dc 00000001 R ledc_periph_signal
+3fc9438c 00000001 B loopTaskWDTEnabled
+3fc9442c 00000001 b non_iram_int_disabled_flag
+3fc9437d 00000001 B RGB_BUILTIN_storage
+3fc943e4 00000001 b s_dumping_core.0
+3fc8e644 00000001 d s_in_startup
+3fc945a8 00000001 b s_periph_ref_counts
+3fc94548 00000001 b s_usb_serial_jtag_conn_status
+42018a16 00000002 T __cxa_guard_dummy
+42018a1c 00000002 T __cxx_init_dummy
+4202a77e 00000002 T __deregister_frame_info
+40385198 00000002 T __ubsan_include
+4202afa4 00000002 T _fseek_r
+42029b5e 00000002 t _Unwind_DebugHook
+3fc94358 00000002 b RadioLibConvCodeInstance
+42000d60 00000002 W ArduinoHal::~ArduinoHal()
+42000d60 00000002 W ArduinoHal::~ArduinoHal()
+42000382 00000002 T RadioLibHal::pullUpDown(unsigned long, bool, bool)
+42000378 00000002 T RadioLibHal::init()
+42000378 00000002 T RadioLibHal::term()
+4200037a 00000002 T RadioLibHal::tone(unsigned long, unsigned int, unsigned long)
+42000378 00000002 T RadioLibHal::yield()
+4200037c 00000002 T RadioLibHal::noTone(unsigned long)
+42008072 00000002 W adaptive_lora::RadioDriver::~RadioDriver()
+42008072 00000002 W adaptive_lora::RadioDriver::~RadioDriver()
+42007e2a 00000002 W adaptive_lora::Llcc68Hardware::~Llcc68Hardware()
+42007e2a 00000002 W adaptive_lora::Llcc68Hardware::~Llcc68Hardware()
+420056f0 00000002 T PhysicalLayer::setDirectAction(void (*)())
+420056f0 00000002 T PhysicalLayer::setPacketSentAction(void (*)())
+420056f0 00000002 T PhysicalLayer::setChannelScanAction(void (*)())
+42005772 00000002 T PhysicalLayer::clearPacketSentAction()
+42005772 00000002 T PhysicalLayer::clearChannelScanAction()
+420056f0 00000002 T PhysicalLayer::setPacketReceivedAction(void (*)())
+42005772 00000002 T PhysicalLayer::clearPacketReceivedAction()
+420056f2 00000002 T PhysicalLayer::readBit(unsigned long)
+4201dd6a 00000002 W nvs::NVSPartition::~NVSPartition()
+4201dd6a 00000002 W nvs::NVSPartition::~NVSPartition()
+4201dde8 00000002 W nvs::NVSPartitionManager::~NVSPartitionManager()
+4201dde8 00000002 W nvs::NVSPartitionManager::~NVSPartitionManager()
+420012d4 00000002 W LLCC68::~LLCC68()
+420012d4 00000002 W LLCC68::~LLCC68()
+42001872 00000002 W SX1262::~SX1262()
+42001872 00000002 W SX1262::~SX1262()
+42001e1e 00000002 W SX126x::~SX126x()
+42001e1e 00000002 W SX126x::~SX126x()
+42008914 00000002 W EspClass::~EspClass()
+42008914 00000002 W EspClass::~EspClass()
+42027caa 00000002 T std::exception::~exception()
+42027caa 00000002 T std::exception::~exception()
+420275b8 00000002 T std::type_info::~type_info()
+420275b8 00000002 T std::type_info::~type_info()
+42012754 00000002 T bootloader_debug_buffer
+403807b2 00000002 t cache_disable.constprop.0
+403807c4 00000002 t cache_enable.constprop.0
+420225d2 00000002 t esp_core_dump_flash_print_write_end
+420225d0 00000002 t esp_core_dump_flash_print_write_start
+420225d2 00000002 T esp_core_dump_print_write_end
+420225d0 00000002 T esp_core_dump_print_write_start
+420122de 00000002 T esp_efuse_check_errors
+420122dc 00000002 T esp_efuse_startup_include_func
+4038bcf8 00000002 T esp_libc_include_assert_impl
+42017bf0 00000002 T esp_libc_include_getentropy_impl
+4038bd56 00000002 T esp_libc_include_heap_impl
+42018186 00000002 T esp_libc_include_init_funcs
+4038bd94 00000002 T esp_libc_include_memcmp_impl
+4038be68 00000002 T esp_libc_include_memcpy_impl
+4038bf36 00000002 T esp_libc_include_memmove_impl
+42017bee 00000002 T esp_libc_include_pthread_impl
+42017ee4 00000002 T esp_libc_include_reent_syscalls_impl
+4038c16c 00000002 T esp_libc_include_strcpy_impl
+4038c1e0 00000002 T esp_libc_include_strncmp_impl
+4038c256 00000002 T esp_libc_include_strncpy_impl
+42017eba 00000002 T esp_libc_include_syscalls_impl
+42017b5a 00000002 T esp_libc_init_funcs
+42017e98 00000002 T esp_libc_time_init
+40380874 00000002 T esp_mspi_pin_init
+42017e98 00000002 T esp_newlib_time_init
+42015c34 00000002 T esp_security_init_include_impl
+42016a7c 00000002 T esp_sleep_gpio_include
+420223ca 00000002 T esp_system_include_coredump_init
+4201343a 00000002 T esp_system_include_startup_funcs
+42018a2e 00000002 T esp_timer_init_include_func
+4201f3f2 00000002 T esp_vfs_include_console_register
+420203dc 00000002 T esp_vfs_include_nullfs_register
+4201ea02 00000002 T include_esp_phy_override
+4200a7aa 00000002 W init
+4200a7a8 00000002 W initVariant
+40382c9e 00000002 T mspi_timing_flash_tuning
+42023fde 00000002 T nvs_sec_provider_include_impl
+4201849e 00000002 T pthread_include_pthread_cond_var_impl
+4201849c 00000002 T pthread_include_pthread_impl
+4201869c 00000002 T pthread_include_pthread_local_storage_impl
+4201869e 00000002 T pthread_include_pthread_rwlock_impl
+420186a0 00000002 T pthread_include_pthread_semaphore_impl
+420131f6 00000002 T spi_flash_chip_list_check
+40380860 00000002 T spi_flash_enable_cache
+420131f8 00000002 T spi_flash_init_lock
+4201b1e4 00000002 T uart_vfs_include_dev_init
+4201ea3e 00000002 T usb_serial_jtag_connection_monitor_include
+4201f1b6 00000002 T usb_serial_jtag_vfs_include_dev_init
+4202013a 00000002 T vfs_include_syscalls_impl
+3fc8f644 00000003 d chip_name
+3fc8f3fc 00000003 d chip_name
+3fc945f4 00000004 B __atexit
+3fc8e66c 00000004 D __atexit_recursive_mutex
+42018a18 00000004 T __cxx_eh_arena_size_get
+3fc944fc 00000004 B __dso_handle
+42015c30 00000004 t __esp_system_init_fn_esp_security_init
+42025b68 00000004 t __esp_system_init_fn_esp_timer_init_os
+420122d8 00000004 t __esp_system_init_fn_init_efuse
+420122c2 00000004 t __esp_system_init_fn_init_efuse_show_app_info
+4201f3ee 00000004 t __esp_system_init_fn_init_vfs_console
+420203d8 00000004 t __esp_system_init_fn_init_vfs_nullfs
+3fc8e664 00000004 D __global_locale_ptr
+3c050f18 00000004 R __on_exit_args
+3fc943d0 00000004 B __stack_chk_guard
+3fc945f0 00000004 B __stdio_exit_handler
+4200fa96 00000004 T _btInUse_default
+3fc8e61c 00000004 d _gpio_hal
+3fc8e668 00000004 D _impure_ptr
+4038179c 00000004 T _lock_release
+403817a0 00000004 T _lock_release_recursive
+4200ebca 00000004 W shouldPrintChipDebugReport()
+4200ebc6 00000004 W getArduinoLoopTaskStackSize()
+42026b54 00000004 T operator delete[](void*)
+42026b50 00000004 T operator delete(void*, unsigned int)
+3fc9436c 00000004 b intr_handle
+3fc94378 00000004 b tx_ring_buf
+3fc94370 00000004 b tx_stash_len
+3fc8e610 00000004 d tx_timeout_ms
+3fc94354 00000004 b rlb_timestamp_hal
+3fc9450c 00000004 b s_static_init_mutex
+3fc94508 00000004 b s_static_init_wait_sem
+3fc94504 00000004 b s_static_init_waiting_count
+3fc94500 00000004 b s_static_init_max_waiting_count
+3fc94360 00000004 b arduino_hw_cdc_event_loop_handle
+3fc945d4 00000004 b init
+3fc94368 00000004 b tx_lock
+3fc94374 00000004 b rx_queue
+3fc8e65c 00000004 D __cxxabiv1::__terminate_handler
+3fc8e658 00000004 D __cxxabiv1::__unexpected_handler
+42000dbe 00000004 W ArduinoHal::yield()
+42000e30 00000004 W ArduinoHal::micros()
+42000e34 00000004 W ArduinoHal::millis()
+4200037e 00000004 T RadioLibHal::pinToInterrupt(unsigned long)
+3fc945c0 00000004 b (anonymous namespace)::__new_handler
+3fc945bc 00000004 b (anonymous namespace)::mx
+3fc945c4 00000004 b (anonymous namespace)::mx
+4200569e 00000004 T PhysicalLayer::launchMode()
+420056ec 00000004 T PhysicalLayer::randomByte()
+420056b6 00000004 T PhysicalLayer::setBitRate(float)
+420056e4 00000004 T PhysicalLayer::getIrqFlags()
+420056e8 00000004 T PhysicalLayer::scanChannel(ChannelScanConfig_t const&)
+4200569e 00000004 T PhysicalLayer::scanChannel()
+420056c6 00000004 T PhysicalLayer::setDataRate(DataRate_t, ModemType_t)
+420056aa 00000004 T PhysicalLayer::setEncoding(unsigned char)
+420056b2 00000004 T PhysicalLayer::setIrqFlags(unsigned long)
+420056ae 00000004 T PhysicalLayer::setSyncWord(unsigned char*, unsigned int)
+420056e0 00000004 T PhysicalLayer::getTimeOnAir(unsigned int)
+420056b6 00000004 T PhysicalLayer::setFrequency(float)
+4200569e 00000004 T PhysicalLayer::startReceive()
+420056c6 00000004 T PhysicalLayer::checkDataRate(DataRate_t, ModemType_t)
+420056b2 00000004 T PhysicalLayer::clearIrqFlags(unsigned long)
+4200569e 00000004 T PhysicalLayer::finishReceive()
+4200569e 00000004 T PhysicalLayer::receiveDirect()
+4200569e 00000004 T PhysicalLayer::finishTransmit()
+420056aa 00000004 T PhysicalLayer::setDataShaping(unsigned char)
+420056be 00000004 T PhysicalLayer::setOutputPower(signed char)
+420056b2 00000004 T PhysicalLayer::transmitDirect(unsigned long)
+420056ca 00000004 T PhysicalLayer::getPacketLength(bool)
+420056c2 00000004 T PhysicalLayer::checkOutputPower(signed char, signed char*)
+420056e8 00000004 T PhysicalLayer::startChannelScan(ChannelScanConfig_t const&)
+4200569e 00000004 T PhysicalLayer::startChannelScan()
+420056b2 00000004 T PhysicalLayer::setPreambleLength(unsigned int)
+420056e0 00000004 T PhysicalLayer::calculateRxTimeout(unsigned long)
+4200569e 00000004 T PhysicalLayer::getChannelScanResult()
+420056b6 00000004 T PhysicalLayer::setFrequencyDeviation(float)
+4200569e 00000004 T PhysicalLayer::sleep()
+4200569a 00000004 T PhysicalLayer::receive(unsigned char*, unsigned int, unsigned long)
+420056aa 00000004 T PhysicalLayer::standby(unsigned char)
+420056e8 00000004 T PhysicalLayer::getModem(ModemType_t*)
+420056ba 00000004 T PhysicalLayer::invertIQ(bool)
+420056ae 00000004 T PhysicalLayer::readData(unsigned char*, unsigned int)
+420056b2 00000004 T PhysicalLayer::setModem(ModemType_t)
+42005696 00000004 T PhysicalLayer::transmit(unsigned char const*, unsigned int, unsigned char)
+42005774 00000004 T PhysicalLayer::stageMode(RadioModeType_t, RadioModeConfig_t*)
+3fc94538 00000004 B NVSHandleEntry::s_nvs_next_handle
+3fc9453c 00000004 B nvs::NVSPartitionManager::instance
+3fc94540 00000004 B nvs::Lock::mSemaphore
+4201e2d4 00000004 T nvs::Lock::init()
+3c04fa7c 00000004 R nvs::Page::SEC_SIZE
+4201e450 00000004 T nvs::HashList::~HashList()
+4201e450 00000004 T nvs::HashList::~HashList()
+420096ee 00000004 T String::~String()
+420096ee 00000004 T String::~String()
+42001a92 00000004 T SX1262::setFrequency(float)
+42001afc 00000004 T SX1262::setOutputPower(signed char)
+42002996 00000004 T SX126x::getPacketLength(bool)
+42003f40 00000004 T SX126x::sleep()
+42002896 00000004 T SX126x::getRSSI()
+42003fa0 00000004 T SX126x::standby(unsigned char)
+42008954 00000004 T EspClass::getFlashSourceFrequencyMHz()
+420273fc 00000004 T operator new[](unsigned int)
+420091a6 00000004 T HWCDC::operator bool() const
+42027e7c 00000004 T std::logic_error::what() const
+42027e7c 00000004 T std::runtime_error::what() const
+420275ba 00000004 T std::type_info::__is_pointer_p() const
+420275ba 00000004 T std::type_info::__is_function_p() const
+42028026 00000004 W std::string::_Rep::_M_destroy(std::allocator<char> const&)
+3fc945d0 00000004 b (anonymous namespace)::get_atomic_mutex()::atomic_mutex
+3fc94420 00000004 b alloc_failed_callback
+3fc943ac 00000004 b apb_change_callbacks
+3fc943a8 00000004 b apb_change_lock
+3fc94404 00000004 b base.0
+420245b4 00000004 T bootloader_init_mem
+3fc8ef30 00000004 d btdm_controller_status
+4200fa96 00000004 W btInUse
+4038bd02 00000004 T cfree
+3fc8e614 00000004 d clock_source
+42023cee 00000004 t core_dump_crc_size
+3fc94400 00000004 b ctx
+3fc943b0 00000004 b curr_partition.2
+3fc8e60c 00000004 V DW.ref.__gxx_personality_v0
+4200a9e4 00000004 t empty_bus_deinit_cb
+3fc8e660 00000004 D environ
+42014b16 00000004 T esp_cache_err_get_cpuid
+4038399a 00000004 T esp_cache_sync_ops_enter_critical_section
+4038399e 00000004 T esp_cache_sync_ops_exit_critical_section
+40382c38 00000004 T esp_clk_tree_enable_src
+40381a02 00000004 T esp_coex_common_task_yield_from_isr_wrapper
+40381a0a 00000004 T esp_coex_common_timer_arm_us_wrapper
+40381a06 00000004 T esp_coex_common_timer_disarm_wrapper
+42020402 00000004 T esp_coex_common_timer_done_wrapper
+42020406 00000004 T esp_coex_common_timer_setfn_wrapper
+40381a18 00000004 t esp_coex_semphr_give_from_isr_wrapper
+42023cee 00000004 T esp_core_dump_checksum_size
+42022406 00000004 T esp_core_dump_reset_tasks_snapshots_iter
+40381e66 00000004 T esp_crosscore_int_send_yield
+3fc8eccc 00000004 d esp_flash_api_funcs_patched_ptr
+3fc943c4 00000004 B esp_flash_default_chip
+403803a0 00000004 T esp_flash_encryption_enabled
+3fc8e620 00000004 D esp_flash_registered_chips
+42012ddc 00000004 T esp_image_verify
+3fc94408 00000004 b esp_log_cache_enabled
+3fc8e63c 00000004 D esp_log_default_level
+3fc8e638 00000004 D esp_log_vprint_func
+4038087a 00000004 T esp_mspi_32bit_address_flash_feature_check
+420122be 00000004 T esp_partition_get_main_flash_sector_size
+4201221e 00000004 T esp_partition_munmap
+40382c9a 00000004 T esp_ptr_external_ram
+42035e4c 00000004 T esp_register_freertos_tick_hook
+42025e88 00000004 T esp_sha_read_digest_state
+42025e84 00000004 T esp_sha_write_digest_state
+4038bd02 00000004 T free
+3fc943dc 00000004 B g_exc_frames
+3fc94570 00000004 b g_fds
+3fc943ec 00000004 B g_panic_abort_details
+3fc8ee8c 00000004 d g_panic_entry_count
+3fc94384 00000004 b g_rmt_block_lock
+3c04ee1c 00000004 R g_spi_lock_main_flash_dev
+3c04e3a8 00000004 R g_startup_fn
+403887d6 00000004 T gdma_ahb_hal_is_tx_link_switch_event_supported
+4038880a 00000004 T gdma_hal_clear_intr
+42036a5a 00000004 T gdma_hal_connect_peri
+42036a5e 00000004 T gdma_hal_disconnect_peri
+42036a62 00000004 T gdma_hal_enable_burst
+42036a6e 00000004 T gdma_hal_enable_intr
+42036a56 00000004 T gdma_hal_set_priority
+42036a52 00000004 T gdma_hal_start_with_desc
+420099c4 00000004 t gpioDetachBus
+3fc945ec 00000004 b initial_env
+3fc94428 00000004 b last_ccount.1
+3fc94380 00000004 B ledc_handle
+3fc8ea94 00000004 D libcoexist_reversion_git
+3fc94398 00000004 B loopTaskHandle
+4038bcfa 00000004 T malloc
+3fc8e640 00000004 d malloc_alwaysinternal_limit
+3fc943bc 00000004 b map
+3c050688 00000004 r memset_func
+4038a1f2 00000004 T multi_heap_get_allocated_size_impl
+42036d16 00000004 T multi_heap_register
+4038a2fe 00000004 T multi_heap_set_lock
+3fc94430 00000004 b non_iram_int_disabled
+3fc94434 00000004 b non_iram_int_mask
+3fc8e608 00000004 d object_mutex
+3fc94580 00000004 b p_ledc_obj
+3fc943d4 00000004 b p_twdt_obj
+3fc94554 00000004 b p_usb_serial_jtag_obj
+3fc944a0 00000004 B port_uxCoreStartupDone
+3fc944ac 00000004 B port_uxCriticalNesting
+3fc944b0 00000004 B port_uxInterruptNesting
+3fc944a8 00000004 B port_uxOldInterruptState
+3fc944b4 00000004 B port_xSchedulerRunning
+3fc94564 00000004 b primary_vfs
+4200b4e6 00000004 T psramFound
+4038bcfa 00000004 T pvalloc
+3fc94494 00000004 B pxCurrentTCBs
+3fc944cc 00000004 b pxCurrentTimerList
+3fc94490 00000004 b pxDelayedTaskList
+3fc9448c 00000004 b pxOverflowDelayedTaskList
+3fc944c8 00000004 b pxOverflowTimerList
+4038bcfe 00000004 T realloc
+3fc94594 00000004 b reason
+3fc94424 00000004 B registered_heaps
+3fc94544 00000004 b remaining_allowed_no_sof_ticks
+3fc8edd4 00000004 D rom_flash_chip_dummy
+3fc8edd0 00000004 D rom_flash_chip_dummy_hpm
+420115ee 00000004 T rtc_gpio_is_valid_gpio
+3fc8ee9c 00000004 d rtc_intr_cache
+3fc8ee98 00000004 d rtc_intr_enabled
+3fc8ee94 00000004 d rtc_isr_cpu
+3fc945b8 00000004 b rx_channel
+3fc94518 00000004 b s_alarm_handler
+3fc9444c 00000004 b s_bbpll_digi_consumers_ref_count
+3fc944e8 00000004 b s_boot_time_lock
+3fc943c0 00000004 b s_bootloader_partition_offset
+3fc94448 00000004 b s_brownout_callback
+3fc945a0 00000004 b s_crypto_sha_aes_lock
+3fc94450 00000004 b s_cur_pll_freq
+3fc94584 00000004 b s_exc_frame
+3fc94590 00000004 b s_fake_stacks_num
+3fc94568 00000004 b s_fd_table_lock
+3fc943cc 00000004 b s_flash_guard_ops
+3fc944b8 00000004 b s_handled_systicks
+3fc944f8 00000004 B s_keys
+3fc9457c 00000004 b s_ledc_fade_isr_handle
+3fc94578 00000004 b s_ledc_mutex
+3fc94574 00000004 b s_ledc_slow_clk_rc_fast_freq
+3fc94414 00000004 b s_log_cache_entry_count
+3fc94418 00000004 b s_log_cache_max_generation
+3fc94410 00000004 b s_log_cache_misses
+3fc9441c 00000004 b s_log_mutex
+3fc9440c 00000004 b s_log_tags
+3fc94558 00000004 b s_open_count
+3fc8e62c 00000004 d s_panic_uart
+3fc943b8 00000004 b s_partition_list
+3fc943b4 00000004 b s_partition_list_lock
+3fc945a4 00000004 b s_rc_fast_freq_hz
+3fc94530 00000004 b s_registered_select_num
+3fc9454c 00000004 b s_registered_select_num
+3fc94534 00000004 b s_registered_selects
+3fc94550 00000004 b s_registered_selects
+3fc943e0 00000004 b s_reset_reason
+3fc9443c 00000004 b s_rtc_isr_handle
+3fc8ee90 00000004 d s_rtc_isr_handler_list
+40381be4 00000004 t s_start_cache
+40381bc4 00000004 t s_stop_cache
+3fc944d0 00000004 b s_time_lock
+3fc9451c 00000004 b s_timer_interrupt_handle
+3fc945ac 00000004 b s_timer_task
+3fc945b0 00000004 b s_timers
+3fc94388 00000004 b s_uart_debug_nr
+3fc943e8 00000004 b s_usbserial_timeout
+3fc9456c 00000004 b s_vfs_upper_bound
+3fc945e4 00000004 b seen_objects
+3c04ebe0 00000004 R soc_memory_region_count
+4038d11a 00000004 T spi_flash_chip_boya_get_caps
+4038d250 00000004 T spi_flash_chip_generic_probe
+4038de34 00000004 T spi_flash_chip_issi_get_caps
+4038dec6 00000004 T spi_flash_chip_mxic_get_caps
+4038deec 00000004 T spi_flash_chip_th_get_caps
+40380814 00000004 T spi_flash_disable_cache
+40380810 00000004 t spi_flash_disable_cache.constprop.0
+40389224 00000004 T spi_flash_hal_gpspi_supports_direct_read
+40389220 00000004 T spi_flash_hal_gpspi_supports_direct_write
+40380876 00000004 T spi_flash_init_chip_state
+4038080c 00000004 T spi_flash_restore_cache
+40380808 00000004 t spi_flash_restore_cache.constprop.0
+42014064 00000004 t sys_rtc_init.isra.0
+3fc8eecc 00000004 d TAG
+3fc8ef84 00000004 d TAG
+4038a57e 00000004 T tlsf_alloc_overhead
+3fc945b4 00000004 b tx_channel
+3fc94458 00000004 b ulTaskSwitchedInTime
+3fc94454 00000004 b ulTotalRunTime
+3fc945e8 00000004 b unseen_objects
+4201ea4c 00000004 t usb_serial_jtag_close
+3fc94484 00000004 b uxCurrentNumberOfTasks
+3fc94488 00000004 b uxDeletedTasksWaitingCleanUp
+3fc9445c 00000004 b uxSchedulerSuspended
+3fc94468 00000004 b uxTaskNumber
+3fc9447c 00000004 b uxTopReadyPriority
+3c04f2e4 00000004 R uxTopUsedPriority
+4038bcfa 00000004 T valloc
+3fc94438 00000004 b vector_desc_head
+4200a7ac 00000004 W verifyOta
+4200a7b0 00000004 W verifyRollbackLater
+4038639c 00000004 T vEventGroupSetBitsCallback
+4202038a 00000004 t vfs_null_fsync
+40386758 00000004 T vPortFree
+403869aa 00000004 T vPortSetupTimer
+3fc94460 00000004 b xIdleTaskHandle
+3fc94498 00000004 B xIsrStackBottom
+3fc9449c 00000004 B xIsrStackTop
+3fc944bc 00000004 b xLastTime.17
+3fc94464 00000004 b xNextTaskUnblockTime
+3fc9446c 00000004 b xNumOfOverflows
+3fc94474 00000004 b xPendedTicks
+40386788 00000004 T xPortcheckValidStackMem
+40386784 00000004 T xPortCheckValidTCBMem
+3fc944a4 00000004 B xPortSwitchFlag
+3fc94478 00000004 b xSchedulerRunning
+40388496 00000004 T xTaskGetCoreID
+3fc94480 00000004 b xTickCount
+3fc944c4 00000004 b xTimerQueue
+3fc944c0 00000004 b xTimerTaskHandle
+3fc94470 00000004 b xYieldPending
+3fc8f53c 00000005 d chip_name
+3fc8f5c0 00000005 d chip_name
+3fc8f378 00000005 d chip_name
+4202a638 00000006 T __register_frame_info
+4202a6c0 00000006 T __register_frame_info_table
+4038bd3a 00000006 T _free_r
+40381784 00000006 T _lock_acquire
+4038178a 00000006 T _lock_acquire_recursive
+40381790 00000006 T _lock_try_acquire
+40381796 00000006 T _lock_try_acquire_recursive
+4038bd48 00000006 T _malloc_r
+42029a08 00000006 T _Unwind_GetCFA
+42029aa4 00000006 T _Unwind_GetDataRelBase
+42029a68 00000006 T _Unwind_GetIP
+42029a82 00000006 T _Unwind_GetLanguageSpecificData
+42029a88 00000006 T _Unwind_GetRegionStart
+42029aaa 00000006 T _Unwind_GetTextRelBase
+42029a7c 00000006 T _Unwind_SetIP
+4200ebce 00000006 W getArduinoSetupWaitTime_ms()
+42000e38 00000006 W ArduinoHal::delayMicroseconds(unsigned long)
+42000e04 00000006 W ArduinoHal::spiEndTransaction()
+42000e3e 00000006 W ArduinoHal::delay(unsigned long)
+42000d70 00000006 W ArduinoHal::spiEnd()
+42008074 00000006 W adaptive_lora::RadioDriver::~RadioDriver()
+4200673a 00000006 T adaptive_lora::PreferencesConfigStorage::getBytesLength(char const*)
+4200674c 00000006 T adaptive_lora::PreferencesConfigStorage::end()
+42006740 00000006 T adaptive_lora::PreferencesConfigStorage::getBytes(char const*, void*, unsigned int)
+42006746 00000006 T adaptive_lora::PreferencesConfigStorage::putBytes(char const*, void const*, unsigned int)
+4200ed56 00000006 T HardwareSerial::availableForWrite()
+4200edb0 00000006 T HardwareSerial::flush()
+4200ed50 00000006 T HardwareSerial::available()
+4200ed4a 00000006 W HardwareSerial::readBytes(char*, unsigned int)
+4201dd92 00000006 T nvs::NVSPartition::erase_range(unsigned int, unsigned int)
+4201dd72 00000006 T nvs::NVSPartition::get_address()
+4201dd6c 00000006 T nvs::NVSPartition::get_partition_name()
+4201dd78 00000006 T nvs::NVSPartition::get_size()
+4201dd86 00000006 T nvs::NVSPartition::read_raw(unsigned int, void*, unsigned int)
+4201dd8c 00000006 T nvs::NVSPartition::write_raw(unsigned int, void const*, unsigned int)
+420089c0 00000006 W Stream::readBytes(unsigned char*, unsigned int)
+420051a4 00000006 T SX126x::setRegulatorLDO()
+420051aa 00000006 T SX126x::setRegulatorDCDC()
+420054dc 00000006 T SX126x::variablePacketLengthMode(unsigned char)
+42001dda 00000006 T SX126x::getMod()
+42027f96 00000006 W std::string::_S_copy_chars(char*, char const*, char const*)
+42012652 00000006 T bootloader_mmap_get_free_pages
+420267ee 00000006 t coex_schm_timeout_process
+3fc8ede0 00000006 d default_flash_chip_dummy
+420203de 00000006 t esp_coexist_debug_matrix_init_wrapper
+42023d7e 00000006 T esp_core_dump_get_arch_id
+4201503c 00000006 T esp_log_set_default_level
+42011a80 00000006 T esp_ota_mark_app_invalid_rollback
+42011a7a 00000006 T esp_ota_mark_app_valid_cancel_rollback
+40381bb8 00000006 T esp_pm_lock_acquire
+420245ae 00000006 T esp_pm_lock_delete
+40381bbe 00000006 T esp_pm_lock_release
+42026180 00000006 T esp_sha_dma_start
+40384fb4 00000006 T esp_system_abort
+3c04e3ac 00000006 r esp_unknown_msg
+42036a4c 00000006 T gdma_hal_deinit
+3fc8edd8 00000006 d hpm_flash_chip_dummy
+4038e332 00000006 t main_flash_op_status
+420180bc 00000006 t raise_r_stub
+4038e37e 00000006 t release_buffer_malloc
+3c04e1d0 00000006 r s_mspi_io_num_default
+4038dd02 00000006 T spi_flash_chip_generic_read_unique_id_none
+4038cd66 00000006 t spiflash_start_default
+420196ce 00000006 T uart_disable_tx_intr
+4201a2c6 00000006 T uart_get_selectlock
+4200d000 00000006 T uartFlush
+40386a62 00000006 T vListInitialiseItem
+3fc8f29c 00000007 d TAG
+3c04da0c 00000008 r __FUNCTION__.1
+3c04da84 00000008 r __FUNCTION__.13
+403817a4 00000008 T __retarget_lock_init
+403817ac 00000008 T __retarget_lock_init_recursive
+4202b538 00000008 T __sclose
+4200a6f4 00000008 T __yield
+4038bd4e 00000008 T _calloc_r
+4038bd40 00000008 T _realloc_r
+42027860 00000008 T operator delete(void*)
+3fc945c8 00000008 b guard variable for (anonymous namespace)::get_atomic_mutex()::atomic_mutex
+3fc9439c 00000008 b uart_instances
+42000ea8 00000008 W ArduinoHal::~ArduinoHal()
+3fc945dc 00000008 b (anonymous namespace)::eh_globals
+42007fb4 00000008 W adaptive_lora::RadioDriver::timeOnAir(unsigned int)
+42007ef8 00000008 W adaptive_lora::Llcc68Hardware::getIrqFlags()
+42007ece 00000008 W adaptive_lora::Llcc68Hardware::getTimeOnAir(unsigned int)
+42007f00 00000008 W adaptive_lora::Llcc68Hardware::finishReceive()
+42007f38 00000008 W adaptive_lora::Llcc68Hardware::explicitHeader()
+42007f08 00000008 W adaptive_lora::Llcc68Hardware::finishTransmit()
+42007ed6 00000008 W adaptive_lora::Llcc68Hardware::getSNR()
+42007ede 00000008 W adaptive_lora::Llcc68Hardware::getRSSI()
+42007f1a 00000008 W adaptive_lora::Llcc68Hardware::standby()
+42007ee6 00000008 W adaptive_lora::Llcc68Hardware::readData(unsigned char*, unsigned int)
+42007e2c 00000008 W adaptive_lora::Llcc68Hardware::~Llcc68Hardware()
+42006732 00000008 T adaptive_lora::PreferencesConfigStorage::begin(char const*, bool)
+420056d8 00000008 T PhysicalLayer::calculateTimeOnAir(ModemType_t, DataRate_t, PacketConfig_t, unsigned int)
+420056a2 00000008 T PhysicalLayer::standby()
+4200efb4 00000008 T HardwareSerial::setPins(signed char, signed char, signed char, signed char)
+4200eda8 00000008 T HardwareSerial::readBytes(unsigned char*, unsigned int)
+4201dd7e 00000008 T nvs::NVSPartition::get_readonly()
+4201dd98 00000008 W nvs::NVSPartition::~NVSPartition()
+4201ddea 00000008 W nvs::NVSPartitionManager::~NVSPartitionManager()
+420015e6 00000008 W LLCC68::~LLCC68()
+4200048e 00000008 T Module::term()
+420019ce 00000008 W SX1262::~SX1262()
+4200552e 00000008 T SX126x::explicitHeader()
+42001dd2 00000008 T SX126x::setDirectAction(void (*)())
+4200467a 00000008 T SX126x::setPacketSentAction(void (*)())
+4200467a 00000008 T SX126x::setChannelScanAction(void (*)())
+42004682 00000008 T SX126x::clearPacketSentAction()
+42004682 00000008 T SX126x::clearChannelScanAction()
+4200467a 00000008 T SX126x::setPacketReceivedAction(void (*)())
+42004682 00000008 T SX126x::clearPacketReceivedAction()
+42003f98 00000008 T SX126x::standby()
+420021e0 00000008 W SX126x::~SX126x()
+4200894c 00000008 T EspClass::restart()
+3c0506ec 00000008 V typeinfo for std::exception
+3fc94390 00000008 b yieldIfNecessary()::lastYield
+3fc8f4a8 00000008 d chip_name
+3fc8f6c4 00000008 d chip_name
+4200a73c 00000008 T delay
+40383bd8 00000008 T esp_cache_freeze_ext_mem_cache
+40383bd0 00000008 T esp_cache_resume_ext_mem_cache
+40383bc8 00000008 T esp_cache_suspend_ext_mem_cache
+40383be0 00000008 T esp_cache_unfreeze_ext_mem_cache
+420203e4 00000008 T esp_coex_common_semphr_create_wrapper
+420203ec 00000008 T esp_coex_common_semphr_delete_wrapper
+4202040a 00000008 T esp_coex_common_semphr_take_wrapper
+40381a1c 00000008 t esp_coex_semphr_take_from_isr_wrapper
+42022454 00000008 T esp_core_dump_tcb_addr_is_sane
+4038c37e 00000008 T esp_flash_chip_driver_initialized
+42014cb2 00000008 T esp_hw_stack_guard_get_pc
+42016436 00000008 T esp_intr_alloc_intrstatus
+42017642 00000008 T esp_mprot_has_byte_enables
+42011f00 00000008 T esp_partition_iterator_release
+3c051a88 00000008 d esp_system_init_fn_esp_hw_stack_guard_init
+3c051aa0 00000008 d esp_system_init_fn_esp_security_init
+3c051ab8 00000008 d esp_system_init_fn_esp_sleep_startup_init
+3c051a90 00000008 d esp_system_init_fn_esp_timer_init_nonos
+3c051a80 00000008 d esp_system_init_fn_esp_timer_init_os
+3c051b00 00000008 d esp_system_init_fn_init_apb_dma
+3c051aa8 00000008 d esp_system_init_fn_init_brownout
+3c051b08 00000008 d esp_system_init_fn_init_coexist
+3c051af0 00000008 d esp_system_init_fn_init_coredump
+3c051b18 00000008 d esp_system_init_fn_init_disable_rtc_wdt
+3c051af8 00000008 d esp_system_init_fn_init_efuse
+3c051a58 00000008 d esp_system_init_fn_init_efuse_check
+3c051a70 00000008 d esp_system_init_fn_init_efuse_show_app_info
+3c051ae8 00000008 d esp_system_init_fn_init_flash
+3c051a78 00000008 d esp_system_init_fn_init_heap
+3c051a98 00000008 d esp_system_init_fn_init_libc
+3c051ae0 00000008 d esp_system_init_fn_init_libc_stdio
+3c051ab0 00000008 d esp_system_init_fn_init_newlib_time
+3c051a68 00000008 d esp_system_init_fn_init_show_app_info
+3c051a60 00000008 d esp_system_init_fn_init_show_cpu_freq
+3c051ad8 00000008 d esp_system_init_fn_init_vfs_console
+3c051ad0 00000008 d esp_system_init_fn_init_vfs_nullfs
+3c051ac0 00000008 d esp_system_init_fn_init_vfs_uart
+3c051ac8 00000008 d esp_system_init_fn_init_vfs_usj_sec
+3c051b10 00000008 d esp_system_init_fn_usb_serial_jtag_conn_status_init
+403818dc 00000008 T esp_timer_impl_get_min_period_us
+3fc8ee48 00000008 D g_flash_guard_default_ops
+3fc8ee40 00000008 D g_flash_guard_no_os_ops
+3fc943f8 00000008 B g_startup_time
+42036a66 00000008 T gdma_hal_set_burst_size
+40380ede 00000008 T heap_caps_malloc_base
+3fc94598 00000008 b iwdt_context
+3fc8e600 00000008 d once_regsizes.0
+3fc94520 00000008 b p_uart_obj
+4200a6dc 00000008 T pinMatrixInAttach
+4200a6c4 00000008 T pinMatrixOutAttach
+3c051a50 00000008 d reserved_region_dram_data
+3c051a48 00000008 d reserved_region_iram_code
+3c051a38 00000008 d reserved_region_rtc_reserved_data
+3c051a40 00000008 d reserved_region_rtcram_data
+40381a24 00000008 t rmt_copy_encoder_reset
+3fc8e630 00000008 d rtc_wdt_ctx
+3fc944e0 00000008 b s_adjtime_start_us
+3fc944d8 00000008 b s_adjtime_total_correction_us
+3fc94440 00000008 b s_calibrated_freq
+420159b4 00000008 t s_compare_reserved_regions
+3fc94510 00000008 b s_correction_us
+3c04fa44 00000008 r s_ctx
+3fc94588 00000008 b s_extra_info
+3fc8e624 00000008 d s_memp_intr
+3fc944f0 00000008 B s_microseconds_offset
+3fc8e648 00000008 d s_reserved_pin_mask
+3fc94528 00000008 b s_uart_select_count
+42026866 00000008 T sha_hal_set_mode
+40380862 00000008 T spi_flash_cache_enabled
+40389268 00000008 T spi_flash_hal_poll_cmd_done
+420131fa 00000008 T spi_flash_op_lock
+42013202 00000008 T spi_flash_op_unlock
+3fc8f6cc 00000008 d TAG
+3c050ba0 00000008 r terminator.1
+420196c6 00000008 T uart_disable_rx_intr
+3fc8e650 00000008 d uart_selectlock
+3fc9455c 00000008 b vfs_console
+4200a6f4 00000008 W yield
+3c051854 00000009 r __func__.19
+42009d8e 0000000a T __attachInterrupt
+3c04eec0 0000000a r __func__.0
+3c051834 0000000a r __func__.16
+3c04f95c 0000000a r __func__.4
+3c051790 0000000a r __func__.6
+3c04d8b0 0000000a r __FUNCTION__.1
+3c04da14 0000000a r __FUNCTION__.6
+3c04e20c 0000000a r __FUNCTION__.7
+3c04d8d8 0000000a r __FUNCTION__.8
+420059b8 0000000a t _GLOBAL__sub_I__ZN11RadioLibCRCC2Ev
+42031b68 0000000a T _localeconv_r
+42027254 0000000a T __cxxabiv1::__unexpected(void (*)())
+42000e0a 0000000a W ArduinoHal::spiBeginTransaction()
+42005b1e 0000000a T Preferences::Preferences()
+42005b1e 0000000a T Preferences::Preferences()
+3c04d658 0000000a r adaptive_lora::(anonymous namespace)::kConfigNamespace
+42007f10 0000000a W adaptive_lora::Llcc68Hardware::startTransmit(unsigned char const*, unsigned int)
+42007e20 0000000a W adaptive_lora::Llcc68Hardware::clearIrqSignal()
+42007eee 0000000a W adaptive_lora::Llcc68Hardware::getPacketLength()
+420056ce 0000000a T PhysicalLayer::getSNR()
+420056ce 0000000a T PhysicalLayer::getRSSI()
+420059cc 0000000a T RadioLibConvCode::begin(unsigned char)
+420059c2 0000000a T RadioLibConvCode::RadioLibConvCode()
+420059c2 0000000a T RadioLibConvCode::RadioLibConvCode()
+420051b0 0000000a T SX126x::setEncoding(unsigned char)
+4202772e 0000000a T __cxxabiv1::__class_type_info::__do_find_public_src(int, void const*, __cxxabiv1::__class_type_info const*, void const*) const
+42007f8e 0000000a W adaptive_lora::RadioDriver::transmitting() const
+42007f98 0000000a W adaptive_lora::RadioDriver::receiving() const
+4202713a 0000000a W __gnu_cxx::__concurrence_lock_error::what() const
+42027144 0000000a W __gnu_cxx::__concurrence_unlock_error::what() const
+420276c6 0000000a T std::bad_array_new_length::what() const
+42027696 0000000a T std::bad_alloc::what() const
+3fc92f60 0000000a B app_elf_sha256_str
+42009d8e 0000000a W attachInterrupt
+4200faa4 0000000a W bleInUse
+4200fa9a 0000000a W btClassicInUse
+4038864c 0000000a T cache_hal_is_cache_enabled
+403821fc 0000000a T coex_dbg_output
+3c0506b4 0000000a V coex_schm_all_default
+42023d5e 0000000a t core_dump_crc_finish
+42023cf2 0000000a t core_dump_crc_version
+40381a0e 0000000a T esp_coex_common_malloc_internal_wrapper
+42023d5e 0000000a T esp_core_dump_checksum_finish
+42023cf2 0000000a T esp_core_dump_elf_version
+42023d8e 0000000a T esp_core_dump_get_isr_stack_top
+42023fc0 0000000a T esp_core_dump_port_set_crashed_tcb
+42023d84 0000000a T esp_core_dump_reset_fake_stacks
+4038e432 0000000a T esp_flash_app_disable_os_functions
+42037296 0000000a T esp_flash_read_chip_id
+42035d40 0000000a T esp_get_idf_version
+4038bb16 0000000a T esp_log_level_get_timeout
+4038bb20 0000000a T esp_log_util_set_cache_enabled_cb
+4203630a 0000000a T esp_reset_reason
+4201b182 0000000a T esp_vfs_uart_get_vfs
+4201f1ac 0000000a T esp_vfs_usb_serial_jtag_get_vfs
+420368f2 0000000a T gdma_ahb_hal_get_intr_status_reg
+420257ce 0000000a T periph_rtc_dig_clk8m_get_freq
+4038674e 0000000a T pvPortMalloc
+4200b8ec 0000000a T rmtWrite
+40386e98 0000000a t rtos_current_tcb
+4038d38a 0000000a T spi_flash_chip_generic_read_reg
+4038dd34 0000000a T spi_flash_common_read_status_8b_rdsr
+40388cbc 0000000a T spi_flash_encryption_hal_check
+40388cb2 0000000a T spi_flash_encryption_hal_destroy
+4038086a 0000000a T spi_flash_guard_set
+4038cd8c 0000000a T spi_flash_set_erasing_flag
+40389b34 0000000a T systimer_hal_set_tick_rate_ops
+3fc8ece0 0000000a d TAG
+3c04e1b4 0000000a r TAG
+4038aa26 0000000a T tlsf_get_pool
+4038b9ba 0000000a T tlsf_size
+4201ea34 0000000a T usb_serial_jtag_is_connected
+4038747e 0000000a T uxTaskGetNumberOfTasks
+4038653e 0000000a T xPortInIsrContext
+40381594 0000000a T xPortInterruptedFromISRContext
+40387d50 0000000a T xTaskGetCurrentTaskHandle
+4038746a 0000000a T xTaskGetTickCount
+40387474 0000000a T xTaskGetTickCountFromISR
+3c04f98c 0000000b r __func__.0
+3c04f980 0000000b r __func__.1
+3c04f974 0000000b r __func__.2
+3c051860 0000000b r __func__.20
+3c04f968 0000000b r __func__.3
+3c04f2a8 0000000b r __func__.40
+3c04f93c 0000000b r __func__.6
+3c04ef30 0000000b r __func__.8
+3c04fd14 0000000b r __FUNCTION__.1
+3c04da20 0000000b r __FUNCTION__.11
+3c050524 0000000b r __FUNCTION__.17
+3c04d8bc 0000000b r __FUNCTION__.5
+3c04d8e4 0000000b r __FUNCTION__.9
+4202a956 0000000c T __cxa_atexit
+3c04f478 0000000c r __func__.0
+3c04eeb4 0000000c r __func__.1
+3c0502c0 0000000c r __func__.4
+3c04f2c4 0000000c r __func__.43
+3c0517b0 0000000c r __func__.8
+3c04da2c 0000000c r __FUNCTION__.0
+3c04fd08 0000000c r __FUNCTION__.0
+3c04da38 0000000c r __FUNCTION__.1
+3c04db70 0000000c r __FUNCTION__.29
+3c0502cc 0000000c r __FUNCTION__.5
+3c04d914 0000000c r __FUNCTION__.8
+3fc8eaf8 0000000c D __sglue
+4038503a 0000000c T __stack_chk_fail
+42003ee6 0000000c t _GLOBAL__sub_I__ZN6SX126x17buildLRFHSSPacketEPKhjPhPjS3_S3_
+42017ed8 0000000c T _raise_r
+42017ed8 0000000c T _sbrk_r
+42029ffe 0000000c T _Unwind_DeleteException
+420087c8 0000000c T loop()
+420087bc 0000000c T setup()
+3fc93d94 0000000c b s_nvs_handles
+4202741a 0000000c T __cxxabiv1::__si_class_type_info::~__si_class_type_info()
+4202741a 0000000c T __cxxabiv1::__si_class_type_info::~__si_class_type_info()
+42005c6e 0000000c T Preferences::~Preferences()
+42005c6e 0000000c T Preferences::~Preferences()
+403802de 0000000c T adaptive_lora::Llcc68Hardware::onDio1()
+42001dc6 0000000c T SX126x::clearIrqFlags(unsigned long)
+420276a0 0000000c T std::bad_alloc::~bad_alloc()
+420276a0 0000000c T std::bad_alloc::~bad_alloc()
+4202728a 0000000c T std::unexpected()
+42027248 0000000c T std::terminate()
+3c050778 0000000c V typeinfo for __gnu_cxx::__concurrence_lock_error
+3c0507b0 0000000c V typeinfo for __gnu_cxx::__concurrence_unlock_error
+3c050878 0000000c V typeinfo for std::logic_error
+3c050898 0000000c V typeinfo for std::length_error
+3c0508b8 0000000c V typeinfo for std::out_of_range
+3c050710 0000000c V typeinfo for std::bad_array_new_length
+3c0506d0 0000000c V typeinfo for std::bad_alloc
+4202a896 0000000c T atexit
+4201f2e4 0000000c T console_access
+4201f2ae 0000000c T console_fcntl
+4201f296 0000000c T console_fstat
+4201f2a2 0000000c T console_read
+4201f308 0000000c T console_tcdrain
+4201f314 0000000c T console_tcflush
+4201f2fc 0000000c T console_tcgetattr
+4201f2f0 0000000c T console_tcsetattr
+42023cfc 0000000c t core_dump_crc_init
+42023cfc 0000000c T esp_core_dump_checksum_init
+42035e34 0000000c T esp_register_freertos_idle_hook_for_cpu
+42035e40 0000000c T esp_register_freertos_tick_hook_for_cpu
+42025ec4 0000000c T esp_sha_block
+3fc8eaec 0000000c d gdma_ahb_hal_priv_data
+3fc92f80 0000000c b init_context
+4201b320 0000000c T nvs_flash_init
+3c050e18 0000000c r p05.0
+4201412a 0000000c T panic_restart
+42035f0a 0000000c t print_abort_details
+4200b614 0000000c T rgbLedWrite
+3fc8ef88 0000000c d s_dma_descr_buf
+3fc8ef94 0000000c d s_dma_descr_input
+3c04ffc4 0000000c r s_glb_clks
+3fc93dc0 0000000c b s_platform
+420268b8 0000000c T sha_hal_wait_idle
+4038dd08 0000000c T spi_flash_common_read_status_8b_rdsr2
+4038daa0 0000000c T spi_flash_common_write_status_16b_wrsr
+4038dd3e 0000000c T spi_flash_common_write_status_8b_wrsr
+40388c30 0000000c T spi_flash_encryption_hal_disable
+4200c1cc 0000000c T spiGetClockDiv
+42017ed8 0000000c t syscall_not_implemented_aborts
+3fc93d88 0000000c b systimer_hal
+3fc93ba0 0000000c b systimer_hal.1
+40383982 0000000c T systimer_ticks_to_us
+4038398e 0000000c T systimer_us_to_ticks
+4202536a 0000000c T uart_hal_get_data_bit_num
+4202534e 0000000c T uart_hal_get_stop_bits
+4200cc9e 0000000c T uartIsDriverInstalled
+4201ea40 0000000c t usb_serial_jtag_open
+40387d26 0000000c T vTaskMissedYield
+3c04e34c 0000000d r __func__.0
+3c051748 0000000d r __func__.1
+3c04e23c 0000000d r __func__.13
+3c04eef0 0000000d r __func__.2
+3c05176c 0000000d r __func__.3
+3c04f2b4 0000000d r __func__.42
+3c04f4b4 0000000d r __FUNCTION__.2
+3c04dbb4 0000000d r __FUNCTION__.2
+3c04ff00 0000000d r __FUNCTION__.25
+3c0515a0 0000000d r __FUNCTION__.4
+3c050184 0000000d r __FUNCTION__.4
+3c04da64 0000000d r __FUNCTION__.4
+3c050558 0000000d r __FUNCTION__.6
+3c0506c0 0000000d V typeinfo name for std::bad_alloc
+3c0506dc 0000000d V typeinfo name for std::exception
+3fc8f4b0 0000000d d TAG
+42017b36 0000000e t __esp_system_init_fn_init_libc
+3c04d9fc 0000000e r __func__.0
+3c04ef50 0000000e r __func__.10
+3c051670 0000000e r __func__.17
+3c04ebb4 0000000e r __func__.3
+3c04f274 0000000e r __func__.31
+3c04dc08 0000000e r __FUNCTION__.0
+3c0500d0 0000000e r __FUNCTION__.13
+3c04fe78 0000000e r __FUNCTION__.14
+3c04fe88 0000000e r __FUNCTION__.17
+3c051680 0000000e r __FUNCTION__.18
+3c04fe98 0000000e r __FUNCTION__.18
+3c04da44 0000000e r __FUNCTION__.2
+3c0502b0 0000000e r __FUNCTION__.2
+3c04da54 0000000e r __FUNCTION__.3
+3c04d8c8 0000000e r __FUNCTION__.6
+3c04fe44 0000000e r __FUNCTION__.7
+420099c8 0000000e t __onPinInterrupt
+42027296 0000000e t _GLOBAL__sub_I__ZN10__cxxabiv111__terminateEPFvvE
+420273a2 0000000e t _GLOBAL__sub_I__ZSt7nothrow
+42029a6e 0000000e T _Unwind_GetIPInfo
+42027738 0000000e T __cxxabiv1::__class_type_info::~__class_type_info()
+42027738 0000000e T __cxxabiv1::__class_type_info::~__class_type_info()
+42000eb0 0000000e T ArduinoHal::init()
+42000ebe 0000000e T ArduinoHal::term()
+42000d62 0000000e W ArduinoHal::spiBegin()
+3c04d648 0000000e r adaptive_lora::kFirmwareVersion
+4201e2d8 0000000e T nvs::HashList::HashList()
+4201e2d8 0000000e T nvs::HashList::HashList()
+4202714e 0000000e W __gnu_cxx::__concurrence_lock_error::~__concurrence_lock_error()
+4202714e 0000000e W __gnu_cxx::__concurrence_lock_error::~__concurrence_lock_error()
+42027176 0000000e W __gnu_cxx::__concurrence_unlock_error::~__concurrence_unlock_error()
+42027176 0000000e W __gnu_cxx::__concurrence_unlock_error::~__concurrence_unlock_error()
+42027ebe 0000000e T std::length_error::~length_error()
+42027ebe 0000000e T std::length_error::~length_error()
+42027ee4 0000000e T std::out_of_range::~out_of_range()
+42027ee4 0000000e T std::out_of_range::~out_of_range()
+420276d0 0000000e T std::bad_array_new_length::~bad_array_new_length()
+420276d0 0000000e T std::bad_array_new_length::~bad_array_new_length()
+42012442 0000000e T bootloader_common_ota_select_crc
+403805a4 0000000e T bootloader_execute_flash_command
+40380aa2 0000000e T efuse_hal_get_disable_wafer_version_major
+420203f4 0000000e T esp_coex_common_semphr_give_wrapper
+4201643e 0000000e T esp_intr_alloc
+4038087e 0000000e t flash_init_state
+40380b06 0000000e t heap_caps_alloc_failed
+420253c4 0000000e T ledc_hal_init
+42025c3a 0000000e T mbedtls_sha256_init
+4201b498 0000000e T nvs_get_blob
+40381586 0000000e T rtc_clk_cpu_set_to_default_config
+4038c2c8 0000000e T rv_utils_dbgr_is_attached
+42034a8e 0000000e t semihosting_call_noerrno
+4038dd4a 0000000e T spi_flash_common_write_status_8b_wrsr2
+40380844 0000000e T spi_flash_disable_interrupts_caches_and_other_cpu_no_os
+40380852 0000000e T spi_flash_enable_interrupts_caches_no_os
+40389228 0000000e T spi_flash_hal_gpspi_check_status
+40388d4a 0000000e T spi_flash_hal_gpspi_poll_cmd_done
+4038a582 0000000e T tlsf_block_size
+4201f1b8 0000000e T usb_serial_jtag_is_driver_installed
+4201f1c6 0000000e T usb_serial_jtag_set_select_notif_callback
+4200a6fc 0000000e T xTaskCreateUniversal
+3c04f3dc 0000000f r __func__.0
+3c04fc50 0000000f r __func__.1
+3c04e22c 0000000f r __func__.12
+3c04eca8 0000000f r __func__.2
+3c04eba4 0000000f r __func__.2
+3c04f284 0000000f r __func__.32
+3c0515d0 0000000f r __FUNCTION__.10
+3c051690 0000000f r __FUNCTION__.19
+3c04fddc 0000000f r __FUNCTION__.2
+3c04d8a0 0000000f r __FUNCTION__.2
+3c04ff38 0000000f r __FUNCTION__.28
+3c04ff84 0000000f r __FUNCTION__.33
+3c04dd9c 0000000f r __FUNCTION__.34
+3c04ddac 0000000f r __FUNCTION__.35
+3c04f4c4 0000000f r __FUNCTION__.4
+3c04de7c 0000000f r __FUNCTION__.46
+3c050174 0000000f r __FUNCTION__.5
+3c04fe54 0000000f r __FUNCTION__.8
+4202bc9e 00000010 T __env_lock
+4202bcae 00000010 T __env_unlock
+42018a1e 00000010 t __esp_system_init_fn_esp_timer_init_nonos
+4201338a 00000010 t __esp_system_init_fn_init_apb_dma
+420223ba 00000010 t __esp_system_init_fn_init_coredump
+4201581a 00000010 t __esp_system_init_fn_init_heap
+4201337a 00000010 t __esp_system_init_fn_init_newlib_time
+4201b1d4 00000010 t __esp_system_init_fn_init_vfs_uart
+3c04dfec 00000010 r __func__.0
+3c05061c 00000010 r __func__.0
+3c04e1c0 00000010 r __func__.0
+3c04da74 00000010 r __func__.12
+3c04f684 00000010 r __func__.21
+3c051738 00000010 r __func__.3
+3fc8f0ac 00000010 d __func__.5
+3c0517bc 00000010 r __func__.9
+3c04fd94 00000010 r __FUNCTION__.1
+3c04d8f0 00000010 r __FUNCTION__.10
+3c0500e0 00000010 r __FUNCTION__.12
+3c04fd20 00000010 r __FUNCTION__.2
+3c04daf8 00000010 r __FUNCTION__.23
+3c04db4c 00000010 r __FUNCTION__.27
+3c04f80c 00000010 r __FUNCTION__.32
+3c04ddbc 00000010 r __FUNCTION__.36
+3c04f8bc 00000010 r __FUNCTION__.4
+3c04de6c 00000010 r __FUNCTION__.45
+3c04f8ac 00000010 r __FUNCTION__.5
+3fc8f0bc 00000010 d __FUNCTION__.6
+3c050548 00000010 r __FUNCTION__.7
+403817b4 00000010 T __retarget_lock_close
+403817c4 00000010 T __retarget_lock_close_recursive
+4202ad3c 00000010 T __sfp_lock_acquire
+4202ad4c 00000010 T __sfp_lock_release
+3fc8e6a4 00000010 d _spi_bus_array
+3c04d5e4 00000010 r ConvCodeTable1_2
+42000d50 00000010 W ArduinoHal::pinToInterrupt(unsigned long)
+42000e44 00000010 W ArduinoHal::detachInterrupt(unsigned long)
+3fc94024 00000010 b (anonymous namespace)::emergency_pool
+420087ac 00000010 W adaptive_lora::Esp32Firmware::~Esp32Firmware()
+420087ac 00000010 W adaptive_lora::Esp32Firmware::~Esp32Firmware()
+42007e84 00000010 T adaptive_lora::Llcc68Hardware::enableDio1()
+42006752 00000010 W adaptive_lora::PreferencesConfigStorage::~PreferencesConfigStorage()
+42006752 00000010 W adaptive_lora::PreferencesConfigStorage::~PreferencesConfigStorage()
+4201e2aa 00000010 T nvs::Lock::Lock()
+4201e2aa 00000010 T nvs::Lock::Lock()
+4201b56a 00000010 T nvs::Page::Header::calculateCrc32()
+42002024 00000010 T SX126x::setIrqFlags(unsigned long)
+3fc94034 00000010 V std::string::_Rep::_S_empty_rep_storage
+3c050868 00000010 V typeinfo name for std::logic_error
+3c04faf4 00000010 V vtable for nvs::NVSPartitionManager
+40380a56 00000010 t apb_backup_dma_lock
+40380a46 00000010 t apb_backup_dma_unlock
+3c05155c 00000010 r blanks.1
+3c051320 00000010 r blanks.1
+3fc8efa0 00000010 D coex_env
+40380ab0 00000010 T efuse_hal_get_disable_blk_version_major
+40380ade 00000010 T efuse_hal_get_major_chip_version
+3fc92b58 00000010 B emptyString
+420255fc 00000010 T esp_crypto_sha_aes_lock_acquire
+4202560c 00000010 T esp_crypto_sha_aes_lock_release
+3fc8ecd0 00000010 d esp_flash_api_funcs_patched
+3fc8eed0 00000010 D FreeRTOS_openocd_params
+3fc92ac8 00000010 B HWCDCSerial
+42013a2a 00000010 t idle_hook_cb
+40382cd4 00000010 T periph_rcc_enter
+40382ce4 00000010 T periph_rcc_exit
+4200a6e4 00000010 T pinMatrixInDetach
+4200a6cc 00000010 T pinMatrixOutDetach
+42020bbc 00000010 T rmt_isr_priority_to_flags
+40382ef2 00000010 T rtc_clk_8md256_enabled
+40382e0e 00000010 T rtc_clk_bbpll_add_consumer
+40382e1e 00000010 T rtc_clk_bbpll_remove_consumer
+4038315e 00000010 T rtc_clk_cpu_freq_set_xtal
+50001ff0 00000010 b s_bootloader_retain_mem.0
+3fc93de4 00000010 b s_core_flash_config
+3fc8ea84 00000010 d s_platform
+3fc93ee0 00000010 b s_priv_data
+403807b4 00000010 t spi1_start
+40389c7c 00000010 T systimer_hal_enable_alarm_int
+40381eea 00000010 t timer_list_lock.isra.0
+40381eda 00000010 t timer_list_unlock.isra.0
+3fc8e7f0 00000010 D timestamp_id
+4202535a 00000010 T uart_hal_set_data_bit_num
+4201ed52 00000010 t usb_serial_jtag_tcdrain
+40386562 00000010 T vPortClearInterruptMaskFromISR
+4038745a 00000010 T vTaskSuspendAll
+3c051310 00000010 r zeroes.0
+3c05154c 00000010 r zeroes.0
+3c04dfd8 00000011 r __func__.1
+3c050608 00000011 r __func__.1
+3c05034c 00000011 r __func__.11
+3c04eb90 00000011 r __func__.13
+3fc8f12c 00000011 d __func__.2
+3c04ed38 00000011 r __func__.2
+3c051758 00000011 r __func__.2
+3fc8f140 00000011 d __func__.3
+3c05177c 00000011 r __func__.5
+3c04f948 00000011 r __func__.5
+3c04eb30 00000011 r __func__.6
+3c04dcec 00000011 r __FUNCTION__.18
+3c04fec4 00000011 r __FUNCTION__.22
+3c04f81c 00000011 r __FUNCTION__.30
+3c04ff70 00000011 r __FUNCTION__.32
+3c04f7a4 00000011 r __FUNCTION__.36
+3c050584 00000011 r __FUNCTION__.4
+3c04de1c 00000011 r __FUNCTION__.41
+3c04de58 00000011 r __FUNCTION__.44
+3c04d9c0 00000011 r __FUNCTION__.7
+3c04e218 00000011 r __FUNCTION__.8
+3c04d9d4 00000011 r __FUNCTION__.9
+3c04d634 00000011 r adaptive_lora::kBuildId
+3c050884 00000011 V typeinfo name for std::length_error
+3c0508a4 00000011 V typeinfo name for std::out_of_range
+4202baae 00000012 T __errno
+420122c6 00000012 t __esp_system_init_fn_init_efuse_check
+3c04f33c 00000012 r __func__.0
+3c04f2e8 00000012 r __func__.1
+3c04ef60 00000012 r __func__.11
+3c0517f8 00000012 r __func__.12
+3c05180c 00000012 r __func__.13
+3c04efac 00000012 r __func__.14
+3c051820 00000012 r __func__.14
+3c051840 00000012 r __func__.17
+3c04f644 00000012 r __func__.18
+3c04decc 00000012 r __func__.2
+3c04f830 00000012 r __func__.28
+3c04f6dc 00000012 r __func__.29
+3c04f750 00000012 r __func__.34
+3c04f77c 00000012 r __func__.36
+3fc8f154 00000012 d __func__.4
+3c04eb44 00000012 r __func__.7
+3c04f5a4 00000012 r __func__.9
+3c04fd80 00000012 r __FUNCTION__.0
+3c04d900 00000012 r __FUNCTION__.11
+3c04e24c 00000012 r __FUNCTION__.14
+3c04dcd8 00000012 r __FUNCTION__.17
+3c04daa8 00000012 r __FUNCTION__.19
+3c04dabc 00000012 r __FUNCTION__.20
+3c04dd28 00000012 r __FUNCTION__.25
+3c04f844 00000012 r __FUNCTION__.27
+3c04db5c 00000012 r __FUNCTION__.28
+3c04ff48 00000012 r __FUNCTION__.29
+3c04ff5c 00000012 r __FUNCTION__.31
+3c04ddf4 00000012 r __FUNCTION__.39
+3c04de08 00000012 r __FUNCTION__.40
+3c04de44 00000012 r __FUNCTION__.43
+3c04dc2c 00000012 r __FUNCTION__.6
+3c04f898 00000012 r __FUNCTION__.6
+3c04f884 00000012 r __FUNCTION__.7
+40381894 00000012 T __retarget_lock_release
+403818a6 00000012 T __retarget_lock_release_recursive
+42000e6a 00000012 W ArduinoHal::digitalRead(unsigned long)
+4200edb6 00000012 T HardwareSerial::write(unsigned char)
+4201ddb2 00000012 T nvs::NVSPartition::read(unsigned int, void*, unsigned int)
+4201dda0 00000012 T nvs::NVSPartition::write(unsigned int, void const*, unsigned int)
+4201db1c 00000012 T nvs::NVSHandleSimple::commit()
+42000336 00000012 T SPIClass::transfer(unsigned char)
+42007fa2 00000012 W adaptive_lora::RadioDriver::healthy() const
+42023d98 00000012 T esp_core_dump_get_isr_stack_end
+4201661e 00000012 T esp_gpio_reserve
+42025e8c 00000012 T esp_sha_acquire_hardware
+42025e9e 00000012 T esp_sha_release_hardware
+4200a70a 00000012 T micros
+4201b3e6 00000012 T nvs_open
+40382cc2 00000012 T periph_rcc_acquire_exit
+42032e4a 00000012 T rmt_alloc_encoder_mem
+4038def0 00000012 T spi_flash_chip_winbond_probe
+42014fa6 00000012 T spi_flash_hal_supports_direct_read
+42014f94 00000012 T spi_flash_hal_supports_direct_write
+4202ac92 00000012 t stdio_exit_handler
+3c0501fc 00000012 r TAG
+3c050224 00000012 r TAG
+4202533c 00000012 T uart_hal_set_stop_bits
+4038a0f0 00000012 T wdt_hal_is_enabled
+4038a018 00000012 T wdt_hal_write_protect_enable
+40386420 00000012 T xEventGroupSetBitsFromISR
+3c04def4 00000013 r __func__.0
+3fc8f118 00000013 d __func__.1
+3c0517cc 00000013 r __func__.10
+3c04f658 00000013 r __func__.19
+3c051724 00000013 r __func__.2
+3c04f2fc 00000013 r __func__.2
+3c04f24c 00000013 r __func__.25
+3c04f080 00000013 r __func__.25
+3c04ff10 00000013 r __func__.26
+3c04f260 00000013 r __func__.26
+3c04dee0 00000013 r __func__.3
+3c04f434 00000013 r __func__.3
+3c04f73c 00000013 r __func__.33
+3c04f558 00000013 r __func__.4
+3c04df68 00000013 r __func__.5
+3fc8f1c8 00000013 d __func__.6
+3fc8f1dc 00000013 d __func__.7
+3c05179c 00000013 r __func__.7
+3c04d9e8 00000013 r __FUNCTION__.0
+3c04dbc4 00000013 r __FUNCTION__.0
+3c051618 00000013 r __FUNCTION__.14
+3c04f8e0 00000013 r __FUNCTION__.2
+3c0516a0 00000013 r __FUNCTION__.20
+3c04dad0 00000013 r __FUNCTION__.21
+3c04dae4 00000013 r __FUNCTION__.22
+3c04dd14 00000013 r __FUNCTION__.24
+3c04ff24 00000013 r __FUNCTION__.27
+3c04f8cc 00000013 r __FUNCTION__.3
+3c04dd88 00000013 r __FUNCTION__.31
+3c04ddcc 00000013 r __FUNCTION__.37
+3c04f790 00000013 r __FUNCTION__.39
+3c04de30 00000013 r __FUNCTION__.42
+3c04fe08 00000013 r __FUNCTION__.5
+3c04e1f8 00000013 r __FUNCTION__.5
+3c04dc18 00000013 r __FUNCTION__.5
+3c04fe64 00000013 r __FUNCTION__.9
+3c050250 00000013 r TAG
+42013344 00000014 t __esp_system_init_fn_init_show_cpu_freq
+3c050210 00000014 r __func__.0
+3c04f030 00000014 r __func__.21
+3c04fed8 00000014 r __func__.23
+3c04f294 00000014 r __func__.33
+3c04f328 00000014 r __func__.4
+3c04df54 00000014 r __func__.4
+3c04f420 00000014 r __func__.4
+3c050320 00000014 r __func__.9
+3c04ef3c 00000014 r __func__.9
+3c04edb8 00000014 r __func__.9
+3c04d920 00000014 r __FUNCTION__.0
+3c04f858 00000014 r __FUNCTION__.19
+3c04d94c 00000014 r __FUNCTION__.2
+3c04dd00 00000014 r __FUNCTION__.23
+3c04db08 00000014 r __FUNCTION__.24
+3c04feec 00000014 r __FUNCTION__.24
+3c04dde0 00000014 r __FUNCTION__.38
+3c04d978 00000014 r __FUNCTION__.4
+4201b518 00000014 W nvs::isVariableLengthType(nvs::ItemType)
+4201e1a2 00000014 T nvs::Item::calculateCrc32(unsigned char const*, unsigned int, unsigned long*)
+42001b30 00000014 T SX126x::startReceive()
+420040fa 00000014 T SX126x::writeRegister(unsigned short, unsigned char const*, unsigned char)
+42004258 00000014 T SX126x::calibrateImage(unsigned char const*)
+3c0507bc 00000014 V vtable for __gnu_cxx::__concurrence_lock_error
+3c0507d0 00000014 V vtable for __gnu_cxx::__concurrence_unlock_error
+3c0508c4 00000014 V vtable for std::logic_error
+3c0508d8 00000014 V vtable for std::length_error
+3c0508ec 00000014 V vtable for std::out_of_range
+3c050828 00000014 V vtable for std::bad_array_new_length
+3c050814 00000014 V vtable for std::bad_alloc
+4202669e 00000014 t coex_schm_is_loop_allowed
+403807e0 00000014 t end
+40383c34 00000014 T esp_cache_unfreeze_caches_enable_interrupts
+4202284c 00000014 t esp_core_dump_flash_write_start
+42023fca 00000014 T esp_core_dump_get_extra_info
+4202284c 00000014 T esp_core_dump_write_start
+42014c9e 00000014 T esp_hw_stack_guard_get_fired_cpu
+42015f30 00000014 T esp_intr_get_cpu
+42011a86 00000014 T esp_ota_mark_app_invalid_rollback_and_reboot
+42025eb0 00000014 T esp_sha_set_mode
+403821c8 00000014 T ets_timer_disarm
+3fc8ea98 00000014 D g_coex_param
+42010aac 00000014 T gpio_get_level
+420154ec 00000014 T heap_caps_get_largest_free_block
+3fc8ed68 00000014 d main_flash_arg
+42025c48 00000014 T mbedtls_sha256_free
+3c04f2d0 00000014 r non_ready_task_lists
+403821c8 00000014 T os_timer_disarm
+40380980 00000014 t panic_enable_cache
+3fc90550 00000014 B RadioLibCRCInstance
+42020bcc 00000014 t rmt_del_copy_encoder
+3fc92f6c 00000014 b shutdown_handlers
+4038cd96 00000014 T spi_flash_brownout_need_reset
+4038d11e 00000014 T spi_flash_chip_gd_get_caps
+3fc8eda4 00000014 D spi_flash_chip_generic_timeout
+4038df02 00000014 T spi_flash_chip_winbond_get_caps
+40389af6 00000014 T spi_flash_hal_resume
+40389b0a 00000014 T spi_flash_hal_suspend
+4200ca00 00000014 T spiEndTransaction
+403807f4 00000014 t start
+40389c8c 00000014 T systimer_hal_enable_counter
+3c05004c 00000014 r TAG
+4201ecd2 00000014 t usb_serial_jtag_tcflush
+40386a4e 00000014 T vListInitialise
+403865f2 00000014 T vPortYieldFromISR
+3fc93cbc 00000014 b xActiveTimerList1
+3fc93ca8 00000014 b xActiveTimerList2
+3fc9315c 00000014 b xDelayedTaskList1
+3fc93148 00000014 b xDelayedTaskList2
+3fc93134 00000014 b xPendingReadyList
+3fc9310c 00000014 b xSuspendedTaskList
+3fc93120 00000014 b xTasksWaitingTermination
+3c04fb20 00000015 r __func__.0
+3fc8f234 00000015 d __func__.0
+3c04f484 00000015 r __func__.0
+3c04f460 00000015 r __func__.1
+3c04edcc 00000015 r __func__.10
+3c04f19c 00000015 r __func__.18
+3c04f448 00000015 r __func__.2
+3c04f384 00000015 r __func__.2
+3c04ede4 00000015 r __func__.2
+3c04f018 00000015 r __func__.20
+3c04f310 00000015 r __func__.3
+3c04f6f0 00000015 r __func__.30
+3c04f764 00000015 r __func__.35
+3fc8f1b0 00000015 d __func__.5
+3c04f0f8 00000015 r __func__.7
+3c04ef18 00000015 r __func__.7
+3c04fda4 00000015 r __FUNCTION__.0
+3c04f90c 00000015 r __FUNCTION__.0
+3c04f8f4 00000015 r __FUNCTION__.1
+3c0500b8 00000015 r __FUNCTION__.14
+3c0501ac 00000015 r __FUNCTION__.2
+3c04db1c 00000015 r __FUNCTION__.25
+3c04db34 00000015 r __FUNCTION__.26
+3c04dd54 00000015 r __FUNCTION__.27
+3c04dbf0 00000015 r __FUNCTION__.3
+3c04d9a8 00000015 r __FUNCTION__.6
+3c04dc70 00000015 r __FUNCTION__.9
+3c050530 00000015 r __FUNCTION__.9
+3c050018 00000015 r TAG
+420169b0 00000016 t __esp_system_init_fn_esp_sleep_startup_init
+42017b44 00000016 t __esp_system_init_fn_init_libc_stdio
+3c04fa4c 00000016 r __func__.0
+3c04eecc 00000016 r __func__.1
+3c04f49c 00000016 r __func__.1
+3c050334 00000016 r __func__.10
+3c0517e0 00000016 r __func__.11
+3c04f5d8 00000016 r __func__.11
+3c04f408 00000016 r __func__.18
+3c04f350 00000016 r __func__.2
+3c04f234 00000016 r __func__.24
+3c04f6c4 00000016 r __func__.28
+3c04f708 00000016 r __func__.31
+3c04fa64 00000016 r __func__.4
+3c04ed84 00000016 r __func__.6
+3c04f924 00000016 r __func__.7
+3c050308 00000016 r __func__.8
+3c0501c4 00000016 r __FUNCTION__.1
+3c04d934 00000016 r __FUNCTION__.1
+3c05010c 00000016 r __FUNCTION__.10
+3c04ffac 00000016 r __FUNCTION__.35
+3c04dc40 00000016 r __FUNCTION__.7
+3c05015c 00000016 r __FUNCTION__.7
+4038852e 00000016 T __getreent
+420275be 00000016 t __tcf_0
+4200fa80 00000016 t _btAvailableMemForMode
+42029a8e 00000016 T _Unwind_FindEnclosingFunction
+42000e7c 00000016 W ArduinoHal::digitalWrite(unsigned long, unsigned long)
+42000e54 00000016 W ArduinoHal::attachInterrupt(unsigned long, void (*)(), unsigned long)
+42000e92 00000016 W ArduinoHal::pinMode(unsigned long, unsigned long)
+4200590a 00000016 T RadioLibCRC::RadioLibCRC()
+4200590a 00000016 T RadioLibCRC::RadioLibCRC()
+42007eb8 00000016 T adaptive_lora::Llcc68Hardware::startReceive()
+42007f22 00000016 W adaptive_lora::Llcc68Hardware::setCRC(unsigned char)
+4201b690 00000016 T nvs::Page::setSeqNumber(unsigned long)
+4201b6fe 00000016 T nvs::Page::markFull()
+42008b34 00000016 T HWCDC::available()
+42001fc4 00000016 T SX126x::receiveDirect()
+42000cf4 00000016 T Module::findRfSwitchMode(unsigned char) const
+42009666 00000016 W String::len() const
+4200ed16 00000016 W std::_Function_base::~_Function_base()
+4200ed16 00000016 W std::_Function_base::~_Function_base()
+42027e66 00000016 T std::__throw_out_of_range_fmt(char const*, ...)
+42012450 00000016 T bootloader_common_ota_select_invalid
+4201f24c 00000016 T console_end_select
+4038e2c0 00000016 t delay_us
+4038e41c 00000016 t delay_us
+42023d68 00000016 T esp_core_dump_port_init
+420372a0 00000016 T esp_flash_app_disable_protect
+42014c88 00000016 T esp_hw_stack_guard_get_bounds
+4200ff4a 00000016 T getCpuFrequencyMhz
+4038a1f6 00000016 T multi_heap_internal_lock
+4038a20c 00000016 T multi_heap_internal_unlock
+40384fe4 00000016 T panic_abort
+403814fc 00000016 T rtc_clk_apb_freq_update
+40382da2 00000016 t rtc_clk_bbpll_disable
+4038342c 00000016 T rtc_dig_clk8m_disable
+40383416 00000016 T rtc_dig_clk8m_enable
+42017120 00000016 T sar_periph_ctrl_init
+42017e82 00000016 T settimeofday
+420268a2 00000016 T sha_hal_hash_dma
+40380818 00000016 T spi_flash_disable_interrupts_caches_and_other_cpu
+4038082e 00000016 T spi_flash_enable_interrupts_caches_and_other_cpu
+40388c1a 00000016 T spi_flash_encryption_hal_enable
+40389802 00000016 T spi_flash_hal_check_status
+40389cd2 00000016 T systimer_hal_connect_alarm_counter
+40389b1e 00000016 T systimer_hal_init
+4201ef76 00000016 t usb_serial_jtag_read_char.constprop.0
+40387c5a 00000016 T vTaskInternalSetTimeOutState
+3c04ee6c 00000017 r __func__.0
+3c050378 00000017 r __func__.0
+3c04ec78 00000017 r __func__.0
+3fc8f07c 00000017 d __func__.0
+3fc8f180 00000017 d __func__.0
+3c04dfc0 00000017 r __func__.1
+3c050390 00000017 r __func__.1
+3c04dffc 00000017 r __func__.1
+3c04ee84 00000017 r __func__.1
+3c04f610 00000017 r __func__.13
+3c04e260 00000017 r __func__.15
+3c051588 00000017 r __func__.2
+3c04ee9c 00000017 r __func__.2
+3c04f66c 00000017 r __func__.20
+3c04f6ac 00000017 r __func__.27
+3c04df3c 00000017 r __func__.3
+3fc8f198 00000017 d __func__.4
+3c04ef00 00000017 r __func__.5
+3c050298 00000017 r __FUNCTION__.1
+3c04dc88 00000017 r __FUNCTION__.10
+3c04f86c 00000017 r __FUNCTION__.14
+3c050194 00000017 r __FUNCTION__.3
+4202a780 00000018 T __deregister_frame
+4201339a 00000018 t __esp_system_init_fn_init_coexist
+3fc8f168 00000018 d __func__.0
+3c04eae8 00000018 r __func__.0
+3c04eb18 00000018 r __func__.1
+3c04eb00 00000018 r __func__.1
+3c04ec90 00000018 r __func__.1
+3c050238 00000018 r __func__.1
+3fc8f268 00000018 d __func__.1
+3c050280 00000018 r __func__.1
+3c04f148 00000018 r __func__.14
+3c04f184 00000018 r __func__.16
+3c04df24 00000018 r __func__.2
+3c04f694 00000018 r __func__.26
+3c0516d0 00000018 r __func__.4
+3c04f110 00000018 r __func__.8
+3fc8f094 00000018 d __FUNCTION__.0
+3c04dbd8 00000018 r __FUNCTION__.1
+3c04fd68 00000018 r __FUNCTION__.10
+3c04dd3c 00000018 r __FUNCTION__.26
+3c04d960 00000018 r __FUNCTION__.3
+3c04f7f4 00000018 r __FUNCTION__.33
+3c04ff94 00000018 r __FUNCTION__.34
+3c04dc58 00000018 r __FUNCTION__.8
+42017e6a 00000018 T _gettimeofday_r
+4200cb92 00000018 t _uartIsOneWireActive
+42006762 00000018 W adaptive_lora::PreferencesConfigStorage::~PreferencesConfigStorage()
+4200edc8 00000018 T HardwareSerial::write(unsigned char const*, unsigned int)
+4201b6e6 00000018 T nvs::Page::markFreeing()
+420092ee 00000018 T HWCDC::~HWCDC()
+420092ee 00000018 T HWCDC::~HWCDC()
+42027ea6 00000018 T std::logic_error::~logic_error()
+42027ecc 00000018 T std::length_error::~length_error()
+42027ef2 00000018 T std::out_of_range::~out_of_range()
+3c04e360 00000018 R cache_ilg_bits
+4202bac0 00000018 T close
+420263d2 00000018 T coex_pre_init
+40380aee 00000018 T efuse_hal_get_minor_chip_version
+42014b1a 00000018 T esp_apb_backup_dma_lock_init
+403810d2 00000018 T esp_clk_xtal_freq
+3fc8edb8 00000018 d esp_flash_encryption_default
+42016630 00000018 T esp_gpio_revoke
+42017a30 00000018 T esp_mprot_ll_world_to_hl_world
+420203c0 00000018 T esp_vfs_null_register
+3c050360 00000018 R g_mmu_mem_regions
+4201166a 00000018 t is_ota_partition
+40380994 00000018 T panicHandler
+4202b3e2 00000018 T puts
+403838fe 00000018 T rtc_time_get
+3fc93dcc 00000018 b s_ledc_fade_rec
+50001fd8 00000018 b s_rtc_timer_retain_mem
+3c04fbf8 00000018 r s_vfs_console_select
+3c04fb8c 00000018 r s_vfs_jtag_select
+3c04f9ec 00000018 r s_vfs_uart_select
+4038ddfa 00000018 T spi_flash_chip_generic_set_io_mode
+4038de38 00000018 T spi_flash_chip_issi_set_io_mode
+4201a2cc 00000018 t uart_get_avail_data_len
+42025392 00000018 T uart_hal_get_parity
+42014fb8 00000018 T uart_hal_rxfifo_rst
+40386a68 00000018 T vListInsertEnd
+40388516 00000018 T vTaskSetThreadLocalStoragePointerAndDelCallback
+4038a000 00000018 T wdt_hal_write_protect_disable
+403809ac 00000018 T xt_unhandled_exception
+3fc8ee70 00000019 d __c.16
+3c05186c 00000019 r __func__.0
+3c04dfa4 00000019 r __func__.0
+3fc8f24c 00000019 d __func__.0
+3c04f368 00000019 r __func__.1
+3c0505d0 00000019 r __func__.1
+3c04ef74 00000019 r __func__.12
+3c04eb74 00000019 r __func__.12
+3c04f628 00000019 r __func__.16
+3c051654 00000019 r __func__.16
+3c04efe0 00000019 r __func__.17
+3c04effc 00000019 r __func__.18
+3c0505b4 00000019 r __func__.2
+3fc8f280 00000019 d __func__.2
+3c04f1d8 00000019 r __func__.21
+3c04ed9c 00000019 r __func__.7
+3c0516e8 00000019 r __func__.8
+3c0505ec 00000019 r __FUNCTION__.0
+3c04dca0 00000019 r __FUNCTION__.11
+3c0515e0 00000019 r __FUNCTION__.12
+3c04dcbc 00000019 r __FUNCTION__.16
+3c05007c 00000019 r __FUNCTION__.18
+3c04dd6c 00000019 r __FUNCTION__.28
+3c04fdec 00000019 r __FUNCTION__.4
+3c050140 00000019 r __FUNCTION__.8
+3c050124 00000019 r __FUNCTION__.9
+3c04fd4c 00000019 r __FUNCTION__.9
+3c0506f4 00000019 V typeinfo name for std::bad_array_new_length
+42036408 0000001a t __esp_stack_guard_setup
+3c050264 0000001a r __func__.0
+3c0516b4 0000001a r __func__.0
+3c04f520 0000001a r __func__.0
+3c050030 0000001a r __func__.0
+3c04df08 0000001a r __func__.1
+3c04eb58 0000001a r __func__.11
+3c04f064 0000001a r __func__.23
+3c050598 0000001a r __func__.3
+3c04ed4c 0000001a r __func__.3
+3c04ed68 0000001a r __func__.5
+3c04f56c 0000001a r __func__.7
+3c04f588 0000001a r __func__.8
+3c0515fc 0000001a r __FUNCTION__.13
+3c04fea8 0000001a r __FUNCTION__.19
+3c050060 0000001a r __FUNCTION__.19
+3c050568 0000001a r __FUNCTION__.5
+3c04d98c 0000001a r __FUNCTION__.5
+42027202 0000001a T __cxxabiv1::__terminate(void (*)())
+42027746 0000001a T __cxxabiv1::__class_type_info::~__class_type_info()
+42027426 0000001a T __cxxabiv1::__si_class_type_info::~__si_class_type_info()
+4201e2ba 0000001a T nvs::Lock::~Lock()
+4201e2ba 0000001a T nvs::Lock::~Lock()
+420089c6 0000001a T HWCDC::write(unsigned char)
+42009306 0000001a T HWCDC::~HWCDC()
+420096ac 0000001a W String::init()
+42009972 0000001a T String::concat(char)
+4202715c 0000001a W __gnu_cxx::__concurrence_lock_error::~__concurrence_lock_error()
+42027184 0000001a W __gnu_cxx::__concurrence_unlock_error::~__concurrence_unlock_error()
+42027400 0000001a T operator new[](unsigned int, std::nothrow_t const&)
+42027f9c 0000001a W std::string::_Rep::_M_set_length_and_sharable(unsigned int)
+420276de 0000001a T std::bad_array_new_length::~bad_array_new_length()
+420276ac 0000001a T std::bad_alloc::~bad_alloc()
+42015d3a 0000001a T esp_clk_slowclk_cal_set
+40382c00 0000001a T esp_cpu_compare_and_set
+4201538a 0000001a T esp_log_cache_clean
+4201f72e 0000001a T get_vfs_for_index
+4202a8a2 0000001a T getenv
+40388054 0000001a T pvTaskIncrementMutexHeldCount
+40382f9e 0000001a T rtc_clk_slow_src_get
+403896a0 0000001a T spi_flash_hal_erase_chip
+403807c6 0000001a t spi1_end
+403818e4 0000001a t timer_alarm_isr
+420253aa 0000001a T uart_hal_set_txfifo_empty_thr
+4201a2ac 0000001a T uart_set_select_notif_callback
+4201f0ba 0000001a t usb_serial_jtag_rx_char_no_driver
+40386548 0000001a T xPortSetInterruptMaskFromISR
+3fc8ebf4 0000001b d __c.2
+3fc8ecb0 0000001b d __c.6
+3c04ebc4 0000001b r __func__.0
+3c05156c 0000001b r __func__.1
+3c04f53c 0000001b r __func__.1
+3c04ef90 0000001b r __func__.13
+3c04f3ec 0000001b r __func__.16
+3c04f720 0000001b r __func__.32
+3c04fd30 0000001b r __func__.8
+3c0500f0 0000001b r __FUNCTION__.11
+3c04da8c 0000001b r __FUNCTION__.18
+3c04f7d8 0000001b r __FUNCTION__.34
+3c04eacc 0000001c r __func__.0
+3c04f504 0000001c r __func__.0
+3c05066c 0000001c r __func__.0
+3c0503a8 0000001c r __func__.0
+3c04fb04 0000001c r __func__.1
+3c04e198 0000001c r __FUNCTION__.0
+42017ebc 0000001c T _getpid_r
+420089a4 0000001c t _GLOBAL__sub_I__Zli4_kHzy
+42017ebc 0000001c W _isatty_r
+42017ebc 0000001c T _kill_r
+42017ebc 0000001c T _system_r
+42000e14 0000001c W ArduinoHal::pulseIn(unsigned long, unsigned long, unsigned long)
+42007190 0000001c W adaptive_lora::put32(unsigned char*, unsigned long)
+4200ef98 0000001c T HardwareSerial::~HardwareSerial()
+4201b4a6 0000001c W intrusive_list<NVSHandleEntry>::erase(intrusive_list<NVSHandleEntry>::iterator)
+4201df4a 0000001c W intrusive_list<nvs::NVSPartition>::erase(intrusive_list<nvs::NVSPartition>::iterator)
+4201e0f0 0000001c W intrusive_list<nvs::NVSHandleSimple>::erase(intrusive_list<nvs::NVSHandleSimple>::iterator)
+4201e51a 0000001c W intrusive_list<nvs::Page>::clear()
+4201e4fe 0000001c W intrusive_list<nvs::Page>::erase(intrusive_list<nvs::Page>::iterator)
+4201e4e2 0000001c W intrusive_list<nvs::Page>::push_back(nvs::Page*)
+4201e3fe 0000001c W intrusive_list<nvs::HashList::HashListBlock>::erase(intrusive_list<nvs::HashList::HashListBlock>::iterator)
+4201db4a 0000001c T nvs::NVSHandleSimple::~NVSHandleSimple()
+4201db2e 0000001c T nvs::NVSHandleSimple::~NVSHandleSimple()
+4201db2e 0000001c T nvs::NVSHandleSimple::~NVSHandleSimple()
+42008958 0000001c T EspClass::getFlashClockDivider()
+42027f7a 0000001c W std::string::_M_copy(char*, char const*, unsigned int)
+4200ff60 0000001c T getApbFrequency
+4200ef44 0000001c T hardware_serial_end
+403848c0 0000001c t prvGetCurMaxSizeByteBuf
+40382e2e 0000001c T rtc_clk_32k_enable
+40381bc8 0000001c t s_do_cache_invalidate
+3c04fbdc 0000001c r s_vfs_console_termios
+3c04fb70 0000001c r s_vfs_jtag_termios
+3c04f9d0 0000001c r s_vfs_uart_termios
+42017ebc 0000001c t syscall_not_implemented
+42025376 0000001c T uart_hal_set_parity
+4200cbaa 0000001c t uart0_write_char
+4200cbc6 0000001c t uart1_write_char
+4200d046 0000001c T uartSetDebug
+40388038 0000001c T uxTaskResetEventItemValue
+4038a09e 0000001c T wdt_hal_feed
+40387d5a 0000001c T xTaskGetSchedulerState
+3fc8f214 0000001d d __func__.0
+3c050504 0000001d r __func__.0
+3c04f5b8 0000001d r __func__.10
+3c04edfc 0000001d r __FUNCTION__.0
+3c04f7b8 0000001d r __FUNCTION__.35
+4201164c 0000001e t __esp_system_init_fn_init_show_app_info
+3fc8f0f8 0000001e d __func__.0
+3c051704 0000001e r __func__.0
+3c0503c4 0000001e r __func__.1
+3c04de8c 0000001e r __func__.1
+3c04f3bc 0000001e r __func__.1
+3c04f128 0000001e r __func__.10
+3c04f5f0 0000001e r __func__.12
+3c04efc0 0000001e r __func__.15
+3c04f044 0000001e r __func__.22
+3c04f0b8 0000001e r __func__.5
+3c04f0d8 0000001e r __func__.6
+3c050098 0000001e r __FUNCTION__.17
+4202a6c6 0000001e T __register_frame_table
+420071ac 0000001e W adaptive_lora::get32(unsigned char const*)
+4201d86c 0000001e W intrusive_list<nvs::Storage::NamespaceEntry>::push_back(nvs::Storage::NamespaceEntry*)
+4201dc7c 0000001e T nvs::NVSHandleSimple::get_item_size(nvs::ItemType, char const*, unsigned int&)
+42000284 0000001e T SPIClass::~SPIClass()
+42000284 0000001e T SPIClass::~SPIClass()
+42027f3e 0000001e T std::length_error::length_error(char const*)
+42027f3e 0000001e T std::length_error::length_error(char const*)
+42027f5c 0000001e T std::out_of_range::out_of_range(char const*)
+42027f5c 0000001e T std::out_of_range::out_of_range(char const*)
+4200ed2c 0000001e T cleanupFunctional
+40380a84 0000001e T efuse_hal_blk_version
+40380a66 0000001e T efuse_hal_chip_revision
+40380ac0 0000001e T efuse_hal_flash_encryption_enabled
+40381070 0000001e T esp_clk_cpu_freq
+40382c1a 0000001e T esp_cpu_wait_for_intr
+420131d8 0000001e T esp_flash_app_init
+42025c1c 0000001e t esp_internal_sha_update_state
+40382c7c 0000001e T esp_ptr_byte_accessible
+4038878a 0000001e T gdma_ahb_hal_clear_intr
+42015410 0000001e T heap_caps_match
+42037258 0000001e T intr_handler_get
+42035eec 0000001e T panic_print_str
+4038519a 0000001e t prvIsQueueEmpty
+40387d32 0000001e T pvTaskGetThreadLocalStoragePointer
+3fc930ec 0000001e b ref_counts
+40381c8e 0000001e t s_do_unmapping
+420252ea 0000001e T uart_hal_get_sclk
+4201a28e 0000001e T uart_is_driver_installed
+4202036c 0000001e t vfs_null_close
+4202b540 0000001e T vprintf
+3c04f39c 0000001f r __func__.0
+3c04f214 0000001f r __func__.23
+3c04d880 0000001f r __FUNCTION__.4
+4202c5ca 00000020 T __ascii_wctomb
+3fc8ee50 00000020 d __c.0
+3c04ffd0 00000020 r __func__.0
+3c04e1d8 00000020 r __func__.0
+3c04f1f4 00000020 r __func__.22
+3c04deac 00000020 r __func__.3
+3c0501dc 00000020 r __FUNCTION__.0
+3c04fdbc 00000020 r __FUNCTION__.1
+3c0515b0 00000020 r __FUNCTION__.5
+40384f94 00000020 T _esp_error_check_failed
+42008418 00000020 T adaptive_lora::GatewayApp::begin(unsigned long)
+4200eeb2 00000020 T HardwareSerial::_destroyEventTask()
+4201dbc4 00000020 T nvs::NVSHandleSimple::get_typed_item(nvs::ItemType, char const*, void*, unsigned int)
+420045f2 00000020 T SX126x::clearDeviceErrors()
+420245b8 00000020 T bootloader_flash_update_id
+403821dc 00000020 T coex_core_timer_idx_get
+3fc8e730 00000020 d default_registered_chips
+42016768 00000020 T esp_clk_tree_rc_fast_get_freq_hz
+42015042 00000020 T esp_log_is_tag_loggable
+4202af4c 00000020 T fopen
+42017e9a 00000020 T fstat
+4201f748 00000020 t get_vfs_for_fd
+4202bb00 00000020 T gettimeofday
+3fc8e710 00000020 d gpio_context
+3fc92fac 00000020 b idle_cb
+42037276 00000020 T intr_handler_set
+403888a6 00000020 T ledc_hal_get_duty
+4038880e 00000020 T ledc_hal_ls_channel_update
+4200d11c 00000020 T log_printf
+4200a71c 00000020 T millis
+42013e6e 00000020 t mspi_init
+3fc93df4 00000020 b name_buffer.6
+4038523a 00000020 t prvCopyDataFromQueue
+4202543a 00000020 T rmt_hal_deinit
+50000000 00000020 d s_sleep_sub_mode_ref_cnt
+3c04ee20 00000020 r s_submode2str
+3fc93da0 00000020 b s_vfs
+3fc90530 00000020 B SPI
+4038d17c 00000020 T spi_flash_chip_gd_get_io_mode
+4038dd14 00000020 T spi_flash_chip_generic_get_io_mode
+4038de50 00000020 T spi_flash_chip_issi_get_io_mode
+4038cd6c 00000020 T spi_flash_needs_reset_check
+3fc92f8c 00000020 b tick_cb
+4201f206 00000020 T usb_serial_jtag_write_ready
+4038a052 00000020 T wdt_hal_disable
+3fc8ec10 00000021 d __c.3
+3c04f094 00000021 r __func__.4
+42013358 00000022 t __esp_system_init_fn_init_brownout
+3c04f1b4 00000022 r __func__.20
+42028ed4 00000022 t _Unwind_SetSpColumn
+42026b80 00000022 t read_uleb128(unsigned char const*, unsigned long*)
+42005c4c 00000022 T Preferences::end()
+42007dfe 00000022 T adaptive_lora::SequenceCounter::take(unsigned short&)
+4200ed5c 00000022 T HardwareSerial::peek()
+4201dbe4 00000022 T nvs::NVSHandleSimple::get_string(char const*, char*, unsigned int)
+4201dc06 00000022 T nvs::NVSHandleSimple::get_blob(char const*, void*, unsigned int)
+4201e2e6 00000022 T nvs::HashList::HashListBlock::HashListBlock()
+4201e2e6 00000022 T nvs::HashList::HashListBlock::HashListBlock()
+42004568 00000022 T SX126x::setRegulatorMode(unsigned char)
+4201b644 00000022 T nvs::Page::readEntry(unsigned int, nvs::Item&) const
+420126e8 00000022 T bootloader_munmap
+42015c36 00000022 t calc_checksum
+42014a68 00000022 T esp_cache_err_has_active_err
+42011ede 00000022 T esp_partition_find_first
+42036314 00000022 T esp_reset_reason_get_hint
+4201f3f4 00000022 t get_local_fd
+4038882e 00000022 T ledc_hal_set_duty_start
+4202615e 00000022 T mbedtls_platform_zeroize
+42036bb6 00000022 t multi_heap_get_info_tlsf
+40382ca0 00000022 T periph_rcc_acquire_enter
+4038718e 00000022 t prvResetNextTaskUnblockTime
+42028104 00000022 t read_uleb128
+4202a0bc 00000022 t read_uleb128
+40383916 00000022 T rtc_clk_freq_cal
+40383916 00000022 T rtc_clk_freq_to_period
+420159bc 00000022 T soc_get_available_memory_region_max_count
+4038d0f8 00000022 T spi_flash_chip_boya_probe
+4038de12 00000022 T spi_flash_chip_issi_probe
+4038de70 00000022 T spi_flash_chip_mxic_probe
+4038deca 00000022 T spi_flash_chip_th_probe
+4038ccdc 00000022 t spiflash_end_default
+40389ce8 00000022 T systimer_hal_counter_can_stall_by_cpu
+4201a336 00000022 t uart_read_char
+4201ece6 00000022 t usb_serial_jtag_fstat
+4201ed62 00000024 t __esp_system_init_fn_init_vfs_usj_sec
+3fc8f1f0 00000024 d __func__.0
+3c04ee40 00000024 r __func__.1
+3c04f160 00000024 r __func__.15
+4202a63e 00000024 T __register_frame
+4203187e 00000024 T __sprint_r
+4200b64a 00000024 t _rmt_tx_done_callback
+4201b1e6 00000024 t nvs_find_ns_handle(unsigned long, nvs::NVSHandleSimple**)
+42007e94 00000024 T adaptive_lora::Llcc68Hardware::irqSignalled()
+4201ddc4 00000024 T nvs::NVSPartition::NVSPartition(esp_partition_t const*)
+4201ddc4 00000024 T nvs::NVSPartition::NVSPartition(esp_partition_t const*)
+4200410e 00000024 T SX126x::readRegister(unsigned short, unsigned char*, unsigned char)
+420021bc 00000024 T SX126x::readBit(unsigned long)
+3c04d674 00000024 V vtable for adaptive_lora::PreferencesConfigStorage
+420252c6 00000024 T clk_hal_apb_get_freq_hz
+3fc8ecec 00000024 d default_chip
+4202583a 00000024 t deinit_timer_task
+4202245c 00000024 T esp_core_dump_in_isr_context
+403818b8 00000024 T esp_system_get_time
+403818fe 00000024 T esp_timer_get_time
+403818fe 00000024 T esp_timer_impl_get_time
+4038c258 00000024 t intr_get_item.part.0
+42014696 00000024 T panic_prepare_frame_from_ctx
+3c0504e0 00000024 R rmt_periph_signals
+42013056 00000024 T spi_flash_cache2phys
+4038d158 00000024 T spi_flash_chip_gd_suspend_cmd_conf
+4038d5d0 00000024 T spi_flash_chip_generic_suspend_cmd_conf
+4038df16 00000024 T spi_flash_chip_winbond_suspend_cmd_conf
+40388c8e 00000024 T spi_flash_encryption_hal_done
+403897de 00000024 T spi_flash_hal_set_write_protect
+42013032 00000024 T spi_flash_mmap_get_free_pages
+4201a312 00000024 t uart_rx_char
+42020230 00000024 t vfs_null_fcntl
+420202da 00000024 t vfs_null_ioctl
+3c05162c 00000025 r __func__.15
+3c04fe1c 00000025 r __func__.6
+420279d2 00000026 T __cxa_free_exception
+42026e04 00000026 t read_encoded_value(_Unwind_Context*, unsigned char, unsigned char const*, unsigned int*)
+42008c7a 00000026 t arduino_hw_cdc_event_post(char const*, long, void*, unsigned int, int*) [clone .constprop.0] [clone .isra.0]
+4201dce4 00000026 T nvs::NVSHandleSimple::erase_all()
+4201e10c 00000026 T nvs::NVSPartitionManager::close_handle(nvs::NVSHandleSimple*)
+42004542 00000026 T SX126x::setBufferBaseAddress(unsigned char, unsigned char)
+4201b742 00000026 W CompressedEnumTable<nvs::Page::EntryState, 2u, 126u>::get(unsigned int, nvs::Page::EntryState*) const
+42027e80 00000026 T std::logic_error::~logic_error()
+42027e80 00000026 T std::logic_error::~logic_error()
+4201f226 00000026 t console_start_select
+42020412 00000026 t esp_bt_mem_release_area
+403812b2 00000026 T esp_intr_disable_source
+4038121a 00000026 T esp_intr_enable_source
+4038baa6 00000026 T esp_log_early_timestamp
+42036114 00000026 T esp_panic_handler_increment_entry_count
+42015d54 00000026 t find_desc_for_int
+40388880 00000026 T ledc_hal_set_hpoint
+4038cf5e 00000026 T memspi_host_flush_cache
+4038d132 00000026 T spi_flash_chip_gd_detect_size
+4038e3f6 00000026 t spi_flash_os_yield
+40386ab0 00000026 T uxListRemove
+3c050750 00000027 V typeinfo name for __gnu_cxx::__concurrence_lock_error
+42026b58 00000028 T __cxa_throw_bad_array_new_length
+3c04df7c 00000028 r __func__.8
+3c050e28 00000028 R __mprec_bigtens
+42008ca0 00000028 t hw_cdc_enable_tx_intr_from_isr()
+420015ee 00000028 T LLCC68::LLCC68(Module*)
+420015ee 00000028 T LLCC68::LLCC68(Module*)
+420096c6 00000028 T String::invalidate()
+4200415a 00000028 T SX126x::readBuffer(unsigned char*, unsigned char, unsigned char)
+42004132 00000028 T SX126x::writeBuffer(unsigned char const*, unsigned char, unsigned char)
+4200426c 00000028 T SX126x::getPacketType()
+420041f2 00000028 T SX126x::clearIrqStatus(unsigned short)
+420053f6 00000028 T SX126x::setDio2AsRfSwitch(bool)
+42027d90 00000028 T std::__throw_bad_alloc()
+3c04d7b4 00000028 V vtable for adaptive_lora::RadioDriver
+403815c8 00000028 t check_lock_nonzero
+3fc8ed7c 00000028 D esp_flash_noos_functions
+3fc8ed40 00000028 d esp_flash_spi1_default_os_functions
+42015136 00000028 T esp_log_linked_list_clean
+4201764a 00000028 T esp_mprot_get_violate_byte_enables
+4202bad8 00000028 T fcntl
+42031a3a 00000028 t lflush
+3fc92fcc 00000028 b ob.0
+4200a7b4 00000028 T pathToFileName
+4200b4be 00000028 T perimanPinIsValid
+4202bb5a 00000028 T read
+3c04fff0 00000028 r s_memory_sections
+40381eb2 00000028 t timer_alarm_handler
+3c04ed10 00000028 R uart_periph_signal
+4038a02a 00000028 T wdt_hal_enable
+4202bb82 00000028 T write
+40386112 00000028 T xEventGroupCreate
+4038675c 00000028 T xPortCheckValidListMem
+40386e70 00000028 T xTimerPendFunctionCallFromISR
+3fc8f400 00000029 d __func__.0
+3c050784 00000029 V typeinfo name for __gnu_cxx::__concurrence_unlock_error
+42027cde 0000002a T __cxa_get_globals_fast
+42009c2e 0000002a T __digitalRead
+42027d66 0000002a t _GLOBAL__sub_I__ZN17__eh_globals_init7_S_initE
+42020c92 0000002a t _ledc_fade_hw_release
+4200b620 0000002a t _rmt_rx_done_callback
+4202818e 0000002a t _Unwind_SetGRPtr
+420071ca 0000002a T adaptive_lora::roleName(adaptive_lora::DeviceRole)
+42005852 0000002a T PhysicalLayer::getIrqMapped(unsigned long)
+4200ed7e 0000002a T HardwareSerial::read()
+42009238 0000002a T HWCDC::setDebugOutput(bool)
+42001508 0000002a T LLCC68::setSpreadingFactor(unsigned char)
+420019d6 0000002a T SX1262::SX1262(Module*)
+420019d6 0000002a T SX1262::SX1262(Module*)
+42004650 0000002a T SX126x::clearDio1Action()
+4202779e 0000002a T __cxxabiv1::__class_type_info::__do_upcast(__cxxabiv1::__class_type_info const*, void const*, __cxxabiv1::__class_type_info::__upcast_result&) const
+4201b666 0000002a T nvs::Page::getSeqNumber(unsigned long&) const
+3fc8efb0 0000002a D coex_pti_tab
+4201f2ba 0000002a T console_fsync
+42009c2e 0000002a W digitalRead
+420372b6 0000002a T esp_flash_app_enable_os_functions
+4038ba7c 0000002a T esp_log_impl_unlock
+42017ee6 0000002a T esp_time_impl_get_time_since_boot
+40384fba 0000002a T esp_vApplicationTickHook
+42028c42 0000002a t execute_cfa_program
+4038159e 0000002a t lock_init_generic
+420183da 0000002a T pthread_mutex_lock
+403833ec 0000002a T rtc_clk_cpu_freq_set_config_fast
+4201a72e 0000002a t uart_tcdrain
+4201a704 0000002a t uart_tcflush
+40384d76 0000002a T xRingbufferGetMaxItemSize
+3fc8eea0 0000002b d __c.1
+3fc8f0cc 0000002b d __func__.0
+42007dd2 0000002c T adaptive_lora::SequenceCounter::renew(unsigned long (*)(unsigned long))
+4201dd0a 0000002c T nvs::NVSHandleSimple::erase_item(char const*)
+42001d9a 0000002c T SX126x::calculateRxTimeout(unsigned long)
+4202721c 0000002c T std::get_terminate()
+4202725e 0000002c T std::get_unexpected()
+3c05083c 0000002c V vtable for __cxxabiv1::__class_type_info
+3c0507e8 0000002c V vtable for __cxxabiv1::__si_class_type_info
+42022480 0000002c t esp_core_dump_enable_stack_overflow_detection
+4038140c 0000002c T rtc_isr_noniram_enable
+420134a2 0000002c t task_wdt_timer_feed
+4038a072 0000002c T wdt_hal_handle_intr
+3c04f4d4 0000002e r __func__.0
+42005af0 0000002e T rlb_reflect(unsigned long, unsigned char)
+42000384 0000002e T RadioLibHal::RadioLibHal(unsigned long, unsigned long, unsigned long, unsigned long, unsigned long, unsigned long)
+42000384 0000002e T RadioLibHal::RadioLibHal(unsigned long, unsigned long, unsigned long, unsigned long, unsigned long, unsigned long)
+42005f04 0000002e t adaptive_lora::(anonymous namespace)::freshBootId(unsigned long)
+42005744 0000002e T PhysicalLayer::clearIrqAction()
+4201db66 0000002e T nvs::NVSHandleSimple::set_typed_item(nvs::ItemType, char const*, void const*, unsigned int)
+420010a0 0000002e T LLCC68::beginLRFHSS(float, unsigned char, unsigned char, bool, signed char, float, bool)
+4200176a 0000002e T SX1262::beginLRFHSS(float, unsigned char, unsigned char, bool, signed char, float, bool)
+420040cc 0000002e T SX126x::setPaConfig(unsigned char, unsigned char, unsigned char, unsigned char)
+420021e8 0000002e T SX126x::finishTransmit()
+4201b714 0000002e T nvs::Page::getVarDataTailroom() const
+42012466 0000002e T bootloader_common_ota_select_valid
+403885e6 0000002e T cache_hal_suspend
+40388726 0000002e T cache_hal_unfreeze
+42011f08 0000002e T esp_partition_get
+42013e00 0000002e T esp_task_wdt_impl_timeout_triggered
+4201f3c0 0000002e T esp_vfs_console_register
+42025bee 0000002e T ets_timer_done
+403887a8 0000002e T gdma_ahb_hal_get_eof_desc_addr
+42025c5c 0000002e T mbedtls_sha256_starts
+42025bee 0000002e T os_timer_done
+4201a2e4 0000002e t uart_tx_char
+40386572 0000002e T vPortEnterCritical
+4201ea04 00000030 t __esp_system_init_fn_usb_serial_jtag_conn_status_init
+3c0502d8 00000030 r __FUNCTION__.7
+403817d4 00000030 T __retarget_lock_acquire
+40381804 00000030 T __retarget_lock_acquire_recursive
+40381834 00000030 T __retarget_lock_try_acquire
+40381864 00000030 T __retarget_lock_try_acquire_recursive
+42000348 00000030 t _GLOBAL__sub_I__ZN8SPIClassC2Eh
+4202815e 00000030 t _Unwind_GetGRPtr
+42008a18 00000030 t hw_cdc_clear_tx_stash()
+420080ca 00000030 T adaptive_lora::RadioDriver::stop()
+420057ac 00000030 T PhysicalLayer::startReceive(unsigned long, unsigned long, unsigned long, unsigned int)
+4201d83c 00000030 W CompressedEnumTable<bool, 1u, 256u>::set(unsigned int, bool)
+4201db94 00000030 T nvs::NVSHandleSimple::set_blob(char const*, void const*, unsigned int)
+42008b4a 00000030 T HWCDC::peek()
+4200967c 00000030 W String::setLen(int)
+42002034 00000030 T SX126x::getIrqFlags()
+42001b00 00000030 T SX126x::scanChannel()
+420045c2 00000030 T SX126x::getDeviceErrors()
+42001b44 00000030 T SX126x::startChannelScan()
+42008974 00000030 T EspClass::getFlashFrequencyMHz()
+42000306 00000030 T SPIClass::endTransaction()
+42027372 00000030 T std::get_new_handler()
+403886f6 00000030 T cache_hal_freeze
+4038c2d6 00000030 t check_chip_pointer_default
+3c04e378 00000030 R core0_acs_bits
+42022550 00000030 T esp_core_dump_write
+3fc8ed10 00000030 d esp_flash_default_host
+42013314 00000030 T esp_restart
+403887da 00000030 T gdma_ahb_hal_read_intr_status
+420367ec 00000030 T gdma_ahb_hal_set_priority
+40388850 00000030 T ledc_hal_set_duty_int_part
+4038cdf0 00000030 T memspi_host_erase_chip
+42036ce6 00000030 T multi_heap_restore_minimum_free_bytes
+420140fa 00000030 t print_state
+4201859c 00000030 T pthread_getspecific
+4202540a 00000030 T rmt_hal_init
+3fc8e8b0 00000030 d s_ctx
+3fc93ff0 00000030 b s_mmu_ctx
+3c04ec48 00000030 R soc_memory_types
+42020200 00000030 t vfs_null_pread
+420202fe 00000030 t vfs_null_read
+40386a80 00000030 T vListInsert
+4202b5c2 00000030 T vsnprintf
+40388544 00000030 T vTaskGetSnapshot
+403869ae 00000030 T xPortSysTickHandler
+403884e6 00000030 T xTaskGetCurrentTaskHandleForCore
+4202b47c 00000032 T __sread
+420281b8 00000032 t _Unwind_SetGRValue
+42027cac 00000032 t eh_globals_dtor(void*)
+4201b7d0 00000032 W CompressedEnumTable<nvs::Page::EntryState, 2u, 126u>::set(unsigned int, nvs::Page::EntryState)
+4201de4a 00000032 T nvs::NVSPartitionManager::lookup_storage_from_name(char const*)
+4201b612 00000032 T nvs::Page::alterPageState(nvs::Page::PageState)
+420095a2 00000032 T Stream::timedRead()
+42003fd6 00000032 T SX126x::setRx(unsigned long)
+42003fa4 00000032 T SX126x::setTx(unsigned long)
+4202719e 00000032 W __gnu_cxx::__mutex::lock()
+420271d0 00000032 W __gnu_cxx::__mutex::unlock()
+42012de0 00000032 T bootloader_sha256_start
+420251da 00000032 T clk_hal_xtal_get_freq_mhz
+42014cba 00000032 T esp_err_to_name
+4201343c 00000032 t find_entry_and_check_all_reset
+4201515e 00000032 t fix_cache_generation_overflow
+42036786 00000032 T gdma_ahb_hal_append
+420368fc 00000032 T gdma_ahb_hal_enable_intr
+42036754 00000032 T gdma_ahb_hal_stop
+40380b14 00000032 T heap_caps_malloc
+40380ba6 00000032 T heap_caps_realloc
+4038ce9a 00000032 T memspi_host_read_data_slicer
+420144e4 00000032 T panic_soc_check_pseudo_cause
+42014408 00000032 t print_cache_err_details
+4202b31a 00000032 T printf
+40384576 00000032 t prvCopyItemNoSplit
+40382e4a 00000032 T rtc_clk_32k_disable_external
+403814ca 00000032 T rtc_clk_xtal_freq_get
+403814ca 00000032 T rtc_get_xtal
+42026928 00000032 T sha_hal_write_digest
+4038d21e 00000032 T spi_flash_chip_generic_detect_size
+40389236 00000032 t spimem_flash_ll_get_source_freq_mhz
+40389ca0 00000032 T systimer_hal_select_alarm_mode
+4201af4c 00000032 t uart_close
+42014fd0 00000032 T uart_hal_tx_break
+4201f1d4 00000032 T usb_serial_jtag_get_read_bytes_available
+4202038e 00000032 t vfs_null_pwrite
+42020254 00000032 t vfs_null_write
+4202ae3a 00000034 T __sinit
+4200956e 00000034 t _GLOBAL__sub_I_ARDUINO_HW_CDC_EVENTS
+42000ecc 00000034 W ArduinoHal::noTone(unsigned long)
+42005778 00000034 T PhysicalLayer::startTransmit(unsigned char const*, unsigned int, unsigned char)
+4201dd36 00000034 T nvs::NVSHandleSimple::get_used_entry_count(unsigned int&)
+42008b7a 00000034 T HWCDC::read()
+42001798 00000034 T SX1262::checkOutputPower(signed char, signed char*)
+42003d56 00000034 T SX126x::stepLRFHSS()
+42002fbc 00000034 T SX126x::finishReceive()
+42027f0a 00000034 T std::logic_error::logic_error(char const*)
+42027f0a 00000034 T std::logic_error::logic_error(char const*)
+3c04fac0 00000034 V vtable for nvs::NVSPartition
+4201261e 00000034 T bootloader_common_get_active_otadata
+403805b2 00000034 T bootloader_read_flash_id
+4038bd06 00000034 T calloc
+4201f262 00000034 T console_write
+42036d64 00000034 t default_walker
+4201346e 00000034 t find_entry_from_task_handle_and_check_all_reset
+4203681c 00000034 T gdma_ahb_hal_disconnect_peri
+420367b8 00000034 T gdma_ahb_hal_reset
+42036ada 00000034 T gpio_hal_intr_disable
+4200fb38 00000034 t initApbChangeCallback
+42022386 00000034 T ledc_fade_func_uninstall
+3fc8e670 00000034 D nvs_errors
+420145ca 00000034 T panic_arch_fill_info
+40382d32 00000034 T regi2c_ctrl_write_reg
+40382fb8 00000034 T rtc_clk_slow_freq_get_hz
+4202686e 00000034 T sha_hal_hash_block
+4038112e 00000034 t shared_intr_isr
+4038de92 00000034 T spi_flash_chip_mxic_detect_size
+42025308 00000034 T uart_hal_get_baudrate
+40386088 00000034 T vQueueDelete
+4038589c 00000034 T xQueueCreateMutex
+420133b2 00000036 t __esp_system_init_fn_init_disable_rtc_wdt
+4202c338 00000036 T __mcmp
+42017e34 00000036 T _times_r
+420186a2 00000036 t signal_waiting_tasks()
+4201e41a 00000036 T nvs::HashList::clear()
+42000b50 00000036 T Module::SPIreadStream(unsigned char const*, unsigned char, unsigned char*, unsigned int, bool, bool)
+42000be2 00000036 T Module::SPIwriteStream(unsigned char const*, unsigned char, unsigned char const*, unsigned int, bool, bool)
+420043ce 00000036 T SX126x::setModulationParamsBPSK(unsigned long, unsigned char)
+420276f8 00000036 T __cxxabiv1::__class_type_info::__do_upcast(__cxxabiv1::__class_type_info const*, void**) const
+420280ce 00000036 W std::basic_string<char, std::char_traits<char>, std::allocator<char> >::basic_string(char const*, std::allocator<char> const&)
+420280ce 00000036 W std::basic_string<char, std::char_traits<char>, std::allocator<char> >::basic_string(char const*, std::allocator<char> const&)
+40388754 00000036 T cache_hal_get_cache_line_size
+4201803a 00000036 T esp_reent_init
+420132de 00000036 T esp_register_shutdown_handler
+42014762 00000036 T esp_rtc_init
+42013dca 00000036 T esp_task_wdt_impl_timer_feed
+4201f416 00000036 t esp_vfs_free_fs_ops
+4038103a 00000036 T heap_caps_calloc_base
+42035f4e 00000036 T panic_print_dec
+40386ba0 00000036 t prvSwitchTimerLists
+4200bf64 00000036 t spiInitBus.isra.0
+42008916 00000036 t spimem_flash_ll_get_source_freq_mhz
+42037172 00000036 T tlsf_create_with_pool
+4038a0ba 00000036 T wdt_hal_set_flashboot_en
+4038580a 00000036 T xQueueCreateMutexStatic
+4202733a 00000038 T __cxa_throw
+4202b500 00000038 T __sseek
+4200998c 00000038 t _GLOBAL__sub_I__ZN6StringC2EPKc
+42026ba2 00000038 t read_sleb128(unsigned char const*, long*)
+420089e0 00000038 t hw_cdc_enable_tx_intr()
+4200ef60 00000038 T HardwareSerial::~HardwareSerial()
+4200ef60 00000038 T HardwareSerial::~HardwareSerial()
+4201d7b0 00000038 W intrusive_list<nvs::Storage::NamespaceEntry>::clearAndFreeNodes()
+42000456 00000038 T Module::init()
+420098ba 00000038 T String::String(char const*)
+420098ba 00000038 T String::String(char const*)
+42004294 00000038 T SX126x::setTxParams(unsigned char, unsigned char)
+4200458a 00000038 T SX126x::getPacketStatus()
+420034d4 00000038 T SX126x::beginBPSK(float)
+4201e132 00000038 T nvs::Item::calculateCrc32() const
+4201e16a 00000038 T nvs::Item::calculateCrc32WithoutValue() const
+3c04db7c 00000038 V vtable for HardwareSerial
+3c04d848 00000038 V vtable for HWCDC
+403885ae 00000038 T cache_hal_init
+40388614 00000038 T cache_hal_resume
+420170e8 00000038 T esp_chip_info
+4202af6c 00000038 T fprintf
+42021332 00000038 t ledc_enable_intr_type.isra.0
+420253d2 00000038 T ledc_hal_get_clk_cfg
+42035f16 00000038 T panic_print_hex
+40387488 00000038 T pcTaskGetName
+40383c48 00000038 t prvCheckItemAvail
+40386b1e 00000038 t prvReloadTimer
+42028126 00000038 t read_sleb128
+4202a0de 00000038 t read_sleb128
+40382fec 00000038 T rtc_clk_fast_src_set
+403813d4 00000038 T rtc_isr_noniram_disable
+3c04fba4 00000038 r s_vfs_console
+3c04fb38 00000038 r s_vfs_jtag
+3c04fc60 00000038 r s_vfs_null
+3c04f998 00000038 r s_vfs_uart
+4038d19c 00000038 T spi_flash_chip_gd_probe
+403896f8 00000038 T spi_flash_hal_erase_block
+4200c4c0 00000038 t spiDetachBus_MISO
+4200c3b8 00000038 t spiDetachBus_MOSI
+4200c5c6 00000038 t spiDetachBus_SCK
+4200c282 00000038 t spiDetachBus_SS
+4201ef3e 00000038 t usb_serial_jtag_return_char.constprop.0
+4202bcbe 0000003a T __ascii_mbtowc
+42008efc 0000003a T HWCDC::isCDC_Connected()
+42027db8 0000003a T std::__throw_logic_error(char const*)
+42027df2 0000003a T std::__throw_length_error(char const*)
+42027e2c 0000003a T std::__throw_out_of_range(char const*)
+42020438 0000003a t esp_bt_mem_release_areas
+420223cc 0000003a T esp_core_dump_write_elf_and_check
+42034baa 0000003a T esp_cpu_clear_watchpoint
+42017f88 0000003a T esp_set_time_from_rtc
+420184a0 0000003a t find_key
+40380c40 0000003a T heap_caps_calloc
+4201582a 0000003a T heap_caps_check_add_region_allowed
+42015584 0000003a T heap_caps_enable_nonos_stack_heaps
+4038d0be 0000003a T memspi_host_init_pointers
+4202bb20 0000003a T open
+40388574 0000003a T s_cache_hal_init_ctx
+42015002 0000003a T uart_hal_write_txfifo
+3fc8ec34 0000003b d __c.4
+4038bf38 0000003c T __atomic_compare_exchange_4
+4202bf88 0000003c T __i2b
+42006c1e 0000003c T adaptive_lora::ClientApp::begin(unsigned long)
+42001f88 0000003c T SX126x::getModem(ModemType_t*)
+42000248 0000003c T SPIClass::end()
+42026186 0000003c t crypto_shared_gdma_new_channel
+4038ba04 0000003c T esp_log_impl_lock
+4038ba40 0000003c T esp_log_impl_lock_timeout
+42017f4c 0000003c T esp_time_impl_get_boot_time
+42017f10 0000003c T esp_time_impl_set_boot_time
+42015500 0000003c T heap_caps_aligned_calloc
+4201542e 0000003c T heap_caps_get_total_size
+4038bd58 0000003c T memcmp
+4038ce20 0000003c T memspi_host_set_write_protect
+40384840 0000003c t prvGetCurMaxSizeNoSplit
+40382d66 0000003c T regi2c_ctrl_write_reg_mask
+42018f86 0000003c t uart_pattern_queue_update.isra.0
+420201c4 0000003c t vfs_null_lseek
+40386432 0000003c t vPortTaskWrapper
+3fc8ec70 0000003e d __c.5
+42027b90 0000003e T __cxa_call_terminate
+42007fbc 0000003e T adaptive_lora::RadioDriver::receive()
+4201b52c 0000003e T nvs::Page::Page()
+4201b52c 0000003e T nvs::Page::Page()
+42004612 0000003e T SX126x::setDio1Action(void (*)())
+4200421a 0000003e T SX126x::setRfFrequency(unsigned long)
+42001de0 0000003e T SX126x::SPIparseStatus(unsigned char)
+42002216 0000003e T SX126x::getChannelScanResult()
+42027760 0000003e t std::type_info::operator==(std::type_info const&) const [clone .isra.0]
+42027440 0000003e t std::type_info::operator==(std::type_info const&) const [clone .isra.0]
+420125e0 0000003e T bootloader_common_select_otadata
+4038ce5c 0000003e T memspi_host_write_data_slicer
+420181f6 0000003e T pthread_cancel
+40382cf4 0000003e T regi2c_ctrl_read_reg_mask
+40382206 0000003e T rmt_encoder_reset
+403896ba 0000003e T spi_flash_hal_erase_sector
+4200bf9a 0000003e t spiSetClockDiv.part.0
+4201ee06 0000003e t usb_serial_jtag_fcntl
+4038604a 0000003e T uxQueueMessagesWaiting
+4202032e 0000003e t vfs_null_fstat
+40386606 0000003e T vPortYield
+40384e74 0000003e T xRingbufferGetStaticBuffer
+3fc92b18 00000040 b rx_data_buf
+3fc92ad8 00000040 b tx_stash_buf
+3c04d5f4 00000040 r ConvCodeTable1_3
+42026bda 00000040 t get_adjusted_ptr(std::type_info const*, std::type_info const*, void**)
+3c04d238 00000040 r paOptimizedTable
+4201b6a6 00000040 T nvs::Page::erase()
+420051ba 00000040 T SX126x::invertIQ(bool)
+4202802a 00000040 W std::string::_Rep::_M_dispose(std::allocator<char> const&)
+3c04fa80 00000040 V vtable for nvs::NVSHandleSimple
+3fc8eaac 00000040 D coex_schm_env
+42022c8e 00000040 t elf_write_core_dump_note_cb
+42015ef0 00000040 T esp_intr_ptr_in_isr_region
+4038b9c4 00000040 T esp_log
+40382c3c 00000040 T esp_ptr_executable
+40384ffa 00000040 T esp_reset_reason_set_hint
+42013e2e 00000040 T esp_task_wdt_impl_timer_restart
+3fc92e88 00000040 b loc_buf.5
+3c04e278 00000040 r reason.0
+3c04fc10 00000040 r s_vfs_console_dir
+3c04fc98 00000040 r s_vfs_null_dir
+3c04fa04 00000040 r s_vfs_uart_dir
+3c05062c 00000040 r sha256_padding
+4038da1c 00000040 T spi_flash_common_read_status_16b_rdsr_rdsr2
+4200d006 00000040 T uart_install_putc
+40384da0 00000040 T xRingbufferGetCurFreeSize
+42027990 00000042 T __cxa_allocate_exception
+42000dc2 00000042 W ArduinoHal::tone(unsigned long, unsigned int, unsigned long)
+420025e2 00000042 T SX126x::setLrFhssConfig(unsigned char, unsigned char, unsigned char, unsigned short)
+42027576 00000042 T __cxxabiv1::__si_class_type_info::__do_upcast(__cxxabiv1::__class_type_info const*, void const*, __cxxabiv1::__class_type_info::__upcast_result&) const
+4202a158 00000042 t base_from_object
+4201f37e 00000042 T console_close
+4201227c 00000042 T esp_partition_main_flash_region_safe
+420168fc 00000042 T esp_sleep_config_gpio_isolate
+42036b74 00000042 T gpio_hal_iomux_out
+4038a4c6 00000042 t poison_allocated_region
+42018304 00000042 t pthread_mutex_init_if_static
+4202a116 00000042 t size_of_encoded_value
+4201af7e 00000042 t uart_return_char
+40385624 00000042 T xQueueCreateCountingSemaphore
+4038bf74 00000044 T __atomic_fetch_and_8
+4038bfb8 00000044 T __atomic_fetch_or_8
+42007c16 00000044 T adaptive_lora::setAckPayload(adaptive_lora::Frame&, adaptive_lora::Frame const&)
+420095d4 00000044 T Stream::readBytes(char*, unsigned int)
+42005536 00000044 T SX126x::setFrequencyRaw(float)
+4202781c 00000044 T __cxxabiv1::__class_type_info::__do_catch(std::type_info const*, void**, unsigned int) const
+42027532 00000044 T __cxxabiv1::__si_class_type_info::__do_find_public_src(int, void const*, __cxxabiv1::__class_type_info const*, void const*) const
+4200ec30 00000044 T app_main
+4038a102 00000044 t assert_valid_block
+3fc94044 00000044 b dwarf_reg_size_table
+4038108e 00000044 T esp_clk_apb_freq
+42016788 00000044 T esp_clk_tree_lp_fast_get_freq_hz
+42017a48 00000044 T esp_mprot_oper_type_to_str
+403810ea 00000044 T esp_random
+42020daa 00000044 t ledc_glb_clk_set_sleep_mode.constprop.0
+4038487c 00000044 t prvGetCurMaxSizeAllowSplit
+40381390 00000044 t rtc_isr
+4038da5c 00000044 t spi_flash_common_write_qe_sr.isra.0
+4200c064 00000044 T spiDetachMOSI
+4200bfd8 00000044 T spiDetachSCK
+4200c0a8 00000044 T spiDetachSS
+40389b3e 00000044 T systimer_hal_get_counter_value
+42029834 00000044 t uw_update_context
+4202bed8 00000046 T __hi0bits
+42026d6a 00000046 t check_exception_spec(lsda_header_info*, std::type_info const*, void*, long)
+420091f2 00000046 T HWCDC::setRxBufferSize(unsigned int)
+42000d0a 00000046 T Module::setRfSwitchState(unsigned char)
+42009824 00000046 T String::reserve(unsigned int)
+42002472 00000046 T SX126x::scanChannel(ChannelScanConfig_t const&)
+420026c8 00000046 T SX126x::hopLRFHSS()
+42026578 00000046 T coex_rom_data_init
+420150f0 00000046 T esp_log_linked_list_get_level
+42017454 00000046 T esp_mprot_get_active_intr
+403820f2 00000046 T esp_timer_stop
+42035dee 00000046 T esp_vApplicationIdleHook
+4038e338 00000046 t main_flash_region_protected
+4038cdaa 00000046 T memspi_host_read_status_hs
+4038a3f4 00000046 T multi_heap_malloc
+42032e04 00000046 T rmt_del_encoder
+42020b76 00000046 T rmt_set_intr_priority_to_group
+4038d7c2 00000046 T spi_flash_chip_generic_yield
+4038d9d6 00000046 t spi_flash_common_read_qe_sr.constprop.0.isra.0
+403855de 00000046 T xQueueGetMutexHolder
+4200eb7e 00000048 T yieldIfNecessary()
+420272a4 00000048 t __gxx_exception_cleanup(_Unwind_Reason_Code, _Unwind_Exception*)
+42000d76 00000048 T ArduinoHal::spiTransfer(unsigned char*, unsigned int, unsigned char*)
+420091aa 00000048 T HWCDC::setTxBufferSize(unsigned int)
+42001934 00000048 T SX1262::beginBPSK(ConfigBPSK_t const&)
+4201b18c 00000048 T esp_vfs_dev_uart_register
+4202acf4 00000048 t global_stdio_init.part.0
+4038065c 00000048 t is_page_mapped_in_cache
+403889d6 00000048 T mmu_hal_check_valid_ext_vaddr_region
+4201b3f8 00000048 T nvs_commit
+40386ad6 00000048 t prvInsertTimerInActiveList
+4201553c 00000048 t register_heap
+42024566 00000048 T riscv_decode_offset_from_jal_instruction
+42020a9e 00000048 T rmt_del_channel
+42020b2e 00000048 T rmt_disable
+42020ae6 00000048 T rmt_enable
+4038d98e 00000048 T spi_flash_chip_generic_get_write_protect
+4200c01c 00000048 T spiDetachMISO
+40381e6a 00000048 t tick_hook
+4201b18c 00000048 T uart_vfs_dev_register
+4038791c 00000048 T vTaskPlaceOnEventList
+4201dc9a 0000004a T nvs::NVSHandleSimple::find_key(char const*, nvs_type_t&)
+42001fda 0000004a T SX126x::transmitDirect(unsigned long)
+420001fe 0000004a T SPIClass::setHwCs(bool)
+4201270a 0000004a T bootloader_flash_read
+40383938 0000004a t enable_timer_group0_for_calibration
+4201671e 0000004a T esp_clk_tree_lp_slow_get_freq_hz
+4202240a 0000004a T esp_core_dump_get_user_ram_info
+4038bacc 0000004a T esp_log_timestamp
+4203670a 0000004a T gdma_ahb_hal_start_with_desc
+4038a1a8 0000004a T multi_heap_free_impl
+4038a3aa 0000004a T multi_heap_get_allocated_size
+42036d1a 0000004a T multi_heap_get_info
+40386b56 0000004a t prvProcessExpiredTimer
+4038d1d4 0000004a T spi_flash_chip_gd_set_io_mode
+4200c182 0000004a T spiSSDisable
+4200c138 0000004a T spiSSEnable
+4200c1d8 0000004a T spiStopBus
+4201ed08 0000004a t usb_serial_jtag_fsync
+40384d2c 0000004a T vRingbufferDelete
+4038c27c 0000004c T _global_interrupt_handler
+42020dee 0000004c t _ledc_update_duty.constprop.0
+42000f00 0000004c T ArduinoHal::ArduinoHal(SPIClass&, SPISettings)
+42000f00 0000004c T ArduinoHal::ArduinoHal(SPIClass&, SPISettings)
+4201c2d2 0000004c T nvs::Page::eraseItem(unsigned char, nvs::ItemType, char const*, unsigned char, nvs::VerOffset)
+420054e2 0000004c T SX126x::setHeaderType(unsigned char, unsigned int)
+420273b0 0000004c T operator new(unsigned int)
+42012e12 0000004c T bootloader_sha256_data
+40388656 0000004c T cache_hal_vaddr_to_cache_level_id
+4202695a 0000004c T coexist_printf
+40383be8 0000004c T esp_cache_freeze_caches_disable_interrupts
+42018070 0000004c t esp_cleanup_r
+403811ce 0000004c T esp_intr_noniram_enable
+420179e4 0000004c T esp_mprot_ll_err_to_esp_err
+42036850 0000004c T gdma_ahb_hal_enable_burst
+40382850 0000004c T rmt_isr_handle_tx_threshold
+3fc92f14 0000004c B Serial0
+3fc92ec8 0000004c B Serial1
+4200c0ec 0000004c T spiEnableSSPins
+4201af00 0000004c t uart_fstat
+4038849a 0000004c T xTaskGetIdleTaskHandleForCore
+3fc8ef34 0000004d d __c.21
+420272ec 0000004e T __cxa_init_primary_exception
+42007f40 0000004e T adaptive_lora::Llcc68Hardware::Llcc68Hardware()
+42007f40 0000004e T adaptive_lora::Llcc68Hardware::Llcc68Hardware()
+42009618 0000004e T Stream::readString()
+42004798 0000004e T SX126x::setSpreadingFactor(unsigned char)
+42003ef2 0000004e T SX126x::sleep(bool)
+4202644c 0000004e t coex_core_unlock.isra.0
+40383b7a 0000004e T esp_cache_get_alignment
+42016838 0000004e T esp_sleep_sub_mode_force_disable
+4201ff34 0000004e T esp_vfs_select_triggered_isr
+42011b36 0000004e t is_partition_encrypted
+42020cbc 0000004e t ledc_slow_clk_calibrate
+4038a222 0000004e T multi_heap_malloc_impl
+42035c6c 0000004e t periph_ll_enable_clk_clear_rst
+4038d33c 0000004e T spi_flash_chip_generic_set_write_protect
+40384eb2 0000004e T vRingbufferDeleteWithCaps
+40381734 00000050 T _lock_close
+40381734 00000050 T _lock_close_recursive
+3c04d45c 00000050 r LrFhssHeaderInterleaver
+4200807a 00000050 T adaptive_lora::RadioDriver::begin()
+42007e34 00000050 T adaptive_lora::Llcc68Hardware::begin()
+420056f4 00000050 T PhysicalLayer::setIrqAction(void (*)(), bool)
+4200986a 00000050 T String::copy(char const*, unsigned int)
+420018e4 00000050 T SX1262::beginFSK(ConfigFSK_t const&)
+42004858 00000050 T SX126x::setSyncWord(unsigned char, unsigned char)
+42002ff0 00000050 T SX126x::fixInvertedIQ(unsigned char)
+4200548c 00000050 T SX126x::setPacketMode(unsigned char, unsigned char)
+4202aca4 00000050 t cleanup_stdio
+4202520c 00000050 T clk_hal_soc_root_get_freq_mhz
+42014d54 00000050 T efuse_hal_read
+42022580 00000050 t esp_core_dump_flash_custom_write
+4201fee4 00000050 T esp_vfs_select_triggered
+3fc8e9a0 00000050 D g_coex_adapter_funcs
+420348c2 00000050 t handler_instances_remove_all
+3fc8eee0 00000050 d msg.3
+3fc8e860 00000050 d s_context
+4200cea8 00000050 T uartWrite
+4201f15c 00000050 t usb_serial_jtag_tcsetattr
+3c04cdf4 00000051 r rlb_info
+420133e8 00000052 t __esp_system_init_fn_init_flash
+4202b4ae 00000052 T __swrite
+42007494 00000052 T adaptive_lora::SerialLogger::text(char const*)
+4201d5aa 00000052 T nvs::Storage::eraseNamespace(unsigned char)
+4200197c 00000052 T SX1262::beginLRFHSS(ConfigLRFHSS_t const&)
+42017ae4 00000052 T esp_cpu_intr_get_desc
+4202561c 00000052 T esp_crypto_sha_enable_periph_clk
+42025134 00000052 T esp_int_wdt_cpu_init
+42035d4a 00000052 t esp_register_freertos_idle_hook_for_cpu.part.0
+42035d9c 00000052 t esp_register_freertos_tick_hook_for_cpu.part.0
+42010df0 00000052 T gpio_uninstall_isr_service
+420371a8 00000052 t log_level_get
+4038a358 00000052 T multi_heap_free
+420254d0 00000052 T rmt_hal_rx_channel_reset
+40388c3c 00000052 T spi_flash_encryption_hal_prepare
+403865a0 00000052 T vPortExitCritical
+4202136a 00000054 t _ledc_fade_hw_acquire
+42026db0 00000054 t base_of_encoded_value(unsigned char, _Unwind_Context*)
+4201dc28 00000054 T nvs::NVSHandleSimple::set_string(char const*, char const*)
+4201d7e8 00000054 T nvs::Storage::~Storage()
+4201d7e8 00000054 T nvs::Storage::~Storage()
+420014b4 00000054 T LLCC68::setBandwidth(float)
+42002eee 00000054 T SX126x::fixPaClamping(bool)
+4200289a 00000054 T SX126x::getPacketLength(bool, unsigned char*)
+42003f44 00000054 T SX126x::standby(unsigned char, bool)
+420277c8 00000054 T __cxxabiv1::__class_type_info::__do_dyncast(int, __cxxabiv1::__class_type_info::__sub_kind, __cxxabiv1::__class_type_info const*, void const*, __cxxabiv1::__class_type_info const*, void const*, __cxxabiv1::__class_type_info::__dyncast_result&) const
+3c04d760 00000054 V vtable for adaptive_lora::Llcc68Hardware
+42023fe0 00000054 t append_arg.constprop.0
+403886a2 00000054 T cache_hal_invalidate_addr
+42025186 00000054 T clk_hal_lp_slow_get_freq_hz
+42016a7e 00000054 T esp_brownout_init
+42023e68 00000054 T esp_core_dump_check_task
+42034a9c 00000054 T esp_cpu_set_breakpoint
+42024512 00000054 T esp_diag_timestamp_get
+4201328a 00000054 T esp_mspi_pin_reserve
+42011898 00000054 T esp_ota_get_app_partition_count
+42011fbc 00000054 T esp_partition_read_raw
+42011798 00000054 t rewrite_ota_seq.part.0
+420245d8 00000054 t s_get_bus_mask
+42020286 00000054 t vfs_null_stat
+403866fa 00000054 T vPortTCBPreDeleteHook
+403877bc 00000054 T vTaskDelay
+4201e536 00000056 T nvs::PageManager::activatePage()
+4201e9ac 00000056 T nvs::partition_lookup::lookup_nvs_partition(char const*, nvs::NVSPartition**)
+4201e3a8 00000056 T nvs::HashList::find(unsigned int, nvs::Item const&)
+42023d08 00000056 t core_dump_crc_update
+42023d08 00000056 T esp_core_dump_checksum_update
+4203689c 00000056 T gdma_ahb_hal_set_strategy
+42011682 00000056 t image_validate
+4038a302 00000056 T multi_heap_aligned_alloc_offs
+4201b4c2 00000056 T nvs_close
+40382db8 00000056 t rtc_clk_32k_enable.part.0
+4201ee44 00000056 t usb_serial_jtag_tcgetattr
+403866a4 00000056 W vApplicationStackOverflowHook
+403860bc 00000056 T vQueueWaitForMessageRestricted
+40385dc4 00000056 T xQueueTakeMutexRecursive
+4200efbc 00000058 t _GLOBAL__sub_I_hardware_serial_end
+3fc8e6b4 00000058 d _uart_bus_array
+4201ddf2 00000058 T nvs::NVSPartitionManager::get_instance()
+420279f8 00000058 W std::basic_string_view<char, std::char_traits<char> >::compare(unsigned int, unsigned int, char const*, unsigned int) const
+42023c96 00000058 t core_dump_crc_print
+42023c96 00000058 T esp_core_dump_print_checksum
+40381db0 00000058 t esp_crosscore_isr
+3fc8ede8 00000058 d esp_flash_default_host
+3fc8f2a4 00000058 d esp_flash_gpspi_host
+42017a8c 00000058 T esp_mprot_pms_world_to_str
+420354f8 00000058 T gdma_get_group_channel_id
+3c04ecb8 00000058 R GPIO_PIN_MUX_REG
+42020e3a 00000058 t ledc_timer_clk_src_set_xpd_in_sleep.constprop.0.isra.0
+4201b440 00000058 T nvs_set_blob
+42035bba 00000058 t periph_ll_get_clk_en_reg
+4200ca14 00000058 T spiTransferByteNL
+42009d98 0000005a T __detachInterrupt
+42021a08 0000005a T _ledc_set_pin
+42029a0e 0000005a T _Unwind_SetGR
+4202649a 0000005a T coex_core_event_duration_get
+42009d98 0000005a W detachInterrupt
+420115f2 0000005a t esp_app_format_init_elf_sha256.part.0
+42023e0e 0000005a T esp_core_dump_get_stack
+42012222 0000005a T esp_partition_is_flash_region_writable
+42018a30 0000005a T esp_timer_impl_init_system_time
+40380c7a 0000005a T heap_caps_aligned_alloc
+42017190 0000005a t memprot_ll_set_dram0_split_line
+42017136 0000005a t memprot_ll_set_iram0_split_line
+42035c12 0000005a t periph_ll_get_rst_en_reg
+4038c112 0000005a T strcpy
+4200ccaa 0000005a T uartAvailable
+420365d6 0000005a T vSemaphoreDeleteWithCaps
+3fc93d2c 0000005c B __lock___arc4random_mutex
+3fc93d2c 0000005c B __lock___at_quick_exit_mutex
+3fc93cd0 0000005c B __lock___atexit_recursive_mutex
+3fc93d2c 0000005c B __lock___dd_hash_mutex
+3fc93cd0 0000005c B __lock___env_recursive_mutex
+3fc93cd0 0000005c B __lock___malloc_recursive_mutex
+3fc93cd0 0000005c B __lock___sfp_recursive_mutex
+3fc93cd0 0000005c B __lock___sinit_recursive_mutex
+3fc93d2c 0000005c B __lock___tz_mutex
+4200ebd4 0000005c T loopTask(void*)
+4201b802 0000005c T nvs::Page::alterEntryState(unsigned int, nvs::Page::EntryState)
+42000b86 0000005c T Module::SPIreadStream(unsigned short, unsigned char*, unsigned int, bool, bool)
+42000c18 0000005c T Module::SPIwriteStream(unsigned short, unsigned char const*, unsigned int, bool, bool)
+42022f0a 0000005c t elf_add_regs
+4201fbfa 0000005c T esp_vfs_fsync
+4201fbfa 0000005c T fsync
+4038e2d6 0000005c t get_buffer_malloc
+42036422 0000005c t main_task
+403848dc 0000005c t prvReturnItemByteBuf
+42018540 0000005c T pthread_key_create
+3fc93d2c 0000005c b s_common_mutex
+3fc93cd0 0000005c b s_common_recursive_mutex
+403819a6 0000005c t usb_serial_jtag_sof_tick_hook
+403854fc 0000005c T xQueueGenericGetStaticBuffers
+40385840 0000005c T xQueueGiveMutexRecursive
+3fc93bac 0000005c b xStaticTimerQueue.14
+42027d08 0000005e T __cxa_get_globals
+4202a662 0000005e T __register_frame_info_table_bases
+4200cc40 0000005e t _uartApplyRxPull.isra.0
+4200cbe2 0000005e t _uartDetectPin.constprop.0
+42026d0c 0000005e t get_ttype_entry(lsda_header_info*, unsigned long)
+42008c1c 0000005e T HWCDC::availableForWrite()
+42001042 0000005e T LLCC68::beginBPSK(float, float, signed char, float, bool)
+4200170c 0000005e T SX1262::beginBPSK(float, float, signed char, float, bool)
+4201f320 0000005e T console_open
+40381e08 0000005e t esp_crosscore_int_send
+420180c2 0000005e T esp_libc_init
+420371fa 0000005e T esp_log_level_set
+42017512 0000005e T esp_mprot_get_violate_addr
+420180c2 0000005e T esp_newlib_init
+420180c2 0000005e T esp_setup_newlib_syscalls
+40380cd4 0000005e T heap_caps_free
+40383d4a 0000005e t prvCheckItemFitsByteBuffer
+40387216 0000005e t prvIdleTask
+420083b8 00000060 T adaptive_lora::GatewayApp::listen(unsigned long)
+42026372 00000060 T esp_coex_adapter_register
+42012010 00000060 T esp_partition_write_raw
+42015954 00000060 T heap_caps_add_region
+40380b46 00000060 T heap_caps_malloc_default
+4202576e 00000060 T periph_rtc_dig_clk8m_enable
+4038d254 00000060 T spi_flash_chip_generic_reset
+4200c222 00000060 t spiDetachBus.isra.0
+40389b82 00000060 T systimer_hal_set_alarm_target
+4202006c 00000060 T tcdrain
+3fc8e800 00000060 d uart_context
+40386644 00000060 T xPortStartScheduler
+4201fb26 00000062 T _fstat_r
+4200f014 00000062 W serialEventRun()
+420013dc 00000062 T LLCC68::beginBPSK(ConfigBPSK_t const&)
+42012e5e 00000062 T bootloader_sha256_finish
+420263ea 00000062 t coex_core_lock
+42035f84 00000062 T esp_panic_handler_disable_timg_wdts
+4201fb26 00000062 T esp_vfs_fstat
+4038cfe6 00000062 T memspi_host_erase_block
+4038cf84 00000062 T memspi_host_erase_sector
+4038a146 00000062 T multi_heap_aligned_alloc_impl_offs
+420257d8 00000062 T periph_rtc_dig_clk8m_disable
+42018234 00000062 T pthread_once
+40383024 00000062 T rtc_clk_cpu_freq_mhz_to_config
+42019108 00000062 T uart_get_word_length
+4201ae1c 00000062 t uart_open
+4200cef8 00000062 T uartWriteBuf
+4202b55e 00000064 T _vsnprintf_r
+420022ec 00000064 T SX126x::getSNR()
+420002a2 00000064 T SPIClass::beginTransaction(SPISettings)
+4202806a 00000064 W char* std::string::_S_construct<char const*>(char const*, char const*, std::allocator<char> const&, std::forward_iterator_tag)
+4200a744 00000064 T delayMicroseconds
+42023daa 00000064 T esp_core_dump_check_stack
+4038c594 00000064 T esp_flash_get_physical_size
+4201371c 00000064 T esp_task_wdt_add
+4038cc78 00000064 t flash_end_flush_cache
+42020e92 00000064 t ledc_fade_channel_deinit.constprop.0.isra.0
+420268c4 00000064 T sha_hal_read_digest
+3c04ebe4 00000064 R soc_memory_regions
+42036572 00000064 T vQueueDeleteWithCaps
+4202a5d2 00000066 T __register_frame_info_bases
+42001a96 00000066 T SX1262::setOutputPower(signed char, bool)
+42004404 00000066 T SX126x::setPacketParams(unsigned short, unsigned char, unsigned char, unsigned char, unsigned char)
+420166b8 00000066 T esp_clk_tree_xtal32k_get_freq_hz
+4202500e 00000066 T esp_crosscore_int_init
+42018120 00000066 T esp_libc_init_global_stdio
+42035492 00000066 T gdma_del_channel
+4200fe18 00000066 T getSupportedCpuFrequencyMhz
+42036b0e 00000066 T gpio_hal_iomux_in
+403871b0 00000066 t prvDeleteTCB
+420184da 00000066 t pthread_cleanup_thread_specific_data_callback
+42014bae 00000066 W start_cpu0
+42014bae 00000066 t start_cpu0_default
+40384b12 00000066 T xRingbufferReceive
+40384be0 00000066 T xRingbufferReceiveUpToFromISR
+4202bdaa 00000068 T _Bfree
+4202ab86 00000068 T _fflush_r
+4202b2b2 00000068 T _fwalk_sglue
+4201fc56 00000068 T _stat_r
+42029006 00000068 T _Unwind_GetGR
+4201b85e 00000068 T nvs::Page::writeEntry(nvs::Item const&)
+4201b768 00000068 T nvs::Page::updateFirstUsedEntry(unsigned int, unsigned int)
+420044da 00000068 T SX126x::setPacketParamsBPSK(unsigned char, unsigned short, unsigned short, unsigned short)
+3c04ce84 00000068 V vtable for ArduinoHal
+3c04cd8c 00000068 V vtable for RadioLibHal
+42014cec 00000068 T efuse_hal_set_timing
+420175da 00000068 T esp_mprot_get_violate_operation
+4201fc56 00000068 T esp_vfs_stat
+42036a72 00000068 T gpio_hal_intr_enable_on_core
+40380bd8 00000068 T heap_caps_realloc_default
+403899de 00000068 T spi_flash_hal_disable_auto_suspend_mode
+4038ccfe 00000068 t spiflash_start_core
+4201f562 00000068 t translate_path
+4038626e 00000068 T xEventGroupClearBits
+40384b78 00000068 T xRingbufferReceiveUpTo
+403849d2 00000068 T xRingbufferSend
+42027c40 0000006a T __cxa_end_catch
+4202bf1e 0000006a T __lo0bits
+4202525c 0000006a T clk_hal_cpu_get_freq_hz
+42017570 0000006a T esp_mprot_get_violate_world
+42015190 0000006a t heap_bubble_down
+40381b4e 0000006a t ledc_duty_config.constprop.0.isra.0
+40382470 0000006a t rmt_rx_default_isr
+4038316e 0000006a t rtc_clk_cpu_freq_to_pll_mhz
+42018cb2 0000006a t uart_free_driver_obj
+3c050f1c 0000006c R __action_table
+3c050f88 0000006c R __state_table
+40381162 0000006c T esp_intr_noniram_disable
+420153a4 0000006c T esp_log_cache_add
+42012070 0000006c T esp_partition_erase_range
+420167cc 0000006c T esp_sleep_sub_mode_config
+42036bd8 0000006c T multi_heap_register_impl
+40381efa 0000006c t timer_remove.isra.0
+42018f1a 0000006c t uart_check_buf_full
+4200cb24 0000006e t _on_apb_change
+4201d5fc 0000006e T nvs::Storage::findKey(unsigned char, char const*, nvs::ItemType*)
+42008bae 0000006e T HWCDC::deinit(void*)
+42004ea4 0000006e T SX126x::setDataShaping(unsigned char)
+4200541e 0000006e T SX126x::setOutputPower(signed char, unsigned char, unsigned char, unsigned char)
+420149fa 0000006e T esp_cache_err_get_panic_info
+40381cac 0000006e T esp_mmu_paddr_find_caps
+42011e70 0000006e T esp_partition_find
+42018296 0000006e T pthread_mutex_init
+42018188 0000006e t pthread_mutex_lock_internal
+42012fc4 0000006e T spi_flash_munmap
+420200cc 0000006e T tcflush
+4201ff82 0000006e T tcgetattr
+4201fd5c 00000070 T _unlink_r
+42001874 00000070 T SX1262::begin(ConfigLoRa_t const&)
+42004182 00000070 T SX126x::setDioIrqParams(unsigned short, unsigned short, unsigned short, unsigned short)
+4200446a 00000070 T SX126x::setPacketParamsFSK(unsigned short, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char)
+42027fb6 00000070 W std::string::_Rep::_S_create(unsigned int, unsigned int, std::allocator<char> const&)
+42016648 00000070 T esp_clk_tree_rc_fast_d256_get_freq_hz
+42025996 00000070 T esp_timer_create
+4201fd5c 00000070 T esp_vfs_unlink
+4203692e 00000070 T gdma_ahb_hal_connect_peri
+4200bef4 00000070 t spiSetBitOrder.part.0
+403869de 00000070 T SysTickIsrHandler
+42036e1e 00000070 T tlsf_fit_size
+4201ace6 00000070 t uart_access
+40384c46 00000070 T vRingbufferReturnItem
+403879fa 00000070 T vTaskPlaceOnEventListRestricted
+42027bce 00000072 T __cxa_begin_catch
+4201fb88 00000072 T _fcntl_r
+4201f996 00000072 T _lseek_r
+4201fa08 00000072 T _read_r
+4201f924 00000072 T _write_r
+4200eed2 00000072 T HardwareSerial::end()
+4200136a 00000072 T LLCC68::beginFSK(ConfigFSK_t const&)
+420047e6 00000072 T SX126x::setCodingRate(unsigned char, bool)
+420048a8 00000072 T SX126x::setCurrentLimit(float)
+420267f4 00000072 T coex_schm_init
+40381240 00000072 T esp_intr_enable
+42035fe6 00000072 T esp_panic_handler_enable_rtc_wdt
+4201693e 00000072 T esp_sleep_enable_gpio_switch
+4201fb88 00000072 T esp_vfs_fcntl_r
+4201f996 00000072 T esp_vfs_lseek
+4201fa08 00000072 T esp_vfs_read
+4201f924 00000072 T esp_vfs_write
+4038e384 00000072 t spi_flash_os_check_yield
+4038c16e 00000072 T strncmp
+4201b110 00000072 t uart_fsync
+42014c14 00000074 t __esp_system_init_fn_esp_hw_stack_guard_init
+4201cbc4 00000074 T nvs::Storage::findItem(unsigned char, nvs::ItemType, char const*, nvs::Page*&, nvs::Item&, unsigned char, nvs::VerOffset, unsigned int*)
+4201256c 00000074 T bootloader_common_check_chip_validity
+42014da4 00000074 t get_flash_clock_divider
+40386bd6 00000074 t prvCheckForValidListAndQueue
+40381512 00000074 t rtc_clk_cpu_freq_to_xtal
+4038c1e2 00000074 T strncpy
+40381f66 00000074 t timer_insert.isra.0
+42006a7a 00000076 T adaptive_lora::ProvisioningConsole::feed(char)
+420057dc 00000076 T PhysicalLayer::PhysicalLayer()
+420057dc 00000076 T PhysicalLayer::PhysicalLayer()
+4200143e 00000076 T LLCC68::beginLRFHSS(ConfigLRFHSS_t const&)
+42000fcc 00000076 T LLCC68::beginFSK(float, float, float, float, signed char, unsigned short, float, bool)
+42001696 00000076 T SX1262::beginFSK(float, float, float, float, signed char, unsigned short, float, bool)
+42002146 00000076 T SX126x::launchMode()
+42004358 00000076 T SX126x::setModulationParamsFSK(unsigned long, unsigned char, unsigned char, unsigned long)
+403805e6 00000076 T bootloader_flash_reset_chip
+42016886 00000076 T esp_sleep_sub_mode_dump_config
+4038d048 00000076 T memspi_host_program_page
+4202545a 00000076 T rmt_hal_tx_channel_reset
+40382e7c 00000076 T rtc_clk_8m_enable
+4038680a 00000076 T vApplicationGetTimerTaskMemory
+4038a508 00000076 t verify_allocated_region
+40384cb6 00000076 T vRingbufferReturnItemFromISR
+40386dfa 00000076 T xTimerCreateTimerTask
+4200dcca 00000078 t _uartDetachBus_CTS
+4200dc52 00000078 t _uartDetachBus_RTS
+42007ffa 00000078 T adaptive_lora::RadioDriver::transmit(unsigned char const*, unsigned int, unsigned long)
+4201fe6c 00000078 T access
+4038c306 00000078 t detect_spi_flash_chip
+4201749a 00000078 T esp_mprot_is_conf_locked_any
+42017fc2 00000078 T esp_sync_timekeeping_timers
+4201fe6c 00000078 T esp_vfs_access
+4201067c 00000078 T gpio_intr_disable
+4038895e 00000078 T mmu_hal_paddr_to_vaddr
+40388ba2 00000078 T mmu_hal_vaddr_to_paddr
+4201b2a8 00000078 T nvs_flash_init_partition
+403806a4 00000078 T spi_flash_check_and_flush_cache
+42018c3a 00000078 t uart_enable_tx_write_fifo
+420318a2 0000007a T __sflags
+4200912c 0000007a t cdc0_write_char(char)
+42002f42 0000007a T SX126x::fixImplicitTimeout()
+4203647e 0000007a T esp_startup_start_app
+420364f8 0000007a T xQueueCreateWithCaps
+42024496 0000007c T __wrap_log_printf
+42014b32 0000007c t do_system_init_fn
+3fc8f2fc 0000007c D esp_flash_chip_boya
+3fc8f380 0000007c D esp_flash_chip_gd
+3fc8f42c 0000007c D esp_flash_chip_generic
+3fc8f4c0 0000007c D esp_flash_chip_issi
+3fc8f544 0000007c D esp_flash_chip_mxic
+3fc8f5c8 0000007c D esp_flash_chip_th
+3fc8f648 0000007c D esp_flash_chip_winbond
+40381fda 0000007c T esp_timer_start_once
+420101a8 0000007c t gpio_input_disable.isra.0
+4038289c 0000007c t rmt_tx_default_isr
+42034530 0000007c T rmt_tx_register_event_callbacks
+4201fff0 0000007c T tcsetattr
+4201930c 0000007c T uart_get_parity
+42019214 0000007c T uart_get_stop_bits
+42019290 0000007c T uart_set_parity
+420082a0 0000007e T adaptive_lora::GatewayApp::GatewayApp(adaptive_lora::DeviceConfig const&, adaptive_lora::RadioTransport&, adaptive_lora::SerialLogger&, unsigned long (*)(unsigned long))
+420082a0 0000007e T adaptive_lora::GatewayApp::GatewayApp(adaptive_lora::DeviceConfig const&, adaptive_lora::RadioTransport&, adaptive_lora::SerialLogger&, unsigned long (*)(unsigned long))
+42002818 0000007e T SX126x::getRSSI(bool)
+42023f42 0000007e T esp_core_dump_get_task_regs_dump
+42022c10 0000007e T esp_core_dump_init
+420122e0 0000007e T esp_efuse_utility_check_errors
+4200fb6c 0000007e t triggerApbChangeCallback.constprop.0
+4038678c 0000007e T vApplicationGetIdleTaskMemory
+4203191c 00000080 T __swhatbuf_r
+40380000 00000080 T _vector_table
+42026e2a 00000080 t parse_lsda_header(_Unwind_Context*, unsigned char const*, lsda_header_info*)
+42000f4c 00000080 T LLCC68::begin(float, float, unsigned char, unsigned char, unsigned char, signed char, unsigned short, float, bool)
+42000c74 00000080 T Module::SPIcheckStream()
+420098f2 00000080 T String::concat(char const*, unsigned int)
+42001616 00000080 T SX1262::begin(float, float, unsigned char, unsigned char, unsigned char, signed char, unsigned short, float, bool)
+42020472 00000080 T esp_bt_controller_rom_mem_release
+4201320a 00000080 T esp_mspi_get_io
+42010922 00000080 T gpio_od_disable
+4200a644 00000080 T ledcDetach
+4200be74 00000080 t spiSetDataMode.part.0
+4201ed86 00000080 t usb_serial_jtag_wait_tx_done_no_driver
+403863a0 00000080 T vEventGroupDelete
+42027868 00000082 t (anonymous namespace)::pool::allocate(unsigned int) [clone .constprop.0]
+403809c4 00000082 T esp_backtrace_print
+42025b6c 00000082 T ets_timer_setfn
+420106f4 00000082 T gpio_input_enable
+420109a2 00000082 T gpio_od_enable
+4201546a 00000082 T heap_caps_get_info
+42025b6c 00000082 T os_timer_setfn
+403851b8 00000082 t prvCopyDataToQueue
+4202b3fa 00000082 T snprintf
+4201ae7e 00000082 t uart_fcntl
+4200cd04 00000082 T uartAvailableForWrite
+4200ce26 00000082 T uartPeek
+42017d20 00000084 t _gettimeofday_r.part.0
+42002b08 00000084 T SX126x::fixSensitivity()
+420264f4 00000084 T coex_core_pre_init
+42025a06 00000084 T esp_timer_delete
+40381922 00000084 T esp_timer_impl_set_alarm_id
+40388cc6 00000084 t gpspi_flash_ll_get_buffer_data
+40388b1e 00000084 T mmu_hal_unmap_region
+4038bb2a 00000086 T abort
+42023ebc 00000086 T esp_core_dump_mem_seg_is_sane
+42011f36 00000086 T esp_partition_write
+42035cba 00000086 T periph_module_enable
+4038d54a 00000086 T spi_flash_chip_generic_get_caps
+42036d98 00000086 T tlsf_walk_pool
+40385558 00000086 T xQueueGenericCreate
+42034dec 00000088 t gdma_release_pair_handle
+42010a24 00000088 T gpio_set_level
+4038d2b4 00000088 T spi_flash_chip_generic_erase_chip
+4201f0d4 00000088 t usb_serial_jtag_tx_char_no_driver
+4202013c 00000088 t vfs_null_open
+4200faae 0000008a T btMemRelease
+42034e74 0000008a t gdma_del_rx_channel
+42034efe 0000008a t gdma_del_tx_channel
+4200ff7c 0000008a t gpio_sleep_pulldown_dis.isra.0
+42010092 0000008a t gpio_sleep_pullup_dis.isra.0
+420338aa 0000008a T rmt_rx_register_event_callbacks
+3fc941c0 0000008c B __atexit0
+4201ba52 0000008c T nvs::Page::writeEntryData(unsigned char const*, unsigned int)
+42009262 0000008c T HWCDC::end()
+420042cc 0000008c T SX126x::setModulationParams(unsigned char, unsigned char, unsigned char, unsigned char)
+42014a8a 0000008c T esp_cache_err_int_init
+4038c834 0000008c T esp_flash_read_encrypted
+42010006 0000008c t gpio_sleep_pulldown_en.isra.0
+4201011c 0000008c t gpio_sleep_pullup_en.isra.0
+403816a8 0000008c t lock_release_generic
+4038a43a 0000008c T multi_heap_realloc
+4200587c 0000008e T PhysicalLayer::updateDirectBuffer(unsigned char)
+4201e454 0000008e T nvs::HashList::erase(unsigned int)
+42015062 0000008e T esp_log_linked_list_set_level
+4038a270 0000008e T multi_heap_realloc_impl
+40385322 0000008e t prvUnlockQueue
+42007c5a 00000090 T adaptive_lora::ackMatches(adaptive_lora::Frame const&, adaptive_lora::Frame const&, unsigned short)
+42012658 00000090 T bootloader_mmap
+40385108 00000090 T esp_system_reset_modules_on_exit
+40382138 00000090 T ets_timer_arm_us
+42031b72 00000090 T frexp
+42011216 00000090 T gpio_iomux_output
+40382138 00000090 T os_timer_arm_us
+4200b0fa 00000090 T perimanGetPinBusExtraType
+42017da4 00000090 t settimeofday.part.0
+42005d84 00000092 T Preferences::getBytesLength(char const*)
+42001a00 00000092 T SX1262::setFrequency(float, bool)
+4200315c 00000092 T SX126x::findChip(char const*)
+42017b5c 00000092 T esp_libc_locks_init
+42017b5c 00000092 T esp_newlib_locks_init
+420120dc 00000092 T esp_partition_mmap
+420114aa 00000092 T gpio_sleep_sel_dis
+4038cecc 00000092 T memspi_host_read_id_hs
+42014068 00000092 t panic_handler
+4200b21c 00000092 T perimanGetPinBusChannel
+4200b18a 00000092 T perimanGetPinBusNum
+4200b068 00000092 T perimanGetPinBusType
+40381438 00000092 t rtc_brownout_isr_handler
+4200c89e 00000092 T spiTransferByte
+42018e88 00000092 t uart_reenable_intr_mask.constprop.0.isra.0
+4201ea50 00000092 t usb_serial_jtag_end_select
+4200b66e 00000094 t _rmtGetBus
+42006af0 00000094 T adaptive_lora::ClientApp::ClientApp(adaptive_lora::DeviceConfig const&, adaptive_lora::RadioTransport&, adaptive_lora::SerialLogger&, unsigned long (*)(unsigned long))
+42006af0 00000094 T adaptive_lora::ClientApp::ClientApp(adaptive_lora::DeviceConfig const&, adaptive_lora::RadioTransport&, adaptive_lora::SerialLogger&, unsigned long (*)(unsigned long))
+420012d6 00000094 T LLCC68::begin(ConfigLoRa_t const&)
+40384f00 00000094 t esp_error_check_failed_print
+42011416 00000094 T gpio_sleep_sel_en
+42018346 00000094 T pthread_mutex_destroy
+3fc8e9f0 00000094 d s_fake_stack_frame
+40384de0 00000094 T vRingbufferGetInfo
+4202b34c 00000096 T _puts_r
+4201d514 00000096 T nvs::Storage::eraseItem(unsigned char, nvs::ItemType, char const*)
+40381d1a 00000096 T esp_heap_adjust_alignment_to_hw
+4200b390 00000096 T perimanClearBusDeinit
+4038071c 00000096 t read_id_core
+4203327c 00000096 t rmt_del_rx_channel
+42033d46 00000096 t rmt_del_tx_channel
+40387964 00000096 T vTaskPlaceOnUnorderedEventList
+42005920 00000098 T RadioLibCRC::checksum(unsigned char const*, unsigned int)
+4201b57a 00000098 T nvs::Page::initialize()
+4201b9ba 00000098 T nvs::Page::alterEntryRangeState(unsigned int, unsigned int, nvs::Page::EntryState)
+42002254 00000098 T SX126x::startChannelScan(ChannelScanConfig_t const&)
+4201117e 00000098 T gpio_iomux_input
+403888c6 00000098 T ledc_hal_set_fade_param
+420145fe 00000098 T panic_print_backtrace
+4200b426 00000098 T perimanGetBusDeinit
+42018404 00000098 T pthread_mutex_unlock
+4201ec3a 00000098 t select_notif_callback_isr
+40389818 00000098 T spi_flash_hal_setup_read_suspend
+4202a6e4 0000009a T __deregister_frame_info_bases
+4202a8bc 0000009a T _findenv_r
+4200831e 0000009a T adaptive_lora::GatewayApp::renewSession(unsigned long)
+42006b84 0000009a T adaptive_lora::ClientApp::renewSession(unsigned long)
+4200123a 0000009a T LLCC68::setModem(ModemType_t)
+420204f2 0000009a T esp_bt_mem_release
+40389be2 0000009a T systimer_hal_set_alarm_period
+4201962c 0000009a T uart_disable_intr_mask
+40384938 0000009a T xRingbufferCreate
+4201e054 0000009c T nvs::NVSPartitionManager::init_partition(char const*)
+42000020 0000009c T SPIClass::SPIClass(unsigned char)
+42000020 0000009c T SPIClass::SPIClass(unsigned char)
+420225d4 0000009c t esp_core_dump_flash_hw_init
+420225d4 0000009c T esp_core_dump_write_init
+42011a9a 0000009c T esp_ota_get_state_partition
+40382056 0000009c T esp_timer_start_periodic
+42035e50 0000009c T panic_print_char
+40382f02 0000009c T rtc_clk_slow_src_set
+3fc8e750 0000009c d s_stub_table
+42018fc2 0000009c t uart_module_disable
+40385460 0000009c T xQueueGenericCreateStatic
+4203199c 0000009e T __smakebuf_r
+4201fcbe 0000009e T _link_r
+4201b20a 0000009e t nvs_get_str_or_blob(unsigned long, nvs::ItemType, char const*, void*, unsigned int*)
+420076de 0000009e T adaptive_lora::SerialLogger::drain()
+4201d712 0000009e T nvs::Storage::calcEntriesInNamespace(unsigned char, unsigned int&)
+4201fcbe 0000009e T esp_vfs_link
+403843c2 0000009e t prvCopyItemByteBuf
+4038806e 0000009e T ulTaskGenericNotifyTake
+4201fdcc 000000a0 T _rename_r
+4201e308 000000a0 T nvs::HashList::insert(nvs::Item const&, unsigned int)
+4200350c 000000a0 T SX126x::beginLRFHSS(unsigned char, unsigned char, bool)
+42004e04 000000a0 T SX126x::setRxBandwidth(float)
+4201fdcc 000000a0 T esp_vfs_rename
+420105dc 000000a0 T gpio_intr_enable
+42020d0a 000000a0 t ledc_speed_mode_ctx_create.constprop.0
+40382abe 000000a0 t rmt_tx_mark_eof
+4200cd86 000000a0 T uartReadBytes
+3fc93c08 000000a0 b ucStaticTimerQueueStorage.15
+4200dd42 000000a2 t _uartApplyOneWireOpenDrain
+4200df60 000000a2 t _uartDetachBus_RX
+4200debe 000000a2 t _uartDetachBus_TX
+42005f32 000000a2 T adaptive_lora::FirmwareRuntime::showConfig(adaptive_lora::DeviceConfig const&, char const*, char const*)
+40382b5e 000000a2 T esp_event_isr_post_to
+42010428 000000a2 T gpio_pulldown_dis
+42036c44 000000a2 T multi_heap_get_info_impl
+4200ec74 000000a2 T pulseIn
+4038dd58 000000a2 T spi_flash_common_set_io_mode
+42009b8a 000000a4 T __digitalWrite
+420003b2 000000a4 T Module::Module(unsigned long, unsigned long, unsigned long, unsigned long, SPIClass&, SPISettings)
+420003b2 000000a4 T Module::Module(unsigned long, unsigned long, unsigned long, unsigned long, SPIClass&, SPISettings)
+42002624 000000a4 T SX126x::reset(bool)
+42009b8a 000000a4 W digitalWrite
+420224ac 000000a4 T esp_core_dump_get_task_snapshot
+42034d48 000000a4 t gdma_release_group_handle
+42010384 000000a4 T gpio_pulldown_en
+42010224 000000a4 T gpio_pullup_en
+4038d808 000000a4 T spi_flash_chip_generic_read_unique_id
+4202abee 000000a4 t std
+4201ee9a 000000a4 t usb_serial_jtag_write
+420317d8 000000a6 t __sbprintf
+420278ea 000000a6 t (anonymous namespace)::pool::free(void*) [clone .constprop.0]
+4201c0ee 000000a6 T nvs::Page::readItem(unsigned char, nvs::ItemType, char const*, void*, unsigned int, unsigned char, nvs::VerOffset)
+420017cc 000000a6 T SX1262::setModem(ModemType_t)
+4200299a 000000a6 T SX126x::calibrateImageRejection(float, float)
+420112a6 000000a6 T gpio_sleep_set_direction
+40384236 000000a6 t prvCheckItemFitsDefault
+403824da 000000a6 T rmt_encode_check_result
+40381be8 000000a6 t s_do_mapping
+42019d92 000000a6 T uart_get_buffered_data_len
+4200cf5a 000000a6 T uartFlushTxOnly
+403883f0 000000a6 T vTaskStartScheduler
+4201d66a 000000a8 T nvs::Storage::getItemDataSize(unsigned char, nvs::ItemType, char const*, unsigned int&)
+420028ee 000000a8 T SX126x::readData(unsigned char*, unsigned int)
+420146ba 000000a8 t select_rtc_slow_clk
+4038d394 000000a8 T spi_flash_chip_generic_wait_idle
+42013780 000000a8 t subscribe_idle
+4200491a 000000aa T SX126x::setPreambleLength(unsigned int)
+420151fa 000000aa T esp_log_cache_set_level
+420118ec 000000aa T esp_ota_check_rollback_is_possible
+420110d4 000000aa T gpio_wakeup_disable
+4201443a 000000aa T panic_print_registers
+4201916a 000000aa T uart_set_stop_bits
+4201905e 000000aa T uart_set_word_length
+4201fa7a 000000ac T _close_r
+420117ec 000000ac T esp_ota_get_running_partition
+4201fa7a 000000ac T esp_vfs_close
+40383852 000000ac T rtc_time_us_to_slowclk
+42029ab0 000000ae T __frame_state_for
+4203699e 000000ae T gdma_ahb_hal_init
+40389730 000000ae T spi_flash_hal_program_page
+4200d922 000000b0 t _uartDetachConflictingPin.isra.0
+4201216e 000000b0 T esp_partition_read
+4201f768 000000b0 T get_vfs_for_path
+40389a46 000000b0 T spi_flash_hal_device_config
+40389170 000000b0 T spi_flash_hal_gpspi_read
+403853b0 000000b0 T xQueueGenericReset
+40388242 000000b0 T xTaskCreatePinnedToCore
+4202bcf8 000000b2 T _Balloc
+4200b702 000000b2 t _rmtDetachBus
+4202a00a 000000b2 T _Unwind_Backtrace
+4201153c 000000b2 T gpio_func_sel
+42020be0 000000b2 T rmt_new_copy_encoder
+4202065c 000000b2 T rmt_release_group_handle
+42001532 000000b4 T LLCC68::setDataRate(DataRate_t, ModemType_t)
+4202747e 000000b4 T __cxxabiv1::__si_class_type_info::__do_dyncast(int, __cxxabiv1::__class_type_info::__sub_kind, __cxxabiv1::__class_type_info const*, void const*, __cxxabiv1::__class_type_info const*, void const*, __cxxabiv1::__class_type_info::__dyncast_result&) const
+42011dbc 000000b4 T esp_partition_next
+42014516 000000b4 T panic_soc_fill_info
+40384054 000000b4 t prvAcquireItemNoSplit
+420071f4 000000b6 T adaptive_lora::validateConfig(adaptive_lora::DeviceConfig const&)
+420169c6 000000b6 T esp_deep_sleep_wakeup_io_reset
+403802ea 000000b6 t gpio_intr_service
+4202977e 000000b6 t uw_init_context_1
+40387c70 000000b6 T xTaskCheckForTimeOut
+4201888e 000000b8 T __cxa_guard_release
+3fc92dd0 000000b8 b deinit_functions
+403812d8 000000b8 T esp_intr_disable
+42015e38 000000b8 t get_desc_for_int
+403815f0 000000b8 t lock_acquire_generic
+4200ca6c 000000b8 T spiFrequencyToClockDiv
+42004d4a 000000ba T SX126x::findRxBw(float, unsigned char const*, unsigned int, float, unsigned char*)
+42034af0 000000ba T esp_cpu_set_watchpoint
+4200d062 000000ba T log_printfv
+4201b32c 000000ba T nvs_open_from_partition
+4202a518 000000ba t search_object
+4038e206 000000ba T spi_flash_chip_winbond_page_program
+420050e8 000000bc T SX126x::setWhitening(bool, unsigned short)
+42036058 000000bc T esp_panic_handler_feed_wdts
+420102c8 000000bc T gpio_pullup_dis
+42029878 000000be t _Unwind_RaiseException_Phase2
+4201d216 000000be T nvs::Storage::readItem(unsigned char, nvs::ItemType, char const*, void*, unsigned int)
+42018a8a 000000be T esp_timer_impl_early_init
+42015d7a 000000be t is_vect_desc_usable
+42032f6c 000000be t rmt_rx_enable
+4038dc44 000000be T spi_flash_chip_generic_page_program
+420049c4 000000c0 T SX126x::setFrequencyDeviation(float)
+42025074 000000c0 T esp_int_wdt_init
+420116d8 000000c0 t read_otadata
+3fc8e8e0 000000c0 d s_fd_table
+42000762 000000c2 T Module::SPIreadRegisterBurst(unsigned long, unsigned int, unsigned char*)
+420008f4 000000c2 T Module::SPIwriteRegisterBurst(unsigned long, unsigned char const*, unsigned int)
+420275d4 000000c2 T __gnu_cxx::__exchange_and_add(int volatile*, int)
+420171ea 000000c2 T esp_mprot_set_split_addr
+40385046 000000c2 T esp_restart_noos
+42019b4a 000000c2 T uart_write_bytes
+42004008 000000c4 T SX126x::setCad(unsigned char, unsigned char, unsigned char, unsigned char, unsigned long)
+420262ae 000000c4 T esp_crypto_shared_gdma_start_axi_ahb
+4202a288 000000c4 t get_cie_encoding
+403846b4 000000c4 t prvReceiveGenericFromISR
+4202906e 000000c4 t uw_install_context_1
+4202be12 000000c6 T __multadd
+420072aa 000000c6 T adaptive_lora::encodeConfig(adaptive_lora::DeviceConfig const&, unsigned char*, unsigned int)
+42013964 000000c6 T esp_task_wdt_reset
+403895da 000000c6 T spi_flash_hal_read
+4201ad56 000000c6 t uart_write
+403862d6 000000c6 T xEventGroupSetBits
+3c050e50 000000c8 R __mprec_tens
+4202b5f2 000000c8 T __swsetup_r
+4200d9d2 000000c8 t _uartTrySetIomuxPin
+42002a40 000000c8 T SX126x::calibrateImage(float)
+42003312 000000c8 T SX126x::begin(unsigned char, unsigned char, unsigned short)
+42022cce 000000c8 t elf_write_note_header
+4038525a 000000c8 t prvNotifyQueueSetContainer
+40384778 000000c8 t prvSendAcquireGeneric
+42006554 000000ca T adaptive_lora::NvsConfigStore::load(adaptive_lora::DeviceConfig&)
+420009b6 000000ca T Module::SPIwriteRegister(unsigned long, unsigned char)
+42010e42 000000ca T gpio_isr_register
+4201134c 000000ca T gpio_sleep_set_pull_mode
+40383c80 000000ca t prvGetItemByteBuf
+4201e58c 000000cc T nvs::PageManager::requestNewPage()
+42021a62 000000cc T ledc_set_pin
+4038be6a 000000cc T memmove
+3fc93e14 000000cc b prstatus.0
+4200fe7e 000000cc T setCpuFrequencyMhz
+4038daac 000000cc T spi_flash_chip_generic_erase_block
+4038db78 000000cc T spi_flash_chip_generic_erase_sector
+4200777c 000000ce t adaptive_lora::(anonymous namespace)::validate(adaptive_lora::Frame const&)
+4201de7c 000000ce T nvs::NVSPartitionManager::open_handle(char const*, char const*, nvs_open_mode_t, nvs::NVSHandleSimple**)
+42022166 000000ce T ledc_get_duty
+40388d58 000000ce T spi_flash_hal_gpspi_device_config
+4200c4f8 000000ce T spiAttachMISO
+42018946 000000d0 T __cxa_guard_abort
+4201be02 000000d0 T nvs::Page::readVariableLengthItemData(nvs::Item const&, unsigned int, void*)
+42000a80 000000d0 T Module::SPIsetRegValue(unsigned long, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char, bool)
+42000824 000000d0 T Module::SPIreadRegister(unsigned long)
+4200a574 000000d0 T ledcWriteTone
+420185cc 000000d0 T pthread_setspecific
+4038646e 000000d0 T pxPortInitialiseStack
+4202058c 000000d0 T rmt_acquire_group_handle
+4200c3f0 000000d0 T spiAttachMOSI
+4200c5fe 000000d0 T spiAttachSCK
+4200c930 000000d0 T spiTransaction
+42029936 000000d2 t _Unwind_ForcedUnwind_Phase2
+4200ede0 000000d2 T HardwareSerial::HardwareSerial(unsigned char)
+4200ede0 000000d2 T HardwareSerial::HardwareSerial(unsigned char)
+42036336 000000d2 t esp_reset_reason_init
+42010f0c 000000d2 T gpio_install_isr_service
+4038bd96 000000d2 T memcpy
+4038d6f0 000000d2 T spi_flash_chip_generic_write
+42022778 000000d4 t esp_core_dump_flash_write_prepare
+42022778 000000d4 T esp_core_dump_write_prepare
+42026a7c 000000d4 T floorf
+4201084e 000000d4 T gpio_output_enable
+4202a962 000000d6 T _fclose_r
+420269a6 000000d6 T ceilf
+420358d0 000000d6 T gdma_start
+42012494 000000d8 T bootloader_common_check_efuse_blk_validity
+420231f4 000000d8 t elf_process_note_segment
+42010776 000000d8 T gpio_output_disable
+40382398 000000d8 T rmt_isr_handle_rx_threshold
+40383086 000000d8 T rtc_clk_cpu_freq_get_config
+420196d4 000000d8 T uart_enable_tx_intr
+40384a3a 000000d8 T xRingbufferSendFromISR
+40387d76 000000d8 T xTaskPriorityInherit
+40380102 000000da T _panic_handler
+4200dde4 000000da t _uartDetachBus_RX_TX
+42025522 000000da T brownout_hal_config
+42036630 000000da T xTaskGetNext
+4201c7d2 000000dc T nvs::Storage::populateBlobIndices(intrusive_list<nvs::Storage::BlobIndexNode>&)
+42004b6c 000000dc T SX126x::setDataRate(DataRate_t, ModemType_t)
+42016ad2 000000dc T get_rtc_dbias_by_efuse
+4201432c 000000dc t print_assist_debug_details
+42016542 000000dc T rtc_isr_register
+4202ad5c 000000de T __sfp
+4202ae6e 000000de T _fopen_r
+42025a8a 000000de T esp_timer_init
+4202a34c 000000de t linear_search_fdes
+40387274 000000de t prvInitialiseNewTask.constprop.0
+420265be 000000e0 T coex_rom_osi_funcs_init
+42002064 000000e2 T SX126x::randomByte()
+42015c58 000000e2 T esp_rtc_get_time_us
+42010d0e 000000e2 T gpio_isr_handler_remove
+4200b2ae 000000e2 T perimanSetBusDeinit
+4038d8ac 000000e2 T spi_flash_chip_generic_write_encrypted
+4202c4e6 000000e4 T __d2b
+42004f12 000000e4 T SX126x::setSyncWord(unsigned char*, unsigned int)
+4201235e 000000e4 T bootloader_common_check_chip_revision_validity
+42011996 000000e4 t esp_ota_current_ota_is_workable
+42025da0 000000e4 T mbedtls_sha256_finish
+4200fd34 000000e4 T removeApbChangeCallback
+4200784a 000000e6 T adaptive_lora::codecResultName(adaptive_lora::CodecResult)
+420152a4 000000e6 T esp_log_cache_get_level
+4200a3a6 000000e6 T ledcAttach
+403842dc 000000e6 t prvInitializeNewRingbuffer
+4038e03a 000000e6 T spi_flash_chip_winbond_erase_block
+4038e120 000000e6 T spi_flash_chip_winbond_erase_sector
+40385f64 000000e6 T xQueueReceiveFromISR
+40387e4e 000000e6 T xTaskPriorityDisinherit
+42029df4 000000e8 T _Unwind_Resume
+42007cea 000000e8 T adaptive_lora::SequenceTracker::observe(adaptive_lora::PacketIdentity const&)
+42004a84 000000e8 T SX126x::setBitRate(float)
+4200a48c 000000e8 T ledcWrite
+4201a61c 000000e8 t select_notif_callback_isr
+4202c146 000000ea T __pow5mult
+42024808 000000ea T esp_mmu_map_get_max_consecutive_free_block_size
+40386f6e 000000ea t prvAddCurrentTaskToDelayedList
+42008a48 000000ec t flushTXBuffer(unsigned char const*, unsigned int)
+42009040 000000ec T HWCDC::flush()
+3c04d4f8 000000ec V vtable for PhysicalLayer
+420261c2 000000ec t crypto_shared_gdma_init
+42013cde 000000ec T esp_task_wdt_impl_timer_allocate
+420357e4 000000ec T gdma_config_transfer
+4201a358 000000ec t uart_end_select
+42005e16 000000ee T Preferences::getBytes(char const*, void*, unsigned int)
+4201df66 000000ee T nvs::NVSPartitionManager::init_custom(nvs::Partition*, unsigned long, unsigned long)
+4202a42a 000000ee t classify_object_over_fdes.constprop.0
+4202a19a 000000ee t read_encoded_value_with_base
+3fc8eb04 000000f0 D _impure_data
+42015864 000000f0 T heap_caps_add_region_with_caps
+42026c1a 000000f2 t read_encoded_value_with_base(unsigned char, unsigned int, unsigned char const*, unsigned int*)
+42004ff6 000000f2 T SX126x::setCRC(unsigned char, unsigned short, unsigned short, bool)
+42018b48 000000f2 T esp_timer_impl_init
+4202bbaa 000000f4 T __register_exitproc
+4201b8c6 000000f4 T nvs::Page::copyItems(nvs::Page&)
+4201e1b6 000000f4 T nvs::Item::checkHeaderConsistency(unsigned char) const
+4038088c 000000f4 T call_start_cpu0
+42013628 000000f4 T task_wdt_timeout_abort
+40387a6a 000000f4 T xTaskRemoveFromEventList
+4201644c 000000f6 T esp_intr_free
+42010fde 000000f6 T gpio_wakeup_enable
+42021b2e 000000f6 T ledc_update_duty
+3c0503e4 000000f8 R esp_isr_names
+4038375a 000000f8 T rtc_clk_cal
+3fc92ff4 000000f8 b s_log_cache
+420033da 000000fa T SX126x::beginFSK(float, float, float, unsigned short)
+40382580 000000fa T rmt_isr_handle_tx_done
+4202b9b2 000000fc T _reclaim_reent
+420148fe 000000fc W esp_perip_clk_init
+4202206a 000000fc T ledc_set_duty
+4038d5f4 000000fc T spi_flash_chip_generic_read
+40387b5e 000000fc T vTaskRemoveFromUnorderedEventList
+4202a798 000000fe T _Unwind_Find_FDE
+42007930 000000fe T adaptive_lora::encodeFrame(adaptive_lora::Frame const&, unsigned char*, unsigned int, unsigned int&)
+420359a6 000000fe t periph_ll_get_clk_en_mask
+4200c2ba 000000fe T spiAttachSS
+403859f8 000000fe T xQueueGiveFromISR
+403882f2 000000fe T xTaskCreateStaticPinnedToCore
+3c050ff4 00000100 R __chclass
+3c04d2a8 00000100 V vtable for SX126x
+3c040020 00000100 V esp_app_desc
+42022860 00000100 t esp_core_dump_flash_write_end
+42022860 00000100 T esp_core_dump_write_end
+4202566e 00000100 T esp_cpu_configure_region_protection
+40388a1e 00000100 T mmu_hal_map_region
+4200af68 00000100 T perimanGetPinBus
+3fc93ef0 00000100 b s_intr_handlers
+4038df3a 00000100 T spi_flash_chip_winbond_read
+3c050ba8 00000101 R _ctype_
+403801dc 00000102 T _interrupt_handler
+42004c48 00000102 T SX126x::checkDataRate(DataRate_t, ModemType_t)
+42021618 00000102 T ledc_timer_pause
+4202171a 00000102 T ledc_timer_resume
+42010c0a 00000104 T gpio_isr_handler_add
+42021514 00000104 T ledc_timer_rst
+42012ec0 00000104 T spi_flash_mmap
+40387f34 00000104 T vTaskPriorityDisinheritAfterTimeout
+42031a62 00000106 T __srefill_r
+4202c230 00000108 T __lshift
+3fc92b68 00000108 b __pinInterruptHandlers
+3fc9424c 00000108 b _on_exit_args_instance
+42022670 00000108 t esp_core_dump_flash_write_data
+42022670 00000108 T esp_core_dump_write_data
+420356dc 00000108 T gdma_disconnect
+4201a186 00000108 T uart_driver_delete
+40387352 00000108 T vTaskDelete
+42005c7a 0000010a T Preferences::putBytes(char const*, void const*, unsigned int)
+42008f36 0000010a T HWCDC::write(unsigned char const*, unsigned int)
+4200270e 0000010a T SX126x::transmit(unsigned char const*, unsigned int, unsigned char)
+420345ac 0000010a t rmt_tx_enable
+4201f818 0000010c T _open_r
+42000496 0000010c T Module::SPItransfer(unsigned short, unsigned long, unsigned char const*, unsigned char*, unsigned int)
+4201f818 0000010c T esp_vfs_open
+403845a8 0000010c t prvReceiveGeneric
+40387810 0000010c T vTaskSwitchContext
+4200468a 0000010e T SX126x::setBandwidth(float)
+4038d43c 0000010e T spi_flash_chip_generic_config_host_io_mode
+4200e002 0000010e T uartEnd
+42022960 00000110 T esp_core_dump_partition_and_size_get
+42028ef6 00000110 t init_dwarf_reg_size_table
+4203316c 00000110 t rmt_rx_destroy
+42032e5c 00000110 t rmt_rx_disable
+420104ca 00000112 T gpio_set_intr_type
+4200661e 00000114 T adaptive_lora::NvsConfigStore::save(adaptive_lora::DeviceConfig const&)
+4201d88a 00000114 T nvs::Storage::createOrOpenNamespace(char const*, bool, unsigned char&)
+42024efa 00000114 T esp_mmu_vaddr_to_paddr
+40383442 00000114 T rtc_sleep_pu
+4201f44c 00000116 t esp_vfs_register_fs_common
+42025c8a 00000116 T mbedtls_sha256_update
+42035aa4 00000116 t periph_ll_get_rst_en_mask
+40384460 00000116 t prvCopyItemAllowSplit
+4038bffc 00000116 T strcmp
+420059d6 0000011a T RadioLibConvCode::encode(unsigned char const*, unsigned int, unsigned char*, unsigned int*)
+42019512 0000011a T uart_get_baudrate
+42029cd8 0000011c T _Unwind_ForcedUnwind
+4200557a 0000011c T SX126x::config(unsigned char)
+42003040 0000011c T SX126x::fixGFSK()
+4038c5f8 0000011c T esp_flash_init_main
+42006c5a 0000011e T adaptive_lora::ClientApp::finish(char const*, adaptive_lora::RadioEvent const*, bool)
+42033c28 0000011e t rmt_tx_destroy
+3c04ceec 00000120 V vtable for LLCC68
+3c04d118 00000120 V vtable for SX1262
+4038c714 00000120 T esp_flash_read
+42020ef6 00000120 t ledc_set_timer_params.isra.0
+42029edc 00000122 T _Unwind_Resume_or_Rethrow
+42005fd4 00000122 T adaptive_lora::FirmwareRuntime::status()
+4201d0f4 00000122 T nvs::Storage::readMultiPageBlob(unsigned char, char const*, void*, unsigned int)
+42002350 00000122 T SX126x::receive(unsigned char*, unsigned int, unsigned long)
+40381a2c 00000122 t rmt_encode_copy
+42005b28 00000124 T Preferences::begin(char const*, bool, char const*)
+42007370 00000124 T adaptive_lora::decodeConfig(unsigned char const*, unsigned int, adaptive_lora::DeviceConfig&)
+420031ee 00000124 T SX126x::modSetup(unsigned char)
+403858d0 00000128 T xQueueGenericSendFromISR
+420024b8 0000012a T SX126x::SX126x(Module*)
+420024b8 0000012a T SX126x::SX126x(Module*)
+4200b4ea 0000012a T rgbLedWriteOrdered
+40386880 0000012a T vSystimerSetup
+40389ed6 0000012a T wdt_hal_config_stage
+42017bf2 0000012e t adjust_boot_time
+40384108 0000012e t prvSendItemDoneNoSplit
+403898b0 0000012e T spi_flash_hal_setup_auto_suspend_mode
+4201ef8c 0000012e t usb_serial_jtag_read
+42021c24 00000130 T ledc_set_duty_with_hpoint
+420096f2 00000132 T String::changeBuffer(unsigned int)
+42037040 00000132 T tlsf_create
+4201ce6c 00000134 T nvs::Storage::cmpMultiPageBlob(unsigned char, char const*, void const*, unsigned int)
+42031c02 00000134 t quorem
+4038613a 00000134 T xEventGroupWaitBits
+42009c58 00000136 T __attachInterruptFunctionalArg
+40387058 00000136 t prvAddNewTaskToReadyList
+420281ea 00000136 t read_encoded_value
+4038810c 00000136 T vTaskGenericNotifyGiveFromISR
+3fc94088 00000138 B __sf
+4200b7b4 00000138 t _rmtWrite
+4202585e 00000138 t timer_task
+4200f946 0000013a T printAfterSetupInfo()
+4201ca88 0000013c T nvs::Storage::eraseOrphanDataBlobs(intrusive_list<nvs::Storage::BlobIndexNode>&)
+420266b2 0000013c t coex_schm_change_phase
+42013828 0000013c T esp_task_wdt_init
+4202c5ea 0000013e T __ssprint_r
+4201c194 0000013e T nvs::Page::cmpItem(unsigned char, nvs::ItemType, char const*, void const*, unsigned int, unsigned char, nvs::VerOffset)
+420087d4 00000140 t _GLOBAL__sub_I__Z5setupv
+42027a50 00000140 t _GLOBAL__sub_I__ZN9__gnu_cxx9__freeresEv
+420230b4 00000140 t elf_save_task
+420000bc 00000142 T SPIClass::begin(signed char, signed char, signed char, signed char)
+4203302a 00000142 t rmt_rx_demodulate_carrier
+4201bcbc 00000146 T nvs::Page::eraseEntryAndSpan(unsigned int)
+4038bbb0 00000148 T __assert_func
+42009df2 00000148 t ledcDetachBus
+42013b96 00000148 t task_wdt_isr
+4200fbea 0000014a T addApbChangeCallback
+42010ac0 0000014a T gpio_config
+40385e1a 0000014a T xQueuePeek
+4202aa38 0000014e T __sflush_r
+42022f66 0000014e t elf_add_segment.constprop.0
+4201afc0 00000150 t uart_read
+4200f076 00000152 t _printMemCapsInfo(unsigned long, char const*)
+42024da8 00000152 T esp_mmu_unmap
+42022234 00000152 T ledc_get_freq
+40383f02 00000152 t prvGetItemDefault
+4201cfa0 00000154 T nvs::Storage::eraseMultiPageBlob(unsigned char, char const*, nvs::VerOffset)
+40380ee6 00000154 T heap_caps_realloc_base
+40382244 00000154 T rmt_isr_handle_rx_done
+40385af6 00000154 T xQueueReceive
+420213be 00000156 T ledc_bind_channel_timer
+4201eae2 00000158 t usb_serial_jtag_start_select
+420134ce 0000015a t add_entry
+40383da8 0000015a t prvReturnItemDefault
+42003d8a 0000015c T SX126x::setLRFHSSHop(unsigned char)
+42013a3a 0000015c T esp_task_wdt_print_triggered_tasks
+4201307a 0000015e T esp_flash_init_default_chip
+3fc92c70 00000160 b pins
+42034be4 00000164 T esp_clk_tree_src_get_freq_hz
+4201f5ca 00000164 T esp_vfs_register_fs
+42014798 00000166 W esp_clk_init
+40387656 00000166 T xTaskResumeAll
+42006280 00000168 T adaptive_lora::FirmwareRuntime::command(adaptive_lora::ConsoleAction)
+42001e20 00000168 T SX126x::getTimeOnAir(unsigned int)
+3c050cac 0000016c R __default_global_locale
+420063e8 0000016c T adaptive_lora::FirmwareRuntime::loop()
+420010ce 0000016c T LLCC68::checkDataRate(DataRate_t, ModemType_t)
+42018d1c 0000016c t uart_release_pin
+42019e38 0000016e T uart_get_tx_buffer_free_size
+42033ab6 00000172 t rmt_tx_modulate_carrier
+42022d96 00000174 t elf_add_note
+42003be0 00000176 T SX126x::resetLRFHSS()
+4202c36e 00000178 T __mdiff
+42029b60 00000178 T _Unwind_RaiseException
+40385c4a 0000017a T xQueueSemaphoreTake
+42034912 0000017c T esp_event_loop_delete
+42014e18 0000017c T spi_flash_hal_init
+4201c654 0000017e T nvs::Page::load(nvs::Partition*, unsigned long)
+4201d99e 0000017e T nvs::Storage::init(unsigned long, unsigned long)
+4202bfc4 00000182 T __multiply
+42033934 00000182 t rmt_tx_disable
+42019c0c 00000186 T uart_read_bytes
+420060f6 0000018a T adaptive_lora::FirmwareRuntime::setup()
+42019388 0000018a T uart_set_baudrate
+42035550 0000018c T gdma_connect
+40388fe0 00000190 T spi_flash_hal_gpspi_common_command
+420295ea 00000194 t uw_update_context_1
+403874c0 00000196 T xTaskIncrementTick
+42022a70 000001a0 T esp_core_dump_image_check
+42023af6 000001a0 T esp_core_dump_store
+42023af6 000001a0 t esp_core_dump_write_elf
+4038c8c0 000001a2 T esp_flash_write
+40385666 000001a4 T xQueueGenericSend
+420080fa 000001a6 T adaptive_lora::RadioDriver::poll(unsigned long)
+40382918 000001a6 t rmt_tx_do_transaction
+420172ac 000001a8 T esp_mprot_set_pms_area
+40389430 000001aa T spi_flash_hal_common_command
+40380d32 000001ac T heap_caps_aligned_alloc_base
+40386c4a 000001b0 t prvTimerTask
+42036e8e 000001b2 T tlsf_add_pool
+420197ac 000001b2 t uart_tx_all.part.0
+420099d6 000001b4 T __pinMode
+420099d6 000001b4 W pinMode
+420186d8 000001b6 T __cxa_guard_acquire
+4200da9a 000001b8 t _uartInternalSetPin
+40388e26 000001ba T spi_flash_hal_gpspi_configure_host_io_mode
+420005a2 000001c0 T Module::SPItransferStream(unsigned char const*, unsigned char, bool, unsigned char const*, unsigned char*, unsigned int, bool)
+40389270 000001c0 T spi_flash_hal_configure_host_io_mode
+40389d0a 000001cc T wdt_hal_init
+4203613a 000001d0 T esp_panic_handler
+4200c6ce 000001d0 T spiStartBus
+4038267a 000001d6 T rmt_isr_handle_tx_loop_end
+42013e8e 000001d6 t system_early_init
+403839a2 000001d8 T esp_cache_msync
+4201a444 000001d8 t uart_start_select
+4201c8ae 000001da T nvs::Storage::eraseMismatchedBlobIndexes(intrusive_list<nvs::Storage::BlobIndexNode>&)
+4202462c 000001dc T esp_mmu_map_init
+4201bade 000001de T nvs::Page::writeItem(unsigned char, nvs::ItemType, char const*, void const*, unsigned int, unsigned char)
+42019fa6 000001e0 T uart_flush
+42019fa6 000001e0 T uart_flush_input
+42007a2e 000001e8 T adaptive_lora::decodeFrame(unsigned char const*, unsigned int, unsigned short, unsigned short, adaptive_lora::Frame&)
+4202181c 000001ec T ledc_timer_config
+4201995e 000001ec T uart_wait_tx_done
+3fc93170 000001f4 b pxReadyTasksLists
+42014136 000001f6 t print_memprot_err_details
+420074e6 000001f8 T adaptive_lora::SerialLogger::event(char const*, char const*, adaptive_lora::Frame const*, adaptive_lora::RadioEvent const*, short, unsigned long)
+420051fa 000001fc T SX126x::setTCXO(float, unsigned long)
+403803a4 00000200 T bootloader_flash_execute_command_common
+40383556 00000204 T rtc_clk_cal_internal
+4200a7dc 00000208 T initArduino
+420346b6 0000020c T rmt_transmit
+4038c386 0000020e T esp_flash_erase_region
+403831d8 00000214 T rtc_clk_cpu_freq_set_config
+4038ca62 00000216 T esp_flash_write_encrypted
+4201bed2 0000021c T nvs::Page::findItem(unsigned char, nvs::ItemType, char const*, unsigned int&, nvs::Item&, unsigned char, nvs::VerOffset)
+42001b74 00000226 T SX126x::calculateTimeOnAir(ModemType_t, DataRate_t, PacketConfig_t, unsigned int)
+42008cc8 00000234 t hw_cdc_isr_handler(void*)
+4201cc38 00000234 T nvs::Storage::writeMultiPageBlob(unsigned char, char const*, void const*, unsigned int, nvs::VerOffset)
+42011b84 00000238 t ensure_partitions_loaded.part.0
+4201d2d4 00000240 T nvs::Storage::writeItem(unsigned char, nvs::ItemType, char const*, void const*, unsigned int)
+42009320 0000024e T HWCDC::begin(unsigned long)
+420159de 00000252 T soc_get_available_memory_regions
+420155be 0000025c T heap_caps_init
+42028c6c 00000268 t uw_frame_state_for
+42032b90 00000274 T __trunctfdf2
+42025ed0 0000028e T esp_sha_dma
+42026eaa 00000290 T __gxx_personality_v0
+4201aa4e 00000298 t uart_tcsetattr
+4200acc6 000002a2 T perimanSetPinBus
+42012756 000002d6 t process_segments.constprop.0
+4200a9e8 000002de T perimanGetTypeName
+4201a758 000002f6 t uart_tcgetattr
+4202b6ba 000002f8 T _fseeko_r
+4200677a 00000300 T adaptive_lora::ProvisioningConsole::execute()
+4202afa6 0000030c T __sfvwrite_r
+42021d54 00000316 T ledc_channel_config
+42021016 0000031c t ledc_set_timer_div.constprop.0
+4201c31e 00000336 T nvs::Page::mLoadEntryTable()
+4201e658 00000354 T nvs::PageManager::load(nvs::Partition*, unsigned long, unsigned long)
+42002b8c 00000362 T SX126x::stageMode(RadioModeType_t, RadioModeConfig_t*)
+42017672 00000372 T esp_mprot_set_prot
+42008438 00000374 T adaptive_lora::GatewayApp::update(unsigned long, adaptive_lora::RadioEvent const&, bool)
+4200d13c 0000038a t _uartValidatePins
+4202070e 00000390 T rmt_select_periph_clock
+42012a2c 000003b0 t image_load
+42006d78 00000418 T adaptive_lora::ClientApp::update(unsigned long, adaptive_lora::RadioEvent const&, bool)
+4202ef48 00000420 t get_arg.isra.0
+4202c728 00000420 t get_arg.isra.0
+4038aa30 00000440 T tlsf_malloc
+42028320 00000456 t execute_cfa_program_specialized
+4200d4c6 0000045c t _uartDetachPins
+42024034 00000462 t diag_log_add
+42009f3a 0000046c T ledcAttachChannel
+4038a590 00000496 T tlsf_free
+420248f2 000004b6 T esp_mmu_map
+42029132 000004b8 t execute_stack_op
+42028776 000004cc t execute_cfa_program_generic
+42015f44 000004f2 T esp_intr_alloc_intrstatus_bind
+4038b4b8 00000502 T tlsf_realloc
+42034f88 0000050a T gdma_new_ahb_channel
+42034f88 0000050a T gdma_new_channel
+42016bae 0000053a T rtc_init
+4200b8f6 0000057e T rmtInit
+42033312 00000598 T rmt_new_rx_channel
+420035ac 00000634 T SX126x::buildLRFHSSPacket(unsigned char const*, unsigned int, unsigned char*, unsigned int*, unsigned int*, unsigned int*)
+4038ae70 00000648 T tlsf_memalign_offs
+3c04e3b4 00000718 r esp_err_msg_table
+42033ddc 00000754 T rmt_new_tx_channel
+4200f1c8 0000077e T printBeforeSetupInfo()
+420232cc 0000082a t esp_core_dump_do_write_elf_pass
+3fc93370 00000830 B xIsrStack
+4200e110 00000a6e T uartSetPins
+42031d36 00000e5a T _dtoa_r
+4202cb48 00002400 T _svfprintf_r
+4202f368 00002470 T _vfprintf_r
+3fc90568 00002560 b (anonymous namespace)::runtime

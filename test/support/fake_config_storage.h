@@ -4,6 +4,7 @@
 #endif
 #include <cstdint>
 #include <cstring>
+#include <esp_timer.h>
 #include "app/config_storage.h"
 
 namespace adaptive_lora::test {
@@ -30,6 +31,7 @@ class FakeConfigStorage final : public ConfigStorage {
 public:
     StorageSession sessions[16]{};
     StorageTrace trace[64]{};
+    uint64_t delayUs[6]{};
     size_t traceLength = 0, begins = 0, successfulBegins = 0, ends = 0;
     bool active = false, readOnly = false, violation = false, exists = true;
     uint8_t bytes[32]{}, lastWrite[32]{};
@@ -80,6 +82,7 @@ public:
 private:
     size_t session_ = 0;
     void record(StorageCall call, const char* identifier = nullptr, size_t count = 0) {
+        host_clock::advance(delayUs[static_cast<size_t>(call)]);
         if (traceLength == sizeof(trace) / sizeof(trace[0])) { violation = true; return; }
         auto& item = trace[traceLength++];
         item.call = call; item.length = count;

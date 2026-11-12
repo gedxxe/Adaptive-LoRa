@@ -18,6 +18,7 @@ public:
     size_t calls = 0;
     size_t largestWrite = 0;
     uint32_t baud = 0;
+    uint64_t availableDelayUs = 0, writeDelayUs = 0;
     size_t beginCalls = 0, readCalls = 0;
     void begin(uint32_t value) { baud = value; ++beginCalls; }
     int available() const { return static_cast<int>(inputLength_ - inputHead_); }
@@ -29,8 +30,9 @@ public:
         inputLength_ += count;
         return true;
     }
-    int availableForWrite() const { return capacity; }
+    int availableForWrite() const { host_clock::advance(availableDelayUs); return capacity; }
     size_t write(const uint8_t* bytes, size_t length) {
+        host_clock::advance(writeDelayUs);
         ++calls;
         if (length > largestWrite) largestWrite = length;
         size_t count = length < writeLimit ? length : writeLimit;
@@ -41,6 +43,7 @@ public:
     }
     void reset() {
         output.clear(); capacity = 64; writeLimit = 128; calls = 0; largestWrite = 0;
+        availableDelayUs = writeDelayUs = 0;
         baud = 0; beginCalls = readCalls = inputHead_ = inputLength_ = 0;
     }
 private:

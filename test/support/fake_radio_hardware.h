@@ -3,6 +3,7 @@
 #error "Fake radio hardware must never be used in firmware"
 #endif
 #include <cstring>
+#include <esp_timer.h>
 #include "common/radio/radio_hardware.h"
 #include "project_config.h"
 
@@ -26,6 +27,7 @@ public:
     HardwareCall trace[128]{};
     size_t traceLength = 0;
     unsigned calls[static_cast<size_t>(HardwareCall::COUNT)]{};
+    uint64_t delayUs[static_cast<size_t>(HardwareCall::COUNT)]{};
     void (*onBegin)(void*) = nullptr;
     void* beginContext = nullptr;
 
@@ -72,6 +74,7 @@ public:
 private:
     void record(HardwareCall call) {
         ++calls[static_cast<size_t>(call)];
+        host_clock::advance(delayUs[static_cast<size_t>(call)]);
         if (traceLength < sizeof(trace) / sizeof(trace[0])) trace[traceLength++] = call;
         else violation = true;
     }

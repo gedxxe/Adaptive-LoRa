@@ -37,3 +37,7 @@ RAM24,548/327,680（较010 +16），flash363,842/1,310,720（-12）；这些是c
 实际库存2个RA-01SCH/LLCC68、1个ESP32-C3 Super Mini，第二MCU待采购、915MHz Moxon待制作，未组装双设备，无烧录或物理发射。ERR-008/010同步等待、ERR-009库分配、捕获时间陈旧、永久坏随机源下freshBootId无界循环仍未解决；跨真实启动previous=0不保证持久唯一性。未复现需改策略的runtime内存/状态缺陷，不能据此证明无race。
 
 M0–M2实物门槛IN PROGRESS，M3–M8 NOT STARTED。本轮不增加TDMA/bitmap/选择性调度/ADR或外部集成。下一软件任务建议依赖时延/分配预算与boot-ID故障活性分析，具体缺陷复现后再作最小策略修正。
+
+## Iteration012修正说明
+
+上文无界generator/陈旧时间属于011。012复现后修正为8次上限、保持耗尽身份/1s恢复，以及poll/stop/drain后刷新边界时间（ADR-015、ERR-019/020）。旧266不变通过，新增24，共290；ESP32 PASS。stop失败仍reset、app先命令、未排空日志可reset均保留。依赖等待/熵/实物限制仍未解决，见DEPENDENCY_BUDGET_AUDIT.md；不改写历史证据。

@@ -53,3 +53,9 @@
 前述runtime未执行的限制属于旧轮次。本轮以已有引用seam/native SDK shim执行实际FirmwareRuntime、store/driver/apps/console/logger，Esp32Firmware拥有唯一concrete adapters。新增47加旧219全部通过，共266；最终ESP32与native均退出0。修改前顺序、A–G覆盖、寿命/资源、失败与修复见RUNTIME_AUDIT.md；不需要生产策略修正。
 
 保留失败stop仍reset、app先于命令、未排空日志可reset。runtime实现仅cinttypes include变更，wire/NVS/PHY/角色不变。Host reset/clock/raw RNG/backend不证明真实重启/NVS/USB/SPI/IRQ/RF/熵。同步依赖、库分配、捕获时间陈旧及永久坏RNG拒绝loop仍有限制。下一软件范围建议时延/分配与RNG故障活性分析；M0–M2实物未验收，后续MAC未启动。
+
+## Iteration012 — 活性/陈旧时间修正及依赖预算
+
+实际011 generator在固定0/previous/交替输入下64次guard仍无返回。012用8次上限/0失败、counter保留耗尽旧身份、SESSION_ERROR和1s恢复，禁止启动/rollover失败时普通TX。延迟依赖复现ERR-020后，刷新poll后app、stop后reset起点、drain后reset判断。旧266源码/有序结果不变，新增24通过，共290；ESP32 PASS，无新warning。A/B/C完整时延/分配/ELF与source hash见DEPENDENCY_BUDGET_AUDIT.md。
+
+仅这些故障行为有意修正，wire/NVS/版本/PHY/命令/main不变。数值有效/有限拒绝不代表熵/唯一/认证。RadioLib反复scratch分配、无显式timeout的TX BUSY ramp、SPI/NVS锁及串口等待仍开放，无库/配置/task改动，无实物测量。下一软件任务建议另行审查有界BUSY launch方案与SDK分配失败策略；实物待组装，不启动M3–M8。

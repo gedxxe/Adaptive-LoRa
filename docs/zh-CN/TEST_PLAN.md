@@ -106,3 +106,9 @@ CONFIG_STORE_AUDIT.md 映射 A–E：实际 store/config/codec 执行，fake 仅
 RUNTIME_AUDIT.md映射A–G：boot11、provision8、serial7、radio4、reboot10、session3、diagnostics4。实际协调器/store/driver/apps/console/logger执行，观察器断言已关闭config read先于radio、radio先于app RNG、无效启动零硬件访问。暂存save不切换已加载角色/ID，新实例才生效；虚拟deadline验证before/at/after、TX完成/超时和uint32 wrap；容量0/1与queue drop证明reset可遗留诊断；Gateway65,537次验证实际generator/session轮换，通过实际帧/日志验证角色与callback。
 
 没有第二协调器模型，不声明覆盖百分比、熵、硬实时或实物验证。脚本只模拟返回/输入/time/reset；真实adapter/SDK/NVS/flash/USB/IRQ/RF/断电语义待验证。失败stop继续reset、app先输入与日志未排空reset均保留。下一步建议依赖时延/分配与永久坏RNG活性评估，不启动M3–M8。
+
+## Iteration012 — Boot-ID活性与延迟依赖
+
+修复前：Git取得实际011内部generator，raw64 guard对三种永久坏输入有限退出，probe退出0。两次focused均9FAIL/1PASS、退出1（首次wrap fixture改Gateway隔离dueClient TX）；修复后focused10/10退出0，完整native290/290退出0（旧266不变、新24），ESP32退出0 PASS。完整失败/成功日志、53输入hash和每条结果见iteration-012证据，不虚构覆盖百分比。
+
+真实runtime/apps/driver/store/console/logger执行，覆盖启动坏值/max/零前缀、第8次/第9次延后、重试频率/pending reboot/wrap、65536次耗尽后counter保留、Gateway三种永久坏rollover及Client失败，恢复拒绝previous100后用200/seq0。延迟read/TX finish/save/stop/serial覆盖ACK期限、reset100ms、wrap及既有尝试起点recovery/TX预算、阻塞期间延后服务。无无限loop、第二runtime/MAC模型或生产测试钩子；不声称实物堆/栈/flash/RF/熵/NVS/重启验证。

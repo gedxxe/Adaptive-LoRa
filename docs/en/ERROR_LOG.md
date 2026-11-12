@@ -263,3 +263,31 @@ No firmware/native test failure or new compiler warning occurred in the first ve
 ### ERR-017 verification - iteration011
 
 Status CLOSED - VERIFIED. With native UNITY_SUPPORT_64 applied consistently, the unchanged full-width assertions compile and all47 runtime cases plus219 regressions pass, exit0 (`logs/test/iteration-011-native-retry.log`). No case or assertion removed; initial failed log retained. No firmware policy fix or physical claim.
+
+## ERR-018 — Probe launcher setup failures
+
+Iteration012, environment/tooling, CLOSED — VERIFIED for version probes. Initial Python subprocess pio --version could not launch (WinError2); exit1 before probes/audit saved. Get-Command pio confirmed absent from PATH; installed <PLATFORMIO_HOME>/penv/Scripts/pio.exe exists. A subsequent evidence script failed parsing a non-ASCII bytes literal (SyntaxError, exit1; no commands executed). Corrected UTF-8 encoding/resolved executable yields four exit0 version probes in logs/build/iteration-012-toolchain.log. No dependency installation/change or production defect. Baseline ELF probe output/exit separately retained in iteration-012-memory-baseline.log.
+
+### ERR-018 ELF probe correction
+
+Initial GDB printf expressions lost inner quotes in Windows argument handling (exit1, iteration-012-memory-baseline.log). Replaced quoted printf with plain p sizeof expressions; actual corrected result in iteration-012-memory-baseline-retry.log. No source change from this probe.
+
+## ERR-019 — Unbounded session-ID generation
+
+REPRODUCED, correction pending. Baseline actual freshBootId on zero, previous100, alternating0/100 did not return before a native-only guard interrupted64 raw calls. python tools/reproduce_boot_id_liveness.py exit0 proves rejection continuation, without an infinite run; logs/test/iteration-012-boot-probe.log. Two actual runtime boot regression tests also fail guard64. Root cause: rejection loop lacks attempt bound and return-failure contract. Affected boot and sequence rotation; no physical entropy failure claimed.
+
+## ERR-020 — Stale runtime timestamps across synchronous dependencies
+
+REPRODUCED, correction pending. pio test -e native -f test_runtime_reliability exit1, logs/test/iteration-012-reproduction.log: delayed RX read accepts ACK beyond deadline; delayed finishTX anchors ACK window too early; save/stop can consume100ms reboot interval; reset check ignores elapsed serial waits. Test stimuli READ/FINISH_TX20us, WRITE/STANDBY200000us, output wait150000us are simulated inputs, not hardware measurements. Root cause: one pre-poll micros snapshot reused throughout loop. Initial wrap test additionally used a Client fixture whose dueHELLO started before reboot (existing app-before-command policy); change fixture to Gateway to isolate reset wrap, rerun before production correction. No production change to that ordering proposed.
+
+### ERR-019/020 verification — Iteration012
+
+CLOSED — VERIFIED for reproduced firmware paths. Corrected focused10/10 exit0, then all290/290 native cases and ESP32 build exit0. No old266 test cpp/name/result changed. Raw RNG bound8, zero sentinel/counter preservation/app1s retry/TX suppression verified at boot/rollover/recovery. Post-poll/app, post-stop arming and post-drain reset timestamps fix reproduced staleness, including wrap. logs/test/iteration-012-focused.log, iteration-012-native.log and logs/build/iteration-012-esp32.log; delays are simulated. No hard real-time/entropy/hardware claim. ERR-018 corrected GDB retry exit0; an incidental rg filename wildcard lookup was rejected on Windows, corrected by explicit filenames with no source impact.
+
+## ERR-021 — Unbounded upstream TX BUSY-ramp dependency path
+
+OPEN — SOURCE-IDENTIFIED RISK, NOT PHYSICALLY REPRODUCED. RadioLib7.8.1 PhysicalLayer.startTransmit -> SX126x.launchMode TX has a separate while(BUSY) yield loop at SX126x.cpp1121–1123 without timeout, after setTx returns. Module's pre/post transfer1000ms checks do not bound this later loop; driver2s deadline cannot preempt it. SPI transaction locks may also wait portMAX_DELAY. Reproduce on hardware only after safe assembly/fault-injection setup; native fakes do not execute these dependency internals. No third-party patch/flag/version change in012; source fingerprints and inventory in DEPENDENCY_BUDGET_AUDIT.md. Hard runtime latency acceptance remains blocked on disposition/measurement; audit/software regression completion does not close this risk.
+
+### ERR-008/009/010 dependency clarification — Iteration012
+
+Still OPEN. Installed IDF5.5.5 nvs_commit is no-op after validation; set_blob does flash work under NVS locks. HWCDC available/write mutex default100ms, connected write consecutive-failure cap20; no measured end-to-end guarantee. RadioLib repeated two-buffer new[] scratch per command, no local recoverable allocation failure handling; STATIC_ONLY moves536 bytes to automatic buffers and leaves other SDK/HAL allocations, so unchanged. Static size is not peak heap/stack. See audit for exact sources, call sites and measurement plan. ERR-005 USB physical warning remains.

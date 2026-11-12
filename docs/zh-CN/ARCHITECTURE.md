@@ -147,3 +147,9 @@ Esp32Firmware 按顺序拥有 PreferencesConfigStorage、Llcc68Hardware、唯一
 Native 通过 SDK header 适配执行实际协调器及全部现有生产模块；有界串口输入、共享虚拟时钟/micros、reset/reason/raw random 提供刺激，实际 freshBootId 拒绝和 session 逻辑执行。无新 radio/storage 接口或第二 runtime 模型。固件标准 optional、旧host experimental optional；native 启用真实64位 Unity 断言。并不构成通用生产平台服务。
 
 保留 app先于命令处理、每loop输入<=64/日志drain<=128、无效配置先于radio/app/entropy返回、radio成功才激活role、暂存/已加载配置区别、TX完成/超时与100ms重启deadline。stop失败仍记录后继续reset；reset不等queue/USB排空。本轮观察/覆盖而未改变这些策略，不证明真实硬件阻塞/熵/活性或生命周期。
+
+## 11. Session失败与时间边界（ADR-015）
+
+Iteration012每次最多8个raw随机值，0代表失败。Counter更新遇0/相同ID保持旧boot/耗尽状态，app不把失败身份初始化为新session。身份不可用时Client HELLO/Gateway ACK均禁止TX；SESSION_ERROR可观察，按尝试开始时间每1s重试，pending reboot时不重试。恢复用新boot/sequence0，无NVS/wire变更；数值合法不代表熵/安全/跨启动唯一。
+
+Runtime poll后给app刷新时间，stop返回后起100ms，logger drain后用当前时间判reset，修复ERR-020。不能抢占阻塞调用、记录真实RF完成时间或消除依赖时延；直接driver/app仍使用调用方观察时间。DEPENDENCY_BUDGET_AUDIT.md记录实际源码时延/分配/ELF预算，包括上游无显式timeout的BUSY-ramp及实物限制。

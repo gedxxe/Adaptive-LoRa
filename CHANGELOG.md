@@ -5,6 +5,12 @@ changes. It is not a substitute for the append-only build memory.
 
 ## Unreleased
 
+### Runtime reliability and dependency budgets — 2026-11-12
+
+- Fixed reproduced unbounded boot-ID rejection: eight-call bound, explicit unavailable identity, exhausted-session preservation, TX suppression and one-second observable recovery; no predictable fallback or NVS schema change.
+- Fixed reproduced stale runtime timestamps after radio polling, stop and diagnostic draining. Preserved stop-failure/reset and app-before-command policies.
+- Added24 reliability cases; all266 earlier tests pass unchanged (290 total), ESP32 PASS. RAM24,564 (+16), flash364,308 (+466); source/ELF timing/allocation audit records open SDK/BUSY/entropy and physical limits. Versions/wire/PHY unchanged.
+
 ### Production runtime lifecycle verification — 2026-11-12
 
 - Injected existing storage/radio references into FirmwareRuntime; ESP32 composition owns the concrete adapters. main remains 15 lines; coordinator policy unchanged.

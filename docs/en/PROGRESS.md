@@ -1,6 +1,14 @@
 # Development Progress
 
-## Iteration 011 software verification PASS; implementation published
+## Iteration 012 software verification PASS; publication pending
+
+Direct baseline8fa0a473b6cc0905ddff53e4b9a5f22806e058e2, branch iteration-012-runtime-reliability; main5bc607cd1a86e5d86ff0fc95ba7a3cd31159b861 unchanged at preflight. `pio test -e native` exit0 **290/290 PASS**,77.575s (266 unchanged+24 reliability). `pio run -e esp32c3_supermini` exit0 PASS31.748s. Corrected ERR-019 boundedID/zero sentinel/preserved prior session/1s retry/TX suppression; ERR-020 post-poll app time/post-stop100ms/post-drain reset check. First RED9FAIL/1PASS and focused10/10 records preserved. ERR-018 launcher/GDB corrections recorded. Full staged review/commit/push pending.
+
+RAM24,564 (+16), flash364,308 (+466). Firmware0.2.0-alpha.1/protocol1/RadioLib7.8.1/NVS/wire/pins/PHY/commands/main15 unchanged; intentional fault/deadline fixes documented in ADR-015. No new compiler warning. DEPENDENCY_BUDGET_AUDIT.md and iteration-012 artifacts contain exact source/ELF/allocation/timing evidence. ERR-021 upstream TX BUSY-ramp loop has no explicit timeout (source risk, not physical reproduction); ERR-005/008/009/010 remain open. No hard latency/entropy/uniqueness/physical claim.
+
+Software finite-value and delayed-boundary behavior is verified; clock/serial/raw RNG/backend faults/reset are simulated. Physical NVS/reset/USB/SPI/IRQ/RF/heap/stack/entropy **NOT VERIFIED/NOT MEASURED**. M0–M2 physical gates IN PROGRESS, M3–M8 NOT STARTED. Next software scope: separately review bounded upstream BUSY-launch options and SDK allocation-failure handling; procurement/assembly required before physical measurement plan.
+
+## Historical Iteration 011 software verification PASS; implementation published
 
 ESP32 final build `pio run -e esp32c3_supermini` exit0, PASS (143.01s); `pio test -e native` exit0, **266/266 PASS** (36.68s): 47 actual runtime cases plus all219 unchanged regressions. Direct baseline `3902de90058ec775587105c5c3edb4914853a9d8`; dedicated branch `iteration-011-runtime-verification`, main is external merge `5bc607cd1a86e5d86ff0fc95ba7a3cd31159b861`. Implementation commit `04280ed3d36e97924a7644c47b1e9cea09b438fd` was pushed and independently matched remote011 (commit/push/ls-remote each exit0). main and010 remain unchanged. Receipt: `logs/build/iteration-011-publication-receipt.json`; a documentation-only follow-up records this verified implementation SHA. No merge, PR or tag.
 
@@ -94,7 +102,7 @@ ERR-007's header filter remains unchanged from iteration 005; physical IRQ behav
 
 ## Next action
 
-Next software task: focused runtime boot/provisioning/reboot dispatch verification while preserving explicit role selection, invalid-config TX fail-safe and staged activation. Driver (71 cases) and store (56 cases) policy checks are complete for documented inputs; resolve dependency timing/memory budgets before claiming hard guarantees. Physical gates wait for the second MCU, antenna and assembly; then follow BENCH_RUNBOOK.md for M0/M1 and >=200 actual M2 HELLO attempts. Do not start M3 until M2 acceptance evidence exists. TDMA/bitmap/retry scheduling/ADR remain unimplemented.
+Next software task: review a bounded upstream TX BUSY-launch path and SDK allocation-failure handling using the Iteration012 source inventory; runtime dispatch and reproduced liveness/staleness fixes already pass. Dependency timing and peak-memory measurement remain acceptance limits. Physical gates wait for the second MCU, antenna and assembly; then follow BENCH_RUNBOOK.md for M0/M1 and >=200 actual M2 HELLO attempts. Do not start M3 until M2 acceptance evidence exists. TDMA/bitmap/retry scheduling/ADR remain unimplemented.
 
 Final evidence-reader check: Windows default decoding failed on a UTF-8 build log; explicit UTF-8 succeeded (ERR-006 recurrence). Firmware/native PASS evidence is unchanged; no new firmware error.
 

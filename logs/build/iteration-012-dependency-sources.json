@@ -1,0 +1,121 @@
+{
+  "method": "Read-only installed source/header inspection, not hardware execution; package versions in iteration-012-toolchain.log",
+  "sources": [
+    {
+      "path": "RadioLib/src/Module.cpp",
+      "sha256": "6899ee39319d95fe48289b3756ed00455501456d504425ab5ca7b561272ddc05",
+      "lines": 559
+    },
+    {
+      "path": "RadioLib/src/Module.h",
+      "sha256": "fcb9d821c9dbd67b63f412d1d82f5feaf4ee1e66fc8553a2a18454b33b9078c5",
+      "lines": 543
+    },
+    {
+      "path": "RadioLib/src/BuildOpt.h",
+      "sha256": "9f10c8b0c7d91e3e7226eea1deea919fc5bfe0b5a410c912bea1f6939cd0181c",
+      "lines": 699
+    },
+    {
+      "path": "RadioLib/src/hal/Arduino/ArduinoHal.cpp",
+      "sha256": "018c2555fd5f039e1b9159eded9c18bcdce19f72cadd6a929842d55d111160d1",
+      "lines": 205
+    },
+    {
+      "path": "RadioLib/src/modules/SX126x/SX126x.cpp",
+      "sha256": "b4b82318bd68b45bfb1832698a7f33f2a0a22b5f50e0d0fdbff1a9fd87033b87",
+      "lines": 1515
+    },
+    {
+      "path": "RadioLib/src/modules/LLCC68/LLCC68.cpp",
+      "sha256": "72ea067508ee5503572bf5494a194a7a3a6ed20b185bbb2410798ef88149d67b",
+      "lines": 283
+    },
+    {
+      "path": "RadioLib/src/protocols/PhysicalLayer/PhysicalLayer.cpp",
+      "sha256": "8c3a02e66375c9a98fd49823b86fb195bb5753ed8d2fbe761401306ce78e9968",
+      "lines": 644
+    },
+    {
+      "path": "Arduino/cores/esp32/HWCDC.cpp",
+      "sha256": "c5ed5fdd05aa0df9b74d390812643599223f96b459256718d0ad328aeaba6a8a",
+      "lines": 743
+    },
+    {
+      "path": "Arduino/cores/esp32/main.cpp",
+      "sha256": "3a80fad62e9a4243aeb67ed1215fac81f47ba4ddc707db57850ec8cab68f1291",
+      "lines": 116
+    },
+    {
+      "path": "Arduino/libraries/Preferences/src/Preferences.cpp",
+      "sha256": "346fa41649decf26c62660b671891e9815eeab2d4539543cd36b6a0d54bf9dab",
+      "lines": 570
+    },
+    {
+      "path": "Arduino/libraries/SPI/src/SPI.cpp",
+      "sha256": "56bd839008c808f34defc2af715b76810f54f844c0643a6fbc9f2d8f3bda00a8",
+      "lines": 360
+    },
+    {
+      "path": "IDF/components/esp_hw_support/hw_random.c",
+      "sha256": "cd6cb8f3833626255a0bbf80397d1744a471e3422d02737639b4ad8e6d48d8c3",
+      "lines": 119
+    },
+    {
+      "path": "IDF/components/bootloader_support/src/bootloader_random_esp32c3.c",
+      "sha256": "50331fd993343aca54e7367cff2568a9a3ee88858384fa1b46bb497e4c472b0f",
+      "lines": 67
+    },
+    {
+      "path": "IDF/components/bootloader_support/include/bootloader_random.h",
+      "sha256": "27168710f9bc067a988e4cda1b54d3347f2989d14864e0dcbc0d717f04956063",
+      "lines": 60
+    },
+    {
+      "path": "IDF/components/nvs_flash/src/nvs_api.cpp",
+      "sha256": "9e2c748145c2a1d9a0798062316382ee24c2eeb18e17c9c43676a3c8bc323e4f",
+      "lines": 883
+    },
+    {
+      "path": "IDF/components/nvs_flash/src/nvs_platform.cpp",
+      "sha256": "34867e196e9e96ab2b740f37adc995d734918d185c921968786135fee54396ed",
+      "lines": 50
+    },
+    {
+      "path": "IDF/components/nvs_flash/src/nvs_handle_simple.cpp",
+      "sha256": "ff65228c44ee4945f54bdb073251ff2e0e39b3b9de7db4caa1e576606e172b91",
+      "lines": 154
+    },
+    {
+      "path": "IDF/components/nvs_flash/src/nvs_storage.cpp",
+      "sha256": "43d9723cee9791d63d9ade1205d26833abd7541a97d77e4392e933e8cf8361c9",
+      "lines": 1127
+    },
+    {
+      "path": "IDF/components/cxx/cxx_exception_stubs.cpp",
+      "sha256": "4a693d5b9c3c764f2ceae702ba005eec6d873553ac3635f126a08f0ee3650984",
+      "lines": 193
+    },
+    {
+      "path": "compiledSDK/esp32c3\\qio_qspi\\include\\sdkconfig.h",
+      "sha256": "47ada0fb05a1b993e92388254ebb163c95b19341e5e5a6b24cb8b74f0b689435",
+      "lines": 1597
+    },
+    {
+      "path": "compiledSDK/esp32c3\\dio_qspi\\include\\sdkconfig.h",
+      "sha256": "3abd1b1e979fc81e9387d9fac180389b725d71c18bcbe2ad268d0ba8bfee95ec",
+      "lines": 1597
+    },
+    {
+      "path": "RadioLib/src/modules/SX126x/SX126x_commands.cpp",
+      "sha256": "11b61c1c892cb84e04221bc0a4abc9ffbd2a69ddb753eb4a93121b0bceec2904",
+      "lines": 318
+    }
+  ],
+  "official_random_docs": [
+    "https://docs.espressif.com/projects/esp-idf/en/v5.5.5/esp32c3/api-reference/system/random.html",
+    "https://docs.espressif.com/projects/esp-idf/en/stable/esp32c3/api-reference/system/random.html"
+  ],
+  "stable_docs_resolved_version": "6.1 at inspection, distinct from installed5.5.5",
+  "physical_measurement": "NOT MEASURED"
+}
