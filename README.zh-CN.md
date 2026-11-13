@@ -1,5 +1,7 @@
 # Adaptive-LoRa
 
+开发基线：经过验证的 [Iteration013 整合PR](https://github.com/gedxxe/Adaptive-LoRa/pull/3) 合并后，以 `main` 为规范基线。后续工作从最新 `main` 开始，保留历史迭代分支和工程记录；验证证据/发布状态见 [PROGRESS.md](docs/zh-CN/PROGRESS.md)。
+
 **研究标题：** Reliability-aware TDMA Scheduling and Link Adaptation for Single-Radio LoRa Industrial Energy Monitoring Networks.
 
 Adaptive-LoRa 是独立的单射频 LoRa P2P 网络研究与嵌入式固件项目。工业能耗监测仅作为通用研究场景；协议不依赖具体电表、现场总线、回传、数据库或部署。它不是 LoRaWAN。

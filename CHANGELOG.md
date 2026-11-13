@@ -5,6 +5,10 @@ changes. It is not a substitute for the append-only build memory.
 
 ## Unreleased
 
+### Iteration 013 main integration - 2026-11-13
+
+- Record the canonical-main workflow and fresh ESP32/290-native/13-capture validation for PR #3; preserve iteration histories and branches. No firmware, NVS, PHY, protocol or version change relative to verified Iteration 013. Physical acceptance remains unverified.
+
 ### M0-M2 physical acceptance readiness - 2026-11-13
 
 - Prepared backed-up MCU-only and gated two-device procedures, verified vendor pin-function documentation and recorded physical wiring/USB/RF uncertainties.

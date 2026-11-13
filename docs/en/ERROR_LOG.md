@@ -319,3 +319,13 @@ Iteration013, environment/approval, status RETRY PENDING after evidence check. C
 ### ERR-024 verification - Iteration013
 
 CLOSED - VERIFIED. After read-only recheck of the current user attachment Stage8, explicit commit and push requests including that authorization were approved. Requested implementation commit/push each exited0; independent ls-remote exit0 matches local HEAD. No rejected command executed, no indirect bypass/force/merge/PR. Actual verified refs/commands in iteration-013-publication-receipt.json; source/tests unchanged.
+
+## Iteration013 main-integration environment and verification checkpoint
+
+2026-11-13. No ESP32 build, native test or capture test failure: required commands all exit0,290/290 native and13/13 fake-port capture PASS. Logs/results use the `iteration-013-main-integration-` prefix under logs/build and logs/test. No merge conflicts: main-only merge commits introduce no file changes relative to the common ancestor.
+
+ERR-001/016 environment recurrence: the initial restricted batched inspection exited1. PowerShell reported InitializeDefaultDrives/FileSystem provider failure; git fetch reported cannot open .git/FETCH_HEAD: Permission denied, and ls-remote reported getaddrinfo thread failed to start. Approved host-shell retry of fetch/ls-remote exited0 and verified both expected heads; no repository content was modified by the failed read/fetch attempt. Workaround VERIFIED; restricted-runner cause remains unresolved.
+
+ERR-006 encoding recurrence: initial Python document dump exited1 with UnicodeEncodeError under Windows cp1252 on U+2192 after successful read-only Git/tree checks. Retried with `python -X utf8 -`, exit0; subsequent evidence reads/writes use explicit UTF-8. No document bytes or firmware behavior changed by the failed inspection.
+
+Existing ERR-005/008/009/010/021/023 and physical NVS/reset/USB/SPI/IRQ/RF/entropy/heap/stack holds remain open. Software integration is not a physical reproduction, dependency timing guarantee or hardware acceptance. Automatic branch deletion is false; historical branches must remain after merge.

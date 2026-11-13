@@ -1,0 +1,9 @@
+{
+  "command": "pio run -e esp32c3_supermini",
+  "launcher": "<PIO_EXECUTABLE>",
+  "exit_code": 0,
+  "elapsed_seconds": 37.596,
+  "log": "logs/build/iteration-013-main-integration-esp32.log",
+  "output_policy": "Full stdout/stderr; local workspace/user/PlatformIO paths replaced with disclosed placeholders; line endings and trailing display whitespace normalized. Raw retained privately under ignored .pio/integration-013-main/.",
+  "physical_validation": "NOT RUN"
+}

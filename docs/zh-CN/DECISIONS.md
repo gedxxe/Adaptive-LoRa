@@ -71,3 +71,9 @@ ACCEPTED2026-11-13，Iteration013。firmware/native及53输入与012逐字节一
 Capture schema2保留pair/status-only，增加单板、DTR/RTS开口意图（不保证无reset）、time/offset journal、hash/碎行、有界metadata、初末状态/中断错误结果。13 fake-port测试针对复现的false-success和证据缺口（ERR-022），不是新增固件覆盖。末status/tail尽力，缺snapshot/歧义就阻挡，file hash不能消除host读取前丢失，私有备份/身份须审核后方能发布。
 
 CSV使用关闭HELLO cohort，区分A/T/R/ACKstart/done/C；A含启动失败，PDR以R交完成T，分母0/关联未知保留N/A。host观察时间/firmware transaction_us不是实测RF。正常>=200完整HELLO、干预和注入另跑，不虚构/覆盖历史实物记录。
+
+## ADR-017 - Iteration013 合并后的 canonical main 基线
+
+2026-11-13 按用户明确要求接受。通过 PR #3 将已核实 e431e3f8ffd6e2d95dc126bb68e8231723a13c4d 及011/012历史用普通 merge commit 合入 main。初始 main5bc607cd1a86e5d86ff0fc95ba7a3cd31159b861 独有两个合并记录，但其 tree 与共同010祖先相同；无冲突候选 tree 等于013。保留双亲历史、全部历史分支和既有记录；本次仅新增整合文档与实际验证日志，不改生产/测试/工具输入。
+
+成功合并后 main 为规范开发基线，后续分支从最新 main 开始。合并前 ESP32、290 native 和13 fake-serial capture 全部重跑通过，最终核对 merge tree/输入。固件0.2.0-alpha.1、协议1、NVS schema1/namespace/key/24-byte blob、RadioLib7.8.1、固定PHY及暂定pins相对013不变。保留既有011/012修正，不新增功能；不声称实物验证，不 squash/rebase/强推/删除历史分支。

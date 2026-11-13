@@ -1,0 +1,9 @@
+{
+  "command": "<PIO_PYTHON> -m unittest discover -s tools -p test_capture_bench.py -v",
+  "launcher": "<PIO_PYTHON>",
+  "exit_code": 0,
+  "elapsed_seconds": 1.13,
+  "log": "logs/test/iteration-013-main-integration-capture.log",
+  "output_policy": "Full stdout/stderr; local workspace/user/PlatformIO paths replaced with disclosed placeholders; line endings and trailing display whitespace normalized. Raw retained privately under ignored .pio/integration-013-main/.",
+  "physical_validation": "NOT RUN"
+}

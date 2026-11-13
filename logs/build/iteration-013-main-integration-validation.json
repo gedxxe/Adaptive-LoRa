@@ -1,0 +1,66 @@
+{
+  "record": "Iteration 013 main integration",
+  "verified_at_wib": "2026-11-13T08:36:29+07:00",
+  "pr_url": "https://github.com/gedxxe/Adaptive-LoRa/pull/3",
+  "initial_source": "e431e3f8ffd6e2d95dc126bb68e8231723a13c4d",
+  "initial_target": "5bc607cd1a86e5d86ff0fc95ba7a3cd31159b861",
+  "shared_ancestor": "3902de90058ec775587105c5c3edb4914853a9d8",
+  "initial_remote_heads": {
+    "refs/heads/iteration-009-radio-driver-verification": "3176e766d3876c86253e7694a7694560be72d1bf",
+    "refs/heads/iteration-010-config-store-verification": "3902de90058ec775587105c5c3edb4914853a9d8",
+    "refs/heads/iteration-011-runtime-verification": "8fa0a473b6cc0905ddff53e4b9a5f22806e058e2",
+    "refs/heads/iteration-012-runtime-reliability": "9341e7c0016c66fd9316d489ccfca00a646ae2cb",
+    "refs/heads/iteration-013-bench-readiness": "e431e3f8ffd6e2d95dc126bb68e8231723a13c4d",
+    "refs/heads/main": "5bc607cd1a86e5d86ff0fc95ba7a3cd31159b861"
+  },
+  "main_unique_commits": 2,
+  "source_unique_commits": 6,
+  "main_tree_equals_shared_ancestor": true,
+  "initial_candidate_tree": "f5f1ec73e4a80909d5eae21c7b60286ebc7f3819",
+  "initial_candidate_tree_equals_verified_source": true,
+  "merge_conflicts": 0,
+  "results": {
+    "esp32": {
+      "command": "pio run -e esp32c3_supermini",
+      "launcher": "<PIO_EXECUTABLE>",
+      "exit_code": 0,
+      "elapsed_seconds": 37.596,
+      "log": "logs/build/iteration-013-main-integration-esp32.log",
+      "output_policy": "Full stdout/stderr; local workspace/user/PlatformIO paths replaced with disclosed placeholders; line endings and trailing display whitespace normalized. Raw retained privately under ignored .pio/integration-013-main/.",
+      "physical_validation": "NOT RUN"
+    },
+    "native": {
+      "command": "pio test -e native",
+      "launcher": "<PIO_EXECUTABLE>",
+      "exit_code": 0,
+      "elapsed_seconds": 215.113,
+      "log": "logs/test/iteration-013-main-integration-native.log",
+      "output_policy": "Full stdout/stderr; local workspace/user/PlatformIO paths replaced with disclosed placeholders; line endings and trailing display whitespace normalized. Raw retained privately under ignored .pio/integration-013-main/.",
+      "physical_validation": "NOT RUN"
+    },
+    "capture": {
+      "command": "<PIO_PYTHON> -m unittest discover -s tools -p test_capture_bench.py -v",
+      "launcher": "<PIO_PYTHON>",
+      "exit_code": 0,
+      "elapsed_seconds": 1.13,
+      "log": "logs/test/iteration-013-main-integration-capture.log",
+      "output_policy": "Full stdout/stderr; local workspace/user/PlatformIO paths replaced with disclosed placeholders; line endings and trailing display whitespace normalized. Raw retained privately under ignored .pio/integration-013-main/.",
+      "physical_validation": "NOT RUN"
+    }
+  },
+  "native_cases": 290,
+  "native_case_names_order_match_published_013": true,
+  "capture_cases": 13,
+  "input_fingerprints_verified": 55,
+  "firmware_bin_sha256": "cbf7301fc8346468817e65c47122c0dc05b52cece408597fa99f204199903201",
+  "binary_matches_verified_013": true,
+  "ram_bytes": 24564,
+  "flash_bytes": 364308,
+  "firmware_version": "0.2.0-alpha.1",
+  "protocol_version": 1,
+  "nvs_schema": 1,
+  "radiolib": "7.8.1",
+  "main_cpp_lines": 15,
+  "physical_validation": "NOT RUN / NOT VERIFIED",
+  "merge_disposition": "Validation passed; merge publication and final remote equality must be independently verified after the documentation-only source commit."
+}

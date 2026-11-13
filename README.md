@@ -1,5 +1,7 @@
 # Adaptive-LoRa
 
+Development baseline: `main` is canonical after the validated [Iteration 013 integration PR](https://github.com/gedxxe/Adaptive-LoRa/pull/3). Start future work from current `main`; preserve historical iteration branches and engineering records. See [PROGRESS.md](docs/en/PROGRESS.md) for validation evidence and publication status.
+
 **Research title:** Reliability-aware TDMA Scheduling and Link Adaptation for Single-Radio LoRa Industrial Energy Monitoring Networks.
 
 Adaptive-LoRa is an independent research and embedded firmware project for private, single-radio LoRa peer-to-peer networks. Industrial energy monitoring is a general research use case; the protocol does not require a particular meter, fieldbus, backhaul, database or deployment. This is not LoRaWAN.

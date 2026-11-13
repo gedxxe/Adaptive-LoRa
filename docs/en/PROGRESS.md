@@ -1,5 +1,13 @@
 # Development Progress
 
+## Iteration013 main integration - validation complete
+
+2026-11-13. PR [#3](https://github.com/gedxxe/Adaptive-LoRa/pull/3) integrates verified013 `e431e3f8ffd6e2d95dc126bb68e8231723a13c4d` into initial main `5bc607cd1a86e5d86ff0fc95ba7a3cd31159b861` using a normal merge commit after successful validation. All113 divergence paths reviewed; main2 unique commits have no tree changes against the common ancestor, so the conflict-free candidate tree equals013. No production/test/tool inputs change; integration documentation/logs only. This snapshot records the tested candidate; the linked PR supplies final publication state and merge SHA, independently checked against remote main. After merge, **main is the canonical development baseline** (ADR-017), and all historical iteration branches/records remain.
+
+Fresh ESP32 exit0 PASS, native exit0 **290/290 PASS**, capture exit0 **13/13 PASS** with fake serial only. All55 input fingerprints and firmware.bin match published013; RAM24,564/flash364,308, firmware0.2.0-alpha.1/protocol1/NVSschema1/RadioLib7.8.1/pins/fixedPHY unchanged; main.cpp remains15 lines. Full evidence: `logs/build/iteration-013-main-integration-validation.json`, `iteration-013-main-integration-review.json`, corresponding build/native/capture logs and per-case scenarios. Source e431e3f remains in ancestry; no squash/rebase/force/branch deletion.
+
+Physical NVS/reset/USB/SPI/IRQ/RF/antenna/entropy/heap/stack NOT VERIFIED/NOT MEASURED. ERR-005/008/009/010/021/023 remain; M0–M2 physical IN PROGRESS and M3–M8 NOT STARTED. Next development starts from synchronized main; existing backed-up MCU/pair gates and dependency recovery holds still apply.
+
 ## Iteration013 physical-readiness package verified; implementation published
 
 2026-11-13 client date. Direct baseline9341e7c0016c66fd9316d489ccfca00a646ae2cb, branch iteration-013-bench-readiness; main5bc607cd1a86e5d86ff0fc95ba7a3cd31159b861 not used. ESP32 exit0 PASS13.053s; native exit0 **290/290 PASS**61.980s, all cases/source unchanged. Capture utility13/13 fake-port tests exit0; separate from native and physical counts. No source/bin/native test/pin/PHY/watchdog/library changes; RAM24,564/flash364,308 unchanged, main15 lines. Full diff/security/history checks passed; implementation `1343e45ae642d0de7c4015ae19575e4e005f1646` committed/pushed and independently matched remote013 (exit0). main/012 unchanged. Receipt `logs/build/iteration-013-publication-receipt.json` is recorded in a documentation-only follow-up. ERR-024 initial approval rejection resolved by rechecking explicit Stage8 authorization; no merge/PR/tag.
@@ -71,7 +79,7 @@ Corrected stock: two LLCC68 modules, one MCU, second MCU not purchased, Moxon no
 |-----|----------------------------------------------------------------|-------------|------------------------------------------|
 | M0  | Board, module, pin, power, antenna, and toolchain confirmation | IN PROGRESS | Resolved toolchain recorded; physical checks pending |
 | M1  | LLCC68 initialization on both devices                          | IN PROGRESS | Firmware compiles; physical initialization/NVS persistence pending |
-| M2  | Fixed-PHY HELLO/ACK                                            | IN PROGRESS | 219 native tests including production apps/driver/store pass; RF evidence pending |
+| M2  | Fixed-PHY HELLO/ACK                                            | IN PROGRESS | 290 native tests including apps/driver/store/runtime/reliability pass; RF evidence pending |
 | M3  | Beacon and one-client TDMA                                     | NOT STARTED | Deferred until M2 passes                 |
 | M4  | ACK bitmap and selective retry                                 | NOT STARTED | Deferred until M3 passes                 |
 | M5  | Versioned ADR SF7/SF8/SF9                                      | NOT STARTED | Deferred until M4 passes                 |

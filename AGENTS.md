@@ -720,3 +720,7 @@ Publish only sanitized project files and engineering records. Ignore SDK
 caches, binaries, local configuration and credentials. Preserve dependency
 license references and do not redistribute research PDFs without permission.
 Use repository-relative paths or disclosed placeholders in historical logs.
+
+## 17. Canonical development baseline
+
+After the validated Iteration 013 integration, use `main` as the canonical development baseline. Start future milestone branches from an up-to-date `main`; preserve historical iteration branches and engineering records. Integrate reviewed work through pull requests using normal merge commits. Do not rewrite history, force-push, squash, rebase or delete historical branches as part of synchronization. A merged software baseline does not close physical acceptance gates.

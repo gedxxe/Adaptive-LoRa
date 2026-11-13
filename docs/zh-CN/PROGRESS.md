@@ -1,5 +1,13 @@
 # 开发进度
 
+## Iteration013 main 整合 - 验证完成
+
+2026-11-13，PR [#3](https://github.com/gedxxe/Adaptive-LoRa/pull/3) 将已核实013 `e431e3f8ffd6e2d95dc126bb68e8231723a13c4d` 合入初始main `5bc607cd1a86e5d86ff0fc95ba7a3cd31159b861`，只用普通merge commit。审查113个差异路径；main独有2个合并记录相对共同祖先无tree变化，故无冲突候选tree与013相同。本次不改生产/测试/工具输入，仅加整合文档/日志。本快照记录已测试候选；链接PR提供最终发布状态和merge SHA，并独立核对remote main。合并后 **main 为规范开发基线**（ADR-017），保留全部历史分支/记录。
+
+重新执行ESP32退出0 PASS、native退出0 **290/290 PASS**、capture退出0 **13/13 PASS**（仅fake serial）。55项输入及firmware.bin与013完全一致；RAM24,564/flash364,308、固件0.2.0-alpha.1/协议1/NVSschema1/RadioLib7.8.1/pins/固定PHY不变，main.cpp仍15行。证据见 `logs/build/iteration-013-main-integration-validation.json`、review.json及相应build/native/capture日志/逐例记录。保留e431e3f祖先，不squash/rebase/强推/删分支。
+
+真实NVS/reset/USB/SPI/IRQ/RF/天线/熵/heap/stack仍NOT VERIFIED/NOT MEASURED。ERR-005/008/009/010/021/023保留；M0–M2实物IN PROGRESS、M3–M8 NOT STARTED。后续从同步main开发，既有备份/单MCU/pair门槛与依赖恢复限制继续适用。
+
 ## Iteration013准备包验证通过，实施已发布
 
 2026-11-13 client date，直接基线9341e7c0016c66fd9316d489ccfca00a646ae2cb，分支iteration-013-bench-readiness，不基于main5bc607c。ESP32退出0 PASS13.053s，native退出0 **290/290 PASS**61.980s，所有旧cases/source不变；capture另有13/13 fake-port通过，不并入native/RF数。firmware/bin/native tests/pins/PHY/watchdog/库不改，RAM24,564/flash364,308，main15行。完整diff/安全/历史检查通过；实施 `1343e45ae642d0de7c4015ae19575e4e005f1646` commit/push及独立remote013核实均退出0，main/012不变，回执iteration-013-publication-receipt.json在仅文档后续提交保存。ERR-024初次review拒绝经重读Stage8明确授权后重试获批，无merge/PR/tag。
@@ -63,7 +71,7 @@ PASS。
 |-----|------------------------------------|-------------|------------------------|
 | M0  | 硬件、引脚、电源、天线和工具链确认 | IN PROGRESS | 工具链已记录；实物检查待完成 |
 | M1  | 两台设备 LLCC68 初始化             | IN PROGRESS | 固件编译通过；NVS/无线实测待完成 |
-| M2  | 固定 PHY HELLO/ACK                 | IN PROGRESS | 219 个 native 测试通过，含生产 app/driver/store；RF 待完成 |
+| M2  | 固定 PHY HELLO/ACK                 | IN PROGRESS | 290 个 native 测试通过，含生产 app/driver/store；RF 待完成 |
 | M3  | Beacon 和单客户端 TDMA             | NOT STARTED | 等待 M2                |
 | M4  | ACK Bitmap 和选择性重传            | NOT STARTED | 等待 M3                |
 | M5  | SF7/SF8/SF9 ADR                    | NOT STARTED | 等待 M4                |
