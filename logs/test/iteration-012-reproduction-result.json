@@ -1,0 +1,7 @@
+{
+  "command": "pio test -e native -f test_runtime_reliability",
+  "exit_code": 1,
+  "elapsed_seconds": 3.23,
+  "log": "logs/test/iteration-012-reproduction.log",
+  "publication_policy": "Full stdout/stderr except disclosed local-path/EOL/trailing-display normalization; raw retained privately."
+}

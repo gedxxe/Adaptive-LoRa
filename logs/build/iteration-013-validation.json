@@ -1,0 +1,54 @@
+{
+  "baseline": "9341e7c0016c66fd9316d489ccfca00a646ae2cb",
+  "branch": "iteration-013-bench-readiness",
+  "firmware": "0.2.0-alpha.1",
+  "protocol": 1,
+  "radiolib": "7.8.1",
+  "firmware_native_inputs": 53,
+  "all_firmware_native_source_and_test_bytes_unchanged": true,
+  "native_cases": 290,
+  "native_names_order_results_match_012": true,
+  "capture_host_tests": 13,
+  "capture_test_kind": "Fake serial only, no physical port opened",
+  "firmware_bin_sha256": "cbf7301fc8346468817e65c47122c0dc05b52cece408597fa99f204199903201",
+  "firmware_binary_identical_to_012": true,
+  "ram": 24564,
+  "flash": 364308,
+  "size_delta": {
+    "ram": 0,
+    "flash": 0
+  },
+  "main_lines": 15,
+  "esp32": {
+    "command": "pio run -e esp32c3_supermini",
+    "exit_code": 0,
+    "elapsed_seconds": 13.691,
+    "log": "logs/build/iteration-013-esp32.log",
+    "publication_policy": "Full stdout/stderr with disclosed local-path/EOL/trailing-display normalization; raw retained privately."
+  },
+  "native": {
+    "command": "pio test -e native",
+    "exit_code": 0,
+    "elapsed_seconds": 62.55,
+    "log": "logs/test/iteration-013-native.log",
+    "publication_policy": "Full stdout/stderr with disclosed local-path/EOL/trailing-display normalization; raw retained privately."
+  },
+  "capture": {
+    "command": "<PIO_PYTHON> -m unittest discover -s tools -p test_capture_bench.py -v",
+    "exit_code": 0,
+    "elapsed_seconds": 0.819,
+    "log": "logs/test/iteration-013-capture.log",
+    "publication_policy": "Full stdout/stderr with disclosed local-path/EOL/trailing-display normalization; raw retained privately."
+  },
+  "warning_observation": "No compiler warnings emitted on incremental cached build; known ERR-005 not closed. Offline esptool help wrapper deprecation recorded separately.",
+  "physical_validation": "NOT RUN / NOT VERIFIED",
+  "serial_observation": "Read-only enumeration no ports; not proof of physical absence",
+  "open_acceptance_holds": [
+    "Second MCU and suitable RF termination/antenna",
+    "Physical board/module wiring/USB/supply/oscillator/regulator checks",
+    "RF authorization",
+    "ERR-021 bounded recovery",
+    "Controlled duplicate/negative-identity and corrupt-NVS fixtures",
+    "ERR-023 startup NVS formatting/backup verification"
+  ]
+}

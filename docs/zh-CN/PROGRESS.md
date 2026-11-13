@@ -1,6 +1,38 @@
 # 开发进度
 
-Iteration 010 软件检查 PASS：ESP32 编译退出 0（146.83 s），native **219/219 PASS**、退出 0（28.62 s）：新增实际 NvsConfigStore 56，既有 regression 163 全部不变且通过。基线 remote Iteration 009 为 `3176e766d3876c86253e7694a7694560be72d1bf`；preflight main 已由外部合并变为 `2a7a68120552a8037d796cf61b0af11e91abd0f2`。本轮直接基于指定009，不基于 main。分支 `iteration-010-config-store-verification` 已发布，实施提交 `01370ac3a6fcc04e9b2bd626a46c9c1b95eb73d4` 与 remote010 一致（push/核实退出 0），remote009 保持 `3176e766d3876c86253e7694a7694560be72d1bf`，main 保持 `2a7a68120552a8037d796cf61b0af11e91abd0f2`。回执 `logs/build/iteration-010-publication-receipt.json` 在仅文档后续提交记录，无合并/PR。证据见 CONFIG_STORE_AUDIT.md、`logs/test/iteration-010-scenarios.md`；实物 NOT VERIFIED。
+## Iteration013 main 整合 - 验证完成
+
+2026-11-13，PR [#3](https://github.com/gedxxe/Adaptive-LoRa/pull/3) 将已核实013 `e431e3f8ffd6e2d95dc126bb68e8231723a13c4d` 合入初始main `5bc607cd1a86e5d86ff0fc95ba7a3cd31159b861`，只用普通merge commit。审查113个差异路径；main独有2个合并记录相对共同祖先无tree变化，故无冲突候选tree与013相同。本次不改生产/测试/工具输入，仅加整合文档/日志。本快照记录已测试候选；链接PR提供最终发布状态和merge SHA，并独立核对remote main。合并后 **main 为规范开发基线**（ADR-017），保留全部历史分支/记录。
+
+重新执行ESP32退出0 PASS、native退出0 **290/290 PASS**、capture退出0 **13/13 PASS**（仅fake serial）。55项输入及firmware.bin与013完全一致；RAM24,564/flash364,308、固件0.2.0-alpha.1/协议1/NVSschema1/RadioLib7.8.1/pins/固定PHY不变，main.cpp仍15行。证据见 `logs/build/iteration-013-main-integration-validation.json`、review.json及相应build/native/capture日志/逐例记录。保留e431e3f祖先，不squash/rebase/强推/删分支。
+
+真实NVS/reset/USB/SPI/IRQ/RF/天线/熵/heap/stack仍NOT VERIFIED/NOT MEASURED。ERR-005/008/009/010/021/023保留；M0–M2实物IN PROGRESS、M3–M8 NOT STARTED。后续从同步main开发，既有备份/单MCU/pair门槛与依赖恢复限制继续适用。
+
+## Iteration013准备包验证通过，实施已发布
+
+2026-11-13 client date，直接基线9341e7c0016c66fd9316d489ccfca00a646ae2cb，分支iteration-013-bench-readiness，不基于main5bc607c。ESP32退出0 PASS13.053s，native退出0 **290/290 PASS**61.980s，所有旧cases/source不变；capture另有13/13 fake-port通过，不并入native/RF数。firmware/bin/native tests/pins/PHY/watchdog/库不改，RAM24,564/flash364,308，main15行。完整diff/安全/历史检查通过；实施 `1343e45ae642d0de7c4015ae19575e4e005f1646` commit/push及独立remote013核实均退出0，main/012不变，回执iteration-013-publication-receipt.json在仅文档后续提交保存。ERR-024初次review拒绝经重读Stage8明确授权后重试获批，无merge/PR/tag。
+
+PHYSICAL_ACCEPTANCE_READINESS.md串联备份单MCU、pair gates/仪器、ERR-021和采集/CSV。官方V1.1.0 module pin功能已核对；GPIO提案/手中板/continuity仍未验证。只读枚举无port，未开口/烧录/擦除/复位/RF。ERR-022中断false-success已修；ERR-023是SDK app前可能格式化NVS源码风险，backup须先于boot。ERR-021阻挡无人值守/卡BUSY恢复，不能假定默认watchdog reset；replay/错身份/corrupt-NVS fixture未提供/执行。
+
+M0/M1/M2实物IN PROGRESS/NOT RUN，M3–M8 NOT STARTED。下一步识别连接板、授权且backup verified后按单MCU流程，采购第二MCU/天线或负载/仪器，核实布线/供电/USB/合法RF，完成fixture和恢复处置再关闭pair gates；不继续推测性抽象/tests。
+
+## 历史Iteration012软件验证PASS，实施已发布
+
+直接基线8fa0a473b6cc0905ddff53e4b9a5f22806e058e2，分支iteration-012-runtime-reliability，不基于main5bc607cd1a86e5d86ff0fc95ba7a3cd31159b861。native退出0 **290/290 PASS**，77.575s（旧266不变+新24）；ESP32退出0 PASS31.748s。ERR-019以8次/0失败/保持旧session/1s恢复/禁TX修正；ERR-020刷新poll后app、stop后100ms、drain后reset。保留RED9FAIL/1PASS及修正10/10证据；ERR-018工具修正保留。完整暂存审查通过；实施 `bdab1cec5de6e38f84b524a8189945dec1ee7dd2` commit/push及独立remote012核实均退出0，main/011不变。回执 `logs/build/iteration-012-publication-receipt.json` 记录已验证实施，后续仅文档提交保存回执，无merge/PR/tag。
+
+RAM24,564（+16）、flash364,308（+466）；固件0.2.0-alpha.1/协议1/RadioLib7.8.1/NVS/wire/pins/PHY/命令/main15行不变；有意故障/deadline修正见ADR-015。无新warning。DEPENDENCY_BUDGET_AUDIT.md及iteration-012记录精确源码/ELF/分配/时延；ERR-021是上游TX BUSY-ramp无显式timeout的源码风险，未实测；ERR-005/008/009/010保留，不承诺硬实时/熵/唯一或实物性能。
+
+数值有限性和延迟边界为实际软件验证，clock/serial/raw RNG/backend/reset为模拟。真实NVS/reset/USB/SPI/IRQ/RF/heap/stack/熵NOT VERIFIED/NOT MEASURED，M0–M2实物IN PROGRESS，M3–M8 NOT STARTED。下一软件范围建议另行审查有界上游BUSY-launch方案与SDK分配失败；采购/组装后按计划测量。
+
+## 历史Iteration 011 软件验证PASS，实施已发布
+
+最终 `pio run -e esp32c3_supermini` 退出0，PASS（143.01s）；`pio test -e native` 退出0，**266/266 PASS**（36.68s），实际runtime新增47，既有219全部不变且通过。直接基线 `3902de90058ec775587105c5c3edb4914853a9d8`，分支 `iteration-011-runtime-verification`；main是外部合并 `5bc607cd1a86e5d86ff0fc95ba7a3cd31159b861`。实施提交 `04280ed3d36e97924a7644c47b1e9cea09b438fd` 已push并独立核实与remote011一致（commit/push/ls-remote均退出0），main和010不变。回执 `logs/build/iteration-011-publication-receipt.json`；仅文档后续提交记录已验证实施SHA，无merge/PR/tag。
+
+固件0.2.0-alpha.1/协议1/RadioLib7.8.1、NVS/wire/pins/PHY/app策略不变。仅引用seam与Esp32Firmware组合，main15行。RAM24,548（+16）、flash363,842（-12）。首次native配置失败ERR-017保留，启用完整64位Unity断言后CLOSED；ERR-016 runner workaround已验证、根因未知。无新增warning，ERR-005/008/009/010保留。细节见RUNTIME_AUDIT.md及 `logs/test/iteration-011-scenarios.md`。
+
+协调器顺序/分派/deadline/预算为实际生产软件验证；storage/radio/串口/时钟/reset/raw RNG为模拟。真实NVS/USB/重启/SPI/IRQ/RF/熵均NOT VERIFIED。stop失败仍可reset，日志可未排空，永久坏随机源可无限loop。M0–M2实物门槛IN PROGRESS，M3–M8 NOT STARTED。下一软件任务建议依赖时延/分配预算和boot-ID故障活性分析；采购/组装/全部物理测量待完成。
+
+历史 Iteration 010 软件检查 PASS：ESP32 编译退出 0（146.83 s），native **219/219 PASS**、退出 0（28.62 s）：新增实际 NvsConfigStore 56，既有 regression 163 全部不变且通过。基线 remote Iteration 009 为 `3176e766d3876c86253e7694a7694560be72d1bf`；preflight main 已由外部合并变为 `2a7a68120552a8037d796cf61b0af11e91abd0f2`。本轮直接基于指定009，不基于 main。分支 `iteration-010-config-store-verification` 已发布，实施提交 `01370ac3a6fcc04e9b2bd626a46c9c1b95eb73d4` 与 remote010 一致（push/核实退出 0），remote009 保持 `3176e766d3876c86253e7694a7694560be72d1bf`，main 保持 `2a7a68120552a8037d796cf61b0af11e91abd0f2`。回执 `logs/build/iteration-010-publication-receipt.json` 在仅文档后续提交记录，无合并/PR。证据见 CONFIG_STORE_AUDIT.md、`logs/test/iteration-010-scenarios.md`；实物 NOT VERIFIED。
 
 历史 Iteration 009 软件检查 PASS：ESP32 编译退出 0（147.15 s），native **163/163 PASS**、退出 0（26.04 s）：新增实际生产 RadioDriver 故障用例 71 个，既有 regression 92 个全部通过。修改前审查/覆盖见 RADIO_DRIVER_AUDIT.md，逐条结果 `logs/test/iteration-009-scenarios.md`。分支 `iteration-009-radio-driver-verification` 已发布，实施提交 `4055a947bdfcd518cdff36d6ae76acf3fabeed93` 与远端分支一致（push/核实退出 0）。回执 `logs/build/iteration-009-publication-receipt.json` 在后续仅文档提交记录；main 保持 `b040ef111b82db96ab81a3c7377efbcf46385221`，无合并、无 PR。实物仍 NOT VERIFIED。
 
@@ -39,7 +71,7 @@ PASS。
 |-----|------------------------------------|-------------|------------------------|
 | M0  | 硬件、引脚、电源、天线和工具链确认 | IN PROGRESS | 工具链已记录；实物检查待完成 |
 | M1  | 两台设备 LLCC68 初始化             | IN PROGRESS | 固件编译通过；NVS/无线实测待完成 |
-| M2  | 固定 PHY HELLO/ACK                 | IN PROGRESS | 219 个 native 测试通过，含生产 app/driver/store；RF 待完成 |
+| M2  | 固定 PHY HELLO/ACK                 | IN PROGRESS | 290 个 native 测试通过，含生产 app/driver/store；RF 待完成 |
 | M3  | Beacon 和单客户端 TDMA             | NOT STARTED | 等待 M2                |
 | M4  | ACK Bitmap 和选择性重传            | NOT STARTED | 等待 M3                |
 | M5  | SF7/SF8/SF9 ADR                    | NOT STARTED | 等待 M4                |
@@ -83,7 +115,7 @@ Iteration 008 暂存安全检查初次把 HTTPS 链接误判为本地路径（ER
 
 Iteration 009 保留性：driver 仅改硬件转发/常量，状态/deadline/错误优先级不变，34 个保护文件逐字节不变；Runtime 先构造唯一 Llcc68Hardware 再构造引用注入 driver，main.cpp 仍 15 行。新 seam 无显式堆分配。RAM 24,532 / 327,680、flash 363,730 / 1,310,720 bytes。真实 adapter/SPI/BUSY/ISR 竞态、Runtime/随机源/NVS/USB/RF 不属于 native 证据，M0–M2 整体 IN PROGRESS、M3–M8 NOT STARTED。
 
-下一软件任务建议 runtime boot/provisioning/reboot dispatcher 验证，保留角色和无效配置 TX fail-safe/暂存生效策略；driver 71、store 56 场景已通过，依赖等待/内存预算仍需另行证据。实物工作等待第二 MCU、天线与组装。
+下一动作是013备份单MCU流程、采购/仪器及真实M0核对；ERR-021和replay/NVS fixture须在完整M1/M2验收前解决，已有software/native证据不代替实物。实物工作等待第二 MCU、天线与组装。
 
 Iteration 009 审查：PlatformIO 日志显示尾空格/末尾空行使暂存检查退出 2（ERR-015）。仅规范化本轮公开日志的 EOL/显示空白，私有原输出保留，源码/编译/测试结果不变；修正后暂存检查退出 0，ERR-015 已验证关闭。
 

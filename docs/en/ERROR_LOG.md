@@ -245,3 +245,87 @@ Status CLOSED — VERIFIED. Corrected `git diff --cached --check` exited 0 witho
 ### Iteration 010 verification checkpoint
 
 No firmware/native test failure or new compiler warning occurred in the first verification run: ESP32 exit 0, native 219/219 exit 0 (`logs/build/iteration-010-esp32.log`, `logs/test/iteration-010-native.log`). Warning-message comparison against iteration 009 retains only known ERR-005 USB CDC warning. ERR-008 synchronous NVS/RadioLib operations, ERR-009 dependency allocation and ERR-010 SDK serial timing remain open; store fake does not validate those dependencies. The preliminary optional lookup of a not-yet-existing fake file returned 1; the inspected inventory confirmed absence before creating it, with no source/build fix required. No physical NVS/RF test or flash-failure observation occurred.
+
+## ERR-016 - Restricted shell read requests stalled before output
+
+- First seen 2026-11-12, iteration011; severity LOW; environment issue, root cause UNKNOWN; status WORKAROUND VERIFIED, underlying cause unresolved.
+- Reproduction: restricted request-attachment/repository reads with default and login=false invocation returned running sessions but no output; interrupted both with Ctrl-C, each exit1. Whether individual shell commands began is NOT AVAILABLE; no source was modified by these read requests.
+- Normal host-shell retry of the same read-only inspection exited0 and exposed the expected baseline. Subsequent work uses reviewed host execution for existing SDK/tool access. No approval review rejection or bypass was involved.
+- Evidence: `logs/build/iteration-011-runner-preflight.log`; no build/test/physical result inferred.
+
+## ERR-017 - Native Unity did not enable requested 64-bit assertions
+
+- First seen iteration011, 2026-11-12; severity LOW, test environment; status FIXED - UNVERIFIED at this checkpoint.
+- Reproduction: native runtime suite compiles with TEST_ASSERT_EQUAL_UINT64 while Unity on this 32-bit MinGW defaults to no UNITY_SUPPORT_64. Macro expands to UnityStrErr64 failure without reading expected/actual, producing -Werror unused-variable for rx. Runtime tests did not execute; all219 old cases passed.
+- Evidence: `logs/test/iteration-011-native.log` exit1; actual installed Unity unity_internals.h support guard and unsupported-64 macro inspected.
+- Fix: define UNITY_SUPPORT_64 for the native environment (framework and tests consistently), retain full-width comparisons and every case; add fixture lifecycle invariants. Production and ESP32 flags unchanged. Verification pending corrected native rerun; no application defect claimed.
+
+### ERR-017 verification - iteration011
+
+Status CLOSED - VERIFIED. With native UNITY_SUPPORT_64 applied consistently, the unchanged full-width assertions compile and all47 runtime cases plus219 regressions pass, exit0 (`logs/test/iteration-011-native-retry.log`). No case or assertion removed; initial failed log retained. No firmware policy fix or physical claim.
+
+## ERR-018 — Probe launcher setup failures
+
+Iteration012, environment/tooling, CLOSED — VERIFIED for version probes. Initial Python subprocess pio --version could not launch (WinError2); exit1 before probes/audit saved. Get-Command pio confirmed absent from PATH; installed <PLATFORMIO_HOME>/penv/Scripts/pio.exe exists. A subsequent evidence script failed parsing a non-ASCII bytes literal (SyntaxError, exit1; no commands executed). Corrected UTF-8 encoding/resolved executable yields four exit0 version probes in logs/build/iteration-012-toolchain.log. No dependency installation/change or production defect. Baseline ELF probe output/exit separately retained in iteration-012-memory-baseline.log.
+
+### ERR-018 ELF probe correction
+
+Initial GDB printf expressions lost inner quotes in Windows argument handling (exit1, iteration-012-memory-baseline.log). Replaced quoted printf with plain p sizeof expressions; actual corrected result in iteration-012-memory-baseline-retry.log. No source change from this probe.
+
+## ERR-019 — Unbounded session-ID generation
+
+REPRODUCED, correction pending. Baseline actual freshBootId on zero, previous100, alternating0/100 did not return before a native-only guard interrupted64 raw calls. python tools/reproduce_boot_id_liveness.py exit0 proves rejection continuation, without an infinite run; logs/test/iteration-012-boot-probe.log. Two actual runtime boot regression tests also fail guard64. Root cause: rejection loop lacks attempt bound and return-failure contract. Affected boot and sequence rotation; no physical entropy failure claimed.
+
+## ERR-020 — Stale runtime timestamps across synchronous dependencies
+
+REPRODUCED, correction pending. pio test -e native -f test_runtime_reliability exit1, logs/test/iteration-012-reproduction.log: delayed RX read accepts ACK beyond deadline; delayed finishTX anchors ACK window too early; save/stop can consume100ms reboot interval; reset check ignores elapsed serial waits. Test stimuli READ/FINISH_TX20us, WRITE/STANDBY200000us, output wait150000us are simulated inputs, not hardware measurements. Root cause: one pre-poll micros snapshot reused throughout loop. Initial wrap test additionally used a Client fixture whose dueHELLO started before reboot (existing app-before-command policy); change fixture to Gateway to isolate reset wrap, rerun before production correction. No production change to that ordering proposed.
+
+### ERR-019/020 verification — Iteration012
+
+CLOSED — VERIFIED for reproduced firmware paths. Corrected focused10/10 exit0, then all290/290 native cases and ESP32 build exit0. No old266 test cpp/name/result changed. Raw RNG bound8, zero sentinel/counter preservation/app1s retry/TX suppression verified at boot/rollover/recovery. Post-poll/app, post-stop arming and post-drain reset timestamps fix reproduced staleness, including wrap. logs/test/iteration-012-focused.log, iteration-012-native.log and logs/build/iteration-012-esp32.log; delays are simulated. No hard real-time/entropy/hardware claim. ERR-018 corrected GDB retry exit0; an incidental rg filename wildcard lookup was rejected on Windows, corrected by explicit filenames with no source impact.
+
+## ERR-021 — Unbounded upstream TX BUSY-ramp dependency path
+
+OPEN — SOURCE-IDENTIFIED RISK, NOT PHYSICALLY REPRODUCED. RadioLib7.8.1 PhysicalLayer.startTransmit -> SX126x.launchMode TX has a separate while(BUSY) yield loop at SX126x.cpp1121–1123 without timeout, after setTx returns. Module's pre/post transfer1000ms checks do not bound this later loop; driver2s deadline cannot preempt it. SPI transaction locks may also wait portMAX_DELAY. Reproduce on hardware only after safe assembly/fault-injection setup; native fakes do not execute these dependency internals. No third-party patch/flag/version change in012; source fingerprints and inventory in DEPENDENCY_BUDGET_AUDIT.md. Hard runtime latency acceptance remains blocked on disposition/measurement; audit/software regression completion does not close this risk.
+
+### ERR-008/009/010 dependency clarification — Iteration012
+
+Still OPEN. Installed IDF5.5.5 nvs_commit is no-op after validation; set_blob does flash work under NVS locks. HWCDC available/write mutex default100ms, connected write consecutive-failure cap20; no measured end-to-end guarantee. RadioLib repeated two-buffer new[] scratch per command, no local recoverable allocation failure handling; STATIC_ONLY moves536 bytes to automatic buffers and leaves other SDK/HAL allocations, so unchanged. Static size is not peak heap/stack. See audit for exact sources, call sites and measurement plan. ERR-005 USB physical warning remains.
+
+## ERR-022 - Capture interruption reported as successful completion
+
+REPRODUCED, correction pending, Iteration013. Exact012 tools/capture_bench.py executed with fake serial objects and an injected KeyboardInterrupt: exit0, errors=[], no interruption marker, no chunk timestamp files. No physical port opened. Evidence logs/test/iteration-013-capture-reproduction.log. Root cause: interrupt except branch passes without recording incomplete state. Missing timestamp/offset and final-fragment evidence also prevents reliable CSV extraction; bounded4096-byte raw streaming itself is preserved.
+
+### Iteration013 source-access/tool observations
+
+Legacy vendor PDF URLs returned HTML/failed fetch; current official product-page download succeeds (hash/pages in readiness record). No hardware verification inferred. Installed esptool5.3 wrapper help emits a deprecation notice for esptool.py; supported syntax used for offline help only, no flash command executed. Read-only port enumeration exit0/no ports found. Physical dependencies remain unverified.
+
+### ERR-022 verification - Iteration013
+
+CLOSED - VERIFIED for host capture behavior.13/13 focused fake-port tests exit0 (logs/test/iteration-013-capture.log). Ctrl-C now records INTERRUPTED/exit130; IO/short-write/unjoined/finalization errors cannot report COMPLETE, hard termination retains initialRUNNING. Byte/hash/offset/time/tail evidence and single-board mode added for actual acceptance requirements. No real port opened, no firmware/native change; all290 native and ESP32 reruns exit0. Raw capture can still lose bytes before host read; final status/backpressure/reset/fragment review remains mandatory, not an automatic RF PASS.
+
+## ERR-023 - SDK startup can format NVS before Runtime
+
+OPEN - SOURCE-IDENTIFIED PRESERVATION RISK, NOT PHYSICALLY EXERCISED. Installed Arduino3.3.11 initArduino (esp32-hal-misc.c331-337) calls nvs_flash_init before FirmwareRuntime and erases the NVS partition/retries on NO_FREE_PAGES or NEW_VERSION_FOUND. Store-level native tests do not execute this SDK startup. A non-overlapping upload alone cannot promise retention across first application boot. Disposition in013 is mandatory private full-flash/NVS backup and verified recovery before that boot; secure/encrypted/incompatible layouts halt the plaintext procedure. No SDK/firmware patch and no erasure performed. Physical corruption/SDK-formatting/power-loss/restore evidence remains NOT RUN; see BENCH_RUNBOOK single-board branch.
+
+### ERR-021 / hardware acceptance hold - Iteration013
+
+Still OPEN; exact path/conditions/watchdog/defaults/options documented in DEPENDENCY_BUDGET_AUDIT.md. No source risk is reclassified as a physical failure. Unattended/stuck-BUSY recovery acceptance held; normal attended observations cannot close it. All board/revision/continuity/USB/supply/oscillator/antenna/regulatory and controlled RF/NVS fixture gates remain unverified. Incremental013 build emits no warning, but ERR-005 and other dependency/physical limits are not closed.
+
+## ERR-024 - Publication auto-review did not recognize attached authorization
+
+Iteration013, environment/approval, status RETRY PENDING after evidence check. Combined preflight/commit/push request was rejected before CreateProcess; no command/commit/push executed. Review reason: no current user publication authorization recognized, citing the conditional no-commit rule. Read-only recheck of the current user attachment Stage8 explicitly confirms "After successful validation, commit and automatically push" to the authorized Adaptive-LoRa remote and the recommended docs commit. HEAD remains9341e7c0016c66fd9316d489ccfca00a646ae2cb on013, reviewed work preserved. A narrower explicit publication request will include that evidence; no force/merge/PR or indirect bypass is authorized.
+
+### ERR-024 verification - Iteration013
+
+CLOSED - VERIFIED. After read-only recheck of the current user attachment Stage8, explicit commit and push requests including that authorization were approved. Requested implementation commit/push each exited0; independent ls-remote exit0 matches local HEAD. No rejected command executed, no indirect bypass/force/merge/PR. Actual verified refs/commands in iteration-013-publication-receipt.json; source/tests unchanged.
+
+## Iteration013 main-integration environment and verification checkpoint
+
+2026-11-13. No ESP32 build, native test or capture test failure: required commands all exit0,290/290 native and13/13 fake-port capture PASS. Logs/results use the `iteration-013-main-integration-` prefix under logs/build and logs/test. No merge conflicts: main-only merge commits introduce no file changes relative to the common ancestor.
+
+ERR-001/016 environment recurrence: the initial restricted batched inspection exited1. PowerShell reported InitializeDefaultDrives/FileSystem provider failure; git fetch reported cannot open .git/FETCH_HEAD: Permission denied, and ls-remote reported getaddrinfo thread failed to start. Approved host-shell retry of fetch/ls-remote exited0 and verified both expected heads; no repository content was modified by the failed read/fetch attempt. Workaround VERIFIED; restricted-runner cause remains unresolved.
+
+ERR-006 encoding recurrence: initial Python document dump exited1 with UnicodeEncodeError under Windows cp1252 on U+2192 after successful read-only Git/tree checks. Retried with `python -X utf8 -`, exit0; subsequent evidence reads/writes use explicit UTF-8. No document bytes or firmware behavior changed by the failed inspection.
+
+Existing ERR-005/008/009/010/021/023 and physical NVS/reset/USB/SPI/IRQ/RF/entropy/heap/stack holds remain open. Software integration is not a physical reproduction, dependency timing guarantee or hardware acceptance. Automatic branch deletion is false; historical branches must remain after merge.

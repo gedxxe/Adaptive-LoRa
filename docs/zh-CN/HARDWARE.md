@@ -76,3 +76,13 @@ GPIO2、GPIO8、GPIO9 是启动绑定位；GPIO18/19 与 USB Serial/JTAG
 候选实现使用 XTAL（DIO3 电压参数为 0）、LDO 模式，保留 RadioLib 默认 DIO2 内部 RF-switch 控制；MCU 不连接 TXEN/RXEN。须核对实际模块/转接板。状态报告驱动选择和初始化返回码，不能视为独立芯片识别。
 
 固件临时启用原生 USB CDC；Flash 容量、USB 路径和板卡版本仍待验证。2026-11-12 只枚举到 6 个蓝牙串口（`logs/test/iteration-004-serial-ports.log`）；没有 ESP32 串口、实物照片、原理图或连通性证据。编译通过不确认引脚或电源。
+
+## Iteration013 硬件证据核对 - 2026-11-13
+
+[当前官方页](https://docs.ai-thinker.com/en/Ra-01SCH/index.html) 链接 [V1.1.0规格](https://aithinker-static.oss-cn-shenzhen.aliyuncs.com/docs/Public%20Document%20Center/LoRa/lora/Specification/Ra-01SCH_V1.1.0%20Specification-20221110.pdf)。p9表4与既有module pin功能一致；p10图6为晶体/DIO2开关，p11图7示10uF/100nF本地去耦，p14第6.6说明默认内部RF开关，外控需不同BOM。旧下载地址返回HTML，当前官方链接/PDF hash见iteration-013-readiness-sources.json；完整PDF未发布入仓库。
+
+这仅证明文档功能，不证明手中module/BOM/pad方向。GPIO4/5/6/7、RESET1、DIO1=0、BUSY10是未改的项目提案；[ESP32-C3芯片规格](https://documentation.espressif.com/esp32-c3_datasheet_en.html) 不能证明Super Mini克隆板routing/USB/LED冲突。无实际照片/修订/continuity证据。XTAL、内部radio LDO、DIO2行为仍待验证；外部电源LDO是另一设置。电压/ripple/瞬态/天线/feed/load均未测；Moxon未制作，替代天线/负载TBD。
+
+断电测continuity，共地/短线/3.3V逻辑/本地去耦须实查；不可并联regulator输出或经GPIO给未上电设备反灌。不按reseller图默改引脚/PHY。radio可TX前必须完成runbook与频率/EIRP/access/设备许可审核，模块频段不等于合法授权。
+
+单板流程的MCU BOOT/EN/RESET控件不是提案GPIO1（后者为radio RESET）；第一次上电/ROM前先辨明实际控件。

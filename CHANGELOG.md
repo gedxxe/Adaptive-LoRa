@@ -5,6 +5,28 @@ changes. It is not a substitute for the append-only build memory.
 
 ## Unreleased
 
+### Iteration 013 main integration - 2026-11-13
+
+- Record the canonical-main workflow and fresh ESP32/290-native/13-capture validation for PR #3; preserve iteration histories and branches. No firmware, NVS, PHY, protocol or version change relative to verified Iteration 013. Physical acceptance remains unverified.
+
+### M0-M2 physical acceptance readiness - 2026-11-13
+
+- Prepared backed-up MCU-only and gated two-device procedures, verified vendor pin-function documentation and recorded physical wiring/USB/RF uncertainties.
+- Fixed host capture interrupted-success behavior; added single-board mode, timestamp/offset/hash/fragment metadata and13 fake-port checks. Defined explicit CSV cohorts/denominators without changing firmware logs or protocol.
+- Documented ERR-021 watchdog/bounded-path options and SDK startup NVS formatting risk. Firmware/bin and290 native cases unchanged; required builds/tests pass. No physical test or hardware acceptance claim.
+
+### Runtime reliability and dependency budgets — 2026-11-12
+
+- Fixed reproduced unbounded boot-ID rejection: eight-call bound, explicit unavailable identity, exhausted-session preservation, TX suppression and one-second observable recovery; no predictable fallback or NVS schema change.
+- Fixed reproduced stale runtime timestamps after radio polling, stop and diagnostic draining. Preserved stop-failure/reset and app-before-command policies.
+- Added24 reliability cases; all266 earlier tests pass unchanged (290 total), ESP32 PASS. RAM24,564 (+16), flash364,308 (+466); source/ELF timing/allocation audit records open SDK/BUSY/entropy and physical limits. Versions/wire/PHY unchanged.
+
+### Production runtime lifecycle verification — 2026-11-12
+
+- Injected existing storage/radio references into FirmwareRuntime; ESP32 composition owns the concrete adapters. main remains 15 lines; coordinator policy unchanged.
+- Added 47 production-runtime boot/provisioning/serial/radio/reboot/session/diagnostic cases. All219 regressions remain passing (266 total); ESP32 build PASS with no new warning messages.
+- Documented existing stop-failure/reset and undrained-log behavior, deterministic SDK boundaries, reference lifetimes and +16 RAM/-12 flash bytes. Versions, NVS/wire/PHY and app policy unchanged. No physical NVS/reset/USB/SPI/RF or entropy validation.
+
 ### Configuration-store boundary verification — 2026-11-12
 
 - Added five-operation ConfigStorage reference and sole-owner PreferencesConfigStorage adapter; actual NvsConfigStore policy now runs under native fault injection.

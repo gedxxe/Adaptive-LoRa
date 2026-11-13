@@ -134,8 +134,22 @@ Modbus、电表模型、Wi-Fi/MQTT、数据库和 dashboard 不在协议核中�
 
 ## 9. 配置存储验证边界（ADR-013）
 
-NvsConfigStore 通过非拥有 ConfigStorage 引用执行五操作，保留实际验证/编解码、错误分类/顺序及读回比较。PreferencesConfigStorage 唯一拥有 Preferences，无配置策略；Runtime 先 adapter 后 store，无堆所有权或通用存储框架。数值 namespace 仍在 store 且原样保留；device key/schema/24-byte blob、DeviceConfig/console/runtime 实现不变。
+NvsConfigStore 通过非拥有 ConfigStorage 引用执行五操作，保留实际验证/编解码、错误分类/顺序及读回比较。PreferencesConfigStorage 唯一拥有 Preferences，无配置策略；Esp32Firmware 先构造 adapter 后构造引用注入的 runtime/store，无堆所有权或通用存储框架。数值 namespace 仍在 store 且原样保留；device key/schema/24-byte blob、DeviceConfig/console/runtime 实现不变。
 
 load 只读打开、查长度、最多读 24 bytes、关闭后 decode；save 先验证/encode，再可写打开/写/关闭，然后实际 load 新开只读会话并精确比较编码字节。每次成功 begin 都显式 end，失败 begin 不 end，维持现有串行非重入约定，不增加并发/嵌套事务。
 
 Native 执行实际 store/config/codec，只模拟低层响应，验证错误/清理/readback 策略，不执行真实 adapter/NVS 内部或 Flash。失败不承诺回滚，host readback 成功不证明实物 commit/断电原子性/持久性。Runtime 无效配置先于 radio.begin 返回、保存后暂存直到重启的策略仅保留/源码核对，本套件未执行 runtime dispatcher。
+
+## 10. Runtime 组合与验证（ADR-014）
+
+Esp32Firmware 按顺序拥有 PreferencesConfigStorage、Llcc68Hardware、唯一 FirmwareRuntime，逆序析构保证引用有效；runtime 保留实际 NvsConfigStore/RadioDriver、console/logger/apps。main 仅改组合 include/type，仍15行，无策略。
+
+Native 通过 SDK header 适配执行实际协调器及全部现有生产模块；有界串口输入、共享虚拟时钟/micros、reset/reason/raw random 提供刺激，实际 freshBootId 拒绝和 session 逻辑执行。无新 radio/storage 接口或第二 runtime 模型。固件标准 optional、旧host experimental optional；native 启用真实64位 Unity 断言。并不构成通用生产平台服务。
+
+保留 app先于命令处理、每loop输入<=64/日志drain<=128、无效配置先于radio/app/entropy返回、radio成功才激活role、暂存/已加载配置区别、TX完成/超时与100ms重启deadline。stop失败仍记录后继续reset；reset不等queue/USB排空。本轮观察/覆盖而未改变这些策略，不证明真实硬件阻塞/熵/活性或生命周期。
+
+## 11. Session失败与时间边界（ADR-015）
+
+Iteration012每次最多8个raw随机值，0代表失败。Counter更新遇0/相同ID保持旧boot/耗尽状态，app不把失败身份初始化为新session。身份不可用时Client HELLO/Gateway ACK均禁止TX；SESSION_ERROR可观察，按尝试开始时间每1s重试，pending reboot时不重试。恢复用新boot/sequence0，无NVS/wire变更；数值合法不代表熵/安全/跨启动唯一。
+
+Runtime poll后给app刷新时间，stop返回后起100ms，logger drain后用当前时间判reset，修复ERR-020。不能抢占阻塞调用、记录真实RF完成时间或消除依赖时延；直接driver/app仍使用调用方观察时间。DEPENDENCY_BUDGET_AUDIT.md记录实际源码时延/分配/ELF预算，包括上游无显式timeout的BUSY-ramp及实物限制。

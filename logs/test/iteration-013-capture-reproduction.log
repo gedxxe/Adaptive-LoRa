@@ -1,0 +1,6 @@
+command: <PIO_PYTHON> <TEMP_PROBE> (exact baseline from git show)
+exit=0
+Baseline actual utility, fake ports only: KeyboardInterrupt exit=0
+errors=[], interruption marker=False
+raw per-chunk timestamps present=False
+REPRODUCED: incomplete capture is reported as success without interruption state; no real serial ports opened.

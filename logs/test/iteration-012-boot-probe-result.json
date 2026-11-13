@@ -1,0 +1,7 @@
+{
+  "command": "python tools/reproduce_boot_id_liveness.py",
+  "exit_code": 0,
+  "elapsed_seconds": 2.241,
+  "log": "logs/test/iteration-012-boot-probe.log",
+  "publication_policy": "Full stdout/stderr except disclosed local-path/EOL/trailing-display normalization; raw retained privately."
+}

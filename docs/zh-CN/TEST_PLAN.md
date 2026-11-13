@@ -98,3 +98,23 @@ Fake 仅注入有界 bytes/返回码、IRQ 锁存/电平/flags 和显式 uint32 
 CONFIG_STORE_AUDIT.md 映射 A–E：实际 store/config/codec 执行，fake 仅注入 bool/count/字节/session。断言 golden blob、数值 namespace/key、RO/W/RO、end/顺序、失败 caller 不变、写失败不读回、错误优先级、不同有效读回为 nvs_verify_failed。失败不保证回滚；不可达 encode-false 防御分支不虚称注入覆盖，无行/分支百分比。
 
 真实 Preferences/NVS/Flash commit、断电/重启/损坏恢复、磨损/保持时间均未验证。Runtime boot/暂存生效只源码核对，未由此 suite 执行。无新命令、迁移、协议/PHY 或后续 MAC。
+
+## Iteration 011 — 实际runtime生命周期
+
+`pio test -e native` 退出0：**266/266 PASS**，新增runtime47和原219全部通过。`pio run -e esp32c3_supermini`退出0、PASS。最终完整日志 `logs/test/iteration-011-native-retry.log`、`logs/build/iteration-011-esp32-final.log`；首次native编译失败与修复（ERR-017）分开保留，未删除断言。逐条结果 `logs/test/iteration-011-scenarios.md`。
+
+RUNTIME_AUDIT.md映射A–G：boot11、provision8、serial7、radio4、reboot10、session3、diagnostics4。实际协调器/store/driver/apps/console/logger执行，观察器断言已关闭config read先于radio、radio先于app RNG、无效启动零硬件访问。暂存save不切换已加载角色/ID，新实例才生效；虚拟deadline验证before/at/after、TX完成/超时和uint32 wrap；容量0/1与queue drop证明reset可遗留诊断；Gateway65,537次验证实际generator/session轮换，通过实际帧/日志验证角色与callback。
+
+没有第二协调器模型，不声明覆盖百分比、熵、硬实时或实物验证。脚本只模拟返回/输入/time/reset；真实adapter/SDK/NVS/flash/USB/IRQ/RF/断电语义待验证。失败stop继续reset、app先输入与日志未排空reset均保留。下一步建议依赖时延/分配与永久坏RNG活性评估，不启动M3–M8。
+
+## Iteration012 — Boot-ID活性与延迟依赖
+
+修复前：Git取得实际011内部generator，raw64 guard对三种永久坏输入有限退出，probe退出0。两次focused均9FAIL/1PASS、退出1（首次wrap fixture改Gateway隔离dueClient TX）；修复后focused10/10退出0，完整native290/290退出0（旧266不变、新24），ESP32退出0 PASS。完整失败/成功日志、53输入hash和每条结果见iteration-012证据，不虚构覆盖百分比。
+
+真实runtime/apps/driver/store/console/logger执行，覆盖启动坏值/max/零前缀、第8次/第9次延后、重试频率/pending reboot/wrap、65536次耗尽后counter保留、Gateway三种永久坏rollover及Client失败，恢复拒绝previous100后用200/seq0。延迟read/TX finish/save/stop/serial覆盖ACK期限、reset100ms、wrap及既有尝试起点recovery/TX预算、阻塞期间延后服务。无无限loop、第二runtime/MAC模型或生产测试钩子；不声称实物堆/栈/flash/RF/熵/NVS/重启验证。
+
+## Iteration013 - 实物验收准备（未执行）
+
+ESP32退出0 PASS13.053s；native退出0 **290/290 PASS**61.980s，53输入/有序cases/bin与012一致，无firmware/native test/pins/PHY/依赖改动。采集工具另有13/13 fake-port检查，不并入native或RF；修正前实际旧工具中断false-success用fake复现，无设备。完整日志/manifests/validation在iteration-013证据。
+
+流程/门槛见PHYSICAL_ACCEPTANCE_READINESS、BENCH_RUNBOOK、HARDWARE、RUN_RECORD_TEMPLATE与LOGGING_GUIDE CSV。未开口/烧录/擦除/复位/RF，no-port枚举不是物理不存在证明。单MCU须先同板备份/安全/layout/恢复，SDK boot前置格式化风险ERR-023需backups；暂存invalid不等于corrupt-NVS boot。合法Gateway无radio仍init，可能fault/block。Pair M0电气/RF、M1 IRQ/BUSY/恢复/no unintendedTX、M2>=200完成cohort及A/T/R/ACK/C分母全待证据。replay/错身份/corrupt-NVS fixture未提供/执行；ERR-021阻挡无人值守/卡BUSY恢复。不用host时延或碎日志代替实物，不改watchdog。

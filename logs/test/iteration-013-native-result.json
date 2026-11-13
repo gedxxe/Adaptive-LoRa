@@ -1,0 +1,7 @@
+{
+  "command": "pio test -e native",
+  "exit_code": 0,
+  "elapsed_seconds": 62.55,
+  "log": "logs/test/iteration-013-native.log",
+  "publication_policy": "Full stdout/stderr with disclosed local-path/EOL/trailing-display normalization; raw retained privately."
+}

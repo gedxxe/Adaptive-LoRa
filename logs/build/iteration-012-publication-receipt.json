@@ -1,0 +1,42 @@
+{
+  "repository": "https://github.com/gedxxe/Adaptive-LoRa.git",
+  "branch": "iteration-012-runtime-reliability",
+  "baseline": "8fa0a473b6cc0905ddff53e4b9a5f22806e058e2",
+  "implementation_commit": "bdab1cec5de6e38f84b524a8189945dec1ee7dd2",
+  "implementation_message": "fix: bound boot-id generation and verify runtime budgets",
+  "commands": [
+    {
+      "command": "git fetch origin",
+      "exit_code": 0
+    },
+    {
+      "command": "git diff --cached --check",
+      "exit_code": 0,
+      "result": "No diagnostics"
+    },
+    {
+      "command": "git commit -m \"fix: bound boot-id generation and verify runtime budgets\"",
+      "exit_code": 0
+    },
+    {
+      "command": "git push -u origin iteration-012-runtime-reliability",
+      "exit_code": 0
+    },
+    {
+      "command": "git ls-remote --heads origin main iteration-011-runtime-verification iteration-012-runtime-reliability",
+      "exit_code": 0,
+      "refs": {
+        "refs/heads/iteration-011-runtime-verification": "8fa0a473b6cc0905ddff53e4b9a5f22806e058e2",
+        "refs/heads/iteration-012-runtime-reliability": "bdab1cec5de6e38f84b524a8189945dec1ee7dd2",
+        "refs/heads/main": "5bc607cd1a86e5d86ff0fc95ba7a3cd31159b861"
+      }
+    }
+  ],
+  "prepublication_main": "5bc607cd1a86e5d86ff0fc95ba7a3cd31159b861",
+  "main_unchanged_at_verification": true,
+  "verified_local_time": "2026-11-12T22:54:33",
+  "software_evidence": "ESP32 exit0;290/290 native exit0; source53 hashes match",
+  "physical_validation": "NOT VERIFIED",
+  "open_timing_risk": "ERR-021 upstream BUSY-ramp; hard deadline acceptance not claimed",
+  "scope": "Dedicated branch only, no merge/PR/force/history rewrite/release/tag. Receipt records verified implementation; own documentation-followup hash cannot be embedded."
+}

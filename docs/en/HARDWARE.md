@@ -164,3 +164,20 @@ For a meaningful comparison:
 A Moxon design or 3D-printed jig is not evidence of antenna gain or
 impedance match. Measure or validate RF performance before making gain
 claims.
+
+## 8. Iteration013 evidence audit - 2026-11-13
+
+The [current vendor product page](https://docs.ai-thinker.com/en/Ra-01SCH/index.html) links [specification V1.1.0](https://aithinker-static.oss-cn-shenzhen.aliyuncs.com/docs/Public%20Document%20Center/LoRa/lora/Specification/Ra-01SCH_V1.1.0%20Specification-20221110.pdf). Table4/p9 confirms the module pin functions already shown above; Fig6/p10 shows a crystal and DIO2 switching, Fig7/p11 illustrates local10uF/100nF decoupling. Section6.6/p14 describes default internal RF switching and a different BOM for external control. These are design evidence, not identification of the two actual modules. PDF/source hashes and retrieval limitations: `logs/build/iteration-013-readiness-sources.json`. Legacy download URLs returned HTML; use the current vendor link.
+
+| Evidence layer | Finding | Physical status |
+|---|---|---|
+| Module pin numbers/functions | Recorded16-pad functions match vendor table; front/back orientation must be respected | Actual markings/BOM/pad continuity NOT VERIFIED |
+| ESP32 SoC functions | [Espressif datasheet](https://documentation.espressif.com/esp32-c3_datasheet_en.html) supports GPIO/USB/strap cautions | Does not establish a clone board schematic |
+| GPIO4/5/6/7 SPI,1RESET,0DIO1,10BUSY | Project proposal, unchanged in board_pins.h | Pads/exposure/onboard conflicts NOT VERIFIED |
+| Supply/grounds/decoupling | Dedicated3.3V rail with margin remains a design requirement | Regulator/ripple/current/transients NOT MEASURED |
+| XTAL/LDO/DIO2 settings | Source choices remain unchanged; external supply LDO and radio internal regulator mode are different settings | Exact oscillator/BOM/regulator/switch operation NOT VERIFIED |
+| Antenna/feed/50-ohm load | Must be suitable and attached before radio can TX | Moxon not fabricated; any reference antenna/load availability TBD |
+
+No verified Super Mini manufacturer/revision schematic or unit photos were supplied. Do not silently adapt pins/USB/oscillator/PHY from a reseller image. Short wires, 3.3V logic, common ground and local decoupling require inspection; do not parallel regulator outputs or back-power an unpowered device through GPIO. All wiring continuity checks occur with power off. No radio power or RF transmission until the runbook gates and local frequency/EIRP/access/equipment review are recorded; module range is not legal authorization.
+
+MCU BOOT/EN/RESET controls in the single-board procedure are distinct from proposed GPIO1, which is the radio RESET signal. Identify actual board controls before first power/ROM entry.

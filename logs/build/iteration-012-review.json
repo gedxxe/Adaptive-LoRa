@@ -1,0 +1,260 @@
+{
+  "baseline": "8fa0a473b6cc0905ddff53e4b9a5f22806e058e2",
+  "branch": "iteration-012-runtime-reliability",
+  "file_count": 58,
+  "files": [
+    {
+      "path": "CHANGELOG.md",
+      "responsibility": "Record reproduced liveness/timing fixes without version bump"
+    },
+    {
+      "path": "README.md",
+      "responsibility": "Current290-case evidence, bounded session recovery and dependency audit link"
+    },
+    {
+      "path": "README.zh-CN.md",
+      "responsibility": "Chinese current290-case and bounded recovery instructions"
+    },
+    {
+      "path": "docs/en/ARCHITECTURE.md",
+      "responsibility": "Append implemented session/timing boundary contract"
+    },
+    {
+      "path": "docs/en/BUILD_MEMORY.md",
+      "responsibility": "Append-only commands/results/failures/resources/publication record"
+    },
+    {
+      "path": "docs/en/DECISIONS.md",
+      "responsibility": "AppendADR-015 bounded identity and timestamp correction rationale"
+    },
+    {
+      "path": "docs/en/DEPENDENCY_BUDGET_AUDIT.md",
+      "responsibility": "Pre-edit findings, liveness/entropy/timing/allocation/ELF/coverage/physical plan"
+    },
+    {
+      "path": "docs/en/ERROR_LOG.md",
+      "responsibility": "Retain launcher failures, reproduced defects/resolutions and open upstream risk"
+    },
+    {
+      "path": "docs/en/PROGRESS.md",
+      "responsibility": "Current evidence, open risks and next scope"
+    },
+    {
+      "path": "docs/en/RUNTIME_AUDIT.md",
+      "responsibility": "Append012 correction note preserving011 findings"
+    },
+    {
+      "path": "docs/en/SOFTWARE_AUDIT.md",
+      "responsibility": "Append actual reliability assessment scope and limits"
+    },
+    {
+      "path": "docs/en/TEST_PLAN.md",
+      "responsibility": "Append focused reliability/reproduction/compatibility evidence"
+    },
+    {
+      "path": "docs/zh-CN/ARCHITECTURE.md",
+      "responsibility": "Append implemented session/timing boundary contract (Simplified Chinese)"
+    },
+    {
+      "path": "docs/zh-CN/DECISIONS.md",
+      "responsibility": "AppendADR-015 bounded identity and timestamp correction rationale (Simplified Chinese)"
+    },
+    {
+      "path": "docs/zh-CN/DEPENDENCY_BUDGET_AUDIT.md",
+      "responsibility": "Pre-edit findings, liveness/entropy/timing/allocation/ELF/coverage/physical plan (Simplified Chinese)"
+    },
+    {
+      "path": "docs/zh-CN/PROGRESS.md",
+      "responsibility": "Current evidence, open risks and next scope (Simplified Chinese)"
+    },
+    {
+      "path": "docs/zh-CN/RUNTIME_AUDIT.md",
+      "responsibility": "Append012 correction note preserving011 findings (Simplified Chinese)"
+    },
+    {
+      "path": "docs/zh-CN/SOFTWARE_AUDIT.md",
+      "responsibility": "Append actual reliability assessment scope and limits (Simplified Chinese)"
+    },
+    {
+      "path": "docs/zh-CN/TEST_PLAN.md",
+      "responsibility": "Append focused reliability/reproduction/compatibility evidence (Simplified Chinese)"
+    },
+    {
+      "path": "include/project_config.h",
+      "responsibility": "Central eight-raw-attempt and one-second identity retry limits"
+    },
+    {
+      "path": "logs/build/iteration-012-dependency-sources.json",
+      "responsibility": "Retained exact command/source/symbol/size/scenario evidence: iteration-012-dependency-sources.json"
+    },
+    {
+      "path": "logs/build/iteration-012-elf-nm.log",
+      "responsibility": "Retained exact command/source/symbol/size/scenario evidence: iteration-012-elf-nm.log"
+    },
+    {
+      "path": "logs/build/iteration-012-elf-size.log",
+      "responsibility": "Retained exact command/source/symbol/size/scenario evidence: iteration-012-elf-size.log"
+    },
+    {
+      "path": "logs/build/iteration-012-esp32-result.json",
+      "responsibility": "Retained exact command/source/symbol/size/scenario evidence: iteration-012-esp32-result.json"
+    },
+    {
+      "path": "logs/build/iteration-012-esp32.log",
+      "responsibility": "Retained exact command/source/symbol/size/scenario evidence: iteration-012-esp32.log"
+    },
+    {
+      "path": "logs/build/iteration-012-memory-baseline-retry.log",
+      "responsibility": "Retained exact command/source/symbol/size/scenario evidence: iteration-012-memory-baseline-retry.log"
+    },
+    {
+      "path": "logs/build/iteration-012-memory-baseline.log",
+      "responsibility": "Retained exact command/source/symbol/size/scenario evidence: iteration-012-memory-baseline.log"
+    },
+    {
+      "path": "logs/build/iteration-012-memory-final.log",
+      "responsibility": "Retained exact command/source/symbol/size/scenario evidence: iteration-012-memory-final.log"
+    },
+    {
+      "path": "logs/build/iteration-012-publication-receipt.json",
+      "responsibility": "Verified implementation commit/push, observed remote refs and physical/timing exclusions; docs-only follow-up receipt"
+    },
+    {
+      "path": "logs/build/iteration-012-review.json",
+      "responsibility": "Exact changed-file responsibilities and staged review receipt"
+    },
+    {
+      "path": "logs/build/iteration-012-source-manifest.sha256",
+      "responsibility": "Retained exact command/source/symbol/size/scenario evidence: iteration-012-source-manifest.sha256"
+    },
+    {
+      "path": "logs/build/iteration-012-toolchain.log",
+      "responsibility": "Retained exact command/source/symbol/size/scenario evidence: iteration-012-toolchain.log"
+    },
+    {
+      "path": "logs/build/iteration-012-validation.json",
+      "responsibility": "Retained exact command/source/symbol/size/scenario evidence: iteration-012-validation.json"
+    },
+    {
+      "path": "logs/test/iteration-012-boot-probe-result.json",
+      "responsibility": "Retained exact command/source/symbol/size/scenario evidence: iteration-012-boot-probe-result.json"
+    },
+    {
+      "path": "logs/test/iteration-012-boot-probe.log",
+      "responsibility": "Retained exact command/source/symbol/size/scenario evidence: iteration-012-boot-probe.log"
+    },
+    {
+      "path": "logs/test/iteration-012-focused-result.json",
+      "responsibility": "Retained exact command/source/symbol/size/scenario evidence: iteration-012-focused-result.json"
+    },
+    {
+      "path": "logs/test/iteration-012-focused.log",
+      "responsibility": "Retained exact command/source/symbol/size/scenario evidence: iteration-012-focused.log"
+    },
+    {
+      "path": "logs/test/iteration-012-native-result.json",
+      "responsibility": "Retained exact command/source/symbol/size/scenario evidence: iteration-012-native-result.json"
+    },
+    {
+      "path": "logs/test/iteration-012-native.log",
+      "responsibility": "Retained exact command/source/symbol/size/scenario evidence: iteration-012-native.log"
+    },
+    {
+      "path": "logs/test/iteration-012-reproduction-result.json",
+      "responsibility": "Retained exact command/source/symbol/size/scenario evidence: iteration-012-reproduction-result.json"
+    },
+    {
+      "path": "logs/test/iteration-012-reproduction-retry-result.json",
+      "responsibility": "Retained exact command/source/symbol/size/scenario evidence: iteration-012-reproduction-retry-result.json"
+    },
+    {
+      "path": "logs/test/iteration-012-reproduction-retry.log",
+      "responsibility": "Retained exact command/source/symbol/size/scenario evidence: iteration-012-reproduction-retry.log"
+    },
+    {
+      "path": "logs/test/iteration-012-reproduction.log",
+      "responsibility": "Retained exact command/source/symbol/size/scenario evidence: iteration-012-reproduction.log"
+    },
+    {
+      "path": "logs/test/iteration-012-scenarios.md",
+      "responsibility": "Retained exact command/source/symbol/size/scenario evidence: iteration-012-scenarios.md"
+    },
+    {
+      "path": "src/app/firmware_runtime.cpp",
+      "responsibility": "Bound raw boot-ID generation and refresh three reproduced stale-time boundaries"
+    },
+    {
+      "path": "src/client/client_app.cpp",
+      "responsibility": "Fail-closed session renewal, observable cooldown/recovery, valid HELLO identity"
+    },
+    {
+      "path": "src/client/client_app.h",
+      "responsibility": "Private session failure/cooldown state and renewal helper"
+    },
+    {
+      "path": "src/common/protocol/sequence_tracker.cpp",
+      "responsibility": "Preserve previous/exhausted counter on invalid generator result"
+    },
+    {
+      "path": "src/common/protocol/sequence_tracker.h",
+      "responsibility": "Document zero failure contract and declare checked renewal"
+    },
+    {
+      "path": "src/gateway/gateway_app.cpp",
+      "responsibility": "Fail-closed ACK identity renewal and observable cooldown/recovery"
+    },
+    {
+      "path": "src/gateway/gateway_app.h",
+      "responsibility": "Private session failure/cooldown state and renewal helper"
+    },
+    {
+      "path": "test/support/fake_config_storage.h",
+      "responsibility": "Native-only per-operation virtual delays; storage policy unchanged"
+    },
+    {
+      "path": "test/support/fake_radio_hardware.h",
+      "responsibility": "Native-only per-operation virtual delays; no driver model"
+    },
+    {
+      "path": "test/support/platform/Arduino.h",
+      "responsibility": "Native output-check/write virtual delays, zero-delay defaults"
+    },
+    {
+      "path": "test/support/platform/esp_random.h",
+      "responsibility": "Finite host guard and cyclic deterministic raw inputs"
+    },
+    {
+      "path": "test/support/platform/esp_timer.h",
+      "responsibility": "Advance shared native virtual microsecond clock"
+    },
+    {
+      "path": "test/test_runtime_reliability/test_main.cpp",
+      "responsibility": "24 real production-module boot/rollover/recovery/delay cases"
+    },
+    {
+      "path": "tools/reproduce_boot_id_liveness.py",
+      "responsibility": "Repeatable finite probe of exact Git baseline generator; no duplicated algorithm"
+    }
+  ],
+  "scope": "Reproduced boot-ID and runtime stale-time corrections, bounded native stimuli and source/ELF audit only",
+  "source_inputs_verified": 53,
+  "original_native_cases_verified": 266,
+  "new_native_cases": 24,
+  "history": "Canonical memory/error/decisions and Chinese decisions retain exact baseline byte prefixes; old evidence untouched",
+  "compatibility": "main15 unchanged; all prior test cpp unchanged; protocol/NVS/adapters/driver/platform flags/version/PHY preserved; project_config only adds2 constants",
+  "behavior_changes": "Eight-attempt/zero sentinel and checked app session recovery; post-poll/post-stop/post-drain current timestamps only",
+  "staging_check": "git diff --cached --check exit0, no diagnostics",
+  "security_scan": {
+    "tracked_staged_blobs": 360,
+    "identified_organization_localpath_credentials_privateaddress_matches": 0,
+    "unexpected_binaries": 0
+  },
+  "physical_validation": "NOT VERIFIED",
+  "resource_measurements": "Target ELF static sizes only; physical stack/heap/timing NOT MEASURED",
+  "relative_document_links_verified": 35,
+  "bilingual_current_facts": "Both languages agree on290 tests, versions, corrected behavior and unverified physical evidence",
+  "full_diff_review": "All production/support/test/probe/document changes and complete evidence artifacts reviewed against required011 baseline; full patch retained privately",
+  "log_formatting": "Full command stdout/stderr retained with disclosed local-path/EOL/trailing-display cleanup; original new dumps retained privately",
+  "implementation_file_count": 57,
+  "publication_followup": "Documentation-only receipt, English/Chinese progress, memory and inventory; firmware/test inputs remain frozen"
+}

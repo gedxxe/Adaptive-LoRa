@@ -3,8 +3,21 @@
 namespace adaptive_lora {
 GatewayApp::GatewayApp(const DeviceConfig& config, RadioTransport& radio, SerialLogger& log, BootIdGenerator generate)
     : config_(config), radio_(radio), log_(log), generate_(generate) {}
+bool GatewayApp::renewSession(uint32_t now) {
+    if (sessionFailed_ && !deadlineReached(now, sessionRetryAt_)) return false;
+    const bool recovering = sessionFailed_;
+    if (!sequence_.renew(generate_)) {
+        sessionFailed_ = true;
+        sessionRetryAt_ = now + kSessionRecoveryUs;
+        log_.event("SESSION_ERROR", "boot_id_unavailable");
+        return false;
+    }
+    sessionFailed_ = false;
+    if (recovering) log_.event("SESSION_NEW", "identity_recovered");
+    return true;
+}
 void GatewayApp::begin(uint32_t now) {
-    sequence_.begin(generate_(0));
+    renewSession(now);
     listen(now);
 }
 void GatewayApp::listen(uint32_t now) {
@@ -16,6 +29,7 @@ void GatewayApp::listen(uint32_t now) {
     } else recoveryAttempts_ = 0;
 }
 void GatewayApp::update(uint32_t now, const RadioEvent& event, bool allowNew) {
+    if (allowNew && sessionFailed_) renewSession(now);
     if (event.type == RadioEventType::TX_DONE) {
         log_.event("TX_DONE", "ack_sent", &ack_);
     } else if (event.type == RadioEventType::RX_DONE) {
@@ -36,7 +50,7 @@ void GatewayApp::update(uint32_t now, const RadioEvent& event, bool allowNew) {
                 ack_.sourceId = config_.nodeId;
                 ack_.destinationId = hello.sourceId;
                 if (!sequence_.take(ack_.sequence)) {
-                    sequence_.begin(generate_(sequence_.bootId()));
+                    if (!renewSession(now)) return;
                     if (!sequence_.take(ack_.sequence)) return;
                 }
                 ack_.bootId = sequence_.bootId();

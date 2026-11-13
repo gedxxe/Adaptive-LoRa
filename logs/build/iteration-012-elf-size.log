@@ -1,0 +1,40 @@
+size -A firmware.elf, exit0
+.pio/build/esp32c3_supermini/firmware.elf  :
+section                   size         addr
+.rtc.text                    0   1342177280
+.rtc.force_fast              0   1342177280
+.rtc_noinit                  0   1342177280
+.rtc.force_slow             32   1342177280
+.rtc_reserved               40   1342185432
+.iram0.text              58428   1077411840
+.iram0.text_end            452   1077470268
+.iram0.data                  0   1077470720
+.iram0.bss                   0   1077470720
+.iram0.end                   0   1077470720
+.dram0.dummy             58880   1070071808
+.dram0.data               7980   1070130688
+.noinit                      0   1070138668
+.dram0.bss               16584   1070138672
+.flash.text             226000   1107296288
+.flash_rodata_dummy     262144   1006632992
+.flash.appdesc             256   1006895136
+.flash.rodata            71900   1006895392
+.flash.init_array          292   1006967292
+.eh_frame_hdr                0   1006967584
+.eh_frame                25400   1006967584
+.flash.tdata                 0   1006992984
+.dram0.heap_start            8   1070155256
+.debug_aranges           57840            0
+.debug_info            4872575            0
+.debug_abbrev           503643            0
+.debug_line            2087876            0
+.debug_frame             96968            0
+.debug_str              562071            0
+.debug_loc             1033755            0
+.debug_ranges           121280            0
+.debug_line_str          12861            0
+.debug_loclists         128584            0
+.debug_rnglists          13143            0
+.comment                    85            0
+.riscv.attributes           72            0
+Total                 10219149

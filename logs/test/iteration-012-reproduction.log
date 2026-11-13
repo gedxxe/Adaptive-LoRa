@@ -1,0 +1,26 @@
+Verbosity level can be increased via `-v, -vv, or -vvv` option
+Collected 10 tests
+
+Processing test_runtime_reliability in native environment
+--------------------------------------------------------------------------------
+Building...
+Testing...
+test\test_runtime_reliability\test_main.cpp:41: test_permanent_zero_initial_client_is_bounded_and_diagnosable: Production generator exceeded finite native guard64	[FAILED]
+test\test_runtime_reliability\test_main.cpp:41: test_permanent_zero_initial_gateway_suppresses_ack: Production generator exceeded finite native guard64	[FAILED]
+test\test_runtime_reliability\test_main.cpp:60: test_delayed_rx_cannot_accept_ack_after_deadline: Expected 4294967295 Was 887	[FAILED]
+test\test_runtime_reliability\test_main.cpp:59: test_tx_done_processing_delay_anchors_ack_window_after_poll: Expected Not-Equal	[FAILED]
+test\test_runtime_reliability\test_main.cpp:91: test_slow_config_save_preserves_full_post_stop_reboot_interval: Expected 0 Was 1	[FAILED]
+test\test_runtime_reliability\test_main.cpp:96: test_slow_stop_preserves_full_post_stop_reboot_interval: Expected 0 Was 1	[FAILED]
+test\test_runtime_reliability\test_main.cpp:101: test_reset_evaluates_fresh_time_after_blocked_serial_write: Expected 1 Was 0	[FAILED]
+test\test_runtime_reliability\test_main.cpp:105: test_reset_evaluates_fresh_time_after_unavailable_output_wait: Expected 1 Was 0	[FAILED]
+test\test_runtime_reliability\test_main.cpp:111: test_save_and_reboot_deadline_remain_correct_across_wrap: Expected 1 Was 0	[FAILED]
+test\test_runtime_reliability\test_main.cpp:134: test_delayed_failed_rx_retains_existing_attempt_start_recovery_policy	[PASSED]
+
+
+Program errored with 9 code
+--------- native:test_runtime_reliability [ERRORED] Took 2.65 seconds ---------
+=================================== SUMMARY ===================================
+Environment    Test                      Status    Duration
+-------------  ------------------------  --------  ------------
+native         test_runtime_reliability  ERRORED   00:00:02.651
+============= 11 test cases: 9 failed, 1 succeeded in 00:00:02.651 =============

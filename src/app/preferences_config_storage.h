@@ -3,7 +3,7 @@
 #include "config_storage.h"
 
 namespace adaptive_lora {
-// Exactly one instance in FirmwareRuntime. No configuration policy belongs here.
+// Exactly one instance in Esp32Firmware composition. No config policy here.
 class PreferencesConfigStorage final : public ConfigStorage {
 public:
     bool begin(const char* name, bool readOnly) override;

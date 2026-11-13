@@ -22,6 +22,13 @@ SequenceResult SequenceTracker::observe(const PacketIdentity& id) {
     s = {true, id.networkId, id.sourceId, id.bootId, id.sequence, 1};
     return SequenceResult::NEW;
 }
+bool SequenceCounter::renew(BootIdGenerator generate) {
+    const uint32_t next = generate(boot_);
+    // Keep the exhausted identity on failure so recovery cannot reuse it.
+    if (next == 0 || next == boot_) return false;
+    begin(next);
+    return true;
+}
 bool SequenceCounter::take(uint16_t& sequence) {
     if (boot_ == 0 || next_ > 65535) return false;
     sequence = static_cast<uint16_t>(next_++);

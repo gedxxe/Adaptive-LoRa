@@ -3,6 +3,7 @@
 #include <cstdint>
 
 namespace adaptive_lora {
+// Return a nonzero ID different from previous, or zero on bounded failure.
 using BootIdGenerator = uint32_t (*)(uint32_t previous);
 struct PacketIdentity {
     uint16_t networkId;
@@ -30,6 +31,7 @@ class SequenceCounter {
 public:
     void begin(uint32_t boot) { boot_ = boot; next_ = 0; }
     bool take(uint16_t& sequence);
+    bool renew(BootIdGenerator generate);
     uint32_t bootId() const { return boot_; }
 private:
     uint32_t boot_ = 0;

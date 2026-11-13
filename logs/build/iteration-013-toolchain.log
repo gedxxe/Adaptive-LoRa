@@ -1,0 +1,29 @@
+pio --version
+exit0
+PlatformIO Core, version 6.1.19
+
+pio pkg list -e esp32c3_supermini
+exit0
+Resolving esp32c3_supermini dependencies...
+Platform espressif32 @ 55.3.311 (required: espressif32)
+├── contrib-piohome @ 3.4.4 (required: <PLATFORMIO_HOME>\packages\contrib-piohome)
+├── framework-arduinoespressif32 @ 3.3.11 (required: https://github.com/espressif/arduino-esp32/releases/download/3.3.11/esp32-core-3.3.11.tar.xz)
+├── framework-arduinoespressif32-libs @ 5.5.5+sha.b774170ff46 (required: https://github.com/espressif/arduino-esp32/releases/download/3.3.11/esp32-core-3.3.11-libs.tar.xz)
+├── framework-espidf @ 3.50505.0 (required: https://github.com/pioarduino/esp-idf/releases/download/v5.5.5/esp-idf-v5.5.5.tar.xz)
+├── tool-esptoolpy @ 5.3.0 (required: <PLATFORMIO_HOME>\packages\tool-esptoolpy)
+├── tool-riscv32-esp-elf-gdb @ 17.1.0+20260402 (required: <PLATFORMIO_HOME>\packages\tool-riscv32-esp-elf-gdb)
+└── toolchain-riscv32-esp @ 14.2.0+20260121 (required: <PLATFORMIO_HOME>\packages\toolchain-riscv32-esp)
+
+Libraries
+└── RadioLib @ 7.8.1 (required: jgromes/RadioLib @ 7.8.1)
+
+<PIO_PYTHON> --version
+exit0
+Python 3.11.7
+
+g++ --version
+exit0
+g++ (MinGW.org GCC-6.3.0-1) 6.3.0
+Copyright (C) 2016 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.

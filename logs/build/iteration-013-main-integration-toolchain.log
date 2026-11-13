@@ -1,0 +1,53 @@
+pio --version
+exit0
+PlatformIO Core, version 6.1.19
+
+<PIO_PYTHON> --version
+exit0
+Python 3.11.7
+
+g++ --version
+exit0
+g++ (MinGW.org GCC-6.3.0-1) 6.3.0
+Copyright (C) 2016 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+
+[
+  {
+    "manifest": "<PLATFORMIO_HOME>/platforms/espressif32/platform.json",
+    "name": "espressif32",
+    "version": "55.03.311"
+  },
+  {
+    "manifest": "<PLATFORMIO_HOME>/packages/framework-arduinoespressif32/package.json",
+    "name": "framework-arduinoespressif32",
+    "version": "3.3.11"
+  },
+  {
+    "manifest": "<PLATFORMIO_HOME>/packages/framework-arduinoespressif32-libs/package.json",
+    "name": "framework-arduinoespressif32-libs",
+    "version": "5.5.5+sha.b774170ff46"
+  },
+  {
+    "manifest": "<PLATFORMIO_HOME>/packages/toolchain-riscv32-esp/package.json",
+    "name": "toolchain-riscv32-esp",
+    "version": "14.2.0+20260121"
+  },
+  {
+    "manifest": "<PLATFORMIO_HOME>/platforms/native/platform.json",
+    "name": "native",
+    "version": "1.2.1"
+  },
+  {
+    "manifest": ".pio/libdeps/esp32c3_supermini/RadioLib/library.json",
+    "name": "RadioLib",
+    "version": "7.8.1"
+  },
+  {
+    "manifest": ".pio/libdeps/native/Unity/library.json",
+    "name": "Unity",
+    "version": "2.6.1"
+  }
+]

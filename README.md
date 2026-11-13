@@ -1,5 +1,7 @@
 # Adaptive-LoRa
 
+Development baseline: `main` is canonical after the validated [Iteration 013 integration PR](https://github.com/gedxxe/Adaptive-LoRa/pull/3). Start future work from current `main`; preserve historical iteration branches and engineering records. See [PROGRESS.md](docs/en/PROGRESS.md) for validation evidence and publication status.
+
 **Research title:** Reliability-aware TDMA Scheduling and Link Adaptation for Single-Radio LoRa Industrial Energy Monitoring Networks.
 
 Adaptive-LoRa is an independent research and embedded firmware project for private, single-radio LoRa peer-to-peer networks. Industrial energy monitoring is a general research use case; the protocol does not require a particular meter, fieldbus, backhaul, database or deployment. This is not LoRaWAN.
@@ -12,7 +14,7 @@ The research direction is reliability-aware gateway scheduling and conservative 
 |---|---|
 | Firmware / protocol | `0.2.0-alpha.1` / `1` |
 | ESP32 compilation | PASS |
-| Native tests | 219/219 PASS: 163 existing cases (38 app integration, 71 driver), plus 56 configuration-store fault cases |
+| Native tests | 290/290 PASS: all 266 existing cases plus 24 boot-ID/dependency-delay reliability cases |
 | Implemented | Explicit bounded frames, provisioned roles, HELLO/ACK identity checks, duplicate suppression, timeout/recovery and sequence/session handling |
 | Physical NVS/reboot/SPI/IRQ/RF/antenna | NOT VERIFIED |
 
@@ -29,7 +31,7 @@ Host integration tests use the actual client/gateway state machines with bounded
 
 One image loads a validated `GATEWAY` or `CLIENT` role from NVS. Missing, corrupt or unsupported configuration enters provisioning mode with application TX disabled. Role edits apply only after save and controlled reboot; identical hardware is not used to infer roles.
 
-The implemented `RadioTransport` reference separates application state machines from `RadioDriver` state policy. Its non-owning `RadioHardware` reference delegates to the sole LLCC68/SPI/GPIO owner, `Llcc68Hardware`; native fault tests execute the actual driver. NvsConfigStore also runs natively through five-operation ConfigStorage; PreferencesConfigStorage solely owns real Preferences access. See the [storage audit](docs/en/CONFIG_STORE_AUDIT.md). Native readback does not prove flash durability. The codec/config/sequence modules are host-testable. `main.cpp` is a 15-line entry point.
+The implemented `RadioTransport` reference separates application state machines from `RadioDriver` state policy. Its non-owning `RadioHardware` reference delegates to the sole LLCC68/SPI/GPIO owner, `Llcc68Hardware`; native fault tests execute the actual driver. NvsConfigStore also runs natively through five-operation ConfigStorage; PreferencesConfigStorage solely owns real Preferences access. See the [storage audit](docs/en/CONFIG_STORE_AUDIT.md). Native readback does not prove flash durability. Esp32Firmware owns the two concrete adapters before the reference-injected FirmwareRuntime; deterministic native tests execute the actual coordinator, store, driver, apps and console. See the [runtime audit](docs/en/RUNTIME_AUDIT.md). SDK shims simulate clock/serial/reset/raw RNG; they do not validate hardware entropy or reset. Generation is bounded to eight raw calls; unavailable identity suppresses normal TX, logs SESSION_ERROR and retries at one-second intervals. See the [dependency budget audit](docs/en/DEPENDENCY_BUDGET_AUDIT.md) for corrected timestamp boundaries and remaining SDK/BUSY/allocation limits. The codec/config/sequence modules are host-testable. `main.cpp` is a 15-line entry point.
 
 Four target boundaries are documented in [ARCHITECTURE.md](docs/en/ARCHITECTURE.md): protocol core, radio adapters, platform services and an application payload/event interface. Platform services are currently ESP32/Arduino-specific; a general application submission/delivery API is still absent. The protocol core contains no Modbus, meter-model, Wi-Fi/MQTT, PostgreSQL or dashboard integration. Do not treat the target architecture as fully implemented.
 
@@ -87,3 +89,5 @@ Preserve chronology, failed attempts, error resolutions, exact commands, package
 Use general application payloads; keep integrations outside protocol logic. Publish assumptions, controlled test conditions and limitations. Do not claim link capacity, antenna gain or hardware validation without evidence. Do not redistribute full research papers without permission. Third-party dependencies remain external; [THIRD_PARTY.md](THIRD_PARTY.md) records their licenses. No project-wide redistribution license has been selected in this task.
 
 Read [AGENTS.md](AGENTS.md) before changes. English is canonical; [简体中文](README.zh-CN.md) is the secondary documentation language.
+
+Physical preparation: [M0-M2 readiness](docs/en/PHYSICAL_ACCEPTANCE_READINESS.md) links backed-up MCU-only and pair gates, capture/CSV rules and remaining ERR-021/SDK-startup holds. No physical procedure has been executed; use a new evidence directory and preserve private backups before upload/config changes.

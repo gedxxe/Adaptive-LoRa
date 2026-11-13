@@ -1,0 +1,15 @@
+GDB ELF-only p sizeof for FirmwareRuntime,Esp32Firmware,GatewayApp,ClientApp,RadioDriver,Llcc68Hardware,NvsConfigStore,SerialLogger,Frame,RadioEvent,SequenceCounter,SequenceTracker,PreferencesConfigStorage
+exit=0
+$1 = 8984
+$2 = 9552
+$3 = 344
+$4 = 184
+$5 = 20
+$6 = 552
+$7 = 4
+$8 = 8228
+$9 = 92
+$10 = 120
+$11 = 8
+$12 = 200
+$13 = 12

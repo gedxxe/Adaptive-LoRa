@@ -1,0 +1,38 @@
+# M0-M2 physical acceptance readiness - Iteration 013
+
+## Pre-edit audit (2026-11-13 client date)
+
+Clean local/fetched Iteration012 HEAD9341e7c0016c66fd9316d489ccfca00a646ae2cb confirmed;013 created directly from it, not main5bc607cd1a86e5d86ff0fc95ba7a3cd31159b861. Firmware0.2.0-alpha.1/protocol1/RadioLib7.8.1; prior290/290 nativePASS. Read current instructions, hardware/runbook/test/record/dependency/error/decision/progress and actual radio/runtime/composition/logger/capture code. Production firmware, pins, PHY and native tests need no changes.
+
+Inventory2RA-01SCH/LLCC68,1ESP32-C3 Super Mini; secondMCU/Moxon/pair pending. Read-only pyserial enumeration found no ports (iteration-013-port-enumeration.log). This is an enumeration observation, not proof of wiring or physical absence. No serial open, upload, erase, reset or RF operation performed.
+
+Vendor PDF V1.1.0 linked from current official product page was rendered and inspected pp9-11; pin functions match the recorded map, schematic shows crystal and DIO2 RF-switch path; section6.6 confirms default internal RF switching. Actual module/BOM/board continuity still unverified. Old download links redirected/returnedHTML; current vendor-linked PDF succeeds, SHA256c16fd1ca1f1e9f23dcc82cce8a3947cea9132446c92cd8f002f4d87c8efa6079. Only source URL/hash/facts are published; full PDF/images remain ignored locally.
+
+ERR-021: LLCC68 inherits startTransmit -> stageMode -> launchMode -> setTx -> separate unbounded BUSY ramp loop. Runtime cannot service serial/reboot/2s driver poll deadline while blocked. Installed loopTaskWDTEnabled=false; project never calls enableLoopWDT, idle subscription macro absent; IWDT tick protection is not an application-progress watchdog. No automatic recovery guarantee. Detailed disposition and bench hold follow below; no third-party patch or watchdog change.
+
+Capture audit: original helper bounded4096-byte reads and two error slots, exclusive run-directory creation and raw partial bytes are sound. Missing chunk timestamps/offsets, final-fragment/hash/metadata state and single-board mode impede acceptance evidence. KeyboardInterrupt was silently treated as success; a finite fake-port reproduction is prepared before modification. Port opening may reset a board even with modem lines preconfigured. Planned utility changes only address these gaps, retain raw files/status-only traffic and never change firmware/protocol. New native tests/frameworks not proposed.
+
+## Operator readiness package
+
+This package prepares procedures; **all physical gates remain NOT RUN/IN PROGRESS**. Required software reruns pass (290/290 native, unchanged firmware) and13 fake-port capture checks pass; no hardware inference follows. Current source/compiled budget is unchanged: firmware0.2.0-alpha.1, protocol1, LLCC68/RadioLib7.8.1, RAM24,564/flash364,308 bytes. No firmware/native test/pin/PHY/watchdog/library change.
+
+- **MCU-only procedure:** [BENCH_RUNBOOK single-board branch](BENCH_RUNBOOK.md#single-board-branch-mcu-only-no-radio-or-antenna-required) covers identification, USB/upload compatibility, dual private full-flash backup, actual layout comparison, protected upload, missing/invalid staging checks, Gateway save/readback/reboot/power-cycle and verified restore. Keep radios physically disconnected/unpowered. Valid config still attempts radio init; a stall is BLOCKED, not persistence PASS. SDK startup may erase damaged/old-version NVS before Runtime; backup precedes first app boot. Secure/encrypted layouts need a separate reviewed recovery path. Controlled corrupt-blob fixture is still a distinct unprovided physical gate.
+- **Pair setup:** [HARDWARE](HARDWARE.md) separates documented module functions, proposed MCU assignment and physically unverified wiring; [existing runbook](BENCH_RUNBOOK.md) retains one image, explicit IDs, fixed PHY and antenna/load/regulatory gates. A known matched reference antenna/load can support initial bench work if available; none is assumed. Moxon fabrication/comparison is later evidence.
+- **Required instruments:** data-capable USB cable/host and board controls; DMM/continuity with power off; regulated/current-limited3.3V source and local decoupling; oscilloscope/power probing and logic analyzer adequate for1MHz SPI/BUSY/DIO1 (record sample rate/calibration); verified50-ohm feed/antenna/load with suitable power rating; antenna/feed matching equipment/evidence as applicable; accessible safe power removal. Actual equipment availability/ratings/calibration are TBD.
+- **ERR-021:** source-only risk remains OPEN. Current watchdog settings do not prove recovery, and a wrapper cannot preempt the library loop. Options and compatibility consequences are in the [dependency-audit disposition](DEPENDENCY_BUDGET_AUDIT.md#iteration013-err-021-disposition-source-review-not-a-physical-reproduction). Do not patch third-party code, disable watchdogs or force GPIO levels. Unattended/stuck-BUSY acceptance is held; normal attended observations do not close it.
+- **Acceptance:** M0 requires actual identity/continuity/supply/USB/feed/legal review; M1 adds real initialization/IRQ/BUSY/recovery/stable logging/no unintendedTX; M2 adds >=200 complete HELLO cohort, identity/timeouts/duplicates and separately reconciled Gateway RX/ACK starts/completions/Client accepted metrics. Full checklist and fixture limitations are in the runbook. Distance/LOS/height/orientation/voltages/RSSI/SNR/latency/PDR remain NOT MEASURED. No RF setting is legally approved by this record.
+
+## Capture and evidence
+
+Use PlatformIO Python; create a new per-phase directory and fill [RUN_RECORD_TEMPLATE](../../logs/test/RUN_RECORD_TEMPLATE.md). Default tool only sends status, never provisioning/flash commands; port open/close can reset units. Finish backups and RF gates before any open. Example **not executed against hardware**:
+
+```powershell
+& $PioPython tools/capture_bench.py --board COM_BOARD --seconds 180 --out logs/test/RUN-YYYYMMDD-HHMMSS-board --metadata PRIVATE_RUN_METADATA.json
+& $PioPython tools/capture_bench.py --gateway COM_GATEWAY --client COM_CLIENT --seconds 1200 --out logs/test/RUN-YYYYMMDD-HHMMSS-pair --metadata PRIVATE_RUN_METADATA.json
+```
+
+Metadata identifies actual flashed commit/binSHA, operator/unit aliases, role/IDs, PHY, instrument/authorization and backup references; private backups/USB identifiers are not publication artifacts. Preserve raw `.log`, `.chunks.jsonl` and schema2 capture.json. Check COMPLETE/error-free state, hashes/offsets/timestamps, fragment/empty flags, BOOT continuity and same-connection final STATUS; a duration alone proves no packet count. Ctrl-C returns130/INTERRUPTED, error1, CLI error2. Initial RUNNING marks unclean termination; unjoined writer evidence is not finalized. Default final1s status tail may be insufficient under backpressure; missing final status blocks the evidence gate rather than fabricating drops0.
+
+[LOGGING_GUIDE CSV specification](LOGGING_GUIDE.md#iteration013-capture-integrity-and-csv-extraction-specification) defines events/transactions, identity association, host observation versus device time and denominators. In particular PDR=|R intersect T|/|T| and transaction success=|C|/|A|, with start failures in A and explicit boundary exclusions. These are planned extraction rules, not an automatic RF evaluator or measured results.
+
+Remaining dependencies: second MCU, safe RF termination/Moxon plan, verified wiring/revisions/power/USB, instruments, jurisdiction/site authorization, ERR-021 disposition and controlled replay/corrupt-NVS fixtures. Next action is the backed-up MCU-only procedure once a board is identified, not M3 or more speculative firmware abstractions. All prior engineering evidence remains intact.

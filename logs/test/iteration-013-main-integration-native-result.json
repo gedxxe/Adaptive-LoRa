@@ -1,0 +1,9 @@
+{
+  "command": "pio test -e native",
+  "launcher": "<PIO_EXECUTABLE>",
+  "exit_code": 0,
+  "elapsed_seconds": 215.113,
+  "log": "logs/test/iteration-013-main-integration-native.log",
+  "output_policy": "Full stdout/stderr; local workspace/user/PlatformIO paths replaced with disclosed placeholders; line endings and trailing display whitespace normalized. Raw retained privately under ignored .pio/integration-013-main/.",
+  "physical_validation": "NOT RUN"
+}

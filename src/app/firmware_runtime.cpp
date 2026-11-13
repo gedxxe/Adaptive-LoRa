@@ -3,15 +3,17 @@
 #include <esp_system.h>
 #include <esp_random.h>
 #include <cstdio>
-#include <inttypes.h>
+#include <cinttypes>
 
 namespace adaptive_lora {
 namespace {
 uint32_t freshBootId(uint32_t previous) {
-    // ESP32 hardware entropy source; RF/Wi-Fi is not enabled by this application.
-    uint32_t value;
-    do { value = esp_random(); } while (value == 0 || value == previous);
-    return value;
+    // Valid-value bound only; entropy quality depends on ESP32-C3 SDK setup.
+    for (unsigned attempt = 0; attempt < kBootIdAttempts; ++attempt) {
+        const uint32_t value = esp_random();
+        if (value != 0 && value != previous) return value;
+    }
+    return 0;
 }
 }
 void FirmwareRuntime::showConfig(const DeviceConfig& c, const char* scope, const char* validity) {
@@ -90,17 +92,19 @@ void FirmwareRuntime::command(ConsoleAction action) {
 void FirmwareRuntime::loop() {
     const uint32_t now = micros();
     const auto event = radio_.poll(now);
-    if (gateway_) gateway_->update(now, event, !rebootPending_);
-    if (client_) client_->update(now, event, !rebootPending_);
+    // Radio calls may wait; apps must classify the completed event at fresh time.
+    const uint32_t appNow = micros();
+    if (gateway_) gateway_->update(appNow, event, !rebootPending_);
+    if (client_) client_->update(appNow, event, !rebootPending_);
     for (unsigned budget = 0; budget < 64 && Serial.available(); ++budget)
         command(console_.feed(static_cast<char>(Serial.read())));
     if (rebootPending_ && !rebootStopped_ && !radio_.transmitting()) {
         const int16_t code = radio_.stop();
         log_.event(code ? "RADIO_ERROR" : "REBOOT", code ? "standby_failed_restarting" : "radio_stopped", nullptr, nullptr, code);
         rebootStopped_ = true;
-        rebootAt_ = now + 100000;
+        rebootAt_ = micros() + 100000;
     }
     log_.drain();
-    if (rebootStopped_ && deadlineReached(now, rebootAt_)) ESP.restart();
+    if (rebootStopped_ && deadlineReached(micros(), rebootAt_)) ESP.restart();
 }
 }  // namespace adaptive_lora

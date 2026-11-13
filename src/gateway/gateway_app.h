@@ -9,6 +9,9 @@ public:
     void begin(uint32_t now);
     void update(uint32_t now, const RadioEvent& event, bool allowNew = true);
 private:
+    bool renewSession(uint32_t now);
+    bool sessionFailed_ = false;
+    uint32_t sessionRetryAt_ = 0;
     void listen(uint32_t now);
     DeviceConfig config_;
     RadioTransport& radio_;

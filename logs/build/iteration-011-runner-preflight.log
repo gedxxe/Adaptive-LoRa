@@ -1,0 +1,4 @@
+Restricted attachment/repository inspection: no stdout/stderr returned; running session interrupted with Ctrl-C; final exit=1.
+Restricted attachment read with login=false: no stdout/stderr returned; interrupted with Ctrl-C; final exit=1.
+Normal host-shell read retry: exit=0; actual request/baseline output inspected.
+Root cause UNKNOWN; no firmware/source action from the stalled read-only requests.

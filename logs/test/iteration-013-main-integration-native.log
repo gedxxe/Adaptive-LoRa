@@ -1,0 +1,367 @@
+Verbosity level can be increased via `-v, -vv, or -vvv` option
+Collected 10 tests
+
+Processing test_app_integration in native environment
+--------------------------------------------------------------------------------
+Building...
+Testing...
+test\test_app_integration\test_main.cpp:518: test_matching_transaction	[PASSED]
+test\test_app_integration\test_main.cpp:519: test_hello_loss_timeout_and_next_new_identity	[PASSED]
+test\test_app_integration\test_main.cpp:520: test_ack_loss_has_no_automatic_retry	[PASSED]
+test\test_app_integration\test_main.cpp:521: test_same_packet_replay_preserves_identity_and_reacks_once	[PASSED]
+test\test_app_integration\test_main.cpp:522: test_delayed_ack_before_deadline	[PASSED]
+test\test_app_integration\test_main.cpp:523: test_ack_at_deadline_is_rejected	[PASSED]
+test\test_app_integration\test_main.cpp:524: test_ack_after_deadline_is_rejected	[PASSED]
+test\test_app_integration\test_main.cpp:525: test_previous_ack_during_new_transaction_is_rejected	[PASSED]
+test\test_app_integration\test_main.cpp:526: test_duplicate_ack_does_not_complete_twice	[PASSED]
+test\test_app_integration\test_main.cpp:527: test_wrong_echo_source	[PASSED]
+test\test_app_integration\test_main.cpp:527: test_wrong_echo_boot	[PASSED]
+test\test_app_integration\test_main.cpp:527: test_wrong_echo_sequence	[PASSED]
+test\test_app_integration\test_main.cpp:528: test_wrong_gateway_sender	[PASSED]
+test\test_app_integration\test_main.cpp:528: test_wrong_ack_network_or_destination	[PASSED]
+test\test_app_integration\test_main.cpp:529: test_malformed_hellos_rejected_then_valid_recovers	[PASSED]
+test\test_app_integration\test_main.cpp:530: test_malformed_acks_do_not_cancel_outstanding_identity	[PASSED]
+test\test_app_integration\test_main.cpp:531: test_wrong_message_for_each_role	[PASSED]
+test\test_app_integration\test_main.cpp:532: test_client_tx_start_failure_uses_new_identity_next_time	[PASSED]
+test\test_app_integration\test_main.cpp:533: test_client_tx_error_never_counts_as_ack_success	[PASSED]
+test\test_app_integration\test_main.cpp:534: test_gateway_ack_start_failure_then_same_hello_recovery	[PASSED]
+test\test_app_integration\test_main.cpp:535: test_gateway_tx_error_then_same_hello_recovery	[PASSED]
+test\test_app_integration\test_main.cpp:536: test_client_rx_recovery_backoff_and_limit	[PASSED]
+test\test_app_integration\test_main.cpp:537: test_gateway_rx_recovery_backoff_and_limit	[PASSED]
+test\test_app_integration\test_main.cpp:538: test_receive_errors_preserve_ack_deadline	[PASSED]
+test\test_app_integration\test_main.cpp:539: test_repeated_transactions_200	[PASSED]
+test\test_app_integration\test_main.cpp:540: test_client_reboot_rejects_prior_session_ack	[PASSED]
+test\test_app_integration\test_main.cpp:541: test_gateway_reboot_loses_volatile_history_but_echo_stays_correct	[PASSED]
+test\test_app_integration\test_main.cpp:542: test_retained_old_session_duplicate_keeps_original_echo	[PASSED]
+test\test_app_integration\test_main.cpp:543: test_32_bit_microsecond_wrap_during_ack_wait	[PASSED]
+test\test_app_integration\test_main.cpp:544: test_maximum_interval_uses_64_bit_time	[PASSED]
+test\test_app_integration\test_main.cpp:545: test_32_bit_microsecond_wrap_during_receive_recovery	[PASSED]
+test\test_app_integration\test_main.cpp:546: test_stop_gate_prevents_new_client_tx_and_finishes_active_tx	[PASSED]
+test\test_app_integration\test_main.cpp:547: test_stop_gate_prevents_gateway_ack	[PASSED]
+test\test_app_integration\test_main.cpp:548: test_sequence_exhaustion_in_actual_apps_changes_both_sessions	[PASSED]
+test\test_app_integration\test_main.cpp:549: test_stale_sequence_is_not_accepted_or_reacked	[PASSED]
+test\test_app_integration\test_main.cpp:550: test_out_of_order_sequence_accepted_once	[PASSED]
+test\test_app_integration\test_main.cpp:551: test_unavailable_transport_never_starts_hello	[PASSED]
+test\test_app_integration\test_main.cpp:552: test_max_payload_replay_is_byte_identical	[PASSED]
+----------- native:test_app_integration [PASSED] Took 45.20 seconds -----------
+
+Processing test_config_store in native environment
+--------------------------------------------------------------------------------
+Building...
+Testing...
+test\test_config_store\test_main.cpp:361: test_load_valid_client_and_preserved_fields	[PASSED]
+test\test_config_store\test_main.cpp:362: test_load_valid_gateway	[PASSED]
+test\test_config_store\test_main.cpp:363: test_load_begin_failure_has_no_end_or_reads	[PASSED]
+test\test_config_store\test_main.cpp:364: test_load_missing_key	[PASSED]
+test\test_config_store\test_main.cpp:365: test_load_empty_blob	[PASSED]
+test\test_config_store\test_main.cpp:366: test_load_all_undersized_blobs_close_without_read	[PASSED]
+test\test_config_store\test_main.cpp:367: test_load_oversized_lengths_never_read_buffer	[PASSED]
+test\test_config_store\test_main.cpp:368: test_load_all_short_read_counts_leave_output_unchanged	[PASSED]
+test\test_config_store\test_main.cpp:369: test_load_overreported_read_count_is_rejected	[PASSED]
+test\test_config_store\test_main.cpp:370: test_load_invalid_magic_with_valid_hash	[PASSED]
+test\test_config_store\test_main.cpp:371: test_load_invalid_checksum	[PASSED]
+test\test_config_store\test_main.cpp:372: test_load_valid_hash_unsupported_schema	[PASSED]
+test\test_config_store\test_main.cpp:373: test_load_valid_hash_invalid_role	[PASSED]
+test\test_config_store\test_main.cpp:374: test_load_valid_hash_invalid_network	[PASSED]
+test\test_config_store\test_main.cpp:375: test_load_valid_hash_invalid_node	[PASSED]
+test\test_config_store\test_main.cpp:376: test_load_valid_hash_invalid_gateway	[PASSED]
+test\test_config_store\test_main.cpp:377: test_load_gateway_id_mismatch	[PASSED]
+test\test_config_store\test_main.cpp:378: test_load_client_id_conflict	[PASSED]
+test\test_config_store\test_main.cpp:379: test_load_valid_hash_invalid_intervals	[PASSED]
+test\test_config_store\test_main.cpp:380: test_load_each_reserved_byte_with_valid_hash	[PASSED]
+test\test_config_store\test_main.cpp:381: test_load_corruption_at_every_blob_byte	[PASSED]
+test\test_config_store\test_main.cpp:382: test_load_begin_failure_precedes_length_and_decode_errors	[PASSED]
+test\test_config_store\test_main.cpp:383: test_load_length_failure_precedes_corruption	[PASSED]
+test\test_config_store\test_main.cpp:384: test_load_short_read_precedes_decode_failure	[PASSED]
+test\test_config_store\test_main.cpp:385: test_load_corruption_then_schema_then_role_error_priority	[PASSED]
+test\test_config_store\test_main.cpp:386: test_load_readonly_exact_namespace_key_and_order	[PASSED]
+test\test_config_store\test_main.cpp:387: test_save_client_exact_golden_blob_and_verification_order	[PASSED]
+test\test_config_store\test_main.cpp:388: test_save_gateway_roundtrip_and_exact_size	[PASSED]
+test\test_config_store\test_main.cpp:389: test_save_all_invalid_configs_rejected_before_storage	[PASSED]
+test\test_config_store\test_main.cpp:390: test_save_validation_error_precedes_open_error	[PASSED]
+test\test_config_store\test_main.cpp:391: test_save_open_failure_has_no_end_or_readback	[PASSED]
+test\test_config_store\test_main.cpp:392: test_save_zero_write_result	[PASSED]
+test\test_config_store\test_main.cpp:393: test_save_all_short_write_counts_close_without_readback	[PASSED]
+test\test_config_store\test_main.cpp:394: test_save_overreported_write_count_is_rejected	[PASSED]
+test\test_config_store\test_main.cpp:395: test_save_write_failure_precedes_scripted_readback_failure	[PASSED]
+test\test_config_store\test_main.cpp:396: test_save_write_failure_can_follow_backing_mutation_without_success	[PASSED]
+test\test_config_store\test_main.cpp:397: test_save_readback_open_failure_no_extra_end	[PASSED]
+test\test_config_store\test_main.cpp:398: test_save_readback_all_wrong_lengths	[PASSED]
+test\test_config_store\test_main.cpp:399: test_save_readback_all_short_read_counts	[PASSED]
+test\test_config_store\test_main.cpp:400: test_save_readback_overreported_count	[PASSED]
+test\test_config_store\test_main.cpp:401: test_save_readback_invalid_magic_with_valid_hash	[PASSED]
+test\test_config_store\test_main.cpp:402: test_save_readback_checksum_corruption	[PASSED]
+test\test_config_store\test_main.cpp:403: test_save_readback_unsupported_schema_propagates	[PASSED]
+test\test_config_store\test_main.cpp:404: test_save_readback_invalid_role_propagates	[PASSED]
+test\test_config_store\test_main.cpp:405: test_save_readback_invalid_device_ids_propagate	[PASSED]
+test\test_config_store\test_main.cpp:406: test_save_readback_reserved_bytes_propagate	[PASSED]
+test\test_config_store\test_main.cpp:407: test_save_readback_invalid_interval_propagates	[PASSED]
+test\test_config_store\test_main.cpp:408: test_save_different_valid_readback_reports_verify_failed	[PASSED]
+test\test_config_store\test_main.cpp:409: test_save_does_not_modify_input_configuration	[PASSED]
+test\test_config_store\test_main.cpp:410: test_failed_readback_reports_failure_even_if_new_bytes_are_present	[PASSED]
+test\test_config_store\test_main.cpp:411: test_save_client_then_load	[PASSED]
+test\test_config_store\test_main.cpp:412: test_save_gateway_then_load	[PASSED]
+test\test_config_store\test_main.cpp:413: test_save_updated_ids_and_hello_interval	[PASSED]
+test\test_config_store\test_main.cpp:414: test_invalid_save_preserves_existing_blob_and_key	[PASSED]
+test\test_config_store\test_main.cpp:415: test_failed_then_successful_sessions_do_not_leak_handles	[PASSED]
+test\test_config_store\test_main.cpp:416: test_repeated_role_updates_and_loads	[PASSED]
+------------- native:test_config_store [PASSED] Took 5.69 seconds -------------
+
+Processing test_firmware_runtime in native environment
+--------------------------------------------------------------------------------
+Building...
+Testing...
+test\test_firmware_runtime\test_main.cpp:405: test_gateway_boot_order_and_exclusive_activation	[PASSED]
+test\test_firmware_runtime\test_main.cpp:406: test_client_boot_schedules_first_hello_after_one_second	[PASSED]
+test\test_firmware_runtime\test_main.cpp:407: test_missing_config_provisioning_poll_has_no_hardware_access	[PASSED]
+test\test_firmware_runtime\test_main.cpp:408: test_corrupt_config_boot_fails_safe	[PASSED]
+test\test_firmware_runtime\test_main.cpp:409: test_unsupported_schema_boot_fails_safe	[PASSED]
+test\test_firmware_runtime\test_main.cpp:410: test_invalid_role_boot_fails_safe	[PASSED]
+test\test_firmware_runtime\test_main.cpp:411: test_invalid_network_and_device_ids_boot_fail_safe	[PASSED]
+test\test_firmware_runtime\test_main.cpp:412: test_nvs_open_failure_boot_fails_safe	[PASSED]
+test\test_firmware_runtime\test_main.cpp:413: test_short_read_boot_fails_safe	[PASSED]
+test\test_firmware_runtime\test_main.cpp:414: test_radio_init_failure_never_constructs_either_app	[PASSED]
+test\test_firmware_runtime\test_main.cpp:415: test_header_or_crc_init_failure_prevents_activation	[PASSED]
+test\test_firmware_runtime\test_main.cpp:416: test_provision_gateway_save_is_inactive_until_new_runtime_boot	[PASSED]
+test\test_firmware_runtime\test_main.cpp:417: test_provision_client_save_is_inactive_until_new_runtime_boot	[PASSED]
+test\test_firmware_runtime\test_main.cpp:418: test_client_staging_and_save_preserve_active_role_and_ids	[PASSED]
+test\test_firmware_runtime\test_main.cpp:419: test_gateway_staging_client_preserves_active_gateway	[PASSED]
+test\test_firmware_runtime\test_main.cpp:420: test_invalid_config_save_rejected_without_storage_access	[PASSED]
+test\test_firmware_runtime\test_main.cpp:421: test_storage_write_failure_dispatches_exact_error	[PASSED]
+test\test_firmware_runtime\test_main.cpp:422: test_storage_readback_failure_does_not_activate_saved_role	[PASSED]
+test\test_firmware_runtime\test_main.cpp:423: test_valid_different_readback_reports_verify_error	[PASSED]
+test\test_firmware_runtime\test_main.cpp:424: test_serial_partial_command_spans_loops	[PASSED]
+test\test_firmware_runtime\test_main.cpp:425: test_serial_input_budget_is_exactly_64_bytes	[PASSED]
+test\test_firmware_runtime\test_main.cpp:426: test_multiple_serial_commands_cr_lf_and_help_dispatch	[PASSED]
+test\test_firmware_runtime\test_main.cpp:427: test_crlf_save_dispatches_only_once	[PASSED]
+test\test_firmware_runtime\test_main.cpp:428: test_invalid_command_and_number_do_not_mutate_or_reboot	[PASSED]
+test\test_firmware_runtime\test_main.cpp:429: test_control_byte_line_cannot_execute_embedded_reboot	[PASSED]
+test\test_firmware_runtime\test_main.cpp:430: test_overflow_line_recovery_keeps_following_status	[PASSED]
+test\test_firmware_runtime\test_main.cpp:431: test_gateway_receives_hello_and_only_gateway_sends_ack	[PASSED]
+test\test_firmware_runtime\test_main.cpp:432: test_client_receives_matching_ack_and_only_client_accepts_it	[PASSED]
+test\test_firmware_runtime\test_main.cpp:433: test_gateway_receive_start_fault_is_reported_then_recovers	[PASSED]
+test\test_firmware_runtime\test_main.cpp:434: test_runtime_dispatches_receive_integrity_error	[PASSED]
+test\test_firmware_runtime\test_main.cpp:435: test_idle_provisioning_reboot_stop_is_hardware_noop	[PASSED]
+test\test_firmware_runtime\test_main.cpp:436: test_reboot_while_receiving_stops_once	[PASSED]
+test\test_firmware_runtime\test_main.cpp:437: test_reboot_waits_for_actual_tx_done_before_stop	[PASSED]
+test\test_firmware_runtime\test_main.cpp:438: test_reboot_waits_for_driver_tx_timeout_and_then_stops	[PASSED]
+test\test_firmware_runtime\test_main.cpp:439: test_reboot_stop_failure_logs_and_still_requests_reset	[PASSED]
+test\test_firmware_runtime\test_main.cpp:440: test_repeated_reboot_commands_do_not_move_armed_deadline	[PASSED]
+test\test_firmware_runtime\test_main.cpp:441: test_reset_deadline_before_at_and_after_expiration	[PASSED]
+test\test_firmware_runtime\test_main.cpp:442: test_reset_deadline_crosses_uint32_micros_wrap	[PASSED]
+test\test_firmware_runtime\test_main.cpp:443: test_reboot_pending_blocks_new_client_transactions	[PASSED]
+test\test_firmware_runtime\test_main.cpp:444: test_due_app_update_precedes_same_loop_reboot_command	[PASSED]
+test\test_firmware_runtime\test_main.cpp:445: test_reset_does_not_wait_for_unavailable_serial_output	[PASSED]
+test\test_firmware_runtime\test_main.cpp:446: test_partial_serial_write_can_leave_boot_log_undrained_at_reset	[PASSED]
+test\test_firmware_runtime\test_main.cpp:447: test_logging_queue_drop_is_bounded_and_status_reports_it	[PASSED]
+test\test_firmware_runtime\test_main.cpp:448: test_zero_random_values_are_rejected_by_actual_boot_generator	[PASSED]
+test\test_firmware_runtime\test_main.cpp:449: test_gateway_runtime_generator_rotates_session_on_sequence_exhaustion	[PASSED]
+test\test_firmware_runtime\test_main.cpp:450: test_simulated_reboot_loads_saved_role_and_new_session	[PASSED]
+test\test_firmware_runtime\test_main.cpp:451: test_status_preserves_reset_reason_version_and_unset_diagnostics	[PASSED]
+----------- native:test_firmware_runtime [PASSED] Took 25.57 seconds -----------
+
+Processing test_frame_codec in native environment
+--------------------------------------------------------------------------------
+Building...
+Testing...
+test\test_frame_codec\test_main.cpp:133: test_golden_empty_hello_layout	[PASSED]
+test\test_frame_codec\test_main.cpp:134: test_payload_minimum_and_maximum	[PASSED]
+test\test_frame_codec\test_main.cpp:135: test_encoder_capacity_and_null	[PASSED]
+test\test_frame_codec\test_main.cpp:136: test_all_header_truncations	[PASSED]
+test\test_frame_codec\test_main.cpp:137: test_payload_truncation_and_excess	[PASSED]
+test\test_frame_codec\test_main.cpp:138: test_oversize_payload_rejected	[PASSED]
+test\test_frame_codec\test_main.cpp:139: test_magic	[PASSED]
+test\test_frame_codec\test_main.cpp:140: test_version	[PASSED]
+test\test_frame_codec\test_main.cpp:141: test_type_and_future_types	[PASSED]
+test\test_frame_codec\test_main.cpp:142: test_header_length	[PASSED]
+test\test_frame_codec\test_main.cpp:143: test_reserved_fields	[PASSED]
+test\test_frame_codec\test_main.cpp:144: test_network_filter	[PASSED]
+test\test_frame_codec\test_main.cpp:145: test_destination_and_source_ranges	[PASSED]
+test\test_frame_codec\test_main.cpp:146: test_nonzero_session_and_m2_fields	[PASSED]
+test\test_frame_codec\test_main.cpp:147: test_ack_echo_layout_and_match	[PASSED]
+test\test_frame_codec\test_main.cpp:148: test_ack_wrong_identity_and_sender	[PASSED]
+test\test_frame_codec\test_main.cpp:149: test_ack_invalid_length_status_and_fields	[PASSED]
+test\test_frame_codec\test_main.cpp:150: test_failed_decode_does_not_mutate_output	[PASSED]
+-------------- native:test_frame_codec [PASSED] Took 5.84 seconds --------------
+
+Processing test_provisioning_console in native environment
+--------------------------------------------------------------------------------
+Building...
+Testing...
+test\test_provisioning_console\test_main.cpp:93: test_command_contract	[PASSED]
+test\test_provisioning_console\test_main.cpp:93: test_gateway_and_client_workflow	[PASSED]
+test\test_provisioning_console\test_main.cpp:94: test_invalid_numeric_input_preserves_staging	[PASSED]
+test\test_provisioning_console\test_main.cpp:94: test_full_network_range_and_interval	[PASSED]
+test\test_provisioning_console\test_main.cpp:95: test_unknown_extra_and_partial_commands	[PASSED]
+test\test_provisioning_console\test_main.cpp:95: test_overflow_discards_entire_line_then_recovers	[PASSED]
+test\test_provisioning_console\test_main.cpp:96: test_crlf_empty_and_spacing	[PASSED]
+test\test_provisioning_console\test_main.cpp:96: test_staging_does_not_change_loaded_config	[PASSED]
+test\test_provisioning_console\test_main.cpp:97: test_invalid_config_cannot_encode_for_save	[PASSED]
+test\test_provisioning_console\test_main.cpp:97: test_binary_input_rejected	[PASSED]
+--------- native:test_provisioning_console [PASSED] Took 5.50 seconds ---------
+
+Processing test_radio_driver in native environment
+--------------------------------------------------------------------------------
+Building...
+Testing...
+test\test_radio_driver\test_main.cpp:434: test_init_success_and_order	[PASSED]
+test\test_radio_driver\test_main.cpp:435: test_init_radio_failure_short_circuits	[PASSED]
+test\test_radio_driver\test_main.cpp:436: test_init_header_failure_short_circuits	[PASSED]
+test\test_radio_driver\test_main.cpp:437: test_init_crc_failure_does_not_enable_irq	[PASSED]
+test\test_radio_driver\test_main.cpp:438: test_failed_init_rejects_operations_and_poll	[PASSED]
+test\test_radio_driver\test_main.cpp:439: test_init_retry_after_failure	[PASSED]
+test\test_radio_driver\test_main.cpp:440: test_repeated_begin_failure_retains_prior_initialized_flag	[PASSED]
+test\test_radio_driver\test_main.cpp:441: test_uninitialized_poll_ignores_irq	[PASSED]
+test\test_radio_driver\test_main.cpp:442: test_receive_before_init	[PASSED]
+test\test_radio_driver\test_main.cpp:443: test_receive_while_transmitting_preserves_tx	[PASSED]
+test\test_radio_driver\test_main.cpp:444: test_receive_start_clears_latch_and_enters_rx	[PASSED]
+test\test_radio_driver\test_main.cpp:445: test_receive_start_failure_and_recovery	[PASSED]
+test\test_radio_driver\test_main.cpp:446: test_receive_restart_while_receiving	[PASSED]
+test\test_radio_driver\test_main.cpp:447: test_transmit_null_buffer	[PASSED]
+test\test_radio_driver\test_main.cpp:448: test_transmit_every_short_length	[PASSED]
+test\test_radio_driver\test_main.cpp:449: test_transmit_oversize_lengths	[PASSED]
+test\test_radio_driver\test_main.cpp:450: test_transmit_maximum_valid_packet_and_order	[PASSED]
+test\test_radio_driver\test_main.cpp:451: test_transmit_before_init	[PASSED]
+test\test_radio_driver\test_main.cpp:452: test_transmit_while_transmitting_preserves_packet_and_deadline	[PASSED]
+test\test_radio_driver\test_main.cpp:453: test_transmit_standby_failure	[PASSED]
+test\test_radio_driver\test_main.cpp:454: test_transmit_start_failure_then_receive_recovery	[PASSED]
+test\test_radio_driver\test_main.cpp:455: test_transmit_from_rx_and_fault	[PASSED]
+test\test_radio_driver\test_main.cpp:456: test_airtime_forwards_length_and_result	[PASSED]
+test\test_radio_driver\test_main.cpp:457: test_idle_poll_does_not_touch_hardware	[PASSED]
+test\test_radio_driver\test_main.cpp:458: test_tx_poll_no_pending_irq	[PASSED]
+test\test_radio_driver\test_main.cpp:459: test_rx_poll_no_pending_irq	[PASSED]
+test\test_radio_driver\test_main.cpp:460: test_latched_irq_with_low_gpio_is_consumed	[PASSED]
+test\test_radio_driver\test_main.cpp:461: test_high_gpio_without_latched_irq_is_consumed	[PASSED]
+test\test_radio_driver\test_main.cpp:462: test_tx_ignores_unrelated_and_zero_flags	[PASSED]
+test\test_radio_driver\test_main.cpp:463: test_tx_done_and_completion_order	[PASSED]
+test\test_radio_driver\test_main.cpp:464: test_tx_hardware_timeout_keeps_idle_after_successful_finish	[PASSED]
+test\test_radio_driver\test_main.cpp:465: test_tx_done_and_timeout_prefers_timeout	[PASSED]
+test\test_radio_driver\test_main.cpp:466: test_tx_finish_failure_and_stop_recovery	[PASSED]
+test\test_radio_driver\test_main.cpp:467: test_tx_finish_failure_overrides_timeout_flag	[PASSED]
+test\test_radio_driver\test_main.cpp:468: test_tx_deadline_immediately_before_expiration	[PASSED]
+test\test_radio_driver\test_main.cpp:469: test_tx_deadline_at_expiration	[PASSED]
+test\test_radio_driver\test_main.cpp:470: test_tx_deadline_immediately_after_expiration	[PASSED]
+test\test_radio_driver\test_main.cpp:471: test_tx_deadline_precedes_pending_tx_done	[PASSED]
+test\test_radio_driver\test_main.cpp:472: test_tx_deadline_standby_failure_and_receive_recovery	[PASSED]
+test\test_radio_driver\test_main.cpp:473: test_tx_deadline_across_uint32_wrap	[PASSED]
+test\test_radio_driver\test_main.cpp:474: test_tx_deadline_after_uint32_wrap	[PASSED]
+test\test_radio_driver\test_main.cpp:475: test_irrelevant_irq_does_not_extend_tx_deadline	[PASSED]
+test\test_radio_driver\test_main.cpp:476: test_rx_minimum_packet_and_call_order	[PASSED]
+test\test_radio_driver\test_main.cpp:477: test_rx_maximum_packet_no_buffer_overrun	[PASSED]
+test\test_radio_driver\test_main.cpp:478: test_rx_timeout_no_payload_or_metrics	[PASSED]
+test\test_radio_driver\test_main.cpp:479: test_rx_crc_error_without_rx_done	[PASSED]
+test\test_radio_driver\test_main.cpp:480: test_rx_header_error_without_valid_header	[PASSED]
+test\test_radio_driver\test_main.cpp:481: test_rx_header_error_with_valid_header_and_rx_done_is_accepted	[PASSED]
+test\test_radio_driver\test_main.cpp:482: test_rx_header_error_with_valid_header_alone_waits	[PASSED]
+test\test_radio_driver\test_main.cpp:483: test_rx_crc_overrides_valid_header_and_rx_done	[PASSED]
+test\test_radio_driver\test_main.cpp:484: test_rx_timeout_precedes_crc_and_data	[PASSED]
+test\test_radio_driver\test_main.cpp:485: test_rx_ignores_nonterminal_flags	[PASSED]
+test\test_radio_driver\test_main.cpp:486: test_rx_every_short_packet_length	[PASSED]
+test\test_radio_driver\test_main.cpp:487: test_rx_oversize_lengths_never_read_buffer	[PASSED]
+test\test_radio_driver\test_main.cpp:488: test_rx_read_failure_propagates_without_metrics	[PASSED]
+test\test_radio_driver\test_main.cpp:489: test_rx_read_crc_failure_is_classified	[PASSED]
+test\test_radio_driver\test_main.cpp:490: test_rx_read_timeout_retains_generic_error_classification	[PASSED]
+test\test_radio_driver\test_main.cpp:491: test_rx_standby_failure_skips_payload_and_finish	[PASSED]
+test\test_radio_driver\test_main.cpp:492: test_rx_finish_failure_retains_successful_read_metrics	[PASSED]
+test\test_radio_driver\test_main.cpp:493: test_rx_finish_failure_overrides_timeout_or_crc	[PASSED]
+test\test_radio_driver\test_main.cpp:494: test_rx_finish_failure_overrides_length_error	[PASSED]
+test\test_radio_driver\test_main.cpp:495: test_rx_finish_failure_overrides_read_error	[PASSED]
+test\test_radio_driver\test_main.cpp:496: test_rx_recovery_after_cleanup_failure	[PASSED]
+test\test_radio_driver\test_main.cpp:497: test_metrics_not_reused_after_previous_success	[PASSED]
+test\test_radio_driver\test_main.cpp:498: test_stop_before_initialization	[PASSED]
+test\test_radio_driver\test_main.cpp:499: test_stop_success_from_rx	[PASSED]
+test\test_radio_driver\test_main.cpp:500: test_stop_success_from_tx_cancels_deadline	[PASSED]
+test\test_radio_driver\test_main.cpp:501: test_stop_success_from_idle	[PASSED]
+test\test_radio_driver\test_main.cpp:502: test_stop_failure_from_rx_and_successful_stop_recovery	[PASSED]
+test\test_radio_driver\test_main.cpp:503: test_stop_failure_from_tx	[PASSED]
+test\test_radio_driver\test_main.cpp:504: test_repeated_rx_tx_transactions_reset_events_and_deadlines	[PASSED]
+------------- native:test_radio_driver [PASSED] Took 5.58 seconds -------------
+
+Processing test_role_config in native environment
+--------------------------------------------------------------------------------
+Building...
+Testing...
+test\test_role_config\test_main.cpp:113: test_unset_and_unknown_role	[PASSED]
+test\test_role_config\test_main.cpp:113: test_valid_client_and_gateway	[PASSED]
+test\test_role_config\test_main.cpp:114: test_role_id_constraints	[PASSED]
+test\test_role_config\test_main.cpp:114: test_network_full_range	[PASSED]
+test\test_role_config\test_main.cpp:115: test_reserved_ids	[PASSED]
+test\test_role_config\test_main.cpp:115: test_schema_and_interval	[PASSED]
+test\test_role_config\test_main.cpp:116: test_blob_roundtrip	[PASSED]
+test\test_role_config\test_main.cpp:116: test_blob_corruption_each_byte	[PASSED]
+test\test_role_config\test_main.cpp:117: test_blob_partial_missing_oversize_and_invalid_save	[PASSED]
+test\test_role_config\test_main.cpp:118: test_valid_integrity_blob_unsupported_schema	[PASSED]
+test\test_role_config\test_main.cpp:119: test_valid_integrity_blob_unsupported_role	[PASSED]
+test\test_role_config\test_main.cpp:120: test_valid_integrity_blob_invalid_ids	[PASSED]
+test\test_role_config\test_main.cpp:121: test_valid_integrity_blob_reserved_bytes	[PASSED]
+------------- native:test_role_config [PASSED] Took 10.03 seconds -------------
+
+Processing test_runtime_reliability in native environment
+--------------------------------------------------------------------------------
+Building...
+Testing...
+test\test_runtime_reliability\test_main.cpp:236: test_permanent_zero_initial_client_is_bounded_and_diagnosable	[PASSED]
+test\test_runtime_reliability\test_main.cpp:237: test_permanent_zero_initial_gateway_suppresses_ack	[PASSED]
+test\test_runtime_reliability\test_main.cpp:238: test_delayed_rx_cannot_accept_ack_after_deadline	[PASSED]
+test\test_runtime_reliability\test_main.cpp:239: test_tx_done_processing_delay_anchors_ack_window_after_poll	[PASSED]
+test\test_runtime_reliability\test_main.cpp:240: test_slow_config_save_preserves_full_post_stop_reboot_interval	[PASSED]
+test\test_runtime_reliability\test_main.cpp:241: test_slow_stop_preserves_full_post_stop_reboot_interval	[PASSED]
+test\test_runtime_reliability\test_main.cpp:242: test_reset_evaluates_fresh_time_after_blocked_serial_write	[PASSED]
+test\test_runtime_reliability\test_main.cpp:243: test_reset_evaluates_fresh_time_after_unavailable_output_wait	[PASSED]
+test\test_runtime_reliability\test_main.cpp:244: test_save_and_reboot_deadline_remain_correct_across_wrap	[PASSED]
+test\test_runtime_reliability\test_main.cpp:245: test_delayed_failed_rx_retains_existing_attempt_start_recovery_policy	[PASSED]
+test\test_runtime_reliability\test_main.cpp:246: test_valid_max_id_after_zero_prefix	[PASSED]
+test\test_runtime_reliability\test_main.cpp:247: test_last_attempt_and_next_batch_boundary	[PASSED]
+test\test_runtime_reliability\test_main.cpp:248: test_failed_client_retries_once_per_second_then_recovers	[PASSED]
+test\test_runtime_reliability\test_main.cpp:249: test_failed_gateway_recovers_without_reinitializing_services	[PASSED]
+test\test_runtime_reliability\test_main.cpp:250: test_identity_recovery_is_suppressed_while_reboot_pending	[PASSED]
+test\test_runtime_reliability\test_main.cpp:251: test_identity_retry_deadline_crosses_micros_wrap	[PASSED]
+test\test_runtime_reliability\test_main.cpp:252: test_counter_renewal_preserves_exhausted_identity_on_invalid_result	[PASSED]
+test\test_runtime_reliability\test_main.cpp:253: test_gateway_rollover_zero_previous_and_alternating_fail_then_recover	[PASSED]
+test\test_runtime_reliability\test_main.cpp:254: test_client_rollover_failure_preserves_identity_until_recovery	[PASSED]
+test\test_runtime_reliability\test_main.cpp:255: test_delayed_ack_rejection_across_uint32_wrap	[PASSED]
+test\test_runtime_reliability\test_main.cpp:256: test_serial_wait_defers_ack_timeout_service_until_next_loop	[PASSED]
+test\test_runtime_reliability\test_main.cpp:257: test_save_delay_defers_ack_timeout_but_cannot_accept_late_ack	[PASSED]
+test\test_runtime_reliability\test_main.cpp:258: test_tx_start_delay_remains_inside_existing_driver_deadline_budget	[PASSED]
+test\test_runtime_reliability\test_main.cpp:259: test_delayed_stop_failure_still_resets_after_full_interval	[PASSED]
+--------- native:test_runtime_reliability [PASSED] Took 100.49 seconds ---------
+
+Processing test_sequence_tracker in native environment
+--------------------------------------------------------------------------------
+Building...
+Testing...
+test\test_sequence_tracker\test_main.cpp:62: test_duplicate_identity	[PASSED]
+test\test_sequence_tracker\test_main.cpp:62: test_all_identity_fields_participate	[PASSED]
+test\test_sequence_tracker\test_main.cpp:63: test_out_of_order_window	[PASSED]
+test\test_sequence_tracker\test_main.cpp:63: test_large_jump_and_no_wrap_in_same_session	[PASSED]
+test\test_sequence_tracker\test_main.cpp:64: test_sequence_exhaustion_requires_new_session	[PASSED]
+test\test_sequence_tracker\test_main.cpp:64: test_bounded_session_replacement	[PASSED]
+test\test_sequence_tracker\test_main.cpp:65: test_wrap_safe_deadline	[PASSED]
+----------- native:test_sequence_tracker [PASSED] Took 5.02 seconds -----------
+
+Processing test_serial_logger in native environment
+--------------------------------------------------------------------------------
+Building...
+Testing...
+test\test_serial_logger\test_main.cpp:71: test_queue_bound_and_fifo	[PASSED]
+test\test_serial_logger\test_main.cpp:72: test_backpressure_retains_queued_line_without_write	[PASSED]
+test\test_serial_logger\test_main.cpp:73: test_short_writes_preserve_bytes_and_128_byte_budget	[PASSED]
+test\test_serial_logger\test_main.cpp:74: test_zero_byte_write_does_not_discard_line	[PASSED]
+test\test_serial_logger\test_main.cpp:75: test_oversized_text_counted_without_partial_line	[PASSED]
+test\test_serial_logger\test_main.cpp:76: test_unavailable_metrics_are_na_and_real_formatter_is_used	[PASSED]
+------------- native:test_serial_logger [PASSED] Took 4.81 seconds -------------
+
+=================================== SUMMARY ===================================
+Environment    Test                       Status    Duration
+-------------  -------------------------  --------  ------------
+native         test_app_integration       PASSED    00:00:45.196
+native         test_config_store          PASSED    00:00:05.691
+native         test_firmware_runtime      PASSED    00:00:25.569
+native         test_frame_codec           PASSED    00:00:05.843
+native         test_provisioning_console  PASSED    00:00:05.500
+native         test_radio_driver          PASSED    00:00:05.581
+native         test_role_config           PASSED    00:00:10.033
+native         test_runtime_reliability   PASSED    00:01:40.494
+native         test_sequence_tracker      PASSED    00:00:05.023
+native         test_serial_logger         PASSED    00:00:04.813
+================ 290 test cases: 290 succeeded in 00:03:33.743 ================

@@ -1,0 +1,7 @@
+{
+  "command": "pio run -e esp32c3_supermini",
+  "exit_code": 0,
+  "elapsed_seconds": 32.399,
+  "log": "logs/build/iteration-012-esp32.log",
+  "publication_policy": "Full stdout/stderr except disclosed local-path/EOL/trailing-display normalization; raw retained privately."
+}

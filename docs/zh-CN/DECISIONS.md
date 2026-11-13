@@ -46,3 +46,34 @@
 - 数值 namespace 初始化表达式保留在 NvsConfigStore 且逐字节不变，不解码历史标签。device key、schema 1、24-byte LE/FNV 格式、验证规则不变；固件 0.2.0-alpha.1、协议 1、RadioLib 7.8.1、radio/app/PHY/console/runtime dispatcher 受保护。
 - 保存失败不承诺回滚或持久性；readback 失败原样传播 load 错误，不一律改为 verify。有效但不同配置仍为 nvs_verify_failed。失败 load 不改调用方配置，运行配置仍由原重启流程生效。
 - Native 仅验证模拟响应下的 store 策略，不验证真实 Preferences/NVS/Flash commit、断电、重启/损坏恢复、磨损/保持时间。防御性 encode-false 分支保留但不虚称注入覆盖；依赖等待/分配和硬件门槛保留。
+
+## ADR-014 - 用 native SDK 适配执行唯一生产协调器
+
+- 2026-11-12 接受，iteration011；先审查/方案后修改，见 RUNTIME_AUDIT.md。固件0.2.0-alpha.1/协议1不变。
+- FirmwareRuntime 接受现有 ConfigStorage/RadioHardware 引用，仍拥有实际 store/driver/console/logger/可选 role apps；无新 lifecycle/platform 接口、factory/task 或第二协调器。Esp32Firmware 先构造具体 Preferences/LLCC68 owner，再构造唯一 runtime，生命周期覆盖引用；main 15行仅委托。
+- runtime.cpp/freshBootId 策略原样保留，仅换 C++ cinttypes 兼容旧 host；扩展 native Arduino/esp_timer 适配，提供有界串口输入、micros、reset/reason/raw random。同一生产 app/store/driver/codec/logger 执行；这些 header 不是硬件模型或通用生产 MCU 端口。
+- 固件使用标准 optional；已安装 GCC6.3 缺少该 header 时由项目 namespace alias 选择 experimental optional，仍原地 emplace/bool/dereference，无 namespace std 改写或堆所有权。复现 ERR-017 后在 native 全局启用 UNITY_SUPPORT_64，保留完整64位断言，不截断/删除。
+- 保留既有策略：app update 先于串口解析，未 init 的 poll/stop 不访问硬件，save 仅暂存直到新启动，stop失败仍可 reset，100ms捕获时间 deadline 不等待日志排空，以及非零/previous-ID 拒绝循环；随机源失败活性/跨启动碰撞未解决。
+- 低层响应+实际协调器仅证明软件顺序；对象重建/虚拟reset/raw random/串口容量不证明真实 NVS/重启/USB/熵/SPI/IRQ/RF，不增加后续 MAC 或外部集成。
+
+## ADR-015 — 有界session更新与runtime边界时间刷新
+
+ACCEPTED2026-11-12，Iteration012。修改前审查/有限RED复现见DEPENDENCY_BUDGET_AUDIT.md与ERR-019/020。生产generator每次最多8次raw调用，失败返回0；保留uint32(previous)签名，明确0为失败，不增加平台接口层。SequenceCounter.renew拒绝0/previous，失败保持旧boot与已耗尽计数。两个app记录SESSION_ERROR/boot_id_unavailable、禁止普通TX，每1s按尝试开始时间重试；恢复记录identity_recovered。pending reboot禁恢复。无可预测fallback、逐包NVS写、schema/boot-counter变更或自动熵源启用。有限调用数假设SDK调用返回，不等于实测WCET/唯一性/认证。
+
+实际延迟注入复现过期ACK被接受、ACK窗口起点偏早、reset等待缩短及检查陈旧。poll后刷新app时间，stop完成后起100ms计时，drain后用当前时间判reset；保留app先串口、stop失败仍reset、不等日志排空及driver/app调用内观察/恢复语义，依赖仍不可抢占。旧266源码/结果不变且通过，新增24通过，ESP32 PASS。静态RAM+16、flash+466，无新增显式分配/task/framework，main不变15行。
+
+wire/NVS/版本/PHY/单镜像兼容。IDF5.5.5不支持无条件熵保证，32位ID跨启动可碰撞；持久counter需另行版本化断电/磨损设计。STATIC_ONLY保持0，避免未经验证的栈/容量变更，HAL/SDK分配仍存在。上游BUSY-ramp及SDK锁/flash/USB时延未解决，未建立硬实时或实物验收。
+
+## ADR-016 - 备份门槛与采集证据契约
+
+ACCEPTED2026-11-13，Iteration013。firmware/native及53输入与012逐字节一致，无架构/协议/PHY/watchdog/库改动。流程/软件准备不等于实物验收；硬件/布线/授权、ERR-021及controlled fixture保持阻挡。无radio的合法角色仍先init LLCC68；单MCU持久性用Gateway暂存、radio物理缺席、ROM私有同板备份/恢复。无备份不擦/覆盖配置，secure/encrypted/不兼容layout另审查。ERR-023 SDK可在Runtime前格式化NVS，仅记录并设backup gate，不改SDK。
+
+Capture schema2保留pair/status-only，增加单板、DTR/RTS开口意图（不保证无reset）、time/offset journal、hash/碎行、有界metadata、初末状态/中断错误结果。13 fake-port测试针对复现的false-success和证据缺口（ERR-022），不是新增固件覆盖。末status/tail尽力，缺snapshot/歧义就阻挡，file hash不能消除host读取前丢失，私有备份/身份须审核后方能发布。
+
+CSV使用关闭HELLO cohort，区分A/T/R/ACKstart/done/C；A含启动失败，PDR以R交完成T，分母0/关联未知保留N/A。host观察时间/firmware transaction_us不是实测RF。正常>=200完整HELLO、干预和注入另跑，不虚构/覆盖历史实物记录。
+
+## ADR-017 - Iteration013 合并后的 canonical main 基线
+
+2026-11-13 按用户明确要求接受。通过 PR #3 将已核实 e431e3f8ffd6e2d95dc126bb68e8231723a13c4d 及011/012历史用普通 merge commit 合入 main。初始 main5bc607cd1a86e5d86ff0fc95ba7a3cd31159b861 独有两个合并记录，但其 tree 与共同010祖先相同；无冲突候选 tree 等于013。保留双亲历史、全部历史分支和既有记录；本次仅新增整合文档与实际验证日志，不改生产/测试/工具输入。
+
+成功合并后 main 为规范开发基线，后续分支从最新 main 开始。合并前 ESP32、290 native 和13 fake-serial capture 全部重跑通过，最终核对 merge tree/输入。固件0.2.0-alpha.1、协议1、NVS schema1/namespace/key/24-byte blob、RadioLib7.8.1、固定PHY及暂定pins相对013不变。保留既有011/012修正，不新增功能；不声称实物验证，不 squash/rebase/强推/删除历史分支。

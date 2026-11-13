@@ -1,0 +1,7 @@
+{
+  "command": "<PIO_PYTHON> -m unittest discover -s tools -p test_capture_bench.py -v",
+  "exit_code": 0,
+  "elapsed_seconds": 0.819,
+  "log": "logs/test/iteration-013-capture.log",
+  "publication_policy": "Full stdout/stderr with disclosed local-path/EOL/trailing-display normalization; raw retained privately."
+}

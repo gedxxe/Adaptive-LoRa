@@ -345,7 +345,10 @@ framework for hypothetical features.
   the runtime and delegate `setup()` / `loop()`; it must not contain
   application logic.
 - `FirmwareRuntime` loads configuration, selects the operating mode, and
-  delegates to `GatewayApp`, `ClientApp`, or provisioning mode.
+  delegates to `GatewayApp`, `ClientApp`, or provisioning mode. It receives
+  the existing ConfigStorage/RadioHardware references; Esp32Firmware owns
+  the concrete adapters before and beyond the coordinator lifetime. Main
+  constructs only that composition and delegates setup/loop.
 - `GatewayApp` owns gateway application state transitions.
 - `ClientApp` owns client application state transitions.
 - `DeviceConfig` is a pure configuration model and validator,
@@ -717,3 +720,7 @@ Publish only sanitized project files and engineering records. Ignore SDK
 caches, binaries, local configuration and credentials. Preserve dependency
 license references and do not redistribute research PDFs without permission.
 Use repository-relative paths or disclosed placeholders in historical logs.
+
+## 17. Canonical development baseline
+
+After the validated Iteration 013 integration, use `main` as the canonical development baseline. Start future milestone branches from an up-to-date `main`; preserve historical iteration branches and engineering records. Integrate reviewed work through pull requests using normal merge commits. Do not rewrite history, force-push, squash, rebase or delete historical branches as part of synchronization. A merged software baseline does not close physical acceptance gates.

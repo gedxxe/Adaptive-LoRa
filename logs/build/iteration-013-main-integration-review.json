@@ -1,0 +1,1000 @@
+{
+  "source": "e431e3f8ffd6e2d95dc126bb68e8231723a13c4d",
+  "target": "5bc607cd1a86e5d86ff0fc95ba7a3cd31159b861",
+  "original_changed_files": [
+    {
+      "path": "AGENTS.md",
+      "added_lines": "4",
+      "deleted_lines": "1",
+      "review_scope": "English/Chinese contracts, audits, decisions, readiness procedures and historical evidence"
+    },
+    {
+      "path": "CHANGELOG.md",
+      "added_lines": "18",
+      "deleted_lines": "0",
+      "review_scope": "English/Chinese contracts, audits, decisions, readiness procedures and historical evidence"
+    },
+    {
+      "path": "README.md",
+      "added_lines": "4",
+      "deleted_lines": "2",
+      "review_scope": "English/Chinese contracts, audits, decisions, readiness procedures and historical evidence"
+    },
+    {
+      "path": "README.zh-CN.md",
+      "added_lines": "4",
+      "deleted_lines": "2",
+      "review_scope": "English/Chinese contracts, audits, decisions, readiness procedures and historical evidence"
+    },
+    {
+      "path": "docs/en/ARCHITECTURE.md",
+      "added_lines": "18",
+      "deleted_lines": "3",
+      "review_scope": "English/Chinese contracts, audits, decisions, readiness procedures and historical evidence"
+    },
+    {
+      "path": "docs/en/BENCH_RUNBOOK.md",
+      "added_lines": "62",
+      "deleted_lines": "5",
+      "review_scope": "English/Chinese contracts, audits, decisions, readiness procedures and historical evidence"
+    },
+    {
+      "path": "docs/en/BUILD_MEMORY.md",
+      "added_lines": "141",
+      "deleted_lines": "0",
+      "review_scope": "English/Chinese contracts, audits, decisions, readiness procedures and historical evidence"
+    },
+    {
+      "path": "docs/en/DECISIONS.md",
+      "added_lines": "25",
+      "deleted_lines": "0",
+      "review_scope": "English/Chinese contracts, audits, decisions, readiness procedures and historical evidence"
+    },
+    {
+      "path": "docs/en/DEPENDENCY_BUDGET_AUDIT.md",
+      "added_lines": "127",
+      "deleted_lines": "0",
+      "review_scope": "English/Chinese contracts, audits, decisions, readiness procedures and historical evidence"
+    },
+    {
+      "path": "docs/en/ERROR_LOG.md",
+      "added_lines": "74",
+      "deleted_lines": "0",
+      "review_scope": "English/Chinese contracts, audits, decisions, readiness procedures and historical evidence"
+    },
+    {
+      "path": "docs/en/HARDWARE.md",
+      "added_lines": "17",
+      "deleted_lines": "0",
+      "review_scope": "English/Chinese contracts, audits, decisions, readiness procedures and historical evidence"
+    },
+    {
+      "path": "docs/en/LOGGING_GUIDE.md",
+      "added_lines": "52",
+      "deleted_lines": "0",
+      "review_scope": "English/Chinese contracts, audits, decisions, readiness procedures and historical evidence"
+    },
+    {
+      "path": "docs/en/PHYSICAL_ACCEPTANCE_READINESS.md",
+      "added_lines": "38",
+      "deleted_lines": "0",
+      "review_scope": "English/Chinese contracts, audits, decisions, readiness procedures and historical evidence"
+    },
+    {
+      "path": "docs/en/PROGRESS.md",
+      "added_lines": "26",
+      "deleted_lines": "2",
+      "review_scope": "English/Chinese contracts, audits, decisions, readiness procedures and historical evidence"
+    },
+    {
+      "path": "docs/en/RUNTIME_AUDIT.md",
+      "added_lines": "80",
+      "deleted_lines": "0",
+      "review_scope": "English/Chinese contracts, audits, decisions, readiness procedures and historical evidence"
+    },
+    {
+      "path": "docs/en/SOFTWARE_AUDIT.md",
+      "added_lines": "12",
+      "deleted_lines": "0",
+      "review_scope": "English/Chinese contracts, audits, decisions, readiness procedures and historical evidence"
+    },
+    {
+      "path": "docs/en/TEST_PLAN.md",
+      "added_lines": "20",
+      "deleted_lines": "0",
+      "review_scope": "English/Chinese contracts, audits, decisions, readiness procedures and historical evidence"
+    },
+    {
+      "path": "docs/zh-CN/ARCHITECTURE.md",
+      "added_lines": "15",
+      "deleted_lines": "1",
+      "review_scope": "English/Chinese contracts, audits, decisions, readiness procedures and historical evidence"
+    },
+    {
+      "path": "docs/zh-CN/BENCH_RUNBOOK.md",
+      "added_lines": "28",
+      "deleted_lines": "0",
+      "review_scope": "English/Chinese contracts, audits, decisions, readiness procedures and historical evidence"
+    },
+    {
+      "path": "docs/zh-CN/DECISIONS.md",
+      "added_lines": "25",
+      "deleted_lines": "0",
+      "review_scope": "English/Chinese contracts, audits, decisions, readiness procedures and historical evidence"
+    },
+    {
+      "path": "docs/zh-CN/DEPENDENCY_BUDGET_AUDIT.md",
+      "added_lines": "82",
+      "deleted_lines": "0",
+      "review_scope": "English/Chinese contracts, audits, decisions, readiness procedures and historical evidence"
+    },
+    {
+      "path": "docs/zh-CN/HARDWARE.md",
+      "added_lines": "10",
+      "deleted_lines": "0",
+      "review_scope": "English/Chinese contracts, audits, decisions, readiness procedures and historical evidence"
+    },
+    {
+      "path": "docs/zh-CN/LOGGING_GUIDE.md",
+      "added_lines": "16",
+      "deleted_lines": "0",
+      "review_scope": "English/Chinese contracts, audits, decisions, readiness procedures and historical evidence"
+    },
+    {
+      "path": "docs/zh-CN/PHYSICAL_ACCEPTANCE_READINESS.md",
+      "added_lines": "23",
+      "deleted_lines": "0",
+      "review_scope": "English/Chinese contracts, audits, decisions, readiness procedures and historical evidence"
+    },
+    {
+      "path": "docs/zh-CN/PROGRESS.md",
+      "added_lines": "26",
+      "deleted_lines": "2",
+      "review_scope": "English/Chinese contracts, audits, decisions, readiness procedures and historical evidence"
+    },
+    {
+      "path": "docs/zh-CN/RUNTIME_AUDIT.md",
+      "added_lines": "43",
+      "deleted_lines": "0",
+      "review_scope": "English/Chinese contracts, audits, decisions, readiness procedures and historical evidence"
+    },
+    {
+      "path": "docs/zh-CN/SOFTWARE_AUDIT.md",
+      "added_lines": "12",
+      "deleted_lines": "0",
+      "review_scope": "English/Chinese contracts, audits, decisions, readiness procedures and historical evidence"
+    },
+    {
+      "path": "docs/zh-CN/TEST_PLAN.md",
+      "added_lines": "20",
+      "deleted_lines": "0",
+      "review_scope": "English/Chinese contracts, audits, decisions, readiness procedures and historical evidence"
+    },
+    {
+      "path": "include/project_config.h",
+      "added_lines": "2",
+      "deleted_lines": "0",
+      "review_scope": "Reviewed production/runtime composition and existing bounded-session/timestamp fixes from 011/012"
+    },
+    {
+      "path": "logs/build/iteration-011-esp32-final-result.json",
+      "added_lines": "7",
+      "deleted_lines": "0",
+      "review_scope": "Preserved build/test output, manifests and completed iteration evidence; current blank template updated in 013"
+    },
+    {
+      "path": "logs/build/iteration-011-esp32-final.log",
+      "added_lines": "238",
+      "deleted_lines": "0",
+      "review_scope": "Preserved build/test output, manifests and completed iteration evidence; current blank template updated in 013"
+    },
+    {
+      "path": "logs/build/iteration-011-esp32-result.json",
+      "added_lines": "7",
+      "deleted_lines": "0",
+      "review_scope": "Preserved build/test output, manifests and completed iteration evidence; current blank template updated in 013"
+    },
+    {
+      "path": "logs/build/iteration-011-esp32.log",
+      "added_lines": "238",
+      "deleted_lines": "0",
+      "review_scope": "Preserved build/test output, manifests and completed iteration evidence; current blank template updated in 013"
+    },
+    {
+      "path": "logs/build/iteration-011-publication-receipt.json",
+      "added_lines": "38",
+      "deleted_lines": "0",
+      "review_scope": "Preserved build/test output, manifests and completed iteration evidence; current blank template updated in 013"
+    },
+    {
+      "path": "logs/build/iteration-011-review.json",
+      "added_lines": "217",
+      "deleted_lines": "0",
+      "review_scope": "Preserved build/test output, manifests and completed iteration evidence; current blank template updated in 013"
+    },
+    {
+      "path": "logs/build/iteration-011-runner-preflight.log",
+      "added_lines": "4",
+      "deleted_lines": "0",
+      "review_scope": "Preserved build/test output, manifests and completed iteration evidence; current blank template updated in 013"
+    },
+    {
+      "path": "logs/build/iteration-011-source-manifest-initial.sha256",
+      "added_lines": "52",
+      "deleted_lines": "0",
+      "review_scope": "Preserved build/test output, manifests and completed iteration evidence; current blank template updated in 013"
+    },
+    {
+      "path": "logs/build/iteration-011-source-manifest-native-pass.sha256",
+      "added_lines": "52",
+      "deleted_lines": "0",
+      "review_scope": "Preserved build/test output, manifests and completed iteration evidence; current blank template updated in 013"
+    },
+    {
+      "path": "logs/build/iteration-011-source-manifest.sha256",
+      "added_lines": "52",
+      "deleted_lines": "0",
+      "review_scope": "Preserved build/test output, manifests and completed iteration evidence; current blank template updated in 013"
+    },
+    {
+      "path": "logs/build/iteration-011-source-review.json",
+      "added_lines": "63",
+      "deleted_lines": "0",
+      "review_scope": "Preserved build/test output, manifests and completed iteration evidence; current blank template updated in 013"
+    },
+    {
+      "path": "logs/build/iteration-011-toolchain.log",
+      "added_lines": "65",
+      "deleted_lines": "0",
+      "review_scope": "Preserved build/test output, manifests and completed iteration evidence; current blank template updated in 013"
+    },
+    {
+      "path": "logs/build/iteration-011-validation.json",
+      "added_lines": "35",
+      "deleted_lines": "0",
+      "review_scope": "Preserved build/test output, manifests and completed iteration evidence; current blank template updated in 013"
+    },
+    {
+      "path": "logs/build/iteration-012-dependency-sources.json",
+      "added_lines": "121",
+      "deleted_lines": "0",
+      "review_scope": "Preserved build/test output, manifests and completed iteration evidence; current blank template updated in 013"
+    },
+    {
+      "path": "logs/build/iteration-012-elf-nm.log",
+      "added_lines": "3246",
+      "deleted_lines": "0",
+      "review_scope": "Preserved build/test output, manifests and completed iteration evidence; current blank template updated in 013"
+    },
+    {
+      "path": "logs/build/iteration-012-elf-size.log",
+      "added_lines": "40",
+      "deleted_lines": "0",
+      "review_scope": "Preserved build/test output, manifests and completed iteration evidence; current blank template updated in 013"
+    },
+    {
+      "path": "logs/build/iteration-012-esp32-result.json",
+      "added_lines": "7",
+      "deleted_lines": "0",
+      "review_scope": "Preserved build/test output, manifests and completed iteration evidence; current blank template updated in 013"
+    },
+    {
+      "path": "logs/build/iteration-012-esp32.log",
+      "added_lines": "82",
+      "deleted_lines": "0",
+      "review_scope": "Preserved build/test output, manifests and completed iteration evidence; current blank template updated in 013"
+    },
+    {
+      "path": "logs/build/iteration-012-memory-baseline-retry.log",
+      "added_lines": "15",
+      "deleted_lines": "0",
+      "review_scope": "Preserved build/test output, manifests and completed iteration evidence; current blank template updated in 013"
+    },
+    {
+      "path": "logs/build/iteration-012-memory-baseline.log",
+      "added_lines": "15",
+      "deleted_lines": "0",
+      "review_scope": "Preserved build/test output, manifests and completed iteration evidence; current blank template updated in 013"
+    },
+    {
+      "path": "logs/build/iteration-012-memory-final.log",
+      "added_lines": "15",
+      "deleted_lines": "0",
+      "review_scope": "Preserved build/test output, manifests and completed iteration evidence; current blank template updated in 013"
+    },
+    {
+      "path": "logs/build/iteration-012-publication-receipt.json",
+      "added_lines": "42",
+      "deleted_lines": "0",
+      "review_scope": "Preserved build/test output, manifests and completed iteration evidence; current blank template updated in 013"
+    },
+    {
+      "path": "logs/build/iteration-012-review.json",
+      "added_lines": "260",
+      "deleted_lines": "0",
+      "review_scope": "Preserved build/test output, manifests and completed iteration evidence; current blank template updated in 013"
+    },
+    {
+      "path": "logs/build/iteration-012-source-manifest.sha256",
+      "added_lines": "53",
+      "deleted_lines": "0",
+      "review_scope": "Preserved build/test output, manifests and completed iteration evidence; current blank template updated in 013"
+    },
+    {
+      "path": "logs/build/iteration-012-toolchain.log",
+      "added_lines": "33",
+      "deleted_lines": "0",
+      "review_scope": "Preserved build/test output, manifests and completed iteration evidence; current blank template updated in 013"
+    },
+    {
+      "path": "logs/build/iteration-012-validation.json",
+      "added_lines": "95",
+      "deleted_lines": "0",
+      "review_scope": "Preserved build/test output, manifests and completed iteration evidence; current blank template updated in 013"
+    },
+    {
+      "path": "logs/build/iteration-013-esp32-result.json",
+      "added_lines": "7",
+      "deleted_lines": "0",
+      "review_scope": "Preserved build/test output, manifests and completed iteration evidence; current blank template updated in 013"
+    },
+    {
+      "path": "logs/build/iteration-013-esp32.log",
+      "added_lines": "34",
+      "deleted_lines": "0",
+      "review_scope": "Preserved build/test output, manifests and completed iteration evidence; current blank template updated in 013"
+    },
+    {
+      "path": "logs/build/iteration-013-publication-receipt.json",
+      "added_lines": "36",
+      "deleted_lines": "0",
+      "review_scope": "Preserved build/test output, manifests and completed iteration evidence; current blank template updated in 013"
+    },
+    {
+      "path": "logs/build/iteration-013-readiness-sources.json",
+      "added_lines": "75",
+      "deleted_lines": "0",
+      "review_scope": "Preserved build/test output, manifests and completed iteration evidence; current blank template updated in 013"
+    },
+    {
+      "path": "logs/build/iteration-013-review.json",
+      "added_lines": "193",
+      "deleted_lines": "0",
+      "review_scope": "Preserved build/test output, manifests and completed iteration evidence; current blank template updated in 013"
+    },
+    {
+      "path": "logs/build/iteration-013-source-manifest.sha256",
+      "added_lines": "53",
+      "deleted_lines": "0",
+      "review_scope": "Preserved build/test output, manifests and completed iteration evidence; current blank template updated in 013"
+    },
+    {
+      "path": "logs/build/iteration-013-tool-help.log",
+      "added_lines": "245",
+      "deleted_lines": "0",
+      "review_scope": "Preserved build/test output, manifests and completed iteration evidence; current blank template updated in 013"
+    },
+    {
+      "path": "logs/build/iteration-013-toolchain.log",
+      "added_lines": "29",
+      "deleted_lines": "0",
+      "review_scope": "Preserved build/test output, manifests and completed iteration evidence; current blank template updated in 013"
+    },
+    {
+      "path": "logs/build/iteration-013-validation.json",
+      "added_lines": "54",
+      "deleted_lines": "0",
+      "review_scope": "Preserved build/test output, manifests and completed iteration evidence; current blank template updated in 013"
+    },
+    {
+      "path": "logs/test/RUN_RECORD_TEMPLATE.md",
+      "added_lines": "16",
+      "deleted_lines": "6",
+      "review_scope": "Preserved build/test output, manifests and completed iteration evidence; current blank template updated in 013"
+    },
+    {
+      "path": "logs/test/iteration-011-native-result.json",
+      "added_lines": "7",
+      "deleted_lines": "0",
+      "review_scope": "Preserved build/test output, manifests and completed iteration evidence; current blank template updated in 013"
+    },
+    {
+      "path": "logs/test/iteration-011-native-retry-result.json",
+      "added_lines": "7",
+      "deleted_lines": "0",
+      "review_scope": "Preserved build/test output, manifests and completed iteration evidence; current blank template updated in 013"
+    },
+    {
+      "path": "logs/test/iteration-011-native-retry.log",
+      "added_lines": "336",
+      "deleted_lines": "0",
+      "review_scope": "Preserved build/test output, manifests and completed iteration evidence; current blank template updated in 013"
+    },
+    {
+      "path": "logs/test/iteration-011-native.log",
+      "added_lines": "295",
+      "deleted_lines": "0",
+      "review_scope": "Preserved build/test output, manifests and completed iteration evidence; current blank template updated in 013"
+    },
+    {
+      "path": "logs/test/iteration-011-scenarios.md",
+      "added_lines": "280",
+      "deleted_lines": "0",
+      "review_scope": "Preserved build/test output, manifests and completed iteration evidence; current blank template updated in 013"
+    },
+    {
+      "path": "logs/test/iteration-012-boot-probe-result.json",
+      "added_lines": "7",
+      "deleted_lines": "0",
+      "review_scope": "Preserved build/test output, manifests and completed iteration evidence; current blank template updated in 013"
+    },
+    {
+      "path": "logs/test/iteration-012-boot-probe.log",
+      "added_lines": "8",
+      "deleted_lines": "0",
+      "review_scope": "Preserved build/test output, manifests and completed iteration evidence; current blank template updated in 013"
+    },
+    {
+      "path": "logs/test/iteration-012-focused-result.json",
+      "added_lines": "7",
+      "deleted_lines": "0",
+      "review_scope": "Preserved build/test output, manifests and completed iteration evidence; current blank template updated in 013"
+    },
+    {
+      "path": "logs/test/iteration-012-focused.log",
+      "added_lines": "24",
+      "deleted_lines": "0",
+      "review_scope": "Preserved build/test output, manifests and completed iteration evidence; current blank template updated in 013"
+    },
+    {
+      "path": "logs/test/iteration-012-native-result.json",
+      "added_lines": "7",
+      "deleted_lines": "0",
+      "review_scope": "Preserved build/test output, manifests and completed iteration evidence; current blank template updated in 013"
+    },
+    {
+      "path": "logs/test/iteration-012-native.log",
+      "added_lines": "367",
+      "deleted_lines": "0",
+      "review_scope": "Preserved build/test output, manifests and completed iteration evidence; current blank template updated in 013"
+    },
+    {
+      "path": "logs/test/iteration-012-reproduction-result.json",
+      "added_lines": "7",
+      "deleted_lines": "0",
+      "review_scope": "Preserved build/test output, manifests and completed iteration evidence; current blank template updated in 013"
+    },
+    {
+      "path": "logs/test/iteration-012-reproduction-retry-result.json",
+      "added_lines": "7",
+      "deleted_lines": "0",
+      "review_scope": "Preserved build/test output, manifests and completed iteration evidence; current blank template updated in 013"
+    },
+    {
+      "path": "logs/test/iteration-012-reproduction-retry.log",
+      "added_lines": "26",
+      "deleted_lines": "0",
+      "review_scope": "Preserved build/test output, manifests and completed iteration evidence; current blank template updated in 013"
+    },
+    {
+      "path": "logs/test/iteration-012-reproduction.log",
+      "added_lines": "26",
+      "deleted_lines": "0",
+      "review_scope": "Preserved build/test output, manifests and completed iteration evidence; current blank template updated in 013"
+    },
+    {
+      "path": "logs/test/iteration-012-scenarios.md",
+      "added_lines": "294",
+      "deleted_lines": "0",
+      "review_scope": "Preserved build/test output, manifests and completed iteration evidence; current blank template updated in 013"
+    },
+    {
+      "path": "logs/test/iteration-013-capture-manifest.sha256",
+      "added_lines": "2",
+      "deleted_lines": "0",
+      "review_scope": "Preserved build/test output, manifests and completed iteration evidence; current blank template updated in 013"
+    },
+    {
+      "path": "logs/test/iteration-013-capture-reproduction.log",
+      "added_lines": "6",
+      "deleted_lines": "0",
+      "review_scope": "Preserved build/test output, manifests and completed iteration evidence; current blank template updated in 013"
+    },
+    {
+      "path": "logs/test/iteration-013-capture-result.json",
+      "added_lines": "7",
+      "deleted_lines": "0",
+      "review_scope": "Preserved build/test output, manifests and completed iteration evidence; current blank template updated in 013"
+    },
+    {
+      "path": "logs/test/iteration-013-capture.log",
+      "added_lines": "18",
+      "deleted_lines": "0",
+      "review_scope": "Preserved build/test output, manifests and completed iteration evidence; current blank template updated in 013"
+    },
+    {
+      "path": "logs/test/iteration-013-native-result.json",
+      "added_lines": "7",
+      "deleted_lines": "0",
+      "review_scope": "Preserved build/test output, manifests and completed iteration evidence; current blank template updated in 013"
+    },
+    {
+      "path": "logs/test/iteration-013-native.log",
+      "added_lines": "367",
+      "deleted_lines": "0",
+      "review_scope": "Preserved build/test output, manifests and completed iteration evidence; current blank template updated in 013"
+    },
+    {
+      "path": "logs/test/iteration-013-port-enumeration.log",
+      "added_lines": "4",
+      "deleted_lines": "0",
+      "review_scope": "Preserved build/test output, manifests and completed iteration evidence; current blank template updated in 013"
+    },
+    {
+      "path": "logs/test/iteration-013-scenarios.md",
+      "added_lines": "294",
+      "deleted_lines": "0",
+      "review_scope": "Preserved build/test output, manifests and completed iteration evidence; current blank template updated in 013"
+    },
+    {
+      "path": "platformio.ini",
+      "added_lines": "2",
+      "deleted_lines": "0",
+      "review_scope": "Reviewed production/runtime composition and existing bounded-session/timestamp fixes from 011/012"
+    },
+    {
+      "path": "src/app/esp32_firmware.h",
+      "added_lines": "18",
+      "deleted_lines": "0",
+      "review_scope": "Reviewed production/runtime composition and existing bounded-session/timestamp fixes from 011/012"
+    },
+    {
+      "path": "src/app/firmware_runtime.cpp",
+      "added_lines": "13",
+      "deleted_lines": "9",
+      "review_scope": "Reviewed production/runtime composition and existing bounded-session/timestamp fixes from 011/012"
+    },
+    {
+      "path": "src/app/firmware_runtime.h",
+      "added_lines": "16",
+      "deleted_lines": "8",
+      "review_scope": "Reviewed production/runtime composition and existing bounded-session/timestamp fixes from 011/012"
+    },
+    {
+      "path": "src/app/preferences_config_storage.h",
+      "added_lines": "1",
+      "deleted_lines": "1",
+      "review_scope": "Reviewed production/runtime composition and existing bounded-session/timestamp fixes from 011/012"
+    },
+    {
+      "path": "src/client/client_app.cpp",
+      "added_lines": "16",
+      "deleted_lines": "2",
+      "review_scope": "Reviewed production/runtime composition and existing bounded-session/timestamp fixes from 011/012"
+    },
+    {
+      "path": "src/client/client_app.h",
+      "added_lines": "3",
+      "deleted_lines": "0",
+      "review_scope": "Reviewed production/runtime composition and existing bounded-session/timestamp fixes from 011/012"
+    },
+    {
+      "path": "src/common/protocol/sequence_tracker.cpp",
+      "added_lines": "7",
+      "deleted_lines": "0",
+      "review_scope": "Reviewed production/runtime composition and existing bounded-session/timestamp fixes from 011/012"
+    },
+    {
+      "path": "src/common/protocol/sequence_tracker.h",
+      "added_lines": "2",
+      "deleted_lines": "0",
+      "review_scope": "Reviewed production/runtime composition and existing bounded-session/timestamp fixes from 011/012"
+    },
+    {
+      "path": "src/common/radio/llcc68_hardware.h",
+      "added_lines": "1",
+      "deleted_lines": "1",
+      "review_scope": "Reviewed production/runtime composition and existing bounded-session/timestamp fixes from 011/012"
+    },
+    {
+      "path": "src/gateway/gateway_app.cpp",
+      "added_lines": "16",
+      "deleted_lines": "2",
+      "review_scope": "Reviewed production/runtime composition and existing bounded-session/timestamp fixes from 011/012"
+    },
+    {
+      "path": "src/gateway/gateway_app.h",
+      "added_lines": "3",
+      "deleted_lines": "0",
+      "review_scope": "Reviewed production/runtime composition and existing bounded-session/timestamp fixes from 011/012"
+    },
+    {
+      "path": "src/main.cpp",
+      "added_lines": "2",
+      "deleted_lines": "2",
+      "review_scope": "Reviewed production/runtime composition and existing bounded-session/timestamp fixes from 011/012"
+    },
+    {
+      "path": "test/support/fake_config_storage.h",
+      "added_lines": "3",
+      "deleted_lines": "0",
+      "review_scope": "Production runtime/reliability tests and bounded fake SDK delay/input adapters from 011/012"
+    },
+    {
+      "path": "test/support/fake_radio_hardware.h",
+      "added_lines": "10",
+      "deleted_lines": "1",
+      "review_scope": "Production runtime/reliability tests and bounded fake SDK delay/input adapters from 011/012"
+    },
+    {
+      "path": "test/support/platform/Arduino.h",
+      "added_lines": "26",
+      "deleted_lines": "2",
+      "review_scope": "Production runtime/reliability tests and bounded fake SDK delay/input adapters from 011/012"
+    },
+    {
+      "path": "test/support/platform/esp_random.h",
+      "added_lines": "25",
+      "deleted_lines": "0",
+      "review_scope": "Production runtime/reliability tests and bounded fake SDK delay/input adapters from 011/012"
+    },
+    {
+      "path": "test/support/platform/esp_system.h",
+      "added_lines": "12",
+      "deleted_lines": "0",
+      "review_scope": "Production runtime/reliability tests and bounded fake SDK delay/input adapters from 011/012"
+    },
+    {
+      "path": "test/support/platform/esp_timer.h",
+      "added_lines": "1",
+      "deleted_lines": "0",
+      "review_scope": "Production runtime/reliability tests and bounded fake SDK delay/input adapters from 011/012"
+    },
+    {
+      "path": "test/test_firmware_runtime/test_main.cpp",
+      "added_lines": "453",
+      "deleted_lines": "0",
+      "review_scope": "Production runtime/reliability tests and bounded fake SDK delay/input adapters from 011/012"
+    },
+    {
+      "path": "test/test_runtime_reliability/test_main.cpp",
+      "added_lines": "261",
+      "deleted_lines": "0",
+      "review_scope": "Production runtime/reliability tests and bounded fake SDK delay/input adapters from 011/012"
+    },
+    {
+      "path": "tools/capture_bench.py",
+      "added_lines": "171",
+      "deleted_lines": "42",
+      "review_scope": "Reviewed 013 capture correction/tests or preserved 012 finite RNG reproduction utility"
+    },
+    {
+      "path": "tools/reproduce_boot_id_liveness.py",
+      "added_lines": "56",
+      "deleted_lines": "0",
+      "review_scope": "Reviewed 013 capture correction/tests or preserved 012 finite RNG reproduction utility"
+    },
+    {
+      "path": "tools/test_capture_bench.py",
+      "added_lines": "233",
+      "deleted_lines": "0",
+      "review_scope": "Reviewed 013 capture correction/tests or preserved 012 finite RNG reproduction utility"
+    }
+  ],
+  "firmware_native_capture_inputs": [
+    {
+      "path": "PROTOCOL_VERSION",
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+    },
+    {
+      "path": "VERSION",
+      "sha256": "09f385c2dd4a2ddaf98ffd057eb3738b3bf007e293dd6e21ce06006cc75c82ca"
+    },
+    {
+      "path": "include/board_pins.h",
+      "sha256": "c9954eca92fccc1ee3521393c8a497be162d96773513f4774cb0c8facfc98d8c"
+    },
+    {
+      "path": "include/project_config.h",
+      "sha256": "25ad6450ee08f8d692ece67fdd2ee8a032da38ee763e7e0f58750d0a9babebce"
+    },
+    {
+      "path": "include/radio_config.h",
+      "sha256": "47f7ecc3b1a99d2edd67f8689ef3f7b73f9535b5fa4dd5e43b9ea01447aaad09"
+    },
+    {
+      "path": "platformio.ini",
+      "sha256": "cdc8853fc098160fbeed2ac11ed9222df4729a3dad7b286a2380be16f2cc6494"
+    },
+    {
+      "path": "src/app/config_storage.h",
+      "sha256": "dd05399f01abb0dab159dc26a9d7800d30b3f21963d76fe4e893755e4ec942d1"
+    },
+    {
+      "path": "src/app/esp32_firmware.h",
+      "sha256": "21717a49db7660da79c5a48191c86b78d581728c3fdfbd54dd169976af3c20b8"
+    },
+    {
+      "path": "src/app/firmware_runtime.cpp",
+      "sha256": "7c83b53d47cd77a0d86d4ac11e2a24f78ed2c3ac943c903febecc8d2a2b141d8"
+    },
+    {
+      "path": "src/app/firmware_runtime.h",
+      "sha256": "9dbe72d17dacd669b196272628153d35f375881d2fc374a217f3a1f19c91b1cf"
+    },
+    {
+      "path": "src/app/nvs_config_store.cpp",
+      "sha256": "c22b567462e781cf5986c7a4dd8ea2f34a63c7d59ab679f1826088154f351873"
+    },
+    {
+      "path": "src/app/nvs_config_store.h",
+      "sha256": "eeddb7ab926d18e41f23fab3c60fddb000211f0a4523d504c26ee34ef28d8eab"
+    },
+    {
+      "path": "src/app/preferences_config_storage.cpp",
+      "sha256": "f6ac1e9c770338f86823a837bdd8d2e18f8a8ec9249ebe39e4fd9b61ebc2d473"
+    },
+    {
+      "path": "src/app/preferences_config_storage.h",
+      "sha256": "09937e22c25412bb021bb693baf95a74fe664a8f7065f265e8d82d81117f1bd9"
+    },
+    {
+      "path": "src/app/provisioning_console.cpp",
+      "sha256": "62fb729c0fc940ebc0251f93a54bfc8e49b67973ff03bcce98c29b0a74928695"
+    },
+    {
+      "path": "src/app/provisioning_console.h",
+      "sha256": "2a98e10ec31eb49f595c7019c312a4a7877c8cb1482b8190dbf0ecd5b4739764"
+    },
+    {
+      "path": "src/client/client_app.cpp",
+      "sha256": "2979626747f67d9357e8ee0d99c413729fcabfca7678ccedafb459b49582b3fb"
+    },
+    {
+      "path": "src/client/client_app.h",
+      "sha256": "4f1ffdc57edf86c844159188a03f0744f7e4764263900ad10fd30076e3e3fc3a"
+    },
+    {
+      "path": "src/common/config/device_config.cpp",
+      "sha256": "d1206949caf46bebbb7f0a29246c93187b47e647c7410c6b9efcfe9e6a72c534"
+    },
+    {
+      "path": "src/common/config/device_config.h",
+      "sha256": "3be8c150c77513db66548bc06a444bd93f7c6fe8ac5098cbdd05ff7319ca0b28"
+    },
+    {
+      "path": "src/common/diagnostics/serial_logger.cpp",
+      "sha256": "a98fd1661ff0c7f92032ffac0b7de0a3110d3f7fddd76bc087918d0d9715e3a4"
+    },
+    {
+      "path": "src/common/diagnostics/serial_logger.h",
+      "sha256": "48e5f25f1de3774890cc9f02edea8d1b72b384dc8161e613fe251e7b46f6a9bd"
+    },
+    {
+      "path": "src/common/protocol/frame_codec.cpp",
+      "sha256": "0d3e7ebee8a1ceb5de86775c7b08aae720f3155f2abd9caeb65498034dc1bfd1"
+    },
+    {
+      "path": "src/common/protocol/frame_codec.h",
+      "sha256": "619a7d2984c16955f71b18cc90ffa2aec8913aa6ab8525c79dfaeb729ee5618e"
+    },
+    {
+      "path": "src/common/protocol/message_types.h",
+      "sha256": "74605ffc1bc4f3d41cec65a2bced4656e47f22fcbd4d239e8edeb17d4b32c8e2"
+    },
+    {
+      "path": "src/common/protocol/sequence_tracker.cpp",
+      "sha256": "e46e4892fb5b00a8bcd002d57a4d3dc913fdd69ce8f7510695b7ba6676dfd2ab"
+    },
+    {
+      "path": "src/common/protocol/sequence_tracker.h",
+      "sha256": "71800742659d260972df604404aa67d04f3563bce64fd0f846f138ab98e4cda7"
+    },
+    {
+      "path": "src/common/radio/llcc68_hardware.cpp",
+      "sha256": "3e9ee790ffdeb0e9af87e3e0b855628939986a76ab24328e71714fc9d829dd91"
+    },
+    {
+      "path": "src/common/radio/llcc68_hardware.h",
+      "sha256": "8f8ab93ae16b770fb003efd26243fda50f152f6ed62b4ca0af1e60f4fb59a470"
+    },
+    {
+      "path": "src/common/radio/radio_driver.cpp",
+      "sha256": "4b2ecfca6413c213296e588885a1abcc177cb4ddab1c04f05b42f831583281d1"
+    },
+    {
+      "path": "src/common/radio/radio_driver.h",
+      "sha256": "41cdde8b8a76ced8c772f5dc437bd17c509261f41698198b7cd862e0942f9d37"
+    },
+    {
+      "path": "src/common/radio/radio_hardware.h",
+      "sha256": "422f8f708c5f3734c9fad9195cf1ed025e0cd328bd1bfd3e749a7a91d14e6ac1"
+    },
+    {
+      "path": "src/common/radio/radio_transport.h",
+      "sha256": "64717827d21e8769a0c0bd48aab35b6e0f568ab1a5fc6b58c4134c6be84abee7"
+    },
+    {
+      "path": "src/gateway/gateway_app.cpp",
+      "sha256": "9c23808f018f9a411de1a491eea255ebc641c3e934608af9d498888446b1ccea"
+    },
+    {
+      "path": "src/gateway/gateway_app.h",
+      "sha256": "6d1b20030598f2a7d6b40898c0d9e2a072d37289ac30220ec0ad8ba3652f5611"
+    },
+    {
+      "path": "src/main.cpp",
+      "sha256": "1147dae4ddef444aedb68909fe1283c51cc0ecfb459228a4191fbe0833cc8fa3"
+    },
+    {
+      "path": "test/support/fake_config_storage.h",
+      "sha256": "405de095014458ed95f8731189a59c8d57c79a5aba64ec9bf1b4257627cb544f"
+    },
+    {
+      "path": "test/support/fake_radio_hardware.h",
+      "sha256": "62dc1bd23690eed0f54d507787d580c17ae7d8f6e7c3a2e0a3e146a6a4cbd7a4"
+    },
+    {
+      "path": "test/support/fake_radio_transport.h",
+      "sha256": "4fcd925ca60d096cc477f782056652229f9a508cf43da403f6779118b1731b1a"
+    },
+    {
+      "path": "test/support/platform/Arduino.h",
+      "sha256": "4192cc7b2606cb03219b5decbb25026e6288c457093583ac9018f259db805a66"
+    },
+    {
+      "path": "test/support/platform/esp_random.h",
+      "sha256": "b70998909547d10ccfae4dc706b916f847dd444e1ea316ff78e274d4791df62e"
+    },
+    {
+      "path": "test/support/platform/esp_system.h",
+      "sha256": "5000d0f0d77b91b673c5a60eb0f577a6466ab5720580eff333a8215ba44d64ea"
+    },
+    {
+      "path": "test/support/platform/esp_timer.h",
+      "sha256": "9671380a3f702172d32e445a4c4258b4d89211e5afd263970fe72f9057f56a33"
+    },
+    {
+      "path": "test/test_app_integration/test_main.cpp",
+      "sha256": "a65052810ec42567c6680a8d9ac248546390b0b0e8721b2b691427d1506ae21b"
+    },
+    {
+      "path": "test/test_config_store/test_main.cpp",
+      "sha256": "993c74a1ad5af681811b2bf302a71ee128dc9fb98a3547106e9925d3434fcd82"
+    },
+    {
+      "path": "test/test_firmware_runtime/test_main.cpp",
+      "sha256": "f0a760171a10e0df4549f3718971fe4a2e5fc4a88f74b0f9c496b48dac87c23b"
+    },
+    {
+      "path": "test/test_frame_codec/test_main.cpp",
+      "sha256": "ac2cb593b13f8c8f3f82ba861ef98ef0df70a8685973eb0607c05e12f269e1e9"
+    },
+    {
+      "path": "test/test_provisioning_console/test_main.cpp",
+      "sha256": "d0381a98d786be700dfe898945facdab3b2f6bbb0ba62d67a6d88f3b6939bd17"
+    },
+    {
+      "path": "test/test_radio_driver/test_main.cpp",
+      "sha256": "5f2b11848eca00c58e3cd6be47d3e75e12516c969302a787a33ea66959dfb373"
+    },
+    {
+      "path": "test/test_role_config/test_main.cpp",
+      "sha256": "c1c83d0a215a6fcaf8d5a4609b8f4c6c3d93344e0d3e1b6a25f42e61cfb3c0bf"
+    },
+    {
+      "path": "test/test_runtime_reliability/test_main.cpp",
+      "sha256": "7010d3fb7b751dee038757346807d43c77bcadedeb207c82405200cf00861aae"
+    },
+    {
+      "path": "test/test_sequence_tracker/test_main.cpp",
+      "sha256": "e04fe61c947cf3f755a32b56a1cc97ca42d0bdb5930580b849a56ec57043e6e9"
+    },
+    {
+      "path": "test/test_serial_logger/test_main.cpp",
+      "sha256": "77705aa4236fc10aa0d8f153385ad944d47cd2a716698464ff528875c5d971a2"
+    },
+    {
+      "path": "tools/capture_bench.py",
+      "sha256": "6c4f72187abe4aa15bbf380bb290feb52ff18b7117ba897cf65509529e2e2216"
+    },
+    {
+      "path": "tools/test_capture_bench.py",
+      "sha256": "9292eb3b75158f2ab15b7158ecc4b02dc9598644a71a05b7dfa954adcad96a1c"
+    }
+  ],
+  "firmware_bin_sha256": "cbf7301fc8346468817e65c47122c0dc05b52cece408597fa99f204199903201",
+  "binary_matches_verified_013": true,
+  "complete_divergence_review": "All 113 paths inventoried; all production/config/support/tool differences reviewed; canonical docs/audits and log manifests checked; existing iteration records preserved. Main-only commits have no tree changes against shared ancestor.",
+  "physical_validation": "NOT RUN",
+  "integration_changed_files": [
+    {
+      "path": "AGENTS.md",
+      "responsibility": "Canonical-main integration policy, current bilingual snapshot or append-only engineering record"
+    },
+    {
+      "path": "CHANGELOG.md",
+      "responsibility": "Canonical-main integration policy, current bilingual snapshot or append-only engineering record"
+    },
+    {
+      "path": "README.md",
+      "responsibility": "Canonical-main integration policy, current bilingual snapshot or append-only engineering record"
+    },
+    {
+      "path": "README.zh-CN.md",
+      "responsibility": "Canonical-main integration policy, current bilingual snapshot or append-only engineering record"
+    },
+    {
+      "path": "docs/en/BUILD_MEMORY.md",
+      "responsibility": "Canonical-main integration policy, current bilingual snapshot or append-only engineering record"
+    },
+    {
+      "path": "docs/en/DECISIONS.md",
+      "responsibility": "Canonical-main integration policy, current bilingual snapshot or append-only engineering record"
+    },
+    {
+      "path": "docs/en/ERROR_LOG.md",
+      "responsibility": "Canonical-main integration policy, current bilingual snapshot or append-only engineering record"
+    },
+    {
+      "path": "docs/en/PROGRESS.md",
+      "responsibility": "Canonical-main integration policy, current bilingual snapshot or append-only engineering record"
+    },
+    {
+      "path": "docs/zh-CN/DECISIONS.md",
+      "responsibility": "Canonical-main integration policy, current bilingual snapshot or append-only engineering record"
+    },
+    {
+      "path": "docs/zh-CN/PROGRESS.md",
+      "responsibility": "Canonical-main integration policy, current bilingual snapshot or append-only engineering record"
+    },
+    {
+      "path": "logs/build/iteration-013-main-integration-esp32-result.json",
+      "responsibility": "Executed validation log/result, toolchain or per-case/input/diff inventory"
+    },
+    {
+      "path": "logs/build/iteration-013-main-integration-esp32.log",
+      "responsibility": "Executed validation log/result, toolchain or per-case/input/diff inventory"
+    },
+    {
+      "path": "logs/build/iteration-013-main-integration-review.json",
+      "responsibility": "Executed validation log/result, toolchain or per-case/input/diff inventory"
+    },
+    {
+      "path": "logs/build/iteration-013-main-integration-toolchain.log",
+      "responsibility": "Executed validation log/result, toolchain or per-case/input/diff inventory"
+    },
+    {
+      "path": "logs/build/iteration-013-main-integration-validation.json",
+      "responsibility": "Executed validation log/result, toolchain or per-case/input/diff inventory"
+    },
+    {
+      "path": "logs/test/iteration-013-main-integration-capture-result.json",
+      "responsibility": "Executed validation log/result, toolchain or per-case/input/diff inventory"
+    },
+    {
+      "path": "logs/test/iteration-013-main-integration-capture.log",
+      "responsibility": "Executed validation log/result, toolchain or per-case/input/diff inventory"
+    },
+    {
+      "path": "logs/test/iteration-013-main-integration-native-result.json",
+      "responsibility": "Executed validation log/result, toolchain or per-case/input/diff inventory"
+    },
+    {
+      "path": "logs/test/iteration-013-main-integration-native.log",
+      "responsibility": "Executed validation log/result, toolchain or per-case/input/diff inventory"
+    },
+    {
+      "path": "logs/test/iteration-013-main-integration-scenarios.md",
+      "responsibility": "Executed validation log/result, toolchain or per-case/input/diff inventory"
+    }
+  ],
+  "preservation_checks": {
+    "published_013_tracked_files": 380,
+    "original_log_files_byte_identical": 276,
+    "append_only_history_prefixes": 4,
+    "integration_code_test_tool_input_changes": 0,
+    "firmware_binary_identical_to_013": true,
+    "no_lost_main_file_changes": true
+  }
+}
