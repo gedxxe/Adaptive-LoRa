@@ -6,9 +6,9 @@
 namespace adaptive_lora {
 // Exactly one instance in Esp32Firmware composition. RadioLib/SPI/GPIO stays
 // here; the ISR only latches a signal for the cooperative driver poll.
-class Llcc68Hardware final : public RadioHardware {
+class Sx1262Hardware final : public RadioHardware {
 public:
-    Llcc68Hardware();
+    Sx1262Hardware();
     int16_t begin() override;
     int16_t explicitHeader() override { return radio_.explicitHeader(); }
     int16_t setCRC(uint8_t length) override { return radio_.setCRC(length); }
@@ -30,6 +30,6 @@ private:
     static void IRAM_ATTR onDio1();
     static volatile bool irq_;
     Module module_;
-    LLCC68 radio_;
+    SX1262 radio_;
 };
 }  // namespace adaptive_lora

@@ -1,88 +1,29 @@
 # 硬件与射频基线
 
-## 1. 当前硬件
+当前唯一目标为Heltec WiFi LoRa 32 V3.2 HF，ESP32-S3FN8/SX1262、8 MB Flash、512 KB SRAM、CP2102，不假定PSRAM。采购选型已确定，但到货数量、实际板标记和silicon stepping未检查。首个验收配置是一台Gateway和一台Client，使用相同硬件。
 
-| 设备    | 硬件                                                |       数量 |
-|---------|-----------------------------------------------------|-----------:|
-| MCU 库存 | ESP32-C3 Super Mini | 1 |
-| 第二个 MCU | ESP32-C3 Super Mini，尚未购买 | 0 |
-| 模块库存 | Ai-Thinker RA-01SCH（LLCC68） | 2 |
-| 天线 | 915 MHz Moxon，尚未制作 | 0 |
+要求HF版本，厂家覆盖863–928 MHz，采购选项902–928 MHz；不接受LF470–510 MHz或其他Heltec产品替代。需要卖家确认、V3.2 HF正反面照片、数据USB-C线、稳定5 V、IPEX1.0匹配pigtail、合适天线/50欧姆负载。完整来源、revision/GPIO矩阵见HARDWARE_MIGRATION_AUDIT。
 
-用户于 2026-11-12 更正库存：没有组装好的双设备，当前仅做软件验证。计划中的 Gateway/Client 仍使用相同硬件、一份固件及 NVS 选角色。实物 NVS 和 RF 均未验证。
+| 信号 | GPIO |
+|---|---:|
+| NSS | 8 |
+| SCK | 9 |
+| MOSI | 10 |
+| MISO | 11 |
+| RESET | 12 |
+| BUSY | 13 |
+| DIO1 | 14 |
 
-## 2. 模块识别
+映射有V3.2图纸和Arduino variant依据，实板仍须核对。DIO2控制板上RF switch，DIO3为32 MHz TCXO供电1.8 V，radio使用已装DC-DC网络；不额外分配TXEN/RXEN。唯一Sx1262Hardware拥有RadioLib/SPI/GPIO/IRQ操作。
 
-当前模块是 Ai-Thinker Ra-01SCH，核心为 LLCC68。
+保留OLED17/18/21、LED35、Vext36、ADC_Ctrl37、UART43/44、PRG0和其他strap/Flash/晶振/JTAG资源。19/20原生USB路由的R3/R29在参考图上为NC，USB-C默认接CP2102，不可把两个USB transceiver并接。
 
-必须使用 RadioLib `LLCC68`，不能使用 `SX1262`。
+V3.2 GPIO36低有效控制Vext LDO；Radio和RF bias用VDD_3V3，OLED用Vext，本次不初始化OLED或外设供电。以后加显示功能时先设安全锁存，开启电源并按要求稳定后再释放reset。GPIO37高/上拉使能新分压检测，不复制早期逻辑；充电IC为LGS4056HDA，本次不做电池功能。
 
-已记录的模块约束： - 电源：2.7–3.6 V，目标 3.3 V。 - 频率范围：803–930
-MHz。 - BW125 kHz：SF5–SF9。 - BW250 kHz：SF5–SF10。 - BW500
-kHz：SF5–SF11。 - 不支持 SF12。 - SPI 接口，需要连接 BUSY 和 DIO1。
+USB/5 V供电按手册至少500 mA能力，直接3.3 V至少150 mA；用稳定5 V并留余量。测TX电压/电流、reset和温升，检查电池极性，不并联任意电源或从GPIO反向供电。射频在板上不能拆除，未知factory固件或已保存角色可能TX，所以第一次上电和单板操作前也要接好IPEX1.0对应50欧姆负载/天线，禁止开路发射，初始10 dBm。
 
-## 3. 建议引脚映射
+固定PHY为915.0 MHz、BW125、dataSF7、保留controlSF9、CR4/5、preamble8、explicit、PHY CRC、sync0x12、10 dBm、SPI1 MHz/mode0/MSB。SX1262支持SF5–SF12，但研究仍限制SF7–SF9，不新增动态PHY/功率/调度。
 
-以下为初始建议，接线前必须核对实际开发板版本、模块方向和丝印。
+按用户要求保留915 MHz研究设置，不据此声称辐射许可；部署前仍须核对适用频率/EIRP/access/设备要求。EIRP=输出+天线gain-feed loss，未知参数不能当零。915 MHz Moxon作为设计基线接受，但制作、SWR、gain和方向图未测，不声称920–923 MHz匹配。后续对比须保持相同PHY、功率、feed、距离、高度、极化和时长。
 
-|   ESP32-C3 GPIO | Ra-01SCH 引脚 | 信号     |
-|----------------:|--------------:|----------|
-|           GPIO4 |            12 | SCK      |
-|           GPIO5 |            13 | MISO     |
-|           GPIO6 |            14 | MOSI     |
-|           GPIO7 |            15 | NSS / CS |
-|           GPIO1 |             4 | RESET    |
-|           GPIO0 |             6 | DIO1     |
-|          GPIO10 |            10 | BUSY     |
-|  外部稳压 3.3 V |             3 | VCC      |
-|             GND |      2、9、16 | Ground   |
-| 50 欧姆天线馈线 |             1 | ANT      |
-
-GPIO2、GPIO8、GPIO9 是启动绑定位；GPIO18/19 与 USB Serial/JTAG
-相关；GPIO20/21 是 UART0。GPIO4–GPIO7 可能与外部 JTAG 功能冲突。
-
-## 4. 电源要求
-
-- 无线模块必须使用稳定的 3.3 V。
-- 不要默认开发板的 3V3 稳压器可以承担发射瞬态电流。
-- 建议无线模块使用额定至少 300 mA 的独立 3.3 V 稳压支路，并留有余量。
-- MCU 与无线模块共地。
-- 在模块电源附近放置去耦电容。
-- 发射时测量模块端电压。
-- 禁止向 VCC 输入 5 V。
-- 天线未连接时禁止发射。
-- 初始发射功率为 10 dBm。
-
-## 5. 初始射频参数
-
-| 参数     |    初始值 | 说明                       |
-|----------|----------:|----------------------------|
-| 频率     | 915.0 MHz | 临时测试值，部署前核对法规 |
-| 带宽     |   125 kHz | 初期固定                   |
-| 控制 SF  |       SF9 | 待验证                     |
-| 数据 SF  |       SF7 | 初始值                     |
-| ADR 范围 |   SF7–SF9 | 后续阶段                   |
-| 编码率   |       4/5 | 初始值                     |
-| 前导码   |         8 | 初始值                     |
-| Header   |  Explicit | 初始值                     |
-| CRC      |      开启 | 必须                       |
-| Sync word | 0x12 | RadioLib 单字节私有 LoRa sync word |
-| TX 功率  |    10 dBm | 初始测试值                 |
-| SPI 时钟 |     1 MHz | 保守初始值                 |
-
-915 MHz 天线和模块硬件频率范围匹配，不代表该频率、功率或 EIRP
-已满足印度尼西亚当地法规。部署前必须核实频段、信道、功率、天线增益及设备要求。
-
-候选实现使用 XTAL（DIO3 电压参数为 0）、LDO 模式，保留 RadioLib 默认 DIO2 内部 RF-switch 控制；MCU 不连接 TXEN/RXEN。须核对实际模块/转接板。状态报告驱动选择和初始化返回码，不能视为独立芯片识别。
-
-固件临时启用原生 USB CDC；Flash 容量、USB 路径和板卡版本仍待验证。2026-11-12 只枚举到 6 个蓝牙串口（`logs/test/iteration-004-serial-ports.log`）；没有 ESP32 串口、实物照片、原理图或连通性证据。编译通过不确认引脚或电源。
-
-## Iteration013 硬件证据核对 - 2026-11-13
-
-[当前官方页](https://docs.ai-thinker.com/en/Ra-01SCH/index.html) 链接 [V1.1.0规格](https://aithinker-static.oss-cn-shenzhen.aliyuncs.com/docs/Public%20Document%20Center/LoRa/lora/Specification/Ra-01SCH_V1.1.0%20Specification-20221110.pdf)。p9表4与既有module pin功能一致；p10图6为晶体/DIO2开关，p11图7示10uF/100nF本地去耦，p14第6.6说明默认内部RF开关，外控需不同BOM。旧下载地址返回HTML，当前官方链接/PDF hash见iteration-013-readiness-sources.json；完整PDF未发布入仓库。
-
-这仅证明文档功能，不证明手中module/BOM/pad方向。GPIO4/5/6/7、RESET1、DIO1=0、BUSY10是未改的项目提案；[ESP32-C3芯片规格](https://documentation.espressif.com/esp32-c3_datasheet_en.html) 不能证明Super Mini克隆板routing/USB/LED冲突。无实际照片/修订/continuity证据。XTAL、内部radio LDO、DIO2行为仍待验证；外部电源LDO是另一设置。电压/ripple/瞬态/天线/feed/load均未测；Moxon未制作，替代天线/负载TBD。
-
-断电测continuity，共地/短线/3.3V逻辑/本地去耦须实查；不可并联regulator输出或经GPIO给未上电设备反灌。不按reseller图默改引脚/PHY。radio可TX前必须完成runbook与频率/EIRP/access/设备许可审核，模块频段不等于合法授权。
-
-单板流程的MCU BOOT/EN/RESET控件不是提案GPIO1（后者为radio RESET）；第一次上电/ROM前先辨明实际控件。
+实物验收按BENCH_RUNBOOK：确认板/RF版本、Flash/security/USB、供电、RF终端、TCXO/BUSY/DIO1/reset、串口和实际HELLO/ACK。编译/native不证明这些。ERR-021仍阻挡卡BUSY无人值守恢复，未改库或watchdog；ERR-023是SDK runtime前可能格式化NVS，须在app boot/配置改动前完成同板私有备份和恢复计划。

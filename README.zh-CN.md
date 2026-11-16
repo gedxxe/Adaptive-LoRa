@@ -14,24 +14,23 @@ Adaptive-LoRa 是独立的单射频 LoRa P2P 网络研究与嵌入式固件项�
 |---|---|
 | 固件 / 协议 | `0.2.0-alpha.1` / `1` |
 | ESP32 编译 | PASS |
-| Native 测试 | 290/290 PASS：既有266全部通过，新增boot-ID/依赖延迟可靠性24个 |
+| Native 测试 | 302/302 PASS：原290全部通过，新增生产SX1262 adapter 12个 |
 | 已实现 | 有界显式帧、角色配置、HELLO/ACK 身份检查、去重、超时/恢复、sequence/session 处理 |
 | 实物 NVS/重启/SPI/IRQ/RF/天线 | NOT VERIFIED |
 
 Host 执行实际 Client/Gateway 状态机，使用有界 fake transport、时钟及串口适配。丢包、延迟、对象重建、radio 返回码与 IRQ 输入均不等于实测，见 [driver 审查](docs/zh-CN/RADIO_DRIVER_AUDIT.md)。精确证据见 [进度](docs/zh-CN/PROGRESS.md)、[软件审查](docs/zh-CN/SOFTWARE_AUDIT.md) 及英文 [BUILD_MEMORY](docs/en/BUILD_MEMORY.md)。
 
-## 硬件和暂定 PHY
+## 硬件与暂定PHY
 
-- 实际库存：**2 个 AI-Thinker RA-01SCH（LLCC68）、1 个 ESP32-C3 Super Mini**。第二个 MCU 和计划中的 915 MHz Moxon 尚未就绪，双设备未组装。
-- 当前 adapter 为 RadioLib **LLCC68**，依赖固定 **7.8.1**；RA-01SCH 不是 SX1262，未来 SX1262 adapter 尚未实现。
-- 暂定参数：915.0 MHz、BW125、SF7、CR4/5、显式 Header、PHY CRC、前导码 8、私有 sync 0x12、10 dBm、SPI 1 MHz。控制 SF9 在 M2 不使用。LLCC68 在 BW125 下不可用 SF10–SF12。
-- 引脚、USB、电源瞬态、天线匹配及本地 RF 许可均待验证；组装或发射前先读 [HARDWARE](docs/zh-CN/HARDWARE.md)。
+唯一活动目标为 **Heltec WiFi LoRa 32 V3.2 HF**，ESP32-S3FN8、SX1262、8 MB Flash和CP2102/UART0；不假定PSRAM。采购选型是HF902–928 MHz选项，到货数量和PCB标记尚未确认。RadioLib固定7.8.1，GPIO8–14接radio，DIO3 TCXO1.8 V，DC-DC；串口115200，原生USB CDC关闭。OLED、电池监测未实现。
+
+保留915 MHz/BW125/SF7/CR4/5/preamble8/explicit/CRC/sync0x12/10 dBm/SPI1 MHz，SF9控制仍预留。915 MHz Moxon作为设计基线，制作、gain和matching未实测。上电前阅读 [硬件说明](docs/zh-CN/HARDWARE.md) 和 [迁移审查](docs/zh-CN/HARDWARE_MIGRATION_AUDIT.md)。过去硬件描述在历史记录/Git中保留。
 
 ## 架构原则
 
 一份镜像从 NVS 加载有效 GATEWAY/CLIENT 角色。配置缺失、损坏或不支持时进入 provisioning，禁止应用 TX。保存并受控重启后才应用编辑，不通过相同硬件自动推断角色。
 
-RadioTransport 引用分离 app 与 RadioDriver 状态策略；非拥有 RadioHardware 引用指向唯一 LLCC68/SPI/GPIO owner Llcc68Hardware，native 故障测试执行实际 driver；NvsConfigStore 也通过五操作 ConfigStorage 在 native 执行，PreferencesConfigStorage 唯一拥有实际 Preferences，见 [存储审查](docs/zh-CN/CONFIG_STORE_AUDIT.md)，host readback 不证明实物持久性；Esp32Firmware先拥有两个concrete adapter，再构造引用注入FirmwareRuntime，native执行实际协调器/store/driver/apps/console，见 [runtime审查](docs/zh-CN/RUNTIME_AUDIT.md)；SDK shim仅模拟时钟/串口/reset/raw RNG，不证明实物熵或重启。随机生成最多8次raw调用；身份不可用禁止普通TX、记录SESSION_ERROR并按1秒间隔重试。修正时间边界和SDK/BUSY/分配限制见 [依赖预算审查](docs/zh-CN/DEPENDENCY_BUDGET_AUDIT.md)。codec/config/sequence 可在 host 测试，main.cpp 为 15 行入口。[架构文档](docs/zh-CN/ARCHITECTURE.md) 区分协议核、radio adapter、platform 服务和应用 payload/event 接口四个目标边界。当前 platform 仍依赖 ESP32/Arduino，通用应用提交/交付 API 尚不存在。协议核没有 Modbus、电表模型、Wi-Fi/MQTT、PostgreSQL 或 dashboard 集成；不能声称目标架构已经完成。
+RadioTransport 引用分离 app 与 RadioDriver 状态策略；非拥有 RadioHardware 引用指向唯一 SX1262/SPI/GPIO owner Sx1262Hardware，native 故障测试执行实际 driver；NvsConfigStore 也通过五操作 ConfigStorage 在 native 执行，PreferencesConfigStorage 唯一拥有实际 Preferences，见 [存储审查](docs/zh-CN/CONFIG_STORE_AUDIT.md)，host readback 不证明实物持久性；Esp32Firmware先拥有两个concrete adapter，再构造引用注入FirmwareRuntime，native执行实际协调器/store/driver/apps/console，见 [runtime审查](docs/zh-CN/RUNTIME_AUDIT.md)；SDK shim仅模拟时钟/串口/reset/raw RNG，不证明实物熵或重启。随机生成最多8次raw调用；身份不可用禁止普通TX、记录SESSION_ERROR并按1秒间隔重试。修正时间边界和SDK/BUSY/分配限制见 [依赖预算审查](docs/zh-CN/DEPENDENCY_BUDGET_AUDIT.md)。codec/config/sequence 可在 host 测试，main.cpp 为 15 行入口。[架构文档](docs/zh-CN/ARCHITECTURE.md) 区分协议核、radio adapter、platform 服务和应用 payload/event 接口四个目标边界。当前 platform 仍依赖 ESP32/Arduino，通用应用提交/交付 API 尚不存在。协议核没有 Modbus、电表模型、Wi-Fi/MQTT、PostgreSQL 或 dashboard 集成；不能声称目标架构已经完成。
 
 ## 仓库结构
 
@@ -42,11 +41,11 @@ RadioTransport 引用分离 app 与 RadioDriver 状态策略；非拥有 RadioHa
 安装 PlatformIO Core 和支持 C++17 的 host 编译器，在根目录执行：
 
 ```sh
-pio run -e esp32c3_supermini
+pio run -e heltec_wifi_lora_32_V3
 pio test -e native
 ```
 
-目标为 Arduino / esp32-c3-devkitm-1，RadioLib 7.8.1。已有解析版本：Core 6.1.19、pioarduino/espressif32 55.03.311、Arduino-ESP32 3.3.11、RISC-V GCC 14.2.0；host GCC 6.3.0 / native 1.2.1 / Unity 2.6.1。platform 尚未固定，其他机器必须重新记录依赖，不可假定相同。每轮 hash 清单与日志标识其验证快照。
+目标为 Arduino / heltec_wifi_lora_32_V3，RadioLib7.8.1。已有Core6.1.19、pioarduino/espressif32 55.03.311和Arduino3.3.11/IDF5.5.5保持，使用Xtensa GCC14.2.0；host GCC6.3.0、native1.2.1、Unity2.6.1。platform尚未固定，其他机器须记录实际依赖；hash清单和日志标识各次验证快照。
 
 ## 配置与后续实物流程
 
@@ -72,3 +71,5 @@ pio test -e native
 修改前阅读 [AGENTS.md](AGENTS.md)。英文为主文档，简体中文为第二语言。
 
 实物准备入口：[M0-M2 readiness](docs/zh-CN/PHYSICAL_ACCEPTANCE_READINESS.md)，含备份单MCU/pair门槛、采集/CSV和ERR-021/SDK启动限制。流程未执行；上传/改配置前先私有备份，证据用新目录。
+
+Iteration014已完成S3目标编译，302 native及另13 fake-serial capture通过。安装平台55.03.311原本支持该板，无需工具链升级；Arduino3.3.11/IDF5.5.5、Xtensa GCC14.2.0，实际结果在构建记录。协议/NVS/app策略和15行main不变，ERR-021仍OPEN；尚未烧录或做实物NVS/RF测试。

@@ -8,7 +8,7 @@
 namespace adaptive_lora {
 namespace {
 uint32_t freshBootId(uint32_t previous) {
-    // Valid-value bound only; entropy quality depends on ESP32-C3 SDK setup.
+    // Valid-value bound only; entropy quality depends on ESP32-S3 SDK setup.
     for (unsigned attempt = 0; attempt < kBootIdAttempts; ++attempt) {
         const uint32_t value = esp_random();
         if (value != 0 && value != previous) return value;

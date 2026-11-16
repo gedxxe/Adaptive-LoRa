@@ -3,7 +3,7 @@
 #include <cstdint>
 
 namespace adaptive_lora {
-// RadioLib 7.8.1 status values and LLCC68 raw IRQ bits. The production adapter
+// RadioLib 7.8.1 status values and SX126x raw IRQ bits. The production adapter
 // asserts these against the library; getters without status cannot report errors.
 namespace radio_status {
 constexpr int16_t none = 0;

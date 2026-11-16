@@ -329,3 +329,21 @@ ERR-001/016 environment recurrence: the initial restricted batched inspection ex
 ERR-006 encoding recurrence: initial Python document dump exited1 with UnicodeEncodeError under Windows cp1252 on U+2192 after successful read-only Git/tree checks. Retried with `python -X utf8 -`, exit0; subsequent evidence reads/writes use explicit UTF-8. No document bytes or firmware behavior changed by the failed inspection.
 
 Existing ERR-005/008/009/010/021/023 and physical NVS/reset/USB/SPI/IRQ/RF/entropy/heap/stack holds remain open. Software integration is not a physical reproduction, dependency timing guarantee or hardware acceptance. Automatic branch deletion is false; historical branches must remain after merge.
+
+## ERR-025 - Iteration014 audit tooling and native fixture setup
+
+2026-11-17 client date. Initial Windows rg paths with literal *.h/*.cpp components returned os error123/exit1; directory search with -g patterns succeeded. Unauthenticated vendor GitHub tree retrieval returned HTTP403/rate limit; authenticated gh api succeeded. Bundled/system Python had no fitz; first unpinned renderer install was cancelled (exit1) after selecting unnecessary optional dependencies, and isolated PyMuPDF1.26.6 --no-deps installed successfully. An attempted private run_validation.py invocation before that helper existed exited2; no validation ran from it. The helper was then created under ignored .pio and used for actual recorded commands. No firmware or dependency library was changed by these probes.
+
+First migrated S3 build exit0, but native compilation exit1 because test/support/platform/RadioLib.h defined RADIOLIB_IRQ_RX_DEFAULT_FLAGS twice. Evidence logs/test/iteration-014-migrated-native.log and -result.json (recorded at command completion). The duplicate literal was removed, retaining the expression verified against pinned PhysicalLayer.h. Firmware was unaffected; all tests/assertions remain. Status: corrected fixture, full verification pending.
+
+### ERR-025 verification - Iteration014
+
+Corrected native fixture is CLOSED - VERIFIED. `pio test -e native` exit0,302/302 PASS (all290 original names/order retained plus12 adapter cases); capture13/13 exit0; S3 rebuild exit0. Full logs/results: iteration-014-retry-native/capture under logs/test and retry-esp32 under logs/build. Initial migrated-native failure is retained. No test assertion removed; one expected selected-driver label changed for the new target. Final S3 logs contain no compiler warning/error matches.
+
+### ERR-021 / ERR-023 migration assessment - Iteration014
+
+Both remain OPEN. SX1262 uses the same pinned SX126x.launchMode BUSY-ramp loop after setTx; driver deadlines cannot preempt it. V3.2 changes neither this dependency nor its watchdog policy. SDK pre-Runtime NVS initialization/formatting is still present. Require same-board backups before app boot and controlled recovery evidence. Previous HWCDC-specific ERR-005 context is historical after the UART0 selection, without claiming the old physical issue was fixed. ERR-008/009 synchronous operations/allocations remain; ERR-010 now requires UART mutex/uart_write_bytes assessment and physical serial timing rather than transferring old CDC observations. No physical failure/measurement was produced in this iteration.
+
+### ERR-025 exit-code clarification
+
+The earlier helper-note exit2 was not the observed tool wrapper status. The missing-file batch returned exit1 and Python printed Errno2 (file not found); that OS error number must not be presented as the measured process exit. No test ran from that invocation. The actual recorded build/native/capture exit codes in their result JSON remain unchanged.

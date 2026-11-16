@@ -1,0 +1,234 @@
+Processing heltec_wifi_lora_32_V3 (platform: espressif32; board: heltec_wifi_lora_32_V3; framework: arduino)
+--------------------------------------------------------------------------------
+Library Manager: Installing jgromes/RadioLib @ 7.8.1
+Unpacking 0% 10% 20% 30% 40% 50% 60% 70% 80% 90% 100%
+Library Manager: RadioLib@7.8.1 has been installed!
+Verbose mode can be enabled via `-v, --verbose` option
+CONFIGURATION: https://docs.platformio.org/page/boards/espressif32/heltec_wifi_lora_32_V3.html
+PLATFORM: Espressif 32 (55.3.311) > Heltec WiFi LoRa 32 (V3)
+HARDWARE: ESP32S3 240MHz, 320KB RAM, 8MB Flash
+DEBUG: Current (cmsis-dap) External (cmsis-dap, esp-bridge, esp-builtin, esp-prog, esp-prog-2, iot-bus-jtag, jlink, minimodule, olimex-arm-usb-ocd, olimex-arm-usb-ocd-h, olimex-arm-usb-tiny-h, olimex-jtag-tiny, tumpa)
+PACKAGES:
+ - contrib-piohome @ 3.4.4
+ - framework-arduinoespressif32 @ 3.3.11
+ - framework-arduinoespressif32-libs @ 5.5.5+sha.b774170ff46
+ - tool-esp-rom-elfs @ 2024.10.11
+ - tool-esptoolpy @ 5.3.0
+ - tool-openocd-esp32 @ 2.1200.20260424 (12.0)
+ - tool-xtensa-esp-elf-gdb @ 17.1.0+20260402
+ - toolchain-xtensa-esp-elf @ 14.2.0+20260121
+LDF: Library Dependency Finder -> https://bit.ly/configure-pio-ldf
+LDF Modes: Finder ~ chain, Compatibility ~ soft
+Found 45 compatible libraries
+Scanning dependencies...
+Dependency Graph
+|-- RadioLib @ 7.8.1
+|-- SPI @ 3.3.11
+|-- Preferences @ 3.3.11
+Building in release mode
+Compiling .pio\build\heltec_wifi_lora_32_V3\libcc9\SPI\SPI.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\lib0a6\RadioLib\Hal.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\lib0a6\RadioLib\Module.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\lib0a6\RadioLib\hal\Arduino\ArduinoHal.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\lib0a6\RadioLib\hal\ESP-IDF\EspHal.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\lib0a6\RadioLib\hal\RPiPico\PicoHal.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\lib0a6\RadioLib\hal\Stm32duino\Stm32wlHal.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\lib0a6\RadioLib\modules\CC1101\CC1101.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\lib0a6\RadioLib\modules\LLCC68\LLCC68.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\lib0a6\RadioLib\modules\LR11x0\LR1110.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\lib0a6\RadioLib\modules\LR11x0\LR1120.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\lib0a6\RadioLib\modules\LR11x0\LR1121.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\lib0a6\RadioLib\modules\LR11x0\LR11x0.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\lib0a6\RadioLib\modules\LR11x0\LR11x0_commands.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\lib0a6\RadioLib\modules\LR11x0\LR11x0_crypto.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\lib0a6\RadioLib\modules\LR11x0\LR11x0_gnss.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\lib0a6\RadioLib\modules\LR11x0\LR11x0_wifi.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\lib0a6\RadioLib\modules\LR11x0\LR_common.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\lib0a6\RadioLib\modules\LR2021\LR2021.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\lib0a6\RadioLib\modules\LR2021\LR2021_cmds_chip_control.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\lib0a6\RadioLib\modules\LR2021\LR2021_cmds_flrc.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\lib0a6\RadioLib\modules\LR2021\LR2021_cmds_gfsk.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\lib0a6\RadioLib\modules\LR2021\LR2021_cmds_lora.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\lib0a6\RadioLib\modules\LR2021\LR2021_cmds_misc.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\lib0a6\RadioLib\modules\LR2021\LR2021_cmds_ook.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\lib0a6\RadioLib\modules\LR2021\LR2021_cmds_oqpsk.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\lib0a6\RadioLib\modules\LR2021\LR2021_cmds_radio.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\lib0a6\RadioLib\modules\LR2021\LR2021_cmds_ranging.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\lib0a6\RadioLib\modules\LR2021\LR2021_config.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\lib0a6\RadioLib\modules\RF69\RF69.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\lib0a6\RadioLib\modules\SX123x\SX1231.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\lib0a6\RadioLib\modules\SX123x\SX1233.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\lib0a6\RadioLib\modules\SX126x\STM32WLx.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\lib0a6\RadioLib\modules\SX126x\SX1261.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\lib0a6\RadioLib\modules\SX126x\SX1262.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\lib0a6\RadioLib\modules\SX126x\SX1268.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\lib0a6\RadioLib\modules\SX126x\SX126x.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\lib0a6\RadioLib\modules\SX126x\SX126x_LR_FHSS.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\lib0a6\RadioLib\modules\SX126x\SX126x_commands.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\lib0a6\RadioLib\modules\SX126x\SX126x_config.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\lib0a6\RadioLib\modules\SX127x\SX1272.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\lib0a6\RadioLib\modules\SX127x\SX1273.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\lib0a6\RadioLib\modules\SX127x\SX1276.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\lib0a6\RadioLib\modules\SX127x\SX1277.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\lib0a6\RadioLib\modules\SX127x\SX1278.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\lib0a6\RadioLib\modules\SX127x\SX1279.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\lib0a6\RadioLib\modules\SX127x\SX127x.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\lib0a6\RadioLib\modules\SX128x\SX1280.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\lib0a6\RadioLib\modules\SX128x\SX1281.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\lib0a6\RadioLib\modules\SX128x\SX1282.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\lib0a6\RadioLib\modules\SX128x\SX128x.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\lib0a6\RadioLib\modules\Si443x\Si4430.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\lib0a6\RadioLib\modules\Si443x\Si4431.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\lib0a6\RadioLib\modules\Si443x\Si4432.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\lib0a6\RadioLib\modules\Si443x\Si443x.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\lib0a6\RadioLib\modules\nRF24\nRF24.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\lib0a6\RadioLib\protocols\ADSB\ADSB.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\lib0a6\RadioLib\protocols\AFSK\AFSK.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\lib0a6\RadioLib\protocols\APRS\APRS.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\lib0a6\RadioLib\protocols\AX25\AX25.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\lib0a6\RadioLib\protocols\BellModem\BellModem.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\lib0a6\RadioLib\protocols\ExternalRadio\ExternalRadio.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\lib0a6\RadioLib\protocols\FSK4\FSK4.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\lib0a6\RadioLib\protocols\Hellschreiber\Hellschreiber.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\lib0a6\RadioLib\protocols\LoRaWAN\LoRaWAN.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\lib0a6\RadioLib\protocols\LoRaWAN\LoRaWANBands.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\lib0a6\RadioLib\protocols\LoRaWAN\LoRaWANPacMan.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\lib0a6\RadioLib\protocols\LoRaWAN\LoRaWANPackageTS003.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\lib0a6\RadioLib\protocols\LoRaWAN\LoRaWANPackageTS009.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\lib0a6\RadioLib\protocols\Morse\Morse.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\lib0a6\RadioLib\protocols\Pager\Pager.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\lib0a6\RadioLib\protocols\PhysicalLayer\PhysicalLayer.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\lib0a6\RadioLib\protocols\Print\ITA2String.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\lib0a6\RadioLib\protocols\Print\Print.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\lib0a6\RadioLib\protocols\RTTY\RTTY.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\lib0a6\RadioLib\protocols\SSTV\SSTV.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\lib0a6\RadioLib\utils\BCH.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\lib0a6\RadioLib\utils\CRC.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\lib0a6\RadioLib\utils\ConvCode.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\lib0a6\RadioLib\utils\Cryptography.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\lib0a6\RadioLib\utils\Utils.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\libdc0\Preferences\Preferences.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\src\app\firmware_runtime.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\src\app\nvs_config_store.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\src\app\preferences_config_storage.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\src\app\provisioning_console.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\src\client\client_app.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\src\common\config\device_config.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\src\common\diagnostics\serial_logger.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\src\common\protocol\frame_codec.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\src\common\protocol\sequence_tracker.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\src\common\radio\radio_driver.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\src\common\radio\sx1262_hardware.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\src\gateway\gateway_app.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\src\main.cpp.o
+Building .pio\build\heltec_wifi_lora_32_V3\bootloader.bin
+Generating partitions .pio\build\heltec_wifi_lora_32_V3\partitions.bin
+esptool v5.3.0
+Creating ESP32-S3 image...
+Merged 2 ELF sections.
+Successfully created ESP32-S3 image.
+Compiling .pio\build\heltec_wifi_lora_32_V3\FrameworkArduino\ColorFormat.c.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\FrameworkArduino\Esp.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\FrameworkArduino\FirmwareMSC.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\FrameworkArduino\FunctionalInterrupt.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\FrameworkArduino\HEXBuilder.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\FrameworkArduino\HWCDC.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\FrameworkArduino\HardwareSerial.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\FrameworkArduino\HashBuilder.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\FrameworkArduino\IPAddress.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\FrameworkArduino\MD5Builder.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\FrameworkArduino\MacAddress.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\FrameworkArduino\Print.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\FrameworkArduino\Stream.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\FrameworkArduino\StreamString.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\FrameworkArduino\StringUtils.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\FrameworkArduino\Tone.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\FrameworkArduino\USB.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\FrameworkArduino\USBCDC.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\FrameworkArduino\USBMSC.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\FrameworkArduino\WMath.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\FrameworkArduino\WString.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\FrameworkArduino\base64.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\FrameworkArduino\cbuf.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\FrameworkArduino\chip-debug-report.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\FrameworkArduino\esp32-hal-adc.c.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\FrameworkArduino\esp32-hal-bt.c.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\FrameworkArduino\esp32-hal-cpu.c.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\FrameworkArduino\esp32-hal-dac.c.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\FrameworkArduino\esp32-hal-gpio.c.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\FrameworkArduino\esp32-hal-hosted.c.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\FrameworkArduino\esp32-hal-i2c-ng.c.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\FrameworkArduino\esp32-hal-i2c-slave.c.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\FrameworkArduino\esp32-hal-i2c.c.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\FrameworkArduino\esp32-hal-ldo.c.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\FrameworkArduino\esp32-hal-ledc.c.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\FrameworkArduino\esp32-hal-log-wrapper.c.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\FrameworkArduino\esp32-hal-matrix.c.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\FrameworkArduino\esp32-hal-misc.c.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\FrameworkArduino\esp32-hal-periman.c.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\FrameworkArduino\esp32-hal-psram.c.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\FrameworkArduino\esp32-hal-rgb-led.c.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\FrameworkArduino\esp32-hal-rmt.c.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\FrameworkArduino\esp32-hal-sigmadelta.c.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\FrameworkArduino\esp32-hal-spi.c.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\FrameworkArduino\esp32-hal-time.c.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\FrameworkArduino\esp32-hal-timer.c.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\FrameworkArduino\esp32-hal-tinyusb.c.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\FrameworkArduino\esp32-hal-touch-ng.c.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\FrameworkArduino\esp32-hal-touch.c.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\FrameworkArduino\esp32-hal-uart.c.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\FrameworkArduino\firmware_msc_fat.c.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\FrameworkArduino\freertos_stats.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\FrameworkArduino\idf_openthread_mpool_wrapper.c.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\FrameworkArduino\libb64\cdecode.c.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\FrameworkArduino\libb64\cencode.c.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\FrameworkArduino\main.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\FrameworkArduino\stdlib_noniso.c.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\FrameworkArduino\wiring_pulse.c.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\FrameworkArduino\wiring_shift.c.o
+Archiving .pio\build\heltec_wifi_lora_32_V3\libFrameworkArduino.a
+Indexing .pio\build\heltec_wifi_lora_32_V3\libFrameworkArduino.a
+Linking .pio\build\heltec_wifi_lora_32_V3\firmware.elf
+                            Memory Type Usage Summary
+┌─────────────────────┬──────────────┬──────────┬────────────────┬───────────────┐
+│ Memory Type/Section │ Used [bytes] │ Used [%] │ Remain [bytes] │ Total [bytes] │
+├─────────────────────┼──────────────┼──────────┼────────────────┼───────────────┤
+│ Flash Code          │       197232 │          │                │               │
+│    .text            │       197232 │          │                │               │
+│ Flash Data          │        78512 │          │                │               │
+│    .rodata          │        68016 │          │                │               │
+│    .eh_frame        │        10240 │          │                │               │
+│    .appdesc         │          256 │          │                │               │
+│ DIRAM               │        78288 │    22.91 │         263472 │        341760 │
+│    .text            │        46195 │    13.52 │                │               │
+│    .bss             │        17360 │     5.08 │                │               │
+│    .data            │        14733 │     4.31 │                │               │
+│ IRAM                │        16384 │    100.0 │              0 │         16384 │
+│    .text            │        15356 │    93.73 │                │               │
+│    .vectors         │         1028 │     6.27 │                │               │
+└─────────────────────┴──────────────┴──────────┴────────────────┴───────────────┘
+Total image size: 353056 bytes (.bin may be padded larger)
+Note: The reported total sizes may be smaller than those in the technical reference manual due to reserved memory and application configuration. The total flash size available for the application is not included by default, as it cannot be reliably determined due to the presence of other data like the bootloader, partition table, and application partition size. The total external RAM size is not included either, because the amount of RAM connected to the chip is detected at boot and is not known during the build.
+Retrieving maximum program size .pio\build\heltec_wifi_lora_32_V3\firmware.elf
+Checking size .pio\build\heltec_wifi_lora_32_V3\firmware.elf
+Advanced Memory Usage is available via "PlatformIO Home > Project Inspect"
+RAM:   [=         ]   9.8% (used 32096 bytes from 327680 bytes)
+Flash: [=         ]  10.2% (used 342560 bytes from 3342336 bytes)
+Building .pio\build\heltec_wifi_lora_32_V3\firmware.bin
+esptool v5.3.0
+Creating ESP32-S3 image...
+Merged 3 ELF sections.
+Successfully created ESP32-S3 image.
+Creating binary "firmware.factory.bin" with:
+    Offset   | File
+ -  0x0000   | bootloader.bin
+ -  0x8000   | partitions.bin
+ -  0xe000   | boot_app0.bin
+ -  0x10000  | firmware.bin
+Successfully created combined binary image.
+======================== [SUCCESS] Took 199.37 seconds ========================
+
+Environment             Status    Duration
+----------------------  --------  ------------
+heltec_wifi_lora_32_V3  SUCCESS   00:03:19.370
+========================= 1 succeeded in 00:03:19.370 =========================

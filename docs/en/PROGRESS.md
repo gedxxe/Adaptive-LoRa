@@ -1,4 +1,43 @@
-# Development Progress
+# Development progress
+
+## Iteration014: Heltec V3.2 HF software migration complete
+
+2026-11-17 client date. The sole active target is Heltec WiFi LoRa 32 V3.2 HF,
+ESP32-S3FN8/SX1262, with CP2102/UART0,1.8 V TCXO and DC-DC selection.
+The user explicitly authorized immediate implementation and preservation
+of engineering history. Baseline main075b8faf includes PR #3; the dedicated
+migration branch is iteration-014-heltec-sx1262-migration-audit. Publication
+is through a normal-merge PR after review; the final PR state identifies
+its merge SHA.
+
+| Software evidence | Result |
+|---|---|
+| S3 firmware build | PASS, exit0 |
+| Native tests | 302/302 PASS: all290 original cases plus12 adapter cases |
+| Capture utility | 13/13 PASS, fake ports only |
+| Protocol / NVS / firmware | 1 / schema1 / 0.2.0-alpha.1, unchanged |
+| Main / app/core policy | 15-line main;25 protected original files byte-identical |
+| RAM / flash | 32,096 /342,560 bytes; no physical heap/stack measurement |
+
+The initial native fixture duplicate declaration failed compilation and is
+preserved in the migrated-native log; corrected retry passes all cases
+(ERR-025). Source settings and vendor documents are recorded in
+HARDWARE_MIGRATION_AUDIT.md and iteration-014 artifacts. Current PHY remains
+915 MHz/BW125/SF7/10 dBm. No display/battery, scheduler, bitmap, selective
+retry or ADR feature is added.
+
+Board receipt/markings, supply, UART/reset, NVS/flash, SPI/IRQ/TCXO/RF,
+antenna matching and runtime memory/entropy remain unverified. ERR-021
+and ERR-023 are open; previous CDC-specific evidence is historical after
+UART0 selection. M0-M2 physical acceptance remains IN PROGRESS; M3-M8
+have not started. Next: procure/inspect the fixed target, terminate RF,
+make same-board private backups, then follow the current bench runbook.
+Do not use the earlier removable-radio single-MCU procedure on this board.
+
+## Historical snapshots through Iteration013
+
+The records below describe their own hardware and publication checkpoints.
+Their inventory/build commands are not the active target configuration.
 
 ## Iteration013 main integration - validation complete
 

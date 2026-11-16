@@ -35,7 +35,7 @@ int main() {
 }
 '''
     sources = [str(p.relative_to(ROOT)) for p in (ROOT / "src").rglob("*.cpp")
-               if p.name not in {"main.cpp", "firmware_runtime.cpp", "llcc68_hardware.cpp", "preferences_config_storage.cpp"}]
+               if p.name not in {"main.cpp", "firmware_runtime.cpp", "sx1262_hardware.cpp", "preferences_config_storage.cpp"}]
     with tempfile.TemporaryDirectory(prefix="adaptive-lora-rng-probe-") as tmp:
         source = Path(tmp) / "probe.cpp"
         source.write_text(baseline + probe, encoding="utf-8")

@@ -1,5 +1,27 @@
 # 系统架构
 
+## 当前Heltec目标
+
+唯一活动硬件为Heltec WiFi LoRa 32 V3.2 HF，ESP32-S3FN8/SX1262。
+Esp32Firmware先拥有PreferencesConfigStorage和Sx1262Hardware，再构造引用它们的FirmwareRuntime。
+一份镜像读取有效NVS角色后只运行GatewayApp或ClientApp；配置无效保持provisioning且禁应用TX。
+main.cpp仍为15行构造和setup/loop委托。
+
+RadioDriver保留全部状态/超时/错误策略，Sx1262Hardware独占RadioLib/SPI/GPIO。
+板GPIO8–14、TCXO1.8 V、DIO2开关及DC-DC与CP2102/UART0设置见迁移审查。
+FrameCodec、DeviceConfig、SequenceTracker及NVSschema1/协议1保持。
+不新增OLED、电池、Wi-Fi、TDMA、bitmap、重传调度或ADR。
+
+Native执行实际生产模块；新增adapter用有界调用记录检查配置和转发，不模拟射频。
+SDK调用仍可能同步等待，ERR-021未因迁移修复。完整平台服务和通用payload/event接口仍缺失。
+详见英文ARCHITECTURE和双语HARDWARE_MIGRATION_AUDIT。
+
+## 截至Iteration013的历史架构说明
+
+以下保留原迭代上下文；硬件、库存和未实现声明描述当时快照，以以上当前目标为准。
+
+# 系统架构
+
 ## 1. 总体设计
 
 两台设备使用相同的 ESP32-C3 Super Mini 和 Ra-01SCH

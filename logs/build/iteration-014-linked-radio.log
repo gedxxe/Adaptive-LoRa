@@ -1,0 +1,23 @@
+xtensa-esp32s3-elf-nm -C .pio/build/heltec_wifi_lora_32_V3/firmware.elf
+exit0
+Selected radio symbols only; no linked LLCC68 symbols.
+4202c380 T SX1262::beginLRFHSS(float, unsigned char, unsigned char, bool, signed char, float, bool)
+420032f4 T SX1262::beginLRFHSS(ConfigLRFHSS_t const&)
+420033d0 T SX1262::setFrequency(float)
+42003360 T SX1262::setFrequency(float, bool)
+42003434 T SX1262::setOutputPower(signed char)
+420033e0 T SX1262::setOutputPower(signed char, bool)
+4202c3b0 T SX1262::checkOutputPower(signed char, signed char*)
+420030d8 T SX1262::begin(float, float, unsigned char, unsigned char, unsigned char, signed char, unsigned short, float, bool)
+4200321c T SX1262::begin(ConfigLoRa_t const&)
+4200311c T SX1262::beginFSK(float, float, float, float, signed char, unsigned short, float, bool)
+4200327c T SX1262::beginFSK(ConfigFSK_t const&)
+42003198 T SX1262::setModem(ModemType_t)
+4200316c T SX1262::beginBPSK(float, float, signed char, float, bool)
+420032bc T SX1262::beginBPSK(ConfigBPSK_t const&)
+42003344 T SX1262::SX1262(Module*)
+42003344 T SX1262::SX1262(Module*)
+42003334 W SX1262::~SX1262()
+4202c3d8 W SX1262::~SX1262()
+4202c3d8 W SX1262::~SX1262()
+3c04bd44 V vtable for SX1262

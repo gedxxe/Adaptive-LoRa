@@ -5,6 +5,12 @@ changes. It is not a substitute for the append-only build memory.
 
 ## Unreleased
 
+### Heltec V3.2 HF hardware migration - 2026-11-17
+
+- Replace the active hardware target with ESP32-S3/SX1262 on Heltec WiFi LoRa 32 V3.2 HF: schematic pins,1.8 V TCXO, DC-DC and CP2102/UART0. Preserve one image, NVS roles, protocol1 and firmware0.2.0-alpha.1.
+- Retain all290 native cases and add12 tests of the actual adapter;13 capture tests remain separate. The initial native fixture failure and correction are retained. S3 build passes.
+- Publish revision/GPIO/API/resource/test/risk audit and updated bilingual bench procedures. Keep all previous iteration evidence; no physical hardware test, later MAC feature or ERR-021 recovery fix is claimed.
+
 ### Iteration 013 main integration - 2026-11-13
 
 - Record the canonical-main workflow and fresh ESP32/290-native/13-capture validation for PR #3; preserve iteration histories and branches. No firmware, NVS, PHY, protocol or version change relative to verified Iteration 013. Physical acceptance remains unverified.

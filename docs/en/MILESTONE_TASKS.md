@@ -10,12 +10,12 @@ Adaptive-LoRa research title: Reliability-aware TDMA Scheduling and Link Adaptat
 - Preserve pure encoding/config/identity helpers and the existing radio transport contract.
 - Before embedding in another application, specify payload submission/delivery, link events and statistics without meter/backhaul/database assumptions.
 - Design clock/random/persistence/interrupt service boundaries from concrete portability requirements; current ESP32 calls and native test shims are not a general production platform layer.
-- Extend radio lifecycle/PHY interfaces only when a second verified adapter is needed. SX1262 is a future option, not an implemented target.
+- Extend radio lifecycle/PHY interfaces only when a second verified adapter is needed. The single SX1262 adapter is implemented; add another only for a concrete requirement.
 - Do not start this API work, scheduling, bitmap/retry or ADR merely as part of identity/publication edits.
 
 ## M0 — Hardware and toolchain baseline
 
-- Inspect both Super Mini boards and both Ra-01SCH modules.
+- Inspect both delivered Heltec WiFi LoRa 32 V3.2 HF boards and confirm their RF variant.
 - Confirm board/module revisions and pin orientation.
 - Verify GPIO continuity against `HARDWARE.md`.
 - Verify radio 3.3 V supply and antenna connection.
@@ -23,7 +23,7 @@ Adaptive-LoRa research title: Reliability-aware TDMA Scheduling and Link Adaptat
 - Record toolchain versions.
 - Do not transmit until antenna and supply are verified.
 
-## M1 — LLCC68 bring-up and role provisioning
+## M1 — SX1262 bring-up and role provisioning
 
 - Create the single PlatformIO firmware environment.
 - Pin RadioLib 7.8.1.
@@ -31,7 +31,7 @@ Adaptive-LoRa research title: Reliability-aware TDMA Scheduling and Link Adaptat
   `NvsConfigStore` persistence wrapper.
 - Implement bounded serial provisioning commands.
 - Implement `FirmwareRuntime` role dispatch.
-- Implement `RadioDriver` with a single LLCC68 owner.
+- Retain `RadioDriver` policy and the sole Sx1262Hardware owner; verify the integrated radio physically.
 - Test valid, missing, corrupt, and incompatible configuration.
 - Verify invalid role enters safe provisioning mode with TX disabled.
 
@@ -102,3 +102,5 @@ Adaptive-LoRa research title: Reliability-aware TDMA Scheduling and Link Adaptat
 - Clearly label results as simulation.
 - Prepare physical multi-node testing only when additional hardware is
   available.
+
+Iteration014 completed the single-target S3/SX1262 source migration and host checks. M0-M2 still need physical acceptance under the current runbook. Procurement/backup/terminated RF tests precede the planned five-client pilot;70-node work remains a separate research study.

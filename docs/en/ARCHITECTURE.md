@@ -1,9 +1,11 @@
 # Architecture
 
+The active hardware is Heltec WiFi LoRa 32 V3.2 HF. Iteration014 changes only the hardware adapter, pins, build/serial selection and selected-driver diagnostic. Protocol1, NVSschema1 and application/driver state policy remain compatible. See HARDWARE_MIGRATION_AUDIT.md for source evidence and physical limits.
+
 ## 1. Design overview
 
 The project uses one firmware image for two physically identical
-ESP32-C3 + Ra-01SCH devices.
+Heltec WiFi LoRa 32 V3.2 HF devices.
 
 ``` text
                          One firmware image
@@ -24,9 +26,9 @@ ESP32-C3 + Ra-01SCH devices.
                                 |
                          RadioDriver
                                 |
-                       Llcc68Hardware
+                       Sx1262Hardware
                                 |
-                       RadioLib LLCC68
+                       RadioLib SX1262
                                 |
                          Ra-01SCH module
 ```
@@ -122,7 +124,7 @@ The original namespace bytes are retained as a numeric compatibility constant in
 | `GatewayApp`          | Gateway state machine and HELLO validation/ACK response | Direct SPI operations                              |
 | `ClientApp`           | Client state machine, HELLO/ACK tracking                | Direct SPI operations                              |
 | `RadioDriver`         | TX/RX state, deadlines, validation and event policy     | Direct RadioLib/SPI/GPIO access                    |
-| `Llcc68Hardware`      | Sole Module/LLCC68/SPI/GPIO/ISR adapter                 | Own driver or application state transitions        |
+| `Sx1262Hardware`      | Sole Module/SX1262/SPI/GPIO/ISR adapter                 | Own driver or application state transitions        |
 | `FrameCodec`          | Serialize/deserialize bounded frames                    | Depend on Arduino or RadioLib                      |
 | `SequenceTracker`     | Track duplicate packet identities                       | Perform radio operations                           |
 | `SerialLogger`        | Format structured diagnostics                           | Block timing-critical radio work                   |
@@ -132,7 +134,7 @@ concrete responsibility, not because every function needs a class.
 
 ## 5. Radio ownership
 
-Only `Llcc68Hardware` within the radio module may access RadioLib, SPI or
+Only `Sx1262Hardware` within the radio module may access RadioLib, SPI or
 the radio GPIOs. `RadioDriver` owns state policy through a non-owning
 `RadioHardware` reference (ADR-012); Esp32Firmware constructs the sole concrete adapter before the reference-injected runtime/driver.
 
@@ -169,7 +171,7 @@ echoed identity.
 The accepted direction is gateway-scheduled TDMA with conservative
 per-client SF adaptation, bitmap ACK, and selective retry.
 
-The gateway has one LLCC68. It cannot listen to multiple spreading
+The gateway has one SX1262. It cannot listen to multiple spreading
 factors at once. For each scheduled client slot, it configures the
 receiver for the expected PHY, receives that client sequentially, then
 changes back to the common control PHY for the ACK bitmap.
@@ -184,6 +186,27 @@ The superframe is planned as:
 
 Control and data are logical planes that time-share the same
 transceiver.
+
+## Current platform and integration boundaries
+
+The V3 board environment selects ESP32-S3, CP2102/UART0 at115200 and
+CDC_ON_BOOT=0. The sole radio adapter uses GPIO8-14, DIO3 TCXO1.8 V,
+DIO2 RF switching and DC-DC. OLED, battery sensing, Wi-Fi and additional
+interfaces are absent. The driver retains header/CRC reassertions and all
+existing deadlines/error priority. Its dependency calls can still block;
+ERR-021 is not fixed by selecting SX1262.
+
+Codec/config/identity helpers remain platform-independent. Applications
+still call ESP timers and SerialLogger, so the full runtime is not a
+generic MCU port. A general application-payload/event API is also absent.
+The radio/storage reference boundaries support focused native tests,
+not an unimplemented cross-platform integration framework.
+
+## Historical architecture and verification notes through Iteration013
+
+The following notes retain the source context of earlier iterations.
+Hardware names, inventories and “not yet implemented” statements describe
+those snapshots; the current hardware decision above supersedes them.
 
 ## Software verification boundary (ADR-010)
 

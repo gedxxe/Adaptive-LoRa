@@ -1,0 +1,376 @@
+{
+  "baseline": "075b8faf64ca8377cc2adc396429aa6943b47a27",
+  "branch": "iteration-014-heltec-sx1262-migration-audit",
+  "client_date": "2026-11-17",
+  "files": [
+    {
+      "path": "AGENTS.md",
+      "status": "modified",
+      "responsibility": "Current migration contract/audit/procedure, bilingual snapshot or append-only historical record."
+    },
+    {
+      "path": "CHANGELOG.md",
+      "status": "modified",
+      "responsibility": "Current migration contract/audit/procedure, bilingual snapshot or append-only historical record."
+    },
+    {
+      "path": "PACKAGE_MANIFEST.md",
+      "status": "modified",
+      "responsibility": "Current migration contract/audit/procedure, bilingual snapshot or append-only historical record."
+    },
+    {
+      "path": "README.md",
+      "status": "modified",
+      "responsibility": "Current migration contract/audit/procedure, bilingual snapshot or append-only historical record."
+    },
+    {
+      "path": "README.zh-CN.md",
+      "status": "modified",
+      "responsibility": "Current migration contract/audit/procedure, bilingual snapshot or append-only historical record."
+    },
+    {
+      "path": "docs/en/ARCHITECTURE.md",
+      "status": "modified",
+      "responsibility": "Current migration contract/audit/procedure, bilingual snapshot or append-only historical record."
+    },
+    {
+      "path": "docs/en/BENCH_RUNBOOK.md",
+      "status": "modified",
+      "responsibility": "Current migration contract/audit/procedure, bilingual snapshot or append-only historical record."
+    },
+    {
+      "path": "docs/en/BUILD_MEMORY.md",
+      "status": "modified",
+      "responsibility": "Current migration contract/audit/procedure, bilingual snapshot or append-only historical record."
+    },
+    {
+      "path": "docs/en/DECISIONS.md",
+      "status": "modified",
+      "responsibility": "Current migration contract/audit/procedure, bilingual snapshot or append-only historical record."
+    },
+    {
+      "path": "docs/en/ERROR_LOG.md",
+      "status": "modified",
+      "responsibility": "Current migration contract/audit/procedure, bilingual snapshot or append-only historical record."
+    },
+    {
+      "path": "docs/en/HARDWARE.md",
+      "status": "modified",
+      "responsibility": "Current migration contract/audit/procedure, bilingual snapshot or append-only historical record."
+    },
+    {
+      "path": "docs/en/HARDWARE_MIGRATION_AUDIT.md",
+      "status": "created",
+      "responsibility": "Current migration contract/audit/procedure, bilingual snapshot or append-only historical record."
+    },
+    {
+      "path": "docs/en/MILESTONE_TASKS.md",
+      "status": "modified",
+      "responsibility": "Update the active M0/M1 hardware steps and integration baseline while keeping M3-M8 future gates."
+    },
+    {
+      "path": "docs/en/PHYSICAL_ACCEPTANCE_READINESS.md",
+      "status": "modified",
+      "responsibility": "Current migration contract/audit/procedure, bilingual snapshot or append-only historical record."
+    },
+    {
+      "path": "docs/en/PROGRESS.md",
+      "status": "modified",
+      "responsibility": "Current migration contract/audit/procedure, bilingual snapshot or append-only historical record."
+    },
+    {
+      "path": "docs/en/TEST_PLAN.md",
+      "status": "modified",
+      "responsibility": "Current migration contract/audit/procedure, bilingual snapshot or append-only historical record."
+    },
+    {
+      "path": "docs/en/VERSIONING.md",
+      "status": "modified",
+      "responsibility": "Current migration contract/audit/procedure, bilingual snapshot or append-only historical record."
+    },
+    {
+      "path": "docs/zh-CN/ARCHITECTURE.md",
+      "status": "modified",
+      "responsibility": "Current migration contract/audit/procedure, bilingual snapshot or append-only historical record."
+    },
+    {
+      "path": "docs/zh-CN/BENCH_RUNBOOK.md",
+      "status": "modified",
+      "responsibility": "Current migration contract/audit/procedure, bilingual snapshot or append-only historical record."
+    },
+    {
+      "path": "docs/zh-CN/DECISIONS.md",
+      "status": "modified",
+      "responsibility": "Current migration contract/audit/procedure, bilingual snapshot or append-only historical record."
+    },
+    {
+      "path": "docs/zh-CN/HARDWARE.md",
+      "status": "modified",
+      "responsibility": "Current migration contract/audit/procedure, bilingual snapshot or append-only historical record."
+    },
+    {
+      "path": "docs/zh-CN/HARDWARE_MIGRATION_AUDIT.md",
+      "status": "created",
+      "responsibility": "Current migration contract/audit/procedure, bilingual snapshot or append-only historical record."
+    },
+    {
+      "path": "docs/zh-CN/PHYSICAL_ACCEPTANCE_READINESS.md",
+      "status": "modified",
+      "responsibility": "Current migration contract/audit/procedure, bilingual snapshot or append-only historical record."
+    },
+    {
+      "path": "docs/zh-CN/PROGRESS.md",
+      "status": "modified",
+      "responsibility": "Current migration contract/audit/procedure, bilingual snapshot or append-only historical record."
+    },
+    {
+      "path": "docs/zh-CN/TEST_PLAN.md",
+      "status": "modified",
+      "responsibility": "Current migration contract/audit/procedure, bilingual snapshot or append-only historical record."
+    },
+    {
+      "path": "include/board_pins.h",
+      "status": "modified",
+      "responsibility": "Select the sole S3 board/composition, correct radio pins/TCXO/regulator or selected-driver label; preserve protocol policy."
+    },
+    {
+      "path": "include/radio_config.h",
+      "status": "modified",
+      "responsibility": "Select the sole S3 board/composition, correct radio pins/TCXO/regulator or selected-driver label; preserve protocol policy."
+    },
+    {
+      "path": "logs/build/iteration-014-baseline-esp32-result.json",
+      "status": "created",
+      "responsibility": "Executed iteration output/result, input/source/diff inventory, or updated current blank run template."
+    },
+    {
+      "path": "logs/build/iteration-014-baseline-esp32.log",
+      "status": "created",
+      "responsibility": "Executed iteration output/result, input/source/diff inventory, or updated current blank run template."
+    },
+    {
+      "path": "logs/build/iteration-014-dependency-inventory.json",
+      "status": "created",
+      "responsibility": "Executed iteration output/result, input/source/diff inventory, or updated current blank run template."
+    },
+    {
+      "path": "logs/build/iteration-014-hardware-sources.json",
+      "status": "created",
+      "responsibility": "Executed iteration output/result, input/source/diff inventory, or updated current blank run template."
+    },
+    {
+      "path": "logs/build/iteration-014-linked-radio.log",
+      "status": "created",
+      "responsibility": "Executed iteration output/result, input/source/diff inventory, or updated current blank run template."
+    },
+    {
+      "path": "logs/build/iteration-014-migrated-esp32-result.json",
+      "status": "created",
+      "responsibility": "Executed iteration output/result, input/source/diff inventory, or updated current blank run template."
+    },
+    {
+      "path": "logs/build/iteration-014-migrated-esp32.log",
+      "status": "created",
+      "responsibility": "Executed iteration output/result, input/source/diff inventory, or updated current blank run template."
+    },
+    {
+      "path": "logs/build/iteration-014-publication-preflight.json",
+      "status": "created",
+      "responsibility": "Fetched baseline, original remote branch heads and normal-merge/no-deletion settings for preservation guards."
+    },
+    {
+      "path": "logs/build/iteration-014-retry-esp32-result.json",
+      "status": "created",
+      "responsibility": "Executed iteration output/result, input/source/diff inventory, or updated current blank run template."
+    },
+    {
+      "path": "logs/build/iteration-014-retry-esp32.log",
+      "status": "created",
+      "responsibility": "Executed iteration output/result, input/source/diff inventory, or updated current blank run template."
+    },
+    {
+      "path": "logs/build/iteration-014-review.json",
+      "status": "deleted",
+      "responsibility": "Executed iteration output/result, input/source/diff inventory, or updated current blank run template."
+    },
+    {
+      "path": "logs/build/iteration-014-source-manifest.sha256",
+      "status": "created",
+      "responsibility": "Executed iteration output/result, input/source/diff inventory, or updated current blank run template."
+    },
+    {
+      "path": "logs/build/iteration-014-toolchain.log",
+      "status": "created",
+      "responsibility": "Executed iteration output/result, input/source/diff inventory, or updated current blank run template."
+    },
+    {
+      "path": "logs/build/iteration-014-validation.json",
+      "status": "created",
+      "responsibility": "Executed iteration output/result, input/source/diff inventory, or updated current blank run template."
+    },
+    {
+      "path": "logs/test/RUN_RECORD_TEMPLATE.md",
+      "status": "modified",
+      "responsibility": "Executed iteration output/result, input/source/diff inventory, or updated current blank run template."
+    },
+    {
+      "path": "logs/test/iteration-014-baseline-capture-result.json",
+      "status": "created",
+      "responsibility": "Executed iteration output/result, input/source/diff inventory, or updated current blank run template."
+    },
+    {
+      "path": "logs/test/iteration-014-baseline-capture.log",
+      "status": "created",
+      "responsibility": "Executed iteration output/result, input/source/diff inventory, or updated current blank run template."
+    },
+    {
+      "path": "logs/test/iteration-014-baseline-native-result.json",
+      "status": "created",
+      "responsibility": "Executed iteration output/result, input/source/diff inventory, or updated current blank run template."
+    },
+    {
+      "path": "logs/test/iteration-014-baseline-native.log",
+      "status": "created",
+      "responsibility": "Executed iteration output/result, input/source/diff inventory, or updated current blank run template."
+    },
+    {
+      "path": "logs/test/iteration-014-historical-boot-probe-result.json",
+      "status": "created",
+      "responsibility": "Executed iteration output/result, input/source/diff inventory, or updated current blank run template."
+    },
+    {
+      "path": "logs/test/iteration-014-historical-boot-probe.log",
+      "status": "created",
+      "responsibility": "Executed iteration output/result, input/source/diff inventory, or updated current blank run template."
+    },
+    {
+      "path": "logs/test/iteration-014-migrated-native-result.json",
+      "status": "created",
+      "responsibility": "Executed iteration output/result, input/source/diff inventory, or updated current blank run template."
+    },
+    {
+      "path": "logs/test/iteration-014-migrated-native.log",
+      "status": "created",
+      "responsibility": "Executed iteration output/result, input/source/diff inventory, or updated current blank run template."
+    },
+    {
+      "path": "logs/test/iteration-014-retry-capture-result.json",
+      "status": "created",
+      "responsibility": "Executed iteration output/result, input/source/diff inventory, or updated current blank run template."
+    },
+    {
+      "path": "logs/test/iteration-014-retry-capture.log",
+      "status": "created",
+      "responsibility": "Executed iteration output/result, input/source/diff inventory, or updated current blank run template."
+    },
+    {
+      "path": "logs/test/iteration-014-retry-native-result.json",
+      "status": "created",
+      "responsibility": "Executed iteration output/result, input/source/diff inventory, or updated current blank run template."
+    },
+    {
+      "path": "logs/test/iteration-014-retry-native.log",
+      "status": "created",
+      "responsibility": "Executed iteration output/result, input/source/diff inventory, or updated current blank run template."
+    },
+    {
+      "path": "logs/test/iteration-014-scenarios.md",
+      "status": "created",
+      "responsibility": "Executed iteration output/result, input/source/diff inventory, or updated current blank run template."
+    },
+    {
+      "path": "platformio.ini",
+      "status": "modified",
+      "responsibility": "Select the sole S3 board/composition, correct radio pins/TCXO/regulator or selected-driver label; preserve protocol policy."
+    },
+    {
+      "path": "src/app/esp32_firmware.h",
+      "status": "modified",
+      "responsibility": "Select the sole S3 board/composition, correct radio pins/TCXO/regulator or selected-driver label; preserve protocol policy."
+    },
+    {
+      "path": "src/app/firmware_runtime.cpp",
+      "status": "modified",
+      "responsibility": "Load/select role and coordinate driver/apps/console/reboot; executable code unchanged, SDK comment updated."
+    },
+    {
+      "path": "src/common/radio/llcc68_hardware.cpp",
+      "status": "deleted",
+      "responsibility": "Old active adapter removed; original implementation remains in Git and original engineering records."
+    },
+    {
+      "path": "src/common/radio/llcc68_hardware.h",
+      "status": "deleted",
+      "responsibility": "Old active adapter removed; original implementation remains in Git and original engineering records."
+    },
+    {
+      "path": "src/common/radio/radio_driver.h",
+      "status": "modified",
+      "responsibility": "Select the sole S3 board/composition, correct radio pins/TCXO/regulator or selected-driver label; preserve protocol policy."
+    },
+    {
+      "path": "src/common/radio/radio_hardware.h",
+      "status": "modified",
+      "responsibility": "Select the sole S3 board/composition, correct radio pins/TCXO/regulator or selected-driver label; preserve protocol policy."
+    },
+    {
+      "path": "src/common/radio/sx1262_hardware.cpp",
+      "status": "created",
+      "responsibility": "Sole new SX1262/SPI/GPIO/ISR adapter; preserve existing forwarding, assert actual board/library constants."
+    },
+    {
+      "path": "src/common/radio/sx1262_hardware.h",
+      "status": "created",
+      "responsibility": "Select the sole S3 board/composition, correct radio pins/TCXO/regulator or selected-driver label; preserve protocol policy."
+    },
+    {
+      "path": "test/support/platform/RadioLib.h",
+      "status": "created",
+      "responsibility": "Native-only bounded SPI/RadioLib argument/result recorder; never included by firmware."
+    },
+    {
+      "path": "test/support/platform/SPI.h",
+      "status": "created",
+      "responsibility": "Native-only bounded SPI/RadioLib argument/result recorder; never included by firmware."
+    },
+    {
+      "path": "test/test_radio_driver/test_main.cpp",
+      "status": "modified",
+      "responsibility": "Retain test policy; update only selected-driver diagnostic expectation."
+    },
+    {
+      "path": "test/test_sx1262_adapter/test_main.cpp",
+      "status": "created",
+      "responsibility": "12 focused tests of the actual production adapter through bounded native call recorders."
+    },
+    {
+      "path": "tools/reproduce_boot_id_liveness.py",
+      "status": "modified",
+      "responsibility": "Keep the historical finite RNG reproduction utility working after the hardware filename change."
+    }
+  ],
+  "production_cpp_responsibilities": {
+    "src/main.cpp": "Construct the single ESP32 composition and delegate Arduino setup/loop (unchanged,15 lines).",
+    "src/app/firmware_runtime.cpp": "Load/select role and coordinate driver/apps/console/reboot; executable code unchanged, SDK comment updated.",
+    "src/app/nvs_config_store.cpp": "Validate/encode/load/save/read back configuration through ConfigStorage (unchanged).",
+    "src/app/preferences_config_storage.cpp": "Sole real Preferences backend (unchanged).",
+    "src/app/provisioning_console.cpp": "Bounded serial line/command parser (unchanged).",
+    "src/client/client_app.cpp": "HELLO identity, ACK matching, timeout/session/recovery policy (unchanged).",
+    "src/gateway/gateway_app.cpp": "Validate/deduplicate HELLO and send identity-echo ACK (unchanged).",
+    "src/common/config/device_config.cpp": "Pure validation and explicit persistent blob encoding (unchanged).",
+    "src/common/diagnostics/serial_logger.cpp": "Bounded structured diagnostics queue/serial drain (unchanged).",
+    "src/common/protocol/frame_codec.cpp": "Bounded v1 serialization/validation and ACK payload identity (unchanged).",
+    "src/common/protocol/sequence_tracker.cpp": "Bounded replay window and session/sequence renewal (unchanged).",
+    "src/common/radio/radio_driver.cpp": "Hardware-independent radio state/deadline/error policy (unchanged).",
+    "src/common/radio/sx1262_hardware.cpp": "Sole new SX1262/SPI/GPIO/ISR adapter; preserve existing forwarding, assert actual board/library constants.",
+    "test/test_sx1262_adapter/test_main.cpp": "12 focused tests of the actual production adapter through bounded native call recorders."
+  },
+  "old_record_prefixes_preserved": 4,
+  "original_log_files_unchanged": 285,
+  "old_test_files_preserved_except_driver_label": 18,
+  "tested_input_hashes_match": 59,
+  "active_old_hardware_references": 0,
+  "relative_changed_document_links_checked": 47,
+  "physical_validation": "NOT RUN / NOT VERIFIED",
+  "publication_files_scanned": 422
+}

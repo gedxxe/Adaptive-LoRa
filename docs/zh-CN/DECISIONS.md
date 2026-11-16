@@ -77,3 +77,13 @@ CSV使用关闭HELLO cohort，区分A/T/R/ACKstart/done/C；A含启动失败，P
 2026-11-13 按用户明确要求接受。通过 PR #3 将已核实 e431e3f8ffd6e2d95dc126bb68e8231723a13c4d 及011/012历史用普通 merge commit 合入 main。初始 main5bc607cd1a86e5d86ff0fc95ba7a3cd31159b861 独有两个合并记录，但其 tree 与共同010祖先相同；无冲突候选 tree 等于013。保留双亲历史、全部历史分支和既有记录；本次仅新增整合文档与实际验证日志，不改生产/测试/工具输入。
 
 成功合并后 main 为规范开发基线，后续分支从最新 main 开始。合并前 ESP32、290 native 和13 fake-serial capture 全部重跑通过，最终核对 merge tree/输入。固件0.2.0-alpha.1、协议1、NVS schema1/namespace/key/24-byte blob、RadioLib7.8.1、固定PHY及暂定pins相对013不变。保留既有011/012修正，不新增功能；不声称实物验证，不 squash/rebase/强推/删除历史分支。
+
+## ADR-018 - 单一Heltec V3.2 HF生产目标
+
+2026-11-17客户端日期接受，Iteration014。用户在原audit-only附件后明确授权立即实施、保留工程历史，并要求push/普通merge。只保留Heltec WiFi LoRa 32 V3.2 HF活动目标，替换adapter/environment，不保留双生产目标；历史记录/分支不删改。
+
+安装平台55.03.311已有官方板定义，无需升级。S3FN8/SX1262、Radio GPIO8–14、DIO3 TCXO1.8 V、DC-DC；RadioLib7.8.1 begin已设DIO2切换。保留Driver header/CRC重设、全部状态/错误策略。CDC_ON_BOOT=0选择CP2102/UART0，board自带USB_MODE不等于启用CDC。OLED/Vext/电池功能不做；36低有效、37高使能仅保留资源。
+
+固件0.2.0-alpha.1、协议1、NVS namespace/key/schema/blob、app/codec/session/driver策略和15行main不变，driver标签改SX1262。保留915 MHz/10 dBm/固定PHY，Moxon为设计基线，未捏造匹配/gain/RF。ERR-021继续开放，不改第三方库/watchdog，不做TDMA/ADR/应用集成。
+
+实际adapter通过有界测试专用SPI/RadioLib调用记录器编译，原290保留、新增12；只有旧driver标签断言更新。首次fixture重复声明失败保留，修正后302和capture另13全部通过。测试不证明真实chip/IRQ/TCXO/DC-DC/RF。单板radio也集成，操作前接RF终端，先同板ROM私有备份，不跨MCU恢复完整镜像。

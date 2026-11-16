@@ -1,0 +1,9 @@
+{
+  "command": "pio run -e esp32c3_supermini",
+  "exit_code": 0,
+  "runner_seconds": 17.632,
+  "log": "logs/build/iteration-014-baseline-esp32.log",
+  "publication_policy": "Full stdout/stderr with workspace/PlatformIO/user paths replaced by disclosed placeholders and EOL/trailing-display normalization. Raw kept privately in ignored audit cache.",
+  "client_date": "2026-11-17",
+  "physical_validation": "NOT RUN"
+}

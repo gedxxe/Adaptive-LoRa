@@ -1,0 +1,22 @@
+{
+  "baseline": "075b8faf64ca8377cc2adc396429aa6943b47a27",
+  "branch": "iteration-014-heltec-sx1262-migration-audit",
+  "remote_heads": {
+    "refs/heads/iteration-009-radio-driver-verification": "3176e766d3876c86253e7694a7694560be72d1bf",
+    "refs/heads/iteration-010-config-store-verification": "3902de90058ec775587105c5c3edb4914853a9d8",
+    "refs/heads/iteration-011-runtime-verification": "8fa0a473b6cc0905ddff53e4b9a5f22806e058e2",
+    "refs/heads/iteration-012-runtime-reliability": "9341e7c0016c66fd9316d489ccfca00a646ae2cb",
+    "refs/heads/iteration-013-bench-readiness": "4fb2308119eb279a4531bfae0228d3705a6c1ba1",
+    "refs/heads/main": "075b8faf64ca8377cc2adc396429aa6943b47a27"
+  },
+  "repository_settings": {
+    "allow_merge_commit": true,
+    "default_branch": "main",
+    "delete_branch_on_merge": false
+  },
+  "client_date": "2026-11-17",
+  "fetch_exit": 0,
+  "ls_remote_exit": 0,
+  "merge_policy": "Normal merge commit only; preserve all historical branches; no force/squash/rebase/deletion",
+  "physical_validation": "NOT RUN"
+}
