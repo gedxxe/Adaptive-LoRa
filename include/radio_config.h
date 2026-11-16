@@ -11,8 +11,8 @@ constexpr uint16_t preambleSymbols = 8;
 constexpr uint8_t privateSyncWord = 0x12;  // RadioLib expands the one-byte LoRa word.
 constexpr int8_t txPowerDbm = 10;
 constexpr uint32_t spiClockHz = 1000000;
-constexpr float tcxoVoltage = 0.0f;  // XTAL assumption; verify exact module revision.
-constexpr bool useRegulatorLdo = true;  // Conservative bench choice; verify on hardware.
-static_assert(dataSf >= 5 && dataSf <= 9 && controlSf <= 9,
-              "LLCC68 BW125 supports SF5 through SF9 only");
+constexpr float tcxoVoltage = 1.8f;  // DIO3-powered TCXO on the V3.2 schematic; vendor uses 1.8 V.
+constexpr bool useRegulatorLdo = false;  // V3.2 populates the SX1262 DC-DC network.
+static_assert(dataSf >= 7 && dataSf <= 9 && controlSf == 9,
+              "Research profile remains BW125 with SF7-SF9; control is SF9");
 }  // namespace adaptive_lora::phy

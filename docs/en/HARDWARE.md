@@ -1,183 +1,103 @@
-# Hardware and RF Baseline
+# Hardware and RF baseline
 
-## 1. Current inventory
+The active target is **Heltec WiFi LoRa 32 V3.2 HF**, with ESP32-S3FN8,
+SX1262,8 MB SiP flash,512 KB SRAM and CP2102. No PSRAM is assumed.
+The procurement target is confirmed, but delivery, individual PCB markings
+and silicon stepping have not been inspected. The first acceptance setup
+needs two identical boards, one configured Gateway and one Client.
 
-| Item               | Specification                                 |         Quantity | Status     |
-|--------------------|-----------------------------------------------|-----------------:|------------|
-| MCU stock          | ESP32-C3 Super Mini                           |                1 | Available, pair not assembled |
-| Second MCU         | ESP32-C3 Super Mini                           |                0 | Not yet purchased |
-| Radio stock        | Ai-Thinker Ra-01SCH, LLCC68                   |                2 | Available, pair not assembled |
-| Antenna            | 915 MHz Moxon                                 |                0 | Not yet fabricated |
-| RF cable/connector | Match the actual module and antenna connector |              TBD | Verify     |
+Use the HF version, not the470-510 MHz LF version. Manufacturer HF coverage
+is863-928 MHz; the ordered902-928 MHz option is within that range. V4,
+Wireless Stick Lite and Tracker are different products. Require seller
+confirmation and clear front/back V3.2 HF photographs. Source URLs,
+fingerprints, revision comparison and the complete GPIO matrix are in
+[HARDWARE_MIGRATION_AUDIT.md](HARDWARE_MIGRATION_AUDIT.md).
 
-Inventory corrected by the user on 2026-11-12. The planned gateway and client use the same hardware; device role is selected through NVS. There is no assembled pair and current work is software-only. No physical NVS or RF validation is available.
+## Radio and reserved resources
 
-## 2. Module identification
+| Signal | ESP32-S3 GPIO |
+|---|---:|
+| NSS | 8 |
+| SCK | 9 |
+| MOSI | 10 |
+| MISO | 11 |
+| RESET | 12 |
+| BUSY | 13 |
+| DIO1 | 14 |
 
-The module is Ai-Thinker Ra-01SCH based on LLCC68.
+This mapping is checked against the V3.2 schematic and Arduino variant;
+confirm that the delivered board matches before use. DIO2 drives the onboard
+RF switch and DIO3 supplies the32 MHz TCXO. RadioLib 7.8.1 uses explicit
+TCXO1.8 V and DC-DC selection, matching the vendor code and populated
+L8/C54 network. Do not assign additional MCU TXEN/RXEN or TCXO-control pins.
+Only Sx1262Hardware owns the radio/SPI/GPIO/IRQ adapter.
 
-Use:
+Reserve OLED17/18/21, LED35, Vext36, ADC_Ctrl37, CP2102 UART43/44 and PRG0.
+GPIO19/20 have optional native-USB routing; R3/R29 are unpopulated in the
+reference schematic. The normal USB-C connection uses CP2102. Do not join
+two USB transceivers on the same data pair. Respect straps0/3/45/46,
+flash/internal resources, crystal15/16 and external-JTAG choices.
 
-- RadioLib `LLCC68`.
-- SPI communication.
-- DIO1 for radio event notification.
-- BUSY for command readiness.
-- RESET for module reset.
+V3.2 Vext is a switched LDO controlled active-low by GPIO36. The radio
+and RF-switch bias use VDD_3V3; OLED uses Vext. This firmware leaves OLED,
+Vext control and battery sensing unused. Later display startup must set a
+safe output latch, enable the rail, allow proper settling, then release
+OLED reset. GPIO37 high/pull-up enables the revised battery-divider path;
+earlier revision logic must not be copied. The charge IC is LGS4056HDA.
 
-Do not use RadioLib `SX1262` for this module. Do not confuse it with a
-Heltec board containing an SX1262.
+## Power, RF feed and handling
 
-Recorded module constraints:
+Use a stable regulated 5 V supply with margin. The manufacturer specifies
+at least 500 mA input capability for USB/5 V and 150 mA for direct3.3 V.
+These are input specifications, not measured project current or spare
+external-load capacity. Measure voltage/current during TX; check for resets,
+connector polarity, heating and supply transients. Do not parallel arbitrary
+supply outputs or back-power an unpowered board through GPIO.
 
-- Supply: 2.7–3.6 V.
-- Frequency range: 803–930 MHz.
-- BW125: SF5–SF9.
-- BW250: SF5–SF10.
-- BW500: SF5–SF11.
-- SF12 unsupported.
-- Packet engine: up to 256 bytes.
+The LoRa connector is IPEX1.0. Fit a compatible 50-ohm pigtail and appropriate
+antenna or RF load **before power**, including single-board and first-boot
+work. The integrated radio cannot be unplugged as a separate module, and
+an unknown factory image or valid saved role may transmit. Never transmit
+with an open RF connector. Start at 10 dBm; inspect the power/feed/placement
+before changing power to compensate for a link problem.
 
-Verify the exact module marking and revision before relying on this
-record.
+## Fixed research PHY
 
-## 3. Proposed pin map
+| Parameter | Setting |
+|---|---|
+| Frequency | 915.0 MHz, provisional research setting |
+| Bandwidth | 125 kHz |
+| Data SF | SF7 |
+| Reserved control SF | SF9; unused in M2 |
+| Coding rate | 4/5 |
+| Preamble | 8 symbols |
+| Header / PHY CRC | Explicit / enabled |
+| Private sync | RadioLib one-byte0x12 |
+| TX power | 10 dBm |
+| SPI | 1 MHz, mode0, MSB first |
+| TCXO / radio regulator | DIO3 1.8 V / DC-DC |
 
-This is a proposed mapping for the ESP32-C3 Super Mini and Ra-01SCH. It
-is not a substitute for checking the actual board schematic and pin
-labels.
+SX1262 supports SF5-SF12, but this research baseline remains SF7-SF9 at
+BW125. No dynamic PHY, TX-power adaptation or scheduler is added. Retaining
+915 MHz at the user's request does not establish permission for radiated
+operation; applicable channel/EIRP/access/equipment checks remain necessary
+before deployment. EIRP equals conducted power plus antenna gain minus feed
+loss, which cannot be calculated honestly until the antenna/feed are known.
 
-|       ESP32-C3 GPIO | Ra-01SCH pin | Signal   |
-|--------------------:|-------------:|----------|
-|               GPIO4 |           12 | SCK      |
-|               GPIO5 |           13 | MISO     |
-|               GPIO6 |           14 | MOSI     |
-|               GPIO7 |           15 | NSS / CS |
-|               GPIO1 |            4 | RESET    |
-|               GPIO0 |            6 | DIO1     |
-|              GPIO10 |           10 | BUSY     |
-|      External 3.3 V |            3 | VCC      |
-|                 GND |     2, 9, 16 | Ground   |
-| 50-ohm antenna feed |            1 | ANT      |
+The 915 MHz Moxon is accepted as the design baseline. Fabrication, impedance,
+SWR, gain and actual radiation pattern remain unmeasured; no matching claim
+for920-923 MHz follows. Use identical radios, PHY, power, distance, placement,
+polarization, feed and run duration for a later reference-versus-Moxon
+comparison. Preserve packet/ACK counts and RSSI/SNR distributions; changing
+location or distance invalidates a claimed controlled comparison.
 
-Before wiring:
+## Bring-up evidence still required
 
-- Photograph both board silkscreens.
-- Confirm the module pin numbering orientation.
-- Confirm continuity from MCU pads to the intended GPIOs.
-- Check that no pin is already used by onboard LEDs, USB, or boot
-  circuitry.
-- Record the actual mapping in the build iteration record.
-
-Ra-01SCH pins 5 (TXEN) and 11 (RXEN) are RF switch controls handled
-internally by the standard module. Leave them unconnected unless the
-exact breakout documentation says otherwise.
-
-ESP32-C3 cautions:
-
-- GPIO2, GPIO8, GPIO9 are strapping pins.
-- GPIO18/19 are associated with USB Serial/JTAG.
-- GPIO20/21 are UART0.
-- GPIO4–GPIO7 overlap external JTAG functionality.
-
-## 4. Power design
-
-The radio requires a stable 3.3 V supply. Do not assume the MCU board’s
-onboard 3V3 regulator can handle radio TX transients.
-
-Initial recommendation:
-
-- Dedicated regulated 3.3 V rail for the radio.
-- Regulator rating at least 300 mA, with margin after verifying actual
-  current demand.
-- Common ground between MCU and radio.
-- Local ceramic decoupling close to the radio supply pins.
-- Short supply and ground paths.
-- Measure voltage at the module during transmit.
-
-Never:
-
-- Apply 5 V to the radio VCC.
-- Exceed 3.6 V.
-- Transmit without an antenna or suitable 50-ohm load.
-- Increase TX power to compensate for an unverified antenna or poor
-  supply.
-
-Start at 10 dBm for bench validation.
-
-## 5. Initial RF profile
-
-| Parameter   |                Value | Note                                        |
-|-------------|---------------------:|---------------------------------------------|
-| Frequency   |            915.0 MHz | Provisional test setting; check local rules |
-| Bandwidth   |              125 kHz | Fixed for M0–M5                             |
-| Control SF  |                  SF9 | Provisional common control PHY              |
-| Data SF     |                  SF7 | Initial data PHY                            |
-| ADR range   |              SF7–SF9 | Future milestone                            |
-| Coding rate |                  4/5 | Initial                                     |
-| Preamble    |                    8 | Initial                                     |
-| Header      |             Explicit | Initial                                     |
-| CRC         |              Enabled | Required                                    |
-| Sync word   |                 0x12 | RadioLib one-byte private LoRa sync word    |
-| TX power    |               10 dBm | Initial bench setting                       |
-| SPI clock   |                1 MHz | Initial conservative setting                |
-
-At BW125, LLCC68 does not support SF10–SF12. Do not put unsupported
-combinations in configuration tables or test loops.
-
-Candidate module settings are XTAL (`tcxoVoltage=0`) and LDO regulator mode. RadioLib default DIO2 RF-switch control is retained for the module's internal path; MCU TXEN/RXEN are not connected. Verify these choices on the exact module/breakout. [Pinned LLCC68 API](https://github.com/jgromes/RadioLib/blob/7.8.1/src/modules/LLCC68/LLCC68.h) defines the initialization arguments. The API does not expose its matched identification string; serial status reports driver selection and initialization result, not independent silicon detection.
-
-The candidate enables native USB CDC. Exact USB routing, flash size and board revision remain provisional. On 2026-11-12 only six Bluetooth ports were enumerated (`logs/test/iteration-004-serial-ports.log`); no ESP32 USB/USB-UART port, photos, schematic or continuity evidence was available. No pins or supply readings are confirmed by the successful compile.
-
-## 6. Frequency and antenna compliance
-
-The 915 MHz Moxon is within the module’s hardware frequency range. This
-does not establish that 915.0 MHz, the selected channel width, TX power,
-or antenna gain is permitted for the intended operation in Indonesia.
-
-Before any operational deployment, verify:
-
-- permitted frequency range and channel plan;
-- maximum conducted power and EIRP;
-- antenna gain and feed-line loss;
-- duty-cycle, channel-access, or other applicable access requirements;
-- equipment certification and site requirements.
-
-Keep 915.0 MHz as a provisional bench value until that review is
-complete.
-
-## 7. Antenna test controls
-
-For a meaningful comparison:
-
-- Use the same radio pair and PHY settings.
-- Keep TX power fixed.
-- Keep device locations and heights fixed.
-- Record antenna orientation and polarization.
-- Record LOS/NLOS and machinery state.
-- Do not compare measurements taken at different distances as if they
-  were a controlled antenna comparison.
-- Record packet count and test duration.
-- Capture RSSI, SNR, PDR, ACK success, retries, and latency.
-- Use a suitable reference antenna if one is available; do not invent a
-  baseline.
-
-A Moxon design or 3D-printed jig is not evidence of antenna gain or
-impedance match. Measure or validate RF performance before making gain
-claims.
-
-## 8. Iteration013 evidence audit - 2026-11-13
-
-The [current vendor product page](https://docs.ai-thinker.com/en/Ra-01SCH/index.html) links [specification V1.1.0](https://aithinker-static.oss-cn-shenzhen.aliyuncs.com/docs/Public%20Document%20Center/LoRa/lora/Specification/Ra-01SCH_V1.1.0%20Specification-20221110.pdf). Table4/p9 confirms the module pin functions already shown above; Fig6/p10 shows a crystal and DIO2 switching, Fig7/p11 illustrates local10uF/100nF decoupling. Section6.6/p14 describes default internal RF switching and a different BOM for external control. These are design evidence, not identification of the two actual modules. PDF/source hashes and retrieval limitations: `logs/build/iteration-013-readiness-sources.json`. Legacy download URLs returned HTML; use the current vendor link.
-
-| Evidence layer | Finding | Physical status |
-|---|---|---|
-| Module pin numbers/functions | Recorded16-pad functions match vendor table; front/back orientation must be respected | Actual markings/BOM/pad continuity NOT VERIFIED |
-| ESP32 SoC functions | [Espressif datasheet](https://documentation.espressif.com/esp32-c3_datasheet_en.html) supports GPIO/USB/strap cautions | Does not establish a clone board schematic |
-| GPIO4/5/6/7 SPI,1RESET,0DIO1,10BUSY | Project proposal, unchanged in board_pins.h | Pads/exposure/onboard conflicts NOT VERIFIED |
-| Supply/grounds/decoupling | Dedicated3.3V rail with margin remains a design requirement | Regulator/ripple/current/transients NOT MEASURED |
-| XTAL/LDO/DIO2 settings | Source choices remain unchanged; external supply LDO and radio internal regulator mode are different settings | Exact oscillator/BOM/regulator/switch operation NOT VERIFIED |
-| Antenna/feed/50-ohm load | Must be suitable and attached before radio can TX | Moxon not fabricated; any reference antenna/load availability TBD |
-
-No verified Super Mini manufacturer/revision schematic or unit photos were supplied. Do not silently adapt pins/USB/oscillator/PHY from a reseller image. Short wires, 3.3V logic, common ground and local decoupling require inspection; do not parallel regulator outputs or back-power an unpowered device through GPIO. All wiring continuity checks occur with power off. No radio power or RF transmission until the runbook gates and local frequency/EIRP/access/equipment review are recorded; module range is not legal authorization.
-
-MCU BOOT/EN/RESET controls in the single-board procedure are distinct from proposed GPIO1, which is the radio RESET signal. Identify actual board controls before first power/ROM entry.
+Follow [BENCH_RUNBOOK.md](BENCH_RUNBOOK.md). Confirm received PCB/RF variant,
+flash/security/USB routing, supply, RF termination, TCXO/BUSY/DIO1/reset,
+serial stability and the actual HELLO/ACK link. Host tests and successful
+S3 compilation have not established those physical properties. ERR-021
+still blocks unattended stuck-BUSY recovery acceptance; no library patch
+or watchdog change is included. SDK startup can format NVS before the
+runtime (ERR-023), so same-board private backup/recovery comes before
+application boot or intentional configuration changes.

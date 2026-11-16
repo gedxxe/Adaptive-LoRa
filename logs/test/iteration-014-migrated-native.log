@@ -1,0 +1,192 @@
+Verbosity level can be increased via `-v, -vv, or -vvv` option
+Collected 11 tests
+
+Processing test_app_integration in native environment
+--------------------------------------------------------------------------------
+Building...
+In file included from src\common\radio\sx1262_hardware.h:3:0,
+                 from src\common\radio\sx1262_hardware.cpp:1:
+test\support\platform/RadioLib.h:18:20: error: redefinition of 'constexpr const uint32_t RADIOLIB_IRQ_RX_DEFAULT_FLAGS'
+ constexpr uint32_t RADIOLIB_IRQ_RX_DEFAULT_FLAGS = (1u << 1) | (1u << 4) | (1u << 5) | (1u << 6) | (1u << 9);
+                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+test\support\platform/RadioLib.h:16:20: note: 'constexpr const uint32_t RADIOLIB_IRQ_RX_DEFAULT_FLAGS' previously defined here
+ constexpr uint32_t RADIOLIB_IRQ_RX_DEFAULT_FLAGS = 0x272;
+                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*** [.pio\build\native\src\common\radio\sx1262_hardware.o] Error 1
+Building stage has failed, see errors above. Use `pio test -vvv` option to enable verbose output.
+----------- native:test_app_integration [ERRORED] Took 2.72 seconds -----------
+
+Processing test_config_store in native environment
+--------------------------------------------------------------------------------
+Building...
+In file included from src\common\radio\sx1262_hardware.h:3:0,
+                 from src\common\radio\sx1262_hardware.cpp:1:
+test\support\platform/RadioLib.h:18:20: error: redefinition of 'constexpr const uint32_t RADIOLIB_IRQ_RX_DEFAULT_FLAGS'
+ constexpr uint32_t RADIOLIB_IRQ_RX_DEFAULT_FLAGS = (1u << 1) | (1u << 4) | (1u << 5) | (1u << 6) | (1u << 9);
+                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+test\support\platform/RadioLib.h:16:20: note: 'constexpr const uint32_t RADIOLIB_IRQ_RX_DEFAULT_FLAGS' previously defined here
+ constexpr uint32_t RADIOLIB_IRQ_RX_DEFAULT_FLAGS = 0x272;
+                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*** [.pio\build\native\src\common\radio\sx1262_hardware.o] Error 1
+Building stage has failed, see errors above. Use `pio test -vvv` option to enable verbose output.
+------------- native:test_config_store [ERRORED] Took 4.04 seconds -------------
+
+Processing test_firmware_runtime in native environment
+--------------------------------------------------------------------------------
+Building...
+In file included from src\common\radio\sx1262_hardware.h:3:0,
+                 from src\common\radio\sx1262_hardware.cpp:1:
+test\support\platform/RadioLib.h:18:20: error: redefinition of 'constexpr const uint32_t RADIOLIB_IRQ_RX_DEFAULT_FLAGS'
+ constexpr uint32_t RADIOLIB_IRQ_RX_DEFAULT_FLAGS = (1u << 1) | (1u << 4) | (1u << 5) | (1u << 6) | (1u << 9);
+                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+test\support\platform/RadioLib.h:16:20: note: 'constexpr const uint32_t RADIOLIB_IRQ_RX_DEFAULT_FLAGS' previously defined here
+ constexpr uint32_t RADIOLIB_IRQ_RX_DEFAULT_FLAGS = 0x272;
+                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*** [.pio\build\native\src\common\radio\sx1262_hardware.o] Error 1
+Building stage has failed, see errors above. Use `pio test -vvv` option to enable verbose output.
+----------- native:test_firmware_runtime [ERRORED] Took 2.03 seconds -----------
+
+Processing test_frame_codec in native environment
+--------------------------------------------------------------------------------
+Building...
+In file included from src\common\radio\sx1262_hardware.h:3:0,
+                 from src\common\radio\sx1262_hardware.cpp:1:
+test\support\platform/RadioLib.h:18:20: error: redefinition of 'constexpr const uint32_t RADIOLIB_IRQ_RX_DEFAULT_FLAGS'
+ constexpr uint32_t RADIOLIB_IRQ_RX_DEFAULT_FLAGS = (1u << 1) | (1u << 4) | (1u << 5) | (1u << 6) | (1u << 9);
+                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+test\support\platform/RadioLib.h:16:20: note: 'constexpr const uint32_t RADIOLIB_IRQ_RX_DEFAULT_FLAGS' previously defined here
+ constexpr uint32_t RADIOLIB_IRQ_RX_DEFAULT_FLAGS = 0x272;
+                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*** [.pio\build\native\src\common\radio\sx1262_hardware.o] Error 1
+Building stage has failed, see errors above. Use `pio test -vvv` option to enable verbose output.
+------------- native:test_frame_codec [ERRORED] Took 1.98 seconds -------------
+
+Processing test_provisioning_console in native environment
+--------------------------------------------------------------------------------
+Building...
+In file included from src\common\radio\sx1262_hardware.h:3:0,
+                 from src\common\radio\sx1262_hardware.cpp:1:
+test\support\platform/RadioLib.h:18:20: error: redefinition of 'constexpr const uint32_t RADIOLIB_IRQ_RX_DEFAULT_FLAGS'
+ constexpr uint32_t RADIOLIB_IRQ_RX_DEFAULT_FLAGS = (1u << 1) | (1u << 4) | (1u << 5) | (1u << 6) | (1u << 9);
+                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+test\support\platform/RadioLib.h:16:20: note: 'constexpr const uint32_t RADIOLIB_IRQ_RX_DEFAULT_FLAGS' previously defined here
+ constexpr uint32_t RADIOLIB_IRQ_RX_DEFAULT_FLAGS = 0x272;
+                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*** [.pio\build\native\src\common\radio\sx1262_hardware.o] Error 1
+Building stage has failed, see errors above. Use `pio test -vvv` option to enable verbose output.
+--------- native:test_provisioning_console [ERRORED] Took 2.01 seconds ---------
+
+Processing test_radio_driver in native environment
+--------------------------------------------------------------------------------
+Building...
+In file included from src\common\radio\sx1262_hardware.h:3:0,
+                 from src\common\radio\sx1262_hardware.cpp:1:
+test\support\platform/RadioLib.h:18:20: error: redefinition of 'constexpr const uint32_t RADIOLIB_IRQ_RX_DEFAULT_FLAGS'
+ constexpr uint32_t RADIOLIB_IRQ_RX_DEFAULT_FLAGS = (1u << 1) | (1u << 4) | (1u << 5) | (1u << 6) | (1u << 9);
+                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+test\support\platform/RadioLib.h:16:20: note: 'constexpr const uint32_t RADIOLIB_IRQ_RX_DEFAULT_FLAGS' previously defined here
+ constexpr uint32_t RADIOLIB_IRQ_RX_DEFAULT_FLAGS = 0x272;
+                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*** [.pio\build\native\src\common\radio\sx1262_hardware.o] Error 1
+Building stage has failed, see errors above. Use `pio test -vvv` option to enable verbose output.
+------------- native:test_radio_driver [ERRORED] Took 1.96 seconds -------------
+
+Processing test_role_config in native environment
+--------------------------------------------------------------------------------
+Building...
+In file included from src\common\radio\sx1262_hardware.h:3:0,
+                 from src\common\radio\sx1262_hardware.cpp:1:
+test\support\platform/RadioLib.h:18:20: error: redefinition of 'constexpr const uint32_t RADIOLIB_IRQ_RX_DEFAULT_FLAGS'
+ constexpr uint32_t RADIOLIB_IRQ_RX_DEFAULT_FLAGS = (1u << 1) | (1u << 4) | (1u << 5) | (1u << 6) | (1u << 9);
+                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+test\support\platform/RadioLib.h:16:20: note: 'constexpr const uint32_t RADIOLIB_IRQ_RX_DEFAULT_FLAGS' previously defined here
+ constexpr uint32_t RADIOLIB_IRQ_RX_DEFAULT_FLAGS = 0x272;
+                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*** [.pio\build\native\src\common\radio\sx1262_hardware.o] Error 1
+Building stage has failed, see errors above. Use `pio test -vvv` option to enable verbose output.
+------------- native:test_role_config [ERRORED] Took 1.98 seconds -------------
+
+Processing test_runtime_reliability in native environment
+--------------------------------------------------------------------------------
+Building...
+In file included from src\common\radio\sx1262_hardware.h:3:0,
+                 from src\common\radio\sx1262_hardware.cpp:1:
+test\support\platform/RadioLib.h:18:20: error: redefinition of 'constexpr const uint32_t RADIOLIB_IRQ_RX_DEFAULT_FLAGS'
+ constexpr uint32_t RADIOLIB_IRQ_RX_DEFAULT_FLAGS = (1u << 1) | (1u << 4) | (1u << 5) | (1u << 6) | (1u << 9);
+                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+test\support\platform/RadioLib.h:16:20: note: 'constexpr const uint32_t RADIOLIB_IRQ_RX_DEFAULT_FLAGS' previously defined here
+ constexpr uint32_t RADIOLIB_IRQ_RX_DEFAULT_FLAGS = 0x272;
+                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*** [.pio\build\native\src\common\radio\sx1262_hardware.o] Error 1
+Building stage has failed, see errors above. Use `pio test -vvv` option to enable verbose output.
+--------- native:test_runtime_reliability [ERRORED] Took 2.03 seconds ---------
+
+Processing test_sequence_tracker in native environment
+--------------------------------------------------------------------------------
+Building...
+In file included from src\common\radio\sx1262_hardware.h:3:0,
+                 from src\common\radio\sx1262_hardware.cpp:1:
+test\support\platform/RadioLib.h:18:20: error: redefinition of 'constexpr const uint32_t RADIOLIB_IRQ_RX_DEFAULT_FLAGS'
+ constexpr uint32_t RADIOLIB_IRQ_RX_DEFAULT_FLAGS = (1u << 1) | (1u << 4) | (1u << 5) | (1u << 6) | (1u << 9);
+                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+test\support\platform/RadioLib.h:16:20: note: 'constexpr const uint32_t RADIOLIB_IRQ_RX_DEFAULT_FLAGS' previously defined here
+ constexpr uint32_t RADIOLIB_IRQ_RX_DEFAULT_FLAGS = 0x272;
+                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*** [.pio\build\native\src\common\radio\sx1262_hardware.o] Error 1
+Building stage has failed, see errors above. Use `pio test -vvv` option to enable verbose output.
+----------- native:test_sequence_tracker [ERRORED] Took 1.98 seconds -----------
+
+Processing test_serial_logger in native environment
+--------------------------------------------------------------------------------
+Building...
+In file included from src\common\radio\sx1262_hardware.h:3:0,
+                 from src\common\radio\sx1262_hardware.cpp:1:
+test\support\platform/RadioLib.h:18:20: error: redefinition of 'constexpr const uint32_t RADIOLIB_IRQ_RX_DEFAULT_FLAGS'
+ constexpr uint32_t RADIOLIB_IRQ_RX_DEFAULT_FLAGS = (1u << 1) | (1u << 4) | (1u << 5) | (1u << 6) | (1u << 9);
+                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+test\support\platform/RadioLib.h:16:20: note: 'constexpr const uint32_t RADIOLIB_IRQ_RX_DEFAULT_FLAGS' previously defined here
+ constexpr uint32_t RADIOLIB_IRQ_RX_DEFAULT_FLAGS = 0x272;
+                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*** [.pio\build\native\src\common\radio\sx1262_hardware.o] Error 1
+Building stage has failed, see errors above. Use `pio test -vvv` option to enable verbose output.
+------------ native:test_serial_logger [ERRORED] Took 2.00 seconds ------------
+
+Processing test_sx1262_adapter in native environment
+--------------------------------------------------------------------------------
+Building...
+In file included from src/common/radio/sx1262_hardware.h:3:0,
+                 from test\test_sx1262_adapter\test_main.cpp:4:
+test\support\platform/RadioLib.h:18:20: error: redefinition of 'constexpr const uint32_t RADIOLIB_IRQ_RX_DEFAULT_FLAGS'
+ constexpr uint32_t RADIOLIB_IRQ_RX_DEFAULT_FLAGS = (1u << 1) | (1u << 4) | (1u << 5) | (1u << 6) | (1u << 9);
+                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+test\support\platform/RadioLib.h:16:20: note: 'constexpr const uint32_t RADIOLIB_IRQ_RX_DEFAULT_FLAGS' previously defined here
+ constexpr uint32_t RADIOLIB_IRQ_RX_DEFAULT_FLAGS = 0x272;
+                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*** [.pio\build\native\test\test_sx1262_adapter\test_main.o] Error 1
+In file included from src\common\radio\sx1262_hardware.h:3:0,
+                 from src\common\radio\sx1262_hardware.cpp:1:
+test\support\platform/RadioLib.h:18:20: error: redefinition of 'constexpr const uint32_t RADIOLIB_IRQ_RX_DEFAULT_FLAGS'
+ constexpr uint32_t RADIOLIB_IRQ_RX_DEFAULT_FLAGS = (1u << 1) | (1u << 4) | (1u << 5) | (1u << 6) | (1u << 9);
+                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+test\support\platform/RadioLib.h:16:20: note: 'constexpr const uint32_t RADIOLIB_IRQ_RX_DEFAULT_FLAGS' previously defined here
+ constexpr uint32_t RADIOLIB_IRQ_RX_DEFAULT_FLAGS = 0x272;
+                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*** [.pio\build\native\src\common\radio\sx1262_hardware.o] Error 1
+Building stage has failed, see errors above. Use `pio test -vvv` option to enable verbose output.
+------------ native:test_sx1262_adapter [ERRORED] Took 2.04 seconds ------------
+
+=================================== SUMMARY ===================================
+Environment    Test                       Status    Duration
+-------------  -------------------------  --------  ------------
+native         test_app_integration       ERRORED   00:00:02.722
+native         test_config_store          ERRORED   00:00:04.037
+native         test_firmware_runtime      ERRORED   00:00:02.033
+native         test_frame_codec           ERRORED   00:00:01.981
+native         test_provisioning_console  ERRORED   00:00:02.007
+native         test_radio_driver          ERRORED   00:00:01.957
+native         test_role_config           ERRORED   00:00:01.984
+native         test_runtime_reliability   ERRORED   00:00:02.027
+native         test_sequence_tracker      ERRORED   00:00:01.980
+native         test_serial_logger         ERRORED   00:00:02.002
+native         test_sx1262_adapter        ERRORED   00:00:02.043
+================== 11 test cases: 0 succeeded in 00:00:24.772 ==================

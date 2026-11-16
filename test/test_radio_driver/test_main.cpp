@@ -55,7 +55,7 @@ void test_init_success_and_order() {
     state(f.d, true, true);
     TEST_ASSERT_EQUAL_UINT8(2, f.h.crcLength);
     order(f.h, {HardwareCall::BEGIN, HardwareCall::HEADER, HardwareCall::CRC, HardwareCall::ENABLE_IRQ});
-    TEST_ASSERT_EQUAL_STRING("LLCC68_driver_id_not_exposed", f.d.chip());
+    TEST_ASSERT_EQUAL_STRING("SX1262_driver_id_not_exposed", f.d.chip());
 }
 void test_init_radio_failure_short_circuits() {
     Fixture f; f.h.beginCode = injected;

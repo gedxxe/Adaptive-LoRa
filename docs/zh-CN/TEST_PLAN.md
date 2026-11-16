@@ -118,3 +118,9 @@ RUNTIME_AUDIT.md映射A–G：boot11、provision8、serial7、radio4、reboot10�
 ESP32退出0 PASS13.053s；native退出0 **290/290 PASS**61.980s，53输入/有序cases/bin与012一致，无firmware/native test/pins/PHY/依赖改动。采集工具另有13/13 fake-port检查，不并入native或RF；修正前实际旧工具中断false-success用fake复现，无设备。完整日志/manifests/validation在iteration-013证据。
 
 流程/门槛见PHYSICAL_ACCEPTANCE_READINESS、BENCH_RUNBOOK、HARDWARE、RUN_RECORD_TEMPLATE与LOGGING_GUIDE CSV。未开口/烧录/擦除/复位/RF，no-port枚举不是物理不存在证明。单MCU须先同板备份/安全/layout/恢复，SDK boot前置格式化风险ERR-023需backups；暂存invalid不等于corrupt-NVS boot。合法Gateway无radio仍init，可能fault/block。Pair M0电气/RF、M1 IRQ/BUSY/恢复/no unintendedTX、M2>=200完成cohort及A/T/R/ACK/C分母全待证据。replay/错身份/corrupt-NVS fixture未提供/执行；ERR-021阻挡无人值守/卡BUSY恢复。不用host时延或碎日志代替实物，不改watchdog。
+
+## Iteration014 - Heltec V3.2 HF迁移
+
+用户后续授权实施。S3编译通过，原290用例名称/顺序保留且通过，新增实际adapter12，总302；capture另13为fake-port。旧测试仅driver标签断言更新。首次fixture编译失败及修正记录保留，不声称行/分支coverage或物理验证。
+
+新suite只用有界SPI/RadioLib调用记录，验证pins/TCXO1.8 V/DC-DC/固定PHY、初始化和错误顺序、IRQ latch/level、RX mask、字节/指标转发；真实库常量/variant由S3编译检查。实物按当前集成radio流程：上电前终端、V3.2 HF/CP2102核对、同板ROM备份/security/layout、provisioning、供电/TCXO/BUSY/DIO1/reset/串口/NVS、至少200闭合cohort及负面fixture。ERR-021/023仍开放，M0–M2实物未完成，M3–M8未开始，不能把新板当5/70节点容量证据。

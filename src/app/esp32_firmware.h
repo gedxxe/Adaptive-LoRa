@@ -1,7 +1,7 @@
 #pragma once
 #include "firmware_runtime.h"
 #include "preferences_config_storage.h"
-#include "common/radio/llcc68_hardware.h"
+#include "common/radio/sx1262_hardware.h"
 
 namespace adaptive_lora {
 // Hardware owners precede and outlive the sole production coordinator. Native
@@ -12,7 +12,7 @@ public:
     void loop() { runtime_.loop(); }
 private:
     PreferencesConfigStorage configStorage_;
-    Llcc68Hardware radioHardware_;
+    Sx1262Hardware radioHardware_;
     FirmwareRuntime runtime_{configStorage_, radioHardware_};
 };
 }  // namespace adaptive_lora

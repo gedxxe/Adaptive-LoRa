@@ -21,7 +21,7 @@ Suggested milestone mapping:
 
 | Version         | Milestone                                  |
 |-----------------|--------------------------------------------|
-| `0.1.0-alpha.1` | LLCC68 bring-up                            |
+| `0.1.0-alpha.1` | Radio bring-up                            |
 | `0.2.0-alpha.1` | Fixed-PHY HELLO/ACK                        |
 | `0.3.0-alpha.1` | Beacon and one-client TDMA                 |
 | `0.4.0-beta.1`  | ACK bitmap and selective retry             |

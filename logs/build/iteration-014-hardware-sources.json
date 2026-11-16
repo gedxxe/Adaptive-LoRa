@@ -1,0 +1,109 @@
+{
+  "client_date": "2026-11-17",
+  "manufacturer_ESP32_commit": "6ab5cf916e01b0930eaa2245323c728f849705c4",
+  "manufacturer_WiKi_commit": "07d6ea4725d07fad98a9b556f91d34a653bd2cb4",
+  "documents": [
+    {
+      "id": "schematic-v3.pdf",
+      "url": "https://s.heltec.cn/download/WiFi_LoRa_32_V3/HTIT-WB32LA(F)_V3_Schematic_Diagram.pdf",
+      "bytes": 3773066,
+      "sha256": "a718d617969d4a48610ddea200f15ce16d53d6a8099a989d2ba5407ac8996e18",
+      "retrieved_client_date": "2026-11-17"
+    },
+    {
+      "id": "schematic-v31.pdf",
+      "url": "https://s.heltec.cn/download/WiFi_LoRa_32_V3/HTIT-WB32LA(F)_V3.1_Schematic_Diagram.pdf",
+      "bytes": 191469,
+      "sha256": "b1c549559109beeb92a24bc044e27b327135c7e5618ed04daa99726109fb72f2",
+      "retrieved_client_date": "2026-11-17"
+    },
+    {
+      "id": "schematic-v32.pdf",
+      "url": "https://s.heltec.cn/download/WiFi_LoRa_32_V3/WiFi_LoRa_32_V3.2_Schematic_Diagram.pdf",
+      "bytes": 241368,
+      "sha256": "79317005400037929f85b0a600ad2159be5c0591cea95120eeed093dc629655a",
+      "retrieved_client_date": "2026-11-17"
+    },
+    {
+      "id": "datasheet-v32.pdf",
+      "url": "https://s.heltec.cn/download/WiFi_LoRa_32_V3/HTIT-WB32LA_V3.2.pdf",
+      "bytes": 1255362,
+      "sha256": "768c61d6ba083e82e0aae42c7801f494852849ea61c4d1a469646484ea0b60fb",
+      "retrieved_client_date": "2026-11-17"
+    },
+    {
+      "id": "pinmap-v32.png",
+      "url": "https://s.heltec.cn/download/WiFi_LoRa_32_V3/Wi-Fi_LoRa32_V3.2_Pinmap.png",
+      "bytes": 1452858,
+      "sha256": "6d602942e6a1c6c819b6ca183b29cba3f4ba392f80eb7e23f0380d3b20dd7a4a",
+      "retrieved_client_date": "2026-11-17"
+    },
+    {
+      "id": "heltec_wifi_lora_32_V3.json",
+      "origin": "<PLATFORMIO_HOME>/platforms/espressif32/boards/heltec_wifi_lora_32_V3.json",
+      "sha256": "228810e4905eb7ebaf6aeea6617792a6f10a5240d2c127fd68e0444afa360629",
+      "bytes": 936
+    },
+    {
+      "id": "pins_arduino.h",
+      "origin": "<PLATFORMIO_HOME>/packages/framework-arduinoespressif32/variants/heltec_wifi_lora_32_V3/pins_arduino.h",
+      "sha256": "167a84550ae5433c0a6264c3b643f3f06d5b37c30894858ac62da465ec959527",
+      "bytes": 1941
+    },
+    {
+      "id": "default_8MB.csv",
+      "origin": "<PLATFORMIO_HOME>/packages/framework-arduinoespressif32/tools/partitions/default_8MB.csv",
+      "sha256": "ab2f33c14eb855054613fd3a4ba85457ae281c6f371c25931ccc763bc79cb0e2",
+      "bytes": 305
+    },
+    {
+      "id": "RadioLib7.8.1/SX1262.cpp",
+      "url": "https://github.com/jgromes/RadioLib/blob/7.8.1/src/modules/SX126x/SX1262.cpp",
+      "sha256": "c2899a897bb05a717873d2645cc3fa3e5e5f2db3a116c667263a00541cb7e3e6",
+      "bytes": 7396
+    },
+    {
+      "id": "RadioLib7.8.1/SX1262.h",
+      "url": "https://github.com/jgromes/RadioLib/blob/7.8.1/src/modules/SX126x/SX1262.h",
+      "sha256": "6727607fa9ebb310b0cbb4c89e734eb8ad039c1da1679416b5ee9df17ba0f5ba",
+      "bytes": 9350
+    },
+    {
+      "id": "RadioLib7.8.1/SX126x.cpp",
+      "url": "https://github.com/jgromes/RadioLib/blob/7.8.1/src/modules/SX126x/SX126x.cpp",
+      "sha256": "b4b82318bd68b45bfb1832698a7f33f2a0a22b5f50e0d0fdbff1a9fd87033b87",
+      "bytes": 52824
+    },
+    {
+      "id": "RadioLib7.8.1/SX126x.h",
+      "url": "https://github.com/jgromes/RadioLib/blob/7.8.1/src/modules/SX126x/SX126x.h",
+      "sha256": "0bf55200bc0ce65681f263c8c8c8f687e34f20a01e13a3e249f1795b5c35de96",
+      "bytes": 40035
+    },
+    {
+      "id": "RadioLib7.8.1/SX126x_config.cpp",
+      "url": "https://github.com/jgromes/RadioLib/blob/7.8.1/src/modules/SX126x/SX126x_config.cpp",
+      "sha256": "25406680f5972b69c0e16e4eaf2b98db27d559bd292a4192e6147a1165298ef4",
+      "bytes": 28857
+    },
+    {
+      "id": "RadioLib7.8.1/SX126x_commands.cpp",
+      "url": "https://github.com/jgromes/RadioLib/blob/7.8.1/src/modules/SX126x/SX126x_commands.cpp",
+      "sha256": "11b61c1c892cb84e04221bc0a4abc9ffbd2a69ddb753eb4a93121b0bceec2904",
+      "bytes": 12453
+    },
+    {
+      "id": "vendor/src_driver_board.c",
+      "revision": "6ab5cf916e01b0930eaa2245323c728f849705c4",
+      "sha256": "e307e64c6f65407aae839d2a57f8ea5ed8ab1d212e4a026210fe3835fe5c6a00",
+      "bytes": 5599
+    },
+    {
+      "id": "vendor/src_driver_sx1262-board.c",
+      "revision": "6ab5cf916e01b0930eaa2245323c728f849705c4",
+      "sha256": "02d6038e21cacf803f4253a615ca0cb4693398b95b1d0f489fdc16e58b6e5b46",
+      "bytes": 6136
+    }
+  ],
+  "pdf_status": "V3, V3.1, V3.2 schematics rendered and visually inspected; source PDFs and vendor assets remain ignored. No delivered hardware inspected."
+}

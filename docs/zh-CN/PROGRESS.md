@@ -1,5 +1,19 @@
 # 开发进度
 
+## Iteration014：Heltec V3.2 HF软件迁移完成
+
+客户端日期2026-11-17。用户明确授权立即实施并保留工程历史。唯一活动目标为V3.2 HF、S3FN8/SX1262，CP2102/UART0、TCXO1.8 V、DC-DC；基线main075b8faf包含PR #3，分支iteration-014-heltec-sx1262-migration-audit。审查后按直接授权通过普通merge PR发布，最终SHA以PR状态为准。
+
+S3编译退出0 PASS，native退出0 **302/302 PASS**（原290+新adapter12），capture另13/13 fake-port通过。首次fixture重复常量编译失败日志保留，修正后全套通过（ERR-025）。协议1/NVSschema1/固件0.2.0-alpha.1不变，25个protected原文件完全一致，main仍15行。RAM32096、flash342560；不是heap/stack实测。证据见HARDWARE_MIGRATION_AUDIT及iteration-014日志/指纹。
+
+保留915 MHz/BW125/SF7/10 dBm，未做OLED/电池/TDMA/bitmap/选择性重传/ADR。实物到货/板标识、供电、UART/reset、NVS/Flash、SPI/IRQ/TCXO/RF、天线/熵/运行内存均未验证。ERR-021/023开放，旧CDC后端证据属历史。M0–M2实物IN PROGRESS，M3–M8未开始。下一步按已选目标采购核对、接RF终端、同板ROM私有备份，再走当前runbook，不能沿用旧拆外置radio的单MCU流程。
+
+## 截至Iteration013的历史快照
+
+下文保留各自硬件和发布上下文，旧库存/命令不是当前活动配置。
+
+# 开发进度
+
 ## Iteration013 main 整合 - 验证完成
 
 2026-11-13，PR [#3](https://github.com/gedxxe/Adaptive-LoRa/pull/3) 将已核实013 `e431e3f8ffd6e2d95dc126bb68e8231723a13c4d` 合入初始main `5bc607cd1a86e5d86ff0fc95ba7a3cd31159b861`，只用普通merge commit。审查113个差异路径；main独有2个合并记录相对共同祖先无tree变化，故无冲突候选tree与013相同。本次不改生产/测试/工具输入，仅加整合文档/日志。本快照记录已测试候选；链接PR提供最终发布状态和merge SHA，并独立核对remote main。合并后 **main 为规范开发基线**（ADR-017），保留全部历史分支/记录。

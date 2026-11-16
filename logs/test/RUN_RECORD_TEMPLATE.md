@@ -30,7 +30,7 @@ Copy into a new run directory as `RUN_RECORD.md`. Never overwrite an earlier run
 | Save/readback/power-cycle persistence | NOT RUN | NOT RUN | TBD |
 | Role edits deferred until reboot | NOT RUN | NOT RUN | TBD |
 | Corrupt/unsupported NVS fixture: no TX | NOT RUN | NOT RUN | TBD |
-| LLCC68 init/status, BUSY, DIO1, reset | NOT RUN | NOT RUN | TBD |
+| SX1262 init/status, BUSY, DIO1, reset | NOT RUN | NOT RUN | TBD |
 | Stable serial/no dropped logs | NOT RUN | NOT RUN | TBD |
 
 - HELLO attempts / gateway valid unique / duplicate / stale: NOT MEASURED
@@ -46,3 +46,5 @@ Copy into a new run directory as `RUN_RECORD.md`. Never overwrite an earlier run
 - CSV method/version, HELLO identity associations, missing/ambiguous records, normal vs intervention cohort separation: TBD
 - Negative ACK identity and duplicate RF injection fixtures/logs: NOT RUN (native results are separate)
 - Result, issue IDs, unresolved assumptions, next action: TBD
+
+Current target: Heltec WiFi LoRa 32 V3.2 HF; confirm PCB/MCU/RF variant and CP2102 port. The integrated radio remains present in a single-board run; connect a suitable antenna/load before power and follow the current runbook. No cross-chip full-flash restore.

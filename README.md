@@ -14,7 +14,7 @@ The research direction is reliability-aware gateway scheduling and conservative 
 |---|---|
 | Firmware / protocol | `0.2.0-alpha.1` / `1` |
 | ESP32 compilation | PASS |
-| Native tests | 290/290 PASS: all 266 existing cases plus 24 boot-ID/dependency-delay reliability cases |
+| Native tests | 302/302 PASS: all 290 existing cases plus 12 production SX1262 adapter cases |
 | Implemented | Explicit bounded frames, provisioned roles, HELLO/ACK identity checks, duplicate suppression, timeout/recovery and sequence/session handling |
 | Physical NVS/reboot/SPI/IRQ/RF/antenna | NOT VERIFIED |
 
@@ -22,16 +22,43 @@ Host integration tests use the actual client/gateway state machines with bounded
 
 ## Hardware and provisional PHY
 
-- Current inventory: **2 × AI-Thinker RA-01SCH (LLCC68), 1 × ESP32-C3 Super Mini**. The second MCU and planned 915 MHz Moxon antenna are pending; no bench pair is assembled.
-- Current radio adapter: RadioLib **LLCC68**, dependency pinned to **7.8.1**. RA-01SCH is not SX1262. A future SX1262 adapter is not implemented.
-- Provisional bench profile: 915.0 MHz, BW125, SF7, CR4/5, explicit header, PHY CRC, preamble 8, private sync 0x12, 10 dBm and 1 MHz SPI. Control SF9 is reserved and unused in M2. SF10–SF12 must not be used at BW125 on LLCC68.
-- Pins, USB path, supply transients, antenna matching and locally permitted RF settings remain unverified. Read [HARDWARE.md](docs/en/HARDWARE.md) before assembly or transmission.
+The sole active target is **Heltec WiFi LoRa 32 V3.2 HF** with ESP32-S3FN8,
+SX1262, 8 MB flash and CP2102/UART0. Procurement is specified as the HF
+902-928 MHz option; receipt and board markings have not been checked. No
+PSRAM, OLED driver or battery-monitoring code is assumed.
+
+RadioLib is pinned to **7.8.1**. The adapter uses the board's GPIO8-14 radio
+interface, a 1.8 V DIO3 TCXO supply and DC-DC regulator selection. Serial
+runs through CP2102 at 115200; native USB CDC is disabled. The fixed research
+profile remains915.0 MHz, BW125, SF7, CR4/5, preamble8, explicit header,
+PHY CRC, private sync0x12,10 dBm and1 MHz SPI. SF9 control remains reserved.
+
+The 915 MHz Moxon is the design baseline; fabrication, gain and matching have
+not been measured. Read [HARDWARE.md](docs/en/HARDWARE.md) and the
+[migration audit](docs/en/HARDWARE_MIGRATION_AUDIT.md) before powering a board.
+Earlier hardware descriptions remain in historical records and Git history.
 
 ## Architecture principles
 
 One image loads a validated `GATEWAY` or `CLIENT` role from NVS. Missing, corrupt or unsupported configuration enters provisioning mode with application TX disabled. Role edits apply only after save and controlled reboot; identical hardware is not used to infer roles.
 
-The implemented `RadioTransport` reference separates application state machines from `RadioDriver` state policy. Its non-owning `RadioHardware` reference delegates to the sole LLCC68/SPI/GPIO owner, `Llcc68Hardware`; native fault tests execute the actual driver. NvsConfigStore also runs natively through five-operation ConfigStorage; PreferencesConfigStorage solely owns real Preferences access. See the [storage audit](docs/en/CONFIG_STORE_AUDIT.md). Native readback does not prove flash durability. Esp32Firmware owns the two concrete adapters before the reference-injected FirmwareRuntime; deterministic native tests execute the actual coordinator, store, driver, apps and console. See the [runtime audit](docs/en/RUNTIME_AUDIT.md). SDK shims simulate clock/serial/reset/raw RNG; they do not validate hardware entropy or reset. Generation is bounded to eight raw calls; unavailable identity suppresses normal TX, logs SESSION_ERROR and retries at one-second intervals. See the [dependency budget audit](docs/en/DEPENDENCY_BUDGET_AUDIT.md) for corrected timestamp boundaries and remaining SDK/BUSY/allocation limits. The codec/config/sequence modules are host-testable. `main.cpp` is a 15-line entry point.
+`RadioTransport` separates the application state machines from driver policy.
+`RadioDriver` uses one `RadioHardware` reference, while `Sx1262Hardware`
+owns all RadioLib, SPI and radio GPIO access. `Esp32Firmware` constructs
+hardware/storage adapters before the runtime that references them.
+
+Native tests execute the actual runtime, driver, configuration store, apps,
+console and logger. Small SDK shims supply simulated time, serial input,
+reset and random values. They test software decisions and error handling,
+while flash durability, physical reset and hardware entropy still require
+board tests. See the [runtime audit](docs/en/RUNTIME_AUDIT.md),
+[storage audit](docs/en/CONFIG_STORE_AUDIT.md) and current migration report.
+
+Session generation permits eight raw calls. If no valid identity is
+available, applications suppress TX, log SESSION_ERROR and retry at
+one-second intervals. The existing timestamp corrections and open SDK
+wait/allocation limits remain. `main.cpp` contains only construction and
+setup/loop delegation in15 lines.
 
 Four target boundaries are documented in [ARCHITECTURE.md](docs/en/ARCHITECTURE.md): protocol core, radio adapters, platform services and an application payload/event interface. Platform services are currently ESP32/Arduino-specific; a general application submission/delivery API is still absent. The protocol core contains no Modbus, meter-model, Wi-Fi/MQTT, PostgreSQL or dashboard integration. Do not treat the target architecture as fully implemented.
 
@@ -40,9 +67,9 @@ Four target boundaries are documented in [ARCHITECTURE.md](docs/en/ARCHITECTURE.
 ```text
 Adaptive-LoRa/
 ├── include/             # Provisional pins, fixed PHY and project limits
-├── src/app/             # ESP32 runtime, NVS and bounded console
+├── src/app/             # ESP32-S3 runtime, NVS and bounded console
 ├── src/common/protocol/ # Frame codec and sequence/session helpers
-├── src/common/radio/    # Transport contract and LLCC68 adapter
+├── src/common/radio/    # Transport contract and SX1262 adapter
 ├── src/common/config/   # Pure configuration model/encoding
 ├── src/common/diagnostics/
 ├── src/gateway/         # Production gateway state machine
@@ -59,17 +86,23 @@ Adaptive-LoRa/
 Install PlatformIO Core and a native C++17-capable host toolchain, then run from the repository root:
 
 ```sh
-pio run -e esp32c3_supermini
+pio run -e heltec_wifi_lora_32_V3
 pio test -e native
 ```
 
-The firmware target is `esp32-c3-devkitm-1` with Arduino and RadioLib 7.8.1. The recorded workstation resolved to pioarduino/espressif32 55.03.311, Arduino-ESP32 3.3.11, RISC-V GCC 14.2.0, Core 6.1.19; native used GCC 6.3.0, native 1.2.1 and Unity 2.6.1. The platform is not pinned, so record the resolved packages rather than assuming a different installation is identical. The source manifest and command logs identify each validation snapshot.
+The firmware uses `heltec_wifi_lora_32_V3` with Arduino and RadioLib 7.8.1.
+The installed platform55.03.311 already supports the board; the migration
+keeps Arduino 3.3.11/IDF5.5.5 and uses Xtensa GCC14.2.0 rather than changing
+the platform. Core6.1.19, native1.2.1, Unity2.6.1 and host GCC6.3.0 are
+recorded in the build evidence. The platform remains unpinned, so preserve
+resolved manifests for reproducibility. Separate capture tests use PlatformIO
+Python: `python -m unittest discover -s tools -p test_capture_bench.py -v`.
 
 ## Provisioning and future bench procedure
 
 Serial: 115200 baud. Commands: `help`, `status`, `config show`, `config set role gateway|client`, `config set network-id N`, `config set node-id N`, `config set gateway-id N`, `config save`, `reboot`. Optional `config set hello-interval-ms <1000..3600000>`; default 5000 ms after transaction completion.
 
-Initial IDs (network/node/gateway) are gateway `1/1/1` and client `1/2/1`. Set all IDs explicitly; role edits preserve IDs. `config show` is staged state, `status` is loaded state. Network IDs are 1–65535; node/gateway IDs are 1–65534. See the deferred [bench runbook](docs/en/BENCH_RUNBOOK.md) and [run-record template](logs/test/RUN_RECORD_TEMPLATE.md); no upload or RF test is claimed here.
+Initial IDs (network/node/gateway) are gateway `1/1/1` and client `1/2/1`. Set all IDs explicitly; role edits preserve IDs. `config show` is staged state, `status` is loaded state. Network IDs are 1–65535; node/gateway IDs are 1–65534. See the deferred [bench runbook](docs/en/BENCH_RUNBOOK.md) and [run-record template](logs/test/RUN_RECORD_TEMPLATE.md); no upload or RF test has been performed.
 
 ## Development roadmap
 
@@ -80,7 +113,7 @@ Initial IDs (network/node/gateway) are gateway `1/1/1` and client `1/2/1`. Set a
 5. M7–M8: controlled reference-vs-Moxon evaluation and explicitly labelled logical-node simulations.
 6. Add application payload/event and platform-service interfaces in a separate reviewed task before integrating other embedded applications.
 
-The [milestone plan](docs/en/MILESTONE_TASKS.md) and [test plan](docs/en/TEST_PLAN.md) define acceptance gates. No later MAC implementation is included in the identity migration.
+The [milestone plan](docs/en/MILESTONE_TASKS.md) and [test plan](docs/en/TEST_PLAN.md) define acceptance gates. No later MAC implementation is included in the hardware migration.
 
 ## Research and reproducibility
 
@@ -91,3 +124,5 @@ Use general application payloads; keep integrations outside protocol logic. Publ
 Read [AGENTS.md](AGENTS.md) before changes. English is canonical; [简体中文](README.zh-CN.md) is the secondary documentation language.
 
 Physical preparation: [M0-M2 readiness](docs/en/PHYSICAL_ACCEPTANCE_READINESS.md) links backed-up MCU-only and pair gates, capture/CSV rules and remaining ERR-021/SDK-startup holds. No physical procedure has been executed; use a new evidence directory and preserve private backups before upload/config changes.
+
+Iteration014 migrated software passes the S3 build,302 native tests and13 fake-serial capture tests. Protocol/NVS/app policy and main.cpp remain unchanged. ERR-021 still affects the shared radio dependency. Exact sources, GPIO/revision/API/test matrices and physical checks are in the migration audit.

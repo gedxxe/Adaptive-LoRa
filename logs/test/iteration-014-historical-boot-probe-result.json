@@ -1,0 +1,7 @@
+{
+  "command": "python tools/reproduce_boot_id_liveness.py",
+  "exit_code": 0,
+  "runner_seconds": 2.069,
+  "log": "logs/test/iteration-014-historical-boot-probe.log",
+  "kind": "Finite guard of actual historical Iteration011 RNG source; not current firmware failure or physical entropy test"
+}

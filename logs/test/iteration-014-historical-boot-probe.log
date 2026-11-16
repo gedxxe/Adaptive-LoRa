@@ -1,0 +1,8 @@
+Compile exact baseline runtime generator plus production dependencies, native SDK guard64
+
+compile exit=0
+baseline mode=0: guard interrupted after 64 rejected raw calls; no return
+baseline mode=1: guard interrupted after 64 rejected raw calls; no return
+baseline mode=2: guard interrupted after 64 rejected raw calls; no return
+
+probe exit=0

@@ -1,0 +1,9 @@
+{
+  "command": "<PIO_PYTHON> -m unittest discover -s tools -p test_capture_bench.py -v",
+  "exit_code": 0,
+  "runner_seconds": 0.814,
+  "log": "logs/test/iteration-014-retry-capture.log",
+  "publication_policy": "Full stdout/stderr with local workspace/PlatformIO/user paths replaced by disclosed placeholders and EOL/trailing-display normalization. Raw retained privately in ignored audit cache.",
+  "client_date": "2026-11-17",
+  "physical_validation": "NOT RUN"
+}

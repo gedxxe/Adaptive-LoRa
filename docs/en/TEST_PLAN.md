@@ -18,8 +18,8 @@ A result at one level does not prove the next level.
 
 Record:
 
-- exact ESP32-C3 Super Mini board revision and visible markings;
-- exact Ra-01SCH module marking and pin orientation;
+- exact Heltec WiFi LoRa 32 V3.2 HF board revision and visible markings;
+- exact integrated SX1262 board marking and pin orientation;
 - GPIO-to-module continuity;
 - radio supply voltage at idle and during TX;
 - antenna connector and 50-ohm connection;
@@ -41,7 +41,7 @@ Run on each physical unit independently.
 
 Verify:
 
-- correct LLCC68 initialization;
+- correct SX1262 initialization;
 - expected RadioLib status code;
 - BUSY behavior;
 - DIO1 event behavior;
@@ -348,3 +348,11 @@ New suite executes real runtime/apps/driver/store/console/logger. Covers initial
 Required reruns: `pio run -e esp32c3_supermini` exit0 PASS13.053s; `pio test -e native` exit0 **290/290 PASS**61.980s. All53 source hashes, ordered native cases and compiled bin match012. No firmware/native test, pins, PHY or dependency changes. Host-only capture changes have13/13 focused fake-port tests, separate from native/RF counts. Logs: iteration-013-esp32/native/capture, source/capture manifests and validation.json. Baseline interruption defect reproduced without a device before fix; raw old/new evidence preserved.
 
 Physical gates and exact procedures: PHYSICAL_ACCEPTANCE_READINESS.md, existing BENCH_RUNBOOK.md/HARDWARE.md, RUN_RECORD_TEMPLATE.md and LOGGING_GUIDE CSV specification. Inventory/no-port observation is not measurement; no open/upload/erase/reset/RF performed. MCU-only backups/security/layout/restore precede NVS modification/app boot (ERR-023). Invalid staging is not corrupt-NVS boot evidence. Valid saved Gateway still initializes radio and may fault/block without it. Pair needs actual M0 electrical/RF approval, M1 IRQ/BUSY/power/error recovery/no unintendedTX and M2 >=200 completed cohort with explicit A/T/R/ACK/C denominators. Controlled replay/negative-identity/corrupt-NVS fixtures remain unprovided/unrun; all physical gates open. ERR-021 holds unattended/stuck-BUSY recovery acceptance; no watchdog modification. Do not count host timings/partial logs as physical evidence.
+
+## 21. Iteration014 - Heltec V3.2 HF migration
+
+The user authorized implementation after the audit-only attachment. Required S3 build passes; all290 original native names/order remain passing plus12 actual-adapter cases (302 total), with13 separate fake-serial capture cases. Only an existing selected-driver label assertion changes. Full failed/retry logs, source fingerprints and protected25-file list are in iteration-014 records. No line/branch coverage percentage is claimed.
+
+The adapter suite uses test-only argument/result recorders for SPI and RadioLib. It verifies V3 pins/SPI, TCXO1.8 V/DC-DC/fixed PHY, initialization/error order, IRQ latch/level fallback, full RX mask, byte/status/metric forwarding. Actual library constants/variant are checked by S3 compilation, not the native recorder. Clock, RNG, storage and serial reset inputs remain simulated; no new production abstraction or hardware emulator.
+
+Physical acceptance uses the updated integrated-radio runbook: terminate RF before power, inspect V3.2 HF/CP2102, same-board ROM backups/security/layout, explicit role provisioning, actual supply/TCXO/BUSY/DIO1/reset/serial/NVS, then >=200 complete closed-cohort HELLO/ACK plus controlled negative/replay/corrupt-config/recovery fixtures. ERR-021 and ERR-023 remain open. M0-M2 physical IN PROGRESS and M3-M8 NOT STARTED; new hardware does not demonstrate five/70-client capacity.
