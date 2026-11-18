@@ -1,0 +1,17 @@
+Command: xtensa-esp32s3-elf-gdb -batch <FIRMWARE_ELF> -ex "p sizeof(adaptive_lora::FirmwareRuntime)" -ex "p sizeof(adaptive_lora::Esp32Firmware)" -ex "p sizeof(adaptive_lora::GatewayApp)" -ex "p sizeof(adaptive_lora::ClientApp)" -ex "p sizeof(adaptive_lora::SerialLogger)" -ex "p sizeof(adaptive_lora::RadioDriver)" -ex "p sizeof(adaptive_lora::RadioEvent)" -ex "p sizeof(adaptive_lora::Frame)" -ex "p sizeof(adaptive_lora::SequenceTracker)" -ex "p sizeof(adaptive_lora::SequenceCounter)" -ex "p sizeof(adaptive_lora::NvsConfigStore)" -ex "p sizeof(adaptive_lora::ProvisioningConsole)" -ex "p sizeof(adaptive_lora::Sx1262Hardware)" -ex "p sizeof(adaptive_lora::PreferencesConfigStorage)"
+Ordered types: FirmwareRuntime, Esp32Firmware, GatewayApp, ClientApp, SerialLogger, RadioDriver, RadioEvent, Frame, SequenceTracker, SequenceCounter, NvsConfigStore, ProvisioningConsole, Sx1262Hardware, PreferencesConfigStorage
+Exit: 0
+$1 = 9000
+$2 = 9568
+$3 = 352
+$4 = 192
+$5 = 8228
+$6 = 20
+$7 = 120
+$8 = 92
+$9 = 200
+$10 = 8
+$11 = 4
+$12 = 156
+$13 = 552
+$14 = 12

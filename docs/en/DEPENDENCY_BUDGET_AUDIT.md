@@ -125,3 +125,78 @@ Installed Arduino3.3.11/IDF5.5.5 sources set loopTaskWDTEnabled=false and only s
 | Attended bench abort | After M0, use current limiting, attached antenna/load and accessible power removal; stop on missing progress. Does not close fault-recovery or unattended acceptance |
 
 ERR-021 remains OPEN. Unattended/stuck-BUSY recovery and any hard timing acceptance are BLOCKED until an approved bounded-path/watchdog disposition is verified. Preparation and normal attended observations may proceed under gates; M1/M2 cannot be reported fully closed by such observations alone. No firmware/library/watchdog configuration changed in013. Exact inspected hashes/config values: iteration-013-readiness-sources.json.
+
+
+## Iteration 015 — current S3 review and unchanged production behavior
+
+This section applies to Heltec V3.2 HF/SX1262. Earlier C3/LLCC68 findings and
+measurements above remain historical; do not transfer their SDK defaults to S3.
+No new production defect was reproduced. All 38 production/config/version
+inputs and the rebuilt binary match main 0d0e71c; no dependency patch is used.
+
+| Boundary reviewed | Current disposition and existing native evidence |
+|---|---|
+| Esp32Firmware / Runtime | Adapter members outlive the coordinator. Invalid config performs no radio operations; successful radio initialization precedes role construction/RNG. Fresh post-poll/post-stop/post-drain timestamps remain. Repeated reboot does not postpone an armed deadline. 47 lifecycle and 24 reliability cases retained |
+| RadioDriver / adapter | One owner, deadline checked before IRQ, bounded frame copy, standby before RX length/read, cleanup errors propagated, latch plus level fallback. 71 driver and 12 actual-adapter cases retained; the native RadioLib recorder does not execute the real library |
+| Gateway / Client | ACK echo/source/network/destination/state/deadline enforced, exact-deadline ACK rejected. Duplicate HELLO re-ACKs, three RX-start failures stop recovery, session generation is bounded with deferred retry. 38 integration cases retained, including loss/delay/recreation and full counter rollover |
+| FrameCodec / identity | Null/length/capacity/reserved/type/network/destination/session checks, unchanged error order, LE header and ACK9. 18 codec and existing role/session/reliability cases retained; no future type enabled |
+| Store / Preferences | Actual store validates, uses one 24-byte blob, closes sessions and verifies readback. Errors propagate; failed save is not a rollback guarantee. 56 store and 13 role/config cases retained. Preferences is a direct adapter; flash interruption and startup formatting remain unverified |
+| Console / logger | Fixed parser/queue and per-loop budgets retained. UART available-for-write and write use SDK locks; capacity does not prove a nonblocking call. 10 console and six logger cases retained. Log loss at reboot is characterized, not silently fixed |
+| SequenceTracker | Five new cases supplement the seven original cases. Eight keys/64 sequences per key; eviction, boot churn and restart limits documented in TDMA_FEASIBILITY.md |
+
+ERR-021 still follows Sx1262Hardware.startTransmit -> PhysicalLayer.startTransmit
+-> stageMode(TX) -> launchMode(TX) -> successful setTx(0) -> separate unbounded
+BUSY-high yield loop. Module's finite pre/post SPI BUSY checks do not bound
+that later loop. RadioDriver cannot execute its two-second poll deadline or
+serial reboot while the call is stuck. getIrqFlags also has no error return;
+zero/irrelevant flags remain ignored under the existing policy.
+
+Selected S3 qio_qspi SDK config enables TWDT/init/panic at five seconds and
+checks idle CPU0. Arduino runs this board's loop on CPU1 and initializes
+loopTaskWDTEnabled=false; this project never enables loop watchdog subscription.
+IWDT is 300 ms and checks CPU1 interrupt progress, which can continue during
+yield. CPU0 idle monitoring therefore does not guarantee loop/transaction
+progress. Debugger watchdog behavior is another limitation, not mitigation.
+Exact selected flags and versions: logs/build/iteration-015-toolchain.log.
+The narrowly scoped upstream timeout option remains plausible but needs a
+justified bound, consistent return/cleanup and normal/late/stuck-BUSY tests.
+Do not edit cached third-party files or claim a post-call wrapper bounds it.
+ERR-021 stays OPEN; the physical injection procedure is in BENCH_RUNBOOK.md.
+
+### Current compiler resources, not physical memory measurements
+
+S3 build reports RAM 32,096/327,680 and flash 342,560/3,342,336 bytes, identical
+to Iteration 014. Chip SRAM is 512 KB; the PlatformIO summary is not a free-heap
+measurement. default_8MB.csv allocates NVS at 0x9000/0x5000, app0 at
+0x10000/0x330000, app1 at 0x340000/0x330000, SPIFFS at 0x670000/0x180000 and
+coredump at 0x7F0000/0x10000. OTA partitions do not mean OTA is implemented.
+
+ELF-only GDB sizeof probe, exit 0 (rows overlap containment):
+
+| Type | Bytes |
+|---|---:|
+| FirmwareRuntime / Esp32Firmware | 9,000 / 9,568 |
+| GatewayApp / ClientApp | 352 / 192 |
+| SerialLogger | 8,228 |
+| RadioDriver / RadioEvent | 20 / 120 |
+| Frame / SequenceTracker / SequenceCounter | 92 / 200 / 8 |
+| NvsConfigStore / ProvisioningConsole | 4 / 156 |
+| Sx1262Hardware / PreferencesConfigStorage | 552 / 12 |
+
+Full command/output: logs/build/iteration-015-resource-probe.log. A Frame is
+92 in-memory bytes, independent of the 28–96-byte explicitly encoded wire
+frame. Both app TX paths declare 96-byte output buffers and a local Frame;
+logger event formatting declares 512+192+64+24 bytes of local arrays. These
+source sums exclude call nesting, compiler spills, printf/SDK use and ISR
+stack. Configured loop/main stacks are 8,192/4,096 bytes, not measured headroom.
+
+Pinned RadioLib still allocates ArduinoHal during Module construction and,
+with default non-STATIC_ONLY stream transfers, two scratch buffers per SPI
+operation. The new[] path has no project-level recoverable OOM policy.
+A static-only build would move scratch to stack and needs a separate audit;
+none is enabled here. UART locks, NVS/SDK allocation and formatting costs
+remain source-reviewed risks (ERR-008/009/010), not injected physical failures.
+Peak/minimum/largest heap, stack high-water, latency, entropy and fragmentation
+remain NOT MEASURED. SDK startup can still erase/reinitialize NVS before
+Runtime on specified initialization errors (ERR-023); private same-board
+backups and the recovery gate remain required.

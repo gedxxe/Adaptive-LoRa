@@ -356,3 +356,32 @@ The user authorized implementation after the audit-only attachment. Required S3 
 The adapter suite uses test-only argument/result recorders for SPI and RadioLib. It verifies V3 pins/SPI, TCXO1.8 V/DC-DC/fixed PHY, initialization/error order, IRQ latch/level fallback, full RX mask, byte/status/metric forwarding. Actual library constants/variant are checked by S3 compilation, not the native recorder. Clock, RNG, storage and serial reset inputs remain simulated; no new production abstraction or hardware emulator.
 
 Physical acceptance uses the updated integrated-radio runbook: terminate RF before power, inspect V3.2 HF/CP2102, same-board ROM backups/security/layout, explicit role provisioning, actual supply/TCXO/BUSY/DIO1/reset/serial/NVS, then >=200 complete closed-cohort HELLO/ACK plus controlled negative/replay/corrupt-config/recovery fixtures. ERR-021 and ERR-023 remain open. M0-M2 physical IN PROGRESS and M3-M8 NOT STARTED; new hardware does not demonstrate five/70-client capacity.
+
+
+## Iteration 015 — pre-hardware characterization and analytical tools
+
+Firmware S3 build exit 0; native 307/307 exit 0, zero skipped. All 302 previous
+case names/order remain; five new cases characterize the actual tracker for
+1/5/8 retained clients, 9/10/70-session eviction and ordered replay, boot churn
+competing with another client, old/new sessions at rollover and gateway
+object recreation. Full case names: logs/test/iteration-015-scenarios.md.
+This does not add automatic retransmission, application DATA delivery,
+persistent replay protection or a 70-client reliability guarantee.
+
+Separate host results: capture 13/13, model 16/16 and consistency 7/7, all
+exit 0. Model tests cover worked airtime vectors, CRC/header/CR/preamble,
+LDRO/limits, heterogeneous payloads, complete bitmap metadata, repeated ACK
+cost, unknown timings, exact budget boundaries, invalid inputs and CLI output.
+Consistency tests inject bad current versions/environments/links/physical
+claims/archive notices/markers. Two initial checker runs failed and are
+preserved under verification/corrected prefixes (ERR-026); final prefix passes.
+
+The scenario command produces 216 deterministic analytical rows: 103 are
+INFEASIBLE and 113 UNDETERMINED under the declared ten-second hypothesis.
+No CONDITIONAL_FIT is claimed with unknown guard/switch/processing costs.
+This is not a packet/channel simulation or RF measurement. Design assumptions,
+future beacon size limits and timer/deduplication contracts are in
+[TDMA_FEASIBILITY.md](TDMA_FEASIBILITY.md). Instrumented line/branch coverage
+and all physical timing, heap/stack, NVS durability and RF evidence remain
+NOT MEASURED. Perform the bench runbook and planned ERR-021 injection only
+when actual hardware/instruments and safe reviewed fixtures are available.

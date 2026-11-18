@@ -124,3 +124,21 @@ ESP32退出0 PASS13.053s；native退出0 **290/290 PASS**61.980s，53输入/有�
 用户后续授权实施。S3编译通过，原290用例名称/顺序保留且通过，新增实际adapter12，总302；capture另13为fake-port。旧测试仅driver标签断言更新。首次fixture编译失败及修正记录保留，不声称行/分支coverage或物理验证。
 
 新suite只用有界SPI/RadioLib调用记录，验证pins/TCXO1.8 V/DC-DC/固定PHY、初始化和错误顺序、IRQ latch/level、RX mask、字节/指标转发；真实库常量/variant由S3编译检查。实物按当前集成radio流程：上电前终端、V3.2 HF/CP2102核对、同板ROM备份/security/layout、provisioning、供电/TCXO/BUSY/DIO1/reset/串口/NVS、至少200闭合cohort及负面fixture。ERR-021/023仍开放，M0–M2实物未完成，M3–M8未开始，不能把新板当5/70节点容量证据。
+
+
+## Iteration 015 — 实物前边界与分析工具
+
+S3 构建退出 0；native 307/307 退出 0，无跳过，原 302 名称/顺序保留。
+五项新测试执行真实 tracker：1/5/8 保留、9/10/70 淘汰与顺序重放、boot churn
+挤占其他 Client、多 Client rollover/新旧 session、Gateway 对象重建。
+逐案例结果见 logs/test/iteration-015-scenarios.md；未增加自动重传、DATA 交付或
+持久 replay 保护，不证明 70 Client 可靠性。
+
+另有 capture 13/13、model 16/16、consistency 7/7，全部退出 0。模型覆盖手算 airtime、
+CRC/header/CR/preamble/LDRO、异长 payload、bitmap 完整开销、每轮 ACK、未知成本、
+预算边界、输入拒绝和 CLI。文档测试注入错版本/环境/链接/实物 PASS/归档标识。
+前两次 checker 失败保留在 verification/corrected 日志（ERR-026），final 全通过。
+216 分析场景中 103 INFEASIBLE、113 UNDETERMINED，不是无线/包级仿真。
+假设与候选合同见 TDMA_FEASIBILITY；guard/切换/处理未知，不报告实物 capacity。
+line/branch 百分比、物理时序、heap/stack、NVS 耐久和 RF 均未测量。
+收到板和安全审查 fixture 后再按 runbook 执行，不能用主机结果关闭实物门槛。
