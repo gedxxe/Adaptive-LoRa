@@ -1,6 +1,6 @@
 # Adaptive-LoRa
 
-开发基线：经过验证的 [Iteration013 整合PR](https://github.com/gedxxe/Adaptive-LoRa/pull/3) 合并后，以 `main` 为规范基线。后续工作从最新 `main` 开始，保留历史迭代分支和工程记录；验证证据/发布状态见 [PROGRESS.md](docs/zh-CN/PROGRESS.md)。
+开发基线：[Heltec 迁移 PR #4](https://github.com/gedxxe/Adaptive-LoRa/pull/4) 已合并，以 `main` 为规范基线。Iteration 015 另提 PR 审查，不自动合并。后续工作从最新 `main` 开始，保留历史迭代分支和工程记录；验证证据/发布状态见 [PROGRESS.md](docs/zh-CN/PROGRESS.md)。
 
 **研究标题：** Reliability-aware TDMA Scheduling and Link Adaptation for Single-Radio LoRa Industrial Energy Monitoring Networks.
 
@@ -8,13 +8,15 @@ Adaptive-LoRa 是独立的单射频 LoRa P2P 网络研究与嵌入式固件项�
 
 ## 研究范围和当前状态
 
-研究方向为可靠性感知的 Gateway 调度与保守链路自适应。**TDMA、ACK bitmap、选择性重传调度和 ADR 均为后续计划，尚未实现。** 当前仅交付 M0–M2 固定 PHY HELLO/ACK 基线。
+研究方向为可靠性感知的 Gateway 调度与保守链路自适应。**生产 TDMA、ACK bitmap、选择性重传调度和 ADR 均未开始。** Iteration 015 只增加主机可行性研究。 当前仅交付 M0–M2 固定 PHY HELLO/ACK 基线。
 
 | 证据 | 当前基线 |
 |---|---|
 | 固件 / 协议 | `0.2.0-alpha.1` / `1` |
 | ESP32 编译 | PASS |
-| Native 测试 | 302/302 PASS：原290全部通过，新增生产SX1262 adapter 12个 |
+| Native 测试 | 307/307 PASS：原 302 全部通过，加五项去重边界测试 |
+| Capture / 模型测试 | 13/13 / 16/16 PASS，仅主机 |
+| Documentation consistency | 7/7 tests PASS; checker exit 0 |
 | 已实现 | 有界显式帧、角色配置、HELLO/ACK 身份检查、去重、超时/恢复、sequence/session 处理 |
 | 实物 NVS/重启/SPI/IRQ/RF/天线 | NOT VERIFIED |
 
@@ -62,7 +64,7 @@ pio test -e native
 5. M7–M8 受控天线对比及明确标注的逻辑节点仿真。
 6. 其他嵌入式应用集成前，另行审查 payload/event 和 platform-service 接口。
 
-验收见英文 [MILESTONE_TASKS](docs/en/MILESTONE_TASKS.md) 和 [TEST_PLAN](docs/zh-CN/TEST_PLAN.md)。本次迁移不实现后续 MAC。
+验收见英文 [MILESTONE_TASKS](docs/en/MILESTONE_TASKS.md) 和 [TEST_PLAN](docs/zh-CN/TEST_PLAN.md)。本次不激活后续 MAC。候选 M3 合同、airtime 预算和未知时序见 [TDMA_FEASIBILITY](docs/zh-CN/TDMA_FEASIBILITY.md)。
 
 ## 研究和复现原则
 
@@ -70,6 +72,17 @@ pio test -e native
 
 修改前阅读 [AGENTS.md](AGENTS.md)。英文为主文档，简体中文为第二语言。
 
-实物准备入口：[M0-M2 readiness](docs/zh-CN/PHYSICAL_ACCEPTANCE_READINESS.md)，含备份单MCU/pair门槛、采集/CSV和ERR-021/SDK启动限制。流程未执行；上传/改配置前先私有备份，证据用新目录。
+实物准备入口：[M0-M2 readiness](docs/zh-CN/PHYSICAL_ACCEPTANCE_READINESS.md)，含集成射频板与 pair 门槛、采集/CSV和ERR-021/SDK启动限制。流程未执行；上传/改配置前先私有备份，证据用新目录。
 
-Iteration014已完成S3目标编译，302 native及另13 fake-serial capture通过。安装平台55.03.311原本支持该板，无需工具链升级；Arduino3.3.11/IDF5.5.5、Xtensa GCC14.2.0，实际结果在构建记录。协议/NVS/app策略和15行main不变，ERR-021仍OPEN；尚未烧录或做实物NVS/RF测试。
+
+其他主机检查使用已安装的 PlatformIO Python，分别执行：
+
+```sh
+python -m unittest discover -s tools -p test_capture_bench.py -v
+python -m unittest discover -s tools -p test_tdma_feasibility.py -v
+python -m unittest discover -s tools -p test_check_consistency.py -v
+python tools/check_consistency.py
+```
+
+一致性检查从源文件读取当前版本和环境，排除历史记录；分析模型包含 216 个场景，
+未知切换/处理/guard 不填零。两者都不属于实物测试，M0–M2 实物验收仍 IN PROGRESS。

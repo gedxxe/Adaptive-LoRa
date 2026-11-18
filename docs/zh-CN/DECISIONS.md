@@ -87,3 +87,16 @@ CSV使用关闭HELLO cohort，区分A/T/R/ACKstart/done/C；A含启动失败，P
 固件0.2.0-alpha.1、协议1、NVS namespace/key/schema/blob、app/codec/session/driver策略和15行main不变，driver标签改SX1262。保留915 MHz/10 dBm/固定PHY，Moxon为设计基线，未捏造匹配/gain/RF。ERR-021继续开放，不改第三方库/watchdog，不做TDMA/ADR/应用集成。
 
 实际adapter通过有界测试专用SPI/RadioLib调用记录器编译，原290保留、新增12；只有旧driver标签断言更新。首次fixture重复声明失败保留，修正后302和capture另13全部通过。测试不证明真实chip/IRQ/TCXO/DC-DC/RF。单板radio也集成，操作前接RF终端，先同板ROM私有备份，不跨MCU恢复完整镜像。
+
+
+## ADR-019 — 当前合同与仅主机调度研究
+
+2026-11-18，Iteration 015 接受。AGENTS 精简并链接规范 PROGRESS、模块归属、验收与
+历史记录；CODEX_START_PROMPT 明确归档，当前进度与历史快照分开。小型 checker 从
+生产/配置读取版本、板环境，检查选定当前文档链接/状态并排除历史，不永久固定测试数/SHA。
+
+新增 Python 标准库 airtime/预留预算工具和一份双语 TDMA_FEASIBILITY。未知时间保持
+显式，ACK 包含完整头/metadata，retry 每轮包含 ACK；结果仅分析假设。不激活预留
+消息、scheduler、bitmap/retry/ADR，不改版本/生产策略。表征八 session 缓存，不扩容；
+按 admission/schedule 维护状态留给 M4。ERR-021 无已证实缓解而继续开放，历史记录保留。
+仅发布指定分支/PR 供审查，不自动合并规范 main。

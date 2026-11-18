@@ -15,3 +15,25 @@
 11. 99%短距transaction成功只是初始工程目标，不是现场保证。记录RSSI/SNR/时延/复位/供电和排除项，做受控失收timeout及恢复后新事务。M2无自动重传；真实重复/错身份/坏帧和corrupt-config需要独立fixture，native不能替代。
 
 M0核实板/供电/USB/Flash/天线/RF条件，M1核实两角色radio/IRQ/BUSY/NVS/串口，M2保留正常和负面测试证据；ERR-021恢复仍单独开放。未知填NOT MEASURED，M2未完成前不开始M3。
+
+
+## ERR-021 计划注入流程，尚未执行
+
+先通过正常 M0/M1，再另审电气 fixture，现场有人值守。不得将 SX1262 BUSY 输出
+短接电源或与其对驱。集成板必须经实际 PCB 审查建立有缓冲、隔离的 MCU 输入路径；
+不能避免电气冲突时暂缓注入，不凭软件说明剪线或驱动输出。
+
+1. 保留同板备份、安全状态、分区、固件 hash 和初始 NVS；接合适 50-ohm 负载，
+   使用限流供电及独立断电，开测前约定并记录外部最长持续时间（TBD，非射频实测上限）。
+2. 用正确电平、高阻仪器观测 NSS/SCK/MOSI、BUSY、DIO1、reset、供电/电流和 UART，
+   先采正常 TX。仅见 setTx opcode 不证明返回成功。
+3. 经过审查的 trigger 必须让 MCU 在 setTx 返回成功后、独立 ramp poll 前/期间看到
+   BUSY 高。提前拉高可能只触发有 timeout 的 SPI 路径，不算 ERR-021 复现。
+   trigger 时延和隔离需实测，目前没有已提供/已执行的 fixture。
+4. 记录 loop/UART 停滞、持续时间、DIO1/RF/供电及 watchdog/reset；调试器会改变
+   watchdog，须披露。到外部上限即停止，必要时安全移除全部供电，不无限等待 poll。
+5. 去除故障，核对接线/供电，按同板备份恢复规则处理状态，再测初始化和 HELLO/ACK。
+   失败、恢复 capture 均保存。
+
+关闭该问题需要精确故障复现及经审查的有界返回或独立测量的恢复，包含 PA 停止与
+重新初始化。正常链路或源码审查不能关闭 ERR-021。本迭代未改库/watchdog，未做实物注入。

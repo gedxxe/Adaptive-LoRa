@@ -140,3 +140,37 @@ M2 needs the closed-cohort normal run and timeout/duplicate/negative-identity
 and corrupt-config evidence. ERR-021 recovery remains a separate hold.
 Leave unavailable measurements as NOT MEASURED. M3 begins only after M2
 physical evidence and measured switching/clock guards exist.
+
+
+## Planned ERR-021 fault injection — not executed
+
+This requires a separately reviewed electrical fixture and attended bench
+session after normal M0/M1 bring-up. Do not short the SX1262 BUSY output to
+a supply or drive against it. On this integrated board, establish a buffered,
+isolated MCU-side BUSY input path only after reviewing the actual PCB and
+fixture. If that cannot be done without unsafe contention, defer injection.
+
+1. Preserve same-board backups/security/layout, firmware hash and initial NVS;
+   terminate RF with a suitable 50-ohm load and use current-limited power.
+   Provide independent power removal and agree/record an external maximum
+   test duration before starting (limit TBD, not a measured radio bound).
+2. Observe NSS/SCK/MOSI, BUSY, DIO1, reset, supply/current and UART with
+   high-impedance instrumentation at the correct logic voltage. Establish a
+   normal TX trace first; do not infer setTx success solely from an SPI opcode.
+3. Arrange a reviewed trigger so the MCU sees BUSY high specifically after
+   setTx has returned success and before/during the separate ramp poll.
+   Holding it high earlier may exercise Module's finite command timeout
+   instead and is not reproduction of ERR-021. Trigger latency and electrical
+   isolation must be characterized; no fixture is supplied or tested here.
+4. Record whether loop/UART progress stops, elapsed time, DIO1, RF/supply and
+   any watchdog/reset. A debugger can change watchdog behavior; report it.
+   Stop at the external limit and safely remove all board power if progress
+   is absent. Do not wait indefinitely for the application's poll deadline.
+5. Remove the fault, verify normal wiring/power, restore the same-board state
+   only under the backup/recovery procedure, and repeat normal initialization
+   and HELLO/ACK. Preserve failed captures as well as recovery evidence.
+
+Closure needs the precise fault reproduced and an approved bounded return or
+independently measured recovery, including radio/PA shutdown and initialization.
+A normal link run or source review cannot close ERR-021. No watchdog/library
+modification or physical fault injection was performed in Iteration 015.

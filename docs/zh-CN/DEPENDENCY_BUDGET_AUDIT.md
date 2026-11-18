@@ -80,3 +80,37 @@ RAM口径补充：linker报告DRAM82,992/321,296，包含instruction58,428 +data
 局部上游timeout/批准的backport是可审查方案，须给出可信ramp界限、返回/清理语义、继承芯片影响和固定依赖hash，再测正常/延迟/卡住BUSY。普通wrapper返回后计时/2s poll不能抢占；adapter override/direct command需保持staging/RF-switch/敏感度/私有状态，不能假定安全。watchdog reset不等同radio ERROR，也不证明radio/PA已停，可能丢日志/重建身份；需独立审查。013不补丁第三方、不改watchdog、不加推测恢复。
 
 ERR-021 OPEN，无人值守/卡BUSY恢复和硬时限验收BLOCKED；M0后仅可限流、天线/负载就绪、有随手断电能力的有人bench观察，不能据此关闭M1/M2故障验收。源码hash/config证据见iteration-013-readiness-sources.json；无物理stall/watchdog测试。
+
+
+## Iteration 015 — 当前 S3 源码与资源复核
+
+本节适用于 V3.2 HF/SX1262，前文 C3/LLCC68 数据保留为历史。未复现新生产缺陷；
+38 项生产/配置/版本输入与固件二进制均匹配 main 0d0e71c。Runtime 生命周期 47、
+reliability 24、driver 71、adapter 12、app integration 38、store 56、role/config 13、
+codec 18、console 10、logger 6 原案例全部保留；SequenceTracker 从 7 增为 12。
+初始化顺序、引用生命周期、fresh timestamps、重复 reboot、exact ACK deadline、
+IRQ latch/level、standby/cleanup、NVS readback 和有界缓冲策略未改动。
+
+ERR-021 路径为 Sx1262Hardware.startTransmit → PhysicalLayer.startTransmit →
+stageMode(TX) → launchMode(TX) → setTx(0) 成功后的独立 BUSY-high/yield 循环。
+SPI 前后 timeout 不包围此循环，driver 的两秒期限与串口 reboot 无法抢占它。
+S3 qio_qspi 配置启用 TWDT/init/panic 五秒和 idle CPU0 检查；本板 Arduino loop
+在 CPU1，loopTaskWDTEnabled 初始 false，项目未订阅。IWDT 300 ms 检查中断进展，
+yield 时中断仍可运行；这些默认值不保证事务进展或恢复。调试器还可能改变 watchdog。
+可审查上游局部 timeout/cleanup 修正，但缺少正常/延迟/卡住 BUSY 证据，故未改库。
+ERR-021 仍开放，后续受控注入步骤见 BENCH_RUNBOOK。
+
+当前构建 RAM 32,096、flash 342,560 bytes，与 014 一致。default_8MB.csv 的 NVS
+0x9000/0x5000，app0 0x10000/0x330000，app1 0x340000/0x330000，SPIFFS
+0x670000/0x180000，coredump 0x7F0000/0x10000；有 OTA 分区不代表实现 OTA。
+ELF GDB sizeof（退出 0）：Runtime 9000、composition 9568、Gateway 352、Client 192、
+logger 8228、driver 20、RadioEvent 120、Frame 92、tracker 200、counter 8、store 4、
+console 156、adapter 552、Preferences wrapper 12 bytes。类型包含关系不能重复求和。
+命令见 logs/build/iteration-015-resource-probe.log，SDK/工具链见 iteration-015-toolchain.log。
+
+TX 本地数组 96 bytes，另有局部 Frame；logger event 数组为 512+192+64+24 bytes，
+不含嵌套、spill、printf/SDK/ISR。loop/main 配置 stack 为 8192/4096，非高水位测量。
+RadioLib 构造分配 ArduinoHal，默认 SPI stream 每次仍分配两个 scratch，项目没有
+完整 OOM 恢复；STATIC_ONLY 会增加 stack，未启用。UART capacity/write 均涉及 SDK
+锁，不证明非阻塞。ERR-008/009/010、Runtime 前 NVS 初始化/格式化 ERR-023 仍开放。
+heap/stack 峰值、碎片、真实时延和熵均未测量。完整边界矩阵见英文对应节。

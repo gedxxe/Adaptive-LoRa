@@ -844,3 +844,181 @@ The changed hardware-filename exclusion was verified with `python tools/reproduc
 Reviewed all 69 changed paths, including the adapter rename, native call recorders, current bilingual documents and full failed/successful logs. Exact file and every-production-.cpp responsibilities are in logs/build/iteration-014-review.json. All59 tested input hashes match;25 protected original source/config/version files,18 original test files (except one driver-label substitution),285 original completed log-area files and4 append-only record prefixes are preserved. All 422 publication files passed identified organization/private-path/credential screening; 47 relative changed-document links resolve. Active src/include/test/tools/platformio have zero old-hardware references. Six pinned SX126x library files match baseline byte-for-byte; ELF links20 SX1262 symbols and no LLCC68 symbols. Fresh fetch/ls-remote exit0 still main075b8faf; new014 remote absent, normal merge enabled and automatic branch deletion false (publication-preflight.json). No source changes after PASS. Next: stage/check, commit/push, PR normal merge and independent final main/tree/branch/input checks.
 
 The publication dependency inventory indexes every original finding by baseline path/line and matched term instead of duplicating long historical paragraphs; complete original context remains at075b8faf and private audit output. The final staged diff check passed before publication, with all59 tested source/tool hashes still matching.
+
+
+## ITERATION-015 pre-edit checkpoint - 2026-11-18 (client date)
+
+Codex; branch iteration-015-prehardware-stabilization created from fetched origin/main 0d0e71c368e88093b081bf9182e1f1babd189a9a; PR #4 and Heltec migration confirmed, clean initial tree. Baseline 422 tracked-file hashes and 38 production/config/version hashes retained in ignored .pio/iteration-015. Baseline firmware.bin SHA256 8119557222af720f64aff9afec9d06d00cc8f2fa08f4e442366445b1af46f1a6. Objective: synchronize current documentation, characterize bounded deduplication and add host-only airtime/schedule research. No reproduced production defect found in initial review; preserve all production behavior. ERR-021 remains a source-level open risk. Existing 302 native/13 capture/build PASS are Iteration014 evidence until fresh commands run. No physical test, port access or transmission. Publication authorized on the named branch and PR only; do not merge.
+
+
+### ITERATION-015 first verification checkpoint — 2026-11-18
+
+`pio run -e heltec_wifi_lora_32_V3` exit 0, PASS 19.58 seconds; native exit 0,
+307/307 PASS (302 original plus five actual SequenceTracker cases), capture
+13/13 exit 0, model 16/16 exit 0. Complete verification-prefixed logs/results
+are under logs/build and logs/test. Resource ELF probe exit 0; unchanged
+binary SHA and 32,096/342,560 RAM/flash. No production edits or physical tests.
+The first consistency suite exited 1 (five passed, two failed) and direct
+checker exited 1 due to a new Chinese roadmap link, ERR-026. Initial output
+is retained; link corrected to canonical English roadmap and rerun pending.
+An earlier review usage-limit rejection prevented its command from executing;
+resumed approved execution succeeded. No invented result for the rejected call.
+
+
+### ITERATION-015 checker correction checkpoint
+
+Second consistency-suite run exited 1, five passed/two failed; corrected link
+was accepted, but generalized version regex matched Esp32Firmware prose.
+ERR-026 records the new word-boundary correction and preserves both failed
+outputs. No production/model/native input changes. Final checker rerun next;
+physical acceptance remains IN PROGRESS.
+
+
+## ITERATION-015 final software verification — 2026-11-18 (client date)
+
+Codex; pre-hardware stabilization and host-only TDMA research, M0–M2 physical
+IN PROGRESS. Branch iteration-015-prehardware-stabilization starts at verified
+main 0d0e71c368e88093b081bf9182e1f1babd189a9a (merged PR #4). Git fetch and
+ls-remote before publication each exited 0; main and all six historical branch
+heads remain unchanged. Implementation commit SHAs and PR state follow in the
+publication report; this entry does not predict its own commit hash. Firmware
+0.2.0-alpha.1, protocol 1, NVS schema 1, RadioLib 7.8.1 remain unchanged.
+
+### Changes and responsibilities
+
+- AGENTS.md: replace duplicated design/file-tree prose with a concise current
+  engineering contract, ownership, acceptance, records and authorized PR workflow.
+- CODEX_START_PROMPT.md: prepend an archival notice; retain original body bytes.
+- README.md/README.zh-CN.md and bilingual PROGRESS: current Heltec target,
+  commands, actual evidence, host research and open physical gates. Historical
+  progress remains explicitly separated; old results are not reclassified.
+- Bilingual ARCHITECTURE: correct obsolete module label, actual boot order,
+  staged config meaning and synchronous-dependency limits (English diagram).
+- test/test_sequence_tracker/test_main.cpp: five bounded-capacity/session/
+  restart characterizations using production tracker; no policy changes.
+- Bilingual DEPENDENCY_BUDGET_AUDIT and BENCH_RUNBOOK: current S3 source/resource
+  review, watchdog/UART/allocation limitations and planned safe ERR-021 injection.
+- Bilingual TEST_PLAN and English MILESTONE_TASKS: exact new evidence and future
+  timing/session/compatibility gates, without production milestone completion.
+- tools/tdma_feasibility.py and test_tdma_feasibility.py: deterministic stdlib
+  airtime/reservation arithmetic and independent vectors/budget/CLI scenarios.
+- tools/check_consistency.py and test_check_consistency.py: selected current
+  version/environment/adapter/link/open-physical/archive checks and negative fixtures.
+- Bilingual TDMA_FEASIBILITY: candidate beacon/slot/session/timer/ADR contracts,
+  complete ACK/bitmap costs, unknown timing assumptions and deduplication limits.
+- Bilingual DECISIONS ADR-019, ERROR_LOG, this record, CHANGELOG and logs:
+  rationale, actual failures/resolutions, exact cases/results and fingerprints.
+  Exact final file inventory and every .cpp responsibility are in
+  logs/build/iteration-015-review.json; command results are in validation.json.
+
+### Commands actually executed
+
+Installed PlatformIO executable/Python are used; publication copies replace
+local paths with disclosed placeholders and normalize EOL/display whitespace.
+Raw launcher output stays privately in ignored .pio/iteration-015.
+
+| Command | Exit | Actual result | Full output |
+|---|---:|---|---|
+| `pio run -e heltec_wifi_lora_32_V3` | 0 | PASS, incremental 19.58 s / runner 20.625 s | logs/build/iteration-015-verification-esp32.log |
+| `pio test -e native` | 0 | 307/307 PASS, zero skipped, 77.470 s / runner 78.218 s | logs/test/iteration-015-verification-native.log |
+| `<PIO_PYTHON> -m unittest discover -s tools -p test_capture_bench.py -v` | 0 | 13/13 PASS, fake serial | logs/test/iteration-015-verification-capture.log |
+| `<PIO_PYTHON> -m unittest discover -s tools -p test_tdma_feasibility.py -v` | 0 | 16/16 PASS, host-only arithmetic | logs/test/iteration-015-verification-model.log |
+| `<PIO_PYTHON> -m unittest discover -s tools -p test_check_consistency.py -v` | 0 | 7/7 PASS, final correction | logs/test/iteration-015-final-consistency-tests.log |
+| `<PIO_PYTHON> tools/check_consistency.py` | 0 | PASS, selected current docs | logs/test/iteration-015-final-consistency.log |
+| `<PIO_PYTHON> tools/tdma_feasibility.py --scenarios --out logs/test/iteration-015-tdma-scenarios.json` | 0 | 216 deterministic analytical rows | logs/test/iteration-015-final-scenarios.log |
+
+Each launch has a same-prefix result JSON. First two consistency-suite attempts
+each exited 1, five passed/two failed: new Chinese link then checker field-name
+regex (ERR-026). Both complete outputs are preserved; assertions were not
+removed. Initial package inventory UnicodeEncodeError exit 1 remains in the
+toolchain log; UTF-8 S3/native retries each exited 0 (ERR-006 recurrence).
+Other version/GDB probes exited 0. A review usage limit rejected an earlier
+launcher before execution, so that call supplied no test/build evidence.
+
+All 302 original native names/order remain, plus five new tracker cases;
+suite counts: app integration 38, store 56, runtime 47, codec 18, console 10,
+driver 71, role/config 13, runtime reliability 24, sequence 12, logger 6,
+adapter 12. Individual names/results: logs/test/iteration-015-scenarios.md.
+No line/branch coverage percentage is claimed. Existing loss/delay/malformed/
+wrong-identity/exact-deadline/reboot/full-counter tests were retained, not copied.
+
+38 production/config/version hashes match baseline, as does firmware.bin
+SHA256 8119557222af720f64aff9afec9d06d00cc8f2fa08f4e442366445b1af46f1a6.
+main.cpp remains the unchanged 15-line composition/delegate. Source/core/apps,
+wire bytes, NVS namespace/key/schema/blob, provisioning, IRQ/recovery/deadline
+policy, pins, TCXO/regulator and fixed PHY do not change. RAM 32,096/327,680,
+flash 342,560/3,342,336 match Iteration 014. ELF type sizes and configured stack
+budgets are compiler/source evidence, not free/peak heap or physical stack use.
+Toolchain: Core 6.1.19, installed espressif32 55.03.311 (display 55.3.311),
+Arduino 3.3.11, IDF libs 5.5.5+sha.b774170ff46, Xtensa 14.2.0+20260121,
+native 1.2.1, Unity 2.6.1, host MinGW GCC 6.3.0, PlatformIO Python 3.11.7.
+No upgrade or third-party patch. See iteration-015-toolchain/packages-utf8 logs.
+
+### Findings, classifications and next gate
+
+Source review found no new reproduced production defect. The eight-session
+cache is retained: native 1/5/8 sessions remember duplicates, 9/10/70 ordered
+replay thrashes after eviction, boot churn competes for capacity and gateway
+recreation loses volatile history. These are M2 limits, not DATA guarantees.
+M4 should review bounded admission/schedule-associated session/window state,
+retired-session expiry and reboot rejoin; estimated 70-record budgets are
+analytical and do not constitute implemented allocations.
+
+The host-only 216-row grid is analytical: clients 1/5/10/20/35/70, SF7/8/9,
+16/68 application bytes, retries 0/1/2, individual/bitmap ACK with full metadata.
+Hypothetical ten-second frames, cached-schedule 45-byte SF9 beacon and unknown
+switch/processing/guard give 103 INFEASIBLE and 113 UNDETERMINED. Maximum
+96-byte frame airtimes are 164096/297472/533504 us at SF7/8/9. No radio/channel
+simulation, node-capacity or physical timing claim. M3 candidate has 17-byte
+base + 6-byte entries: one entry fits, seventy do not fit a current frame.
+
+Native role stimuli use Gateway network/node/gateway 1/1/1 and Client 1/2/1;
+no physical roles were provisioned. Target Heltec V3.2 HF/S3FN8/SX1262/8 MB,
+receipt quantity/revision/markings NOT VERIFIED. Physical distance, LOS/NLOS,
+antenna/orientation, supply/current, packet count, PDR/ACK ratio, RSSI/SNR,
+retry/latency/reset counts, heap/stack peaks and entropy NOT MEASURED.
+Configured research PHY remains 915 MHz/BW125/SF7/CR4/5/preamble 8/explicit/CRC/
+sync 0x12/10 dBm/SPI 1 MHz; SF9 is future control only. No port, upload, erase,
+physical reboot/NVS/SPI/BUSY/DIO1/TCXO/RF/antenna test was performed.
+
+ERR-008/009/010/021/023 remain open. S3 idle CPU0 watchdog does not prove CPU1
+loop progress; default loop subscription is disabled. ERR-021 injection needs
+reviewed isolated BUSY fixture, terminated RF and independent stop/recovery
+observations. SDK pre-runtime NVS formatting still requires same-board backups.
+M0–M2 physical acceptance IN PROGRESS; M3–M8 production NOT STARTED. Next:
+inspect delivered boards, backup/security/layout, execute current runbook,
+resolve recovery hold and measure switch/IRQ/process/drift before M3 design
+freeze. Publish the verified branch and review PR only; do not merge main.
+
+
+### ITERATION-015 pre-publication review
+
+Review added explicit AGENTS protocol-version checking to the existing negative
+version fixture; no case-count or production change. Publication-prefixed
+consistency tests 7/7 and direct checker each exit 0; complete logs/results
+retained. All 313 original log-area files and four append-only record prefixes
+are preserved; the archived task body retains its exact bytes. All 38 production
+inputs and firmware binary still match the tested baseline. Complete changed-
+file/source ownership inventory is iteration-015-review.json; final staged
+check, commit/push and independently verified PR/remote state follow. Main and
+six historical branch heads were unchanged at publication preflight. No merge.
+
+
+### ITERATION-015 staged formatting correction
+
+First documentation commit cc5fe9a succeeded after staged check exit 0.
+Second scoped staging check exited 2 on a new package log's blank EOF;
+ERR-015 recurrence records original retention and whitespace-only correction.
+No source/tool/test change or repeat firmware build is needed. Restaged review
+must pass before the second commit; physical status remains unchanged.
+
+
+### ITERATION-015 scoped commits before publication
+
+Documentation commit cc5fe9a and reliability commit ba56667 succeeded; each
+final staged check exited 0. New host tooling/design and complete iteration
+records form the third scoped commit. Final publication is branch + review PR
+only, with main unchanged. Tested firmware/native/model/capture inputs remain
+unchanged since their passing runs; additional changes are documentation and
+log formatting only. Final commit/push/remote/PR identifiers are reported after
+actual execution rather than predicted in this record.

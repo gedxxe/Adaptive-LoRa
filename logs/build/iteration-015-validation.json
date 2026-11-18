@@ -1,0 +1,138 @@
+{
+  "client_date": "2026-11-18",
+  "baseline": "0d0e71c368e88093b081bf9182e1f1babd189a9a",
+  "branch": "iteration-015-prehardware-stabilization",
+  "firmware": "0.2.0-alpha.1",
+  "protocol": 1,
+  "nvs_schema": 1,
+  "radiolib": "7.8.1",
+  "production_inputs_unchanged": 38,
+  "firmware_bin_sha256": "8119557222af720f64aff9afec9d06d00cc8f2fa08f4e442366445b1af46f1a6",
+  "binary_identical_to_014": true,
+  "main_lines": 15,
+  "ram_bytes": 32096,
+  "flash_bytes": 342560,
+  "native_cases": 307,
+  "native_prior_cases_retained": 302,
+  "native_new_cases": 5,
+  "capture_cases": 13,
+  "model_cases": 16,
+  "consistency_cases": 7,
+  "scenario_count": 216,
+  "scenario_outcomes": {
+    "INFEASIBLE": 103,
+    "UNDETERMINED": 113
+  },
+  "original_log_files_unchanged": 313,
+  "append_only_record_prefixes_preserved": [
+    "docs/en/BUILD_MEMORY.md",
+    "docs/en/ERROR_LOG.md",
+    "docs/en/DECISIONS.md",
+    "docs/zh-CN/DECISIONS.md"
+  ],
+  "archived_contract_body_preserved": true,
+  "relative_changed_document_links_checked": 70,
+  "physical_validation": "NOT RUN",
+  "failed_checks_preserved": "ERR-026 checker link/regex; ERR-006 package display; approval-review limit prevented one launcher before execution; ERR-015 staged new-log blank EOF corrected",
+  "command_results": {
+    "logs/build/iteration-015-verification-esp32-result.json": {
+      "command": "pio run -e heltec_wifi_lora_32_V3",
+      "exit_code": 0,
+      "runner_seconds": 20.625,
+      "log": "logs/build/iteration-015-verification-esp32.log",
+      "publication_policy": "Full stdout/stderr with local workspace/PlatformIO/user paths replaced by disclosed placeholders and EOL/trailing-display normalization. Raw retained privately in ignored audit cache.",
+      "client_date": "2026-11-18",
+      "physical_validation": "NOT RUN"
+    },
+    "logs/test/iteration-015-corrected-consistency-tests-result.json": {
+      "command": "<PIO_PYTHON> -m unittest discover -s tools -p test_check_consistency.py -v",
+      "exit_code": 1,
+      "runner_seconds": 0.937,
+      "log": "logs/test/iteration-015-corrected-consistency-tests.log",
+      "publication_policy": "Full stdout/stderr with local workspace/PlatformIO/user paths replaced by disclosed placeholders and EOL/trailing-display normalization. Raw retained privately in ignored audit cache.",
+      "client_date": "2026-11-18",
+      "physical_validation": "NOT RUN"
+    },
+    "logs/test/iteration-015-final-consistency-result.json": {
+      "command": "<PIO_PYTHON> tools/check_consistency.py",
+      "exit_code": 0,
+      "runner_seconds": 0.25,
+      "log": "logs/test/iteration-015-final-consistency.log",
+      "publication_policy": "Full stdout/stderr with local workspace/PlatformIO/user paths replaced by disclosed placeholders and EOL/trailing-display normalization. Raw retained privately in ignored audit cache.",
+      "client_date": "2026-11-18",
+      "physical_validation": "NOT RUN"
+    },
+    "logs/test/iteration-015-final-consistency-tests-result.json": {
+      "command": "<PIO_PYTHON> -m unittest discover -s tools -p test_check_consistency.py -v",
+      "exit_code": 0,
+      "runner_seconds": 1.375,
+      "log": "logs/test/iteration-015-final-consistency-tests.log",
+      "publication_policy": "Full stdout/stderr with local workspace/PlatformIO/user paths replaced by disclosed placeholders and EOL/trailing-display normalization. Raw retained privately in ignored audit cache.",
+      "client_date": "2026-11-18",
+      "physical_validation": "NOT RUN"
+    },
+    "logs/test/iteration-015-final-scenarios-result.json": {
+      "command": "<PIO_PYTHON> tools/tdma_feasibility.py --scenarios --out logs/test/iteration-015-tdma-scenarios.json",
+      "exit_code": 0,
+      "runner_seconds": 0.281,
+      "log": "logs/test/iteration-015-final-scenarios.log",
+      "publication_policy": "Full stdout/stderr with local workspace/PlatformIO/user paths replaced by disclosed placeholders and EOL/trailing-display normalization. Raw retained privately in ignored audit cache.",
+      "client_date": "2026-11-18",
+      "physical_validation": "NOT RUN"
+    },
+    "logs/test/iteration-015-publication-consistency-result.json": {
+      "command": "<PIO_PYTHON> tools/check_consistency.py",
+      "exit_code": 0,
+      "runner_seconds": 0.156,
+      "log": "logs/test/iteration-015-publication-consistency.log",
+      "publication_policy": "Full stdout/stderr with local workspace/PlatformIO/user paths replaced by disclosed placeholders and EOL/trailing-display normalization. Raw retained privately in ignored audit cache.",
+      "client_date": "2026-11-18",
+      "physical_validation": "NOT RUN"
+    },
+    "logs/test/iteration-015-publication-consistency-tests-result.json": {
+      "command": "<PIO_PYTHON> -m unittest discover -s tools -p test_check_consistency.py -v",
+      "exit_code": 0,
+      "runner_seconds": 0.969,
+      "log": "logs/test/iteration-015-publication-consistency-tests.log",
+      "publication_policy": "Full stdout/stderr with local workspace/PlatformIO/user paths replaced by disclosed placeholders and EOL/trailing-display normalization. Raw retained privately in ignored audit cache.",
+      "client_date": "2026-11-18",
+      "physical_validation": "NOT RUN"
+    },
+    "logs/test/iteration-015-verification-capture-result.json": {
+      "command": "<PIO_PYTHON> -m unittest discover -s tools -p test_capture_bench.py -v",
+      "exit_code": 0,
+      "runner_seconds": 0.938,
+      "log": "logs/test/iteration-015-verification-capture.log",
+      "publication_policy": "Full stdout/stderr with local workspace/PlatformIO/user paths replaced by disclosed placeholders and EOL/trailing-display normalization. Raw retained privately in ignored audit cache.",
+      "client_date": "2026-11-18",
+      "physical_validation": "NOT RUN"
+    },
+    "logs/test/iteration-015-verification-consistency-tests-result.json": {
+      "command": "<PIO_PYTHON> -m unittest discover -s tools -p test_check_consistency.py -v",
+      "exit_code": 1,
+      "runner_seconds": 0.797,
+      "log": "logs/test/iteration-015-verification-consistency-tests.log",
+      "publication_policy": "Full stdout/stderr with local workspace/PlatformIO/user paths replaced by disclosed placeholders and EOL/trailing-display normalization. Raw retained privately in ignored audit cache.",
+      "client_date": "2026-11-18",
+      "physical_validation": "NOT RUN"
+    },
+    "logs/test/iteration-015-verification-model-result.json": {
+      "command": "<PIO_PYTHON> -m unittest discover -s tools -p test_tdma_feasibility.py -v",
+      "exit_code": 0,
+      "runner_seconds": 0.469,
+      "log": "logs/test/iteration-015-verification-model.log",
+      "publication_policy": "Full stdout/stderr with local workspace/PlatformIO/user paths replaced by disclosed placeholders and EOL/trailing-display normalization. Raw retained privately in ignored audit cache.",
+      "client_date": "2026-11-18",
+      "physical_validation": "NOT RUN"
+    },
+    "logs/test/iteration-015-verification-native-result.json": {
+      "command": "pio test -e native",
+      "exit_code": 0,
+      "runner_seconds": 78.218,
+      "log": "logs/test/iteration-015-verification-native.log",
+      "publication_policy": "Full stdout/stderr with local workspace/PlatformIO/user paths replaced by disclosed placeholders and EOL/trailing-display normalization. Raw retained privately in ignored audit cache.",
+      "client_date": "2026-11-18",
+      "physical_validation": "NOT RUN"
+    }
+  }
+}

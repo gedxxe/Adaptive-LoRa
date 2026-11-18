@@ -1,5 +1,62 @@
 # 开发进度
 
+<!-- current-state:start -->
+## 当前状态 — Iteration 015
+
+客户端日期：2026-11-18。规范 main 基线为已合并的 Iteration 014：
+`0d0e71c368e88093b081bf9182e1f1babd189a9a`（[PR #4](https://github.com/gedxxe/Adaptive-LoRa/pull/4)）。
+当前分支为 `iteration-015-prehardware-stabilization`，提交 PR 供审查，
+本任务不自动合并；合并前 main 仍为规范固件基线。
+
+| 项目 | 当前证据 |
+|---|---|
+| 固件 / 协议 | `0.2.0-alpha.1` / `1` |
+| 硬件 | Heltec WiFi LoRa 32 V3.2 HF，ESP32-S3FN8/SX1262 |
+| 构建环境 | `heltec_wifi_lora_32_V3` |
+| 板配置 | 8 MB flash，不假定 PSRAM；CP2102/UART0 115200，TCXO 1.8 V，DC-DC |
+| S3 构建 | PASS，退出 0 |
+| Native | 307/307 PASS：原 302 加五项去重边界测试，无跳过 |
+| Capture | 13/13 PASS，仅 fake serial |
+| Airtime/model | 16/16 PASS，仅主机分析模型 |
+| Documentation consistency | 7/7 tests PASS; checker exit 0 |
+| Physical acceptance | IN PROGRESS; NOT RUN |
+| M3–M8 生产功能 | NOT STARTED；主机初步研究单独记录 |
+| 静态资源 | RAM 32,096 / flash 342,560 bytes，与 Iteration 014 相同 |
+
+单镜像、NVS 角色选择、schema 1、固定 SF7/BW125 和协议 v1 HELLO/ACK 均不变。
+38 个生产/配置/版本输入指纹及固件二进制与基线一致，main.cpp 仍为 15 行。
+命令日志与结果见 logs/build/iteration-015-verification-esp32* 和
+logs/test/iteration-015-verification-{native,capture,model}*；文档检查结果见 BUILD_MEMORY。
+
+AGENTS 精简为当前工程合同，修正活动架构图和启动顺序，旧 CODEX_START_PROMPT
+加归档声明。下方历史快照保留原硬件、结果和发布上下文。
+[TDMA_FEASIBILITY.md](TDMA_FEASIBILITY.md) 给出 216 个主机分析场景，
+假设十秒超帧，切换/处理/guard 均未知，不证明节点容量。八 session 缓存的淘汰、
+boot churn 和重启限制已有测试，未修改生产去重策略。
+
+实际工具链：Core 6.1.19、espressif32 55.03.311、Arduino 3.3.11、
+IDF libs 5.5.5+sha.b774170ff46、Xtensa GCC 14.2.0+20260121、RadioLib 7.8.1、
+native 1.2.1、Unity 2.6.1、host GCC 6.3.0。platform 未固定，复现需核对记录清单。
+
+ERR-008/009/010 同步调用和内存分配限制、ERR-021 TX BUSY 等待、ERR-023
+Runtime 前 NVS 格式化风险仍开放。没有复现新的生产缺陷，也未打开真实端口、烧录、
+擦除或进行 NVS/RF/重启实物测试。到货标识、供电、IRQ/TCXO、heap/stack 峰值、
+熵、天线匹配/增益和链路可靠性均未测量。
+
+下一步核对两块 V3.2 HF 实物，上电前接 RF 终端，核实同板 ROM 私有备份、安全状态
+和分区，然后按 [BENCH_RUNBOOK.md](BENCH_RUNBOOK.md) 采集正常、负向和恢复证据。
+测量切换、处理和漂移后再审查 M3 实现；ERR-021 恢复仍是独立验收门槛。
+<!-- current-state:end -->
+
+## 截至 Iteration 014 的历史快照
+
+下方库存、命令和“当前”均只描述原迭代，不代表活动目标。详细历史保留在英文 BUILD_MEMORY。
+
+<details>
+<summary>历史进度与验收快照</summary>
+
+# 开发进度
+
 ## Iteration014：Heltec V3.2 HF软件迁移完成
 
 客户端日期2026-11-17。用户明确授权立即实施并保留工程历史。唯一活动目标为V3.2 HF、S3FN8/SX1262，CP2102/UART0、TCXO1.8 V、DC-DC；基线main075b8faf包含PR #3，分支iteration-014-heltec-sx1262-migration-audit。审查后按直接授权通过普通merge PR发布，最终SHA以PR状态为准。
@@ -134,3 +191,5 @@ Iteration 009 保留性：driver 仅改硬件转发/常量，状态/deadline/错
 Iteration 009 审查：PlatformIO 日志显示尾空格/末尾空行使暂存检查退出 2（ERR-015）。仅规范化本轮公开日志的 EOL/显示空白，私有原输出保留，源码/编译/测试结果不变；修正后暂存检查退出 0，ERR-015 已验证关闭。
 
 Iteration 010：实际 store 只做引用转发，错误/count/end/readback、数值 namespace/device key/schema/24-byte 格式不变；Runtime header 先构造唯一 PreferencesConfigStorage 后 store，runtime 实现和 39 个保护文件（含163旧tests）逐字节不变，48 个编译输入 hash 相符，main.cpp 15 行。无显式新分配，RAM 24,532 不变，flash 363,854（+124）。无新增 warning，ERR-005/008/009/010 保留；实际 NVS/Flash commit、断电、重启/损坏恢复、磨损/保持时间及 RF 未验证，M0–M2 整体 IN PROGRESS、M3–M8 NOT STARTED。
+
+</details>

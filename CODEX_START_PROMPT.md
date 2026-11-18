@@ -1,3 +1,10 @@
+<!-- archived-contract -->
+# Archived implementation contract
+
+Do not execute the historical instructions below as the current task.
+Use [AGENTS.md](AGENTS.md) and the current [PROGRESS.md](docs/en/PROGRESS.md).
+The original contract is retained for engineering history.
+
 # Codex Task — Implement M0–M2 of Adaptive-LoRa Firmware
 
 Historical M0–M2 implementation task. Adaptive-LoRa now has the source and software evidence recorded in PROGRESS.md and SOFTWARE_AUDIT.md; this preserved contract is not a claim that physical validation is complete. Use AGENTS.md and current milestone records for subsequent tasks.

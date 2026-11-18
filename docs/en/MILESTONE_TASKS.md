@@ -104,3 +104,22 @@ Adaptive-LoRa research title: Reliability-aware TDMA Scheduling and Link Adaptat
   available.
 
 Iteration014 completed the single-target S3/SX1262 source migration and host checks. M0-M2 still need physical acceptance under the current runbook. Procurement/backup/terminated RF tests precede the planned five-client pilot;70-node work remains a separate research study.
+
+
+## Iteration 015 planning checkpoint
+
+M0–M2 software regressions pass; physical acceptance is still IN PROGRESS.
+M3–M8 production remains NOT STARTED. The host-only feasibility model is
+preliminary research, not completion of M3 or M8. See TDMA_FEASIBILITY.md for
+the candidate one-entry beacon, cached-schedule limits, 64-bit anchors,
+unknown timing inputs and per-active-client deduplication recommendation.
+
+Before M3 production changes: collect current-board M0/M1/M2 evidence and
+ERR-021 disposition, measure radio preparation/IRQ/processing/drift, review
+slot/guard bounds, freeze a one-client beacon plus compatibility/version
+policy, then test synchronization, missed beacon, stale schedule, session
+change and timer wrap. Do not activate reserved types in this iteration.
+Before M4: define admission/session eviction and reboot semantics, schedule
+mapping and complete bitmap validation; preserve identity/payload on retry.
+A 70-entry mapping does not fit one current 96-byte beacon, and analytical
+arithmetic does not replace the separate M8 scaling study.

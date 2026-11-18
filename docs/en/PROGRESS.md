@@ -1,5 +1,74 @@
 # Development progress
 
+<!-- current-state:start -->
+## Current state — Iteration 015
+
+Client date: 2026-11-18. Canonical main is the merged Iteration 014 baseline
+`0d0e71c368e88093b081bf9182e1f1babd189a9a` ([PR #4](https://github.com/gedxxe/Adaptive-LoRa/pull/4)).
+Work is on `iteration-015-prehardware-stabilization`; its PR is for review,
+with no automatic merge. Main remains canonical until review and integration.
+
+| Item | Current evidence |
+|---|---|
+| Firmware / protocol | `0.2.0-alpha.1` / `1` |
+| Target | Heltec WiFi LoRa 32 V3.2 HF, ESP32-S3FN8/SX1262 |
+| Build environment | `heltec_wifi_lora_32_V3` |
+| Hardware configuration | 8 MB flash, no assumed PSRAM; CP2102/UART0 115200; TCXO 1.8 V, DC-DC |
+| Firmware build | PASS, exit 0 |
+| Native tests | 307/307 PASS: 302 regressions plus five deduplication characterizations; no skipped cases |
+| Capture tests | 13/13 PASS, fake serial only |
+| Airtime/model tests | 16/16 PASS, host-only analytical model |
+| Documentation consistency | 7/7 tests PASS; checker exit 0 |
+| Physical acceptance | IN PROGRESS; NOT RUN |
+| M3–M8 production | NOT STARTED; preliminary host-only research is separate |
+| Resource summary | 32,096 bytes RAM, 342,560 bytes flash; unchanged from Iteration 014 |
+
+The one-image NVS-role architecture, schema 1, fixed SF7/BW125 PHY and v1
+HELLO/ACK behavior are unchanged. All 38 production/config/version input
+hashes and the firmware binary match the baseline; main.cpp remains 15 lines.
+Fresh logs/results use `logs/build/iteration-015-verification-esp32*` and
+`logs/test/iteration-015-verification-{native,capture,model}*`.
+The documentation checker and its results are recorded in BUILD_MEMORY.
+
+AGENTS is now a shorter current contract. The active architecture diagram and
+boot order are corrected; CODEX_START_PROMPT is explicitly archived. Previous
+progress snapshots below retain their own hardware, outcomes and publication
+checkpoints. New design/tooling is described in [TDMA_FEASIBILITY.md](TDMA_FEASIBILITY.md).
+The 216 analytical scenarios use a hypothetical ten-second superframe and
+unknown switching/processing/guard costs; they do not establish node capacity.
+Eight-session cache tests demonstrate eviction/reboot limits without changing
+production deduplication policy.
+
+Resolved environment: PlatformIO Core 6.1.19, installed espressif32 55.03.311,
+Arduino 3.3.11/IDF libs 5.5.5+sha.b774170ff46, Xtensa GCC 14.2.0+20260121,
+RadioLib 7.8.1, native 1.2.1, Unity 2.6.1 and host GCC 6.3.0. The platform is
+not pinned; reproduce against the recorded manifests rather than assuming a
+new installation selects the same packages.
+
+ERR-008/009/010 synchronous I/O/allocation limitations, ERR-021 TX BUSY wait
+and ERR-023 pre-runtime NVS formatting remain open. No new production defect
+was reproduced. No real port, upload, erase, reset, NVS or RF test was used.
+Board receipt/markings, supply, IRQ/TCXO timing, heap/stack peaks, entropy,
+antenna matching/gain and radio reliability remain unmeasured.
+
+Next: inspect both delivered V3.2 HF boards, terminate RF before power, verify
+same-board private ROM backups/security/layout, then execute the
+[BENCH_RUNBOOK.md](BENCH_RUNBOOK.md). Capture the controlled normal/negative/
+recovery cases and measure switching, processing and drift before an M3
+implementation review. ERR-021 recovery acceptance remains a separate hold.
+<!-- current-state:end -->
+
+## Historical snapshots through Iteration 014
+
+The snapshots below are historical records. Their hardware inventory, build
+commands and words such as "current" apply only to their original iteration.
+Detailed chronology and corrections remain in BUILD_MEMORY and ERROR_LOG.
+
+<details>
+<summary>Earlier progress snapshots and historical acceptance state</summary>
+
+# Development progress
+
 ## Iteration014: Heltec V3.2 HF software migration complete
 
 2026-11-17 client date. The sole active target is Heltec WiFi LoRa 32 V3.2 HF,
@@ -88,7 +157,7 @@ Status values: `NOT STARTED`, `IN PROGRESS`, `BLOCKED`, `PASS`. A
 milestone is `PASS` only when its acceptance criteria and evidence are
 recorded.
 
-## Current baseline
+## Historical current baseline (pre-Heltec snapshot)
 
 | Item                      | Current value                                             |
 |---------------------------|-----------------------------------------------------------|
@@ -108,7 +177,7 @@ recorded.
 | Firmware version baseline | 0.2.0-alpha.1 implementation candidate                    |
 | Protocol version          | 1                                                         |
 
-## Current status
+## Historical current status (pre-Heltec snapshot)
 
 Iteration-007 baseline evidence is preserved: candidate `0.2.0-alpha.1` / protocol 1, compile PASS and 92/92 host cases. Iteration 008 re-executed those checks after identity changes: 38 production-app scenarios, codec 18, role/config 13, console 10, sequence/timing 7, logger 6. These are scenario counts, not line/branch coverage percentages.
 
@@ -126,7 +195,7 @@ Corrected stock: two LLCC68 modules, one MCU, second MCU not purchased, Moxon no
 | M7  | Controlled Moxon RF evaluation                                 | NOT STARTED | No controlled RF data recorded           |
 | M8  | 5–70 logical-client host simulation                            | NOT STARTED | No simulation recorded                   |
 
-## Toolchain record
+## Historical toolchain record (pre-Heltec snapshot)
 
 | Item                            | Resolved value                                       |
 |---------------------------------|------------------------------------------------------|
@@ -138,7 +207,7 @@ Corrected stock: two LLCC68 modules, one MCU, second MCU not purchased, Moxon no
 | Host compiler                   | MinGW GCC 6.3.0                                     |
 | Host test framework             | Unity 2.6.1 / PlatformIO native 1.2.1                |
 
-## Open hardware checks
+## Historical open hardware checks (pre-Heltec snapshot)
 
 - [ ] Confirm exact ESP32-C3 Super Mini board revision and flash size.
 - [ ] Confirm exact Ra-01SCH module marking and pin orientation.
@@ -149,13 +218,13 @@ Corrected stock: two LLCC68 modules, one MCU, second MCU not purchased, Moxon no
   deployment.
 - [x] Record the exact toolchain versions after first successful build.
 
-## Current blockers
+## Historical current blockers (pre-Heltec snapshot)
 
 ERR-011 (legacy MinGW format macros) is fixed by C++ `<cinttypes>` and verified by 92 passing native cases/ESP32 compile. No application packet/state defect was reproduced in those scenarios. ERR-008 synchronous NVS/BUSY, ERR-009 dependency scratch allocations, ERR-010 SDK serial waits and ERR-005 physical CDC behavior remain open limitations; hardware IRQ/random-source assumptions are also unverified. Native driver fault tests cover policy around returned operations, not the actual dependency timing/allocation or ISR interleavings.
 
 ERR-007's header filter remains unchanged from iteration 005; physical IRQ behavior is still an M1/M2 gate. Migration changes are mechanical namespace/macro labels and a byte-equivalent storage namespace representation; behavior equivalence is checked across 35 source/header/test files. New source/binary fingerprints are in iteration-008 records; older hashes identify original artifacts. Git was initialized only after the pre-edit identity audit. No new scheduler, bitmap, selective retry or ADR code exists.
 
-## Next action
+## Historical next action (pre-Heltec snapshot)
 
 Next physical action: use the Iteration013 backed-up MCU-only procedure once a board is identified; complete procurement/instruments and actual M0 checks. ERR-021 and controlled replay/NVS fixture gates must be resolved before full M1/M2 closure; native/software evidence is already verified. Physical gates wait for the second MCU, antenna and assembly; then follow BENCH_RUNBOOK.md for M0/M1 and >=200 actual M2 HELLO attempts. Do not start M3 until M2 acceptance evidence exists. TDMA/bitmap/retry scheduling/ADR remain unimplemented.
 
@@ -166,3 +235,5 @@ Iteration 009 preservation: RadioDriver state/deadline/error policy remains equi
 Iteration 009 review note: staged log display whitespace triggered ERR-015 (check exit 2); log-format normalization is verified closed by staged check exit 0; source/build/test evidence unaffected.
 
 Iteration 010 preservation: NvsConfigStore error/count/cleanup/readback logic and numeric namespace are equivalent after reference forwarding; key `device`, schema 1 and 24-byte format unchanged. Runtime header constructs one PreferencesConfigStorage before its store; runtime implementation and 39 protected original files (including all 163 old test cases) are byte-identical. All 48 frozen inputs match. Main remains a 15-line entry point; no explicit allocation introduced. RAM 24,532 bytes unchanged, flash 363,854 (+124). No new warning messages; ERR-005/008/009/010 remain. Actual NVS/flash durability, power interruption, reboot/corruption recovery, wear/retention and physical radio/RF remain unverified; M0–M2 overall IN PROGRESS, M3–M8 NOT STARTED.
+
+</details>
