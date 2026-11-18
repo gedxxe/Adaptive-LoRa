@@ -30,7 +30,7 @@ Heltec WiFi LoRa 32 V3.2 HF devices.
                                 |
                        RadioLib SX1262
                                 |
-                         Ra-01SCH module
+                         Heltec V3.2 HF onboard SX1262
 ```
 
 Role selection is configuration-driven, not hardware-detected. The
@@ -47,10 +47,11 @@ tasks rather than separate, drifting codebases.
 4.  Validate role, network ID, node ID, gateway ID, and reserved values.
 5.  If configuration is invalid, enter provisioning mode. Do not start
     normal radio transmission.
-6.  If valid, construct exactly one role application.
-7.  Initialize the radio through the single `RadioDriver` owner.
-8.  Call the selected application’s non-blocking `begin()` and
-    `update()` methods from the runtime loop.
+6.  If valid, initialize the radio through the single `RadioDriver` owner.
+7.  Only after successful initialization, construct and begin the selected role application.
+8.  Poll the driver, advance the application at a fresh timestamp, service bounded
+    serial input and drain diagnostics. Dependency calls can wait synchronously;
+    cooperative state machines do not establish a hard loop-time bound.
 
 A configuration schema mismatch must not be interpreted as a valid role.
 Provide a clear diagnostic and require re-provisioning or a deliberate
@@ -66,7 +67,7 @@ Minimum commands:
 |-----------------------------------|---------------------------------------------------|
 | `help`                            | Show supported commands                           |
 | `status`                          | Show runtime mode, role, IDs, schema, radio state |
-| `config show`                     | Show current configuration                        |
+| `config show`                     | Show staged configuration                        |
 | `config set role gateway\|client` | Select device role                                |
 | `config set network-id N`         | Set network ID                                    |
 | `config set node-id N`            | Set this device ID                                |

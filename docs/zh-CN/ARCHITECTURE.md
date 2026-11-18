@@ -175,3 +175,14 @@ Native 通过 SDK header 适配执行实际协调器及全部现有生产模块�
 Iteration012每次最多8个raw随机值，0代表失败。Counter更新遇0/相同ID保持旧boot/耗尽状态，app不把失败身份初始化为新session。身份不可用时Client HELLO/Gateway ACK均禁止TX；SESSION_ERROR可观察，按尝试开始时间每1s重试，pending reboot时不重试。恢复用新boot/sequence0，无NVS/wire变更；数值合法不代表熵/安全/跨启动唯一。
 
 Runtime poll后给app刷新时间，stop返回后起100ms，logger drain后用当前时间判reset，修复ERR-020。不能抢占阻塞调用、记录真实RF完成时间或消除依赖时延；直接driver/app仍使用调用方观察时间。DEPENDENCY_BUDGET_AUDIT.md记录实际源码时延/分配/ELF预算，包括上游无显式timeout的BUSY-ramp及实物限制。
+
+
+## Iteration 015 当前合同修正
+
+英文活动图末端改为 Heltec V3.2 HF 板载 SX1262，删除误留的旧外置模块标签。
+实际启动先完成 NVS 校验，再初始化唯一 radio；成功后才构造并 begin 所选角色。
+loop 在 poll 后取 fresh timestamp，再推进 app、处理有界 serial、drain 日志。
+app 为协作式状态机，但 SDK/RadioLib 同步等待仍存在，不声明全路径 nonblocking。
+config show 是暂存配置，status 才是加载配置。生产代码、schema 1、v1 字节未改。
+AGENTS 为当前合同，CODEX_START_PROMPT 明确归档；主机 TDMA 模型不进入固件。
+当前平台接口和通用 payload/event API 缺口仍保留，不声称已全部实现。
