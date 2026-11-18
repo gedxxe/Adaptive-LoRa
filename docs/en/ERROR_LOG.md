@@ -347,3 +347,80 @@ Both remain OPEN. SX1262 uses the same pinned SX126x.launchMode BUSY-ramp loop a
 ### ERR-025 exit-code clarification
 
 The earlier helper-note exit2 was not the observed tool wrapper status. The missing-file batch returned exit1 and Python printed Errno2 (file not found); that OS error number must not be presented as the measured process exit. No test ran from that invocation. The actual recorded build/native/capture exit codes in their result JSON remain unchanged.
+
+
+## ERR-026 — Iteration 015 new Chinese research link
+
+REPRODUCED; correction awaiting rerun. The first documentation checker suite
+exited 1: five cases passed and two repository-fixture cases failed because
+new docs/zh-CN/TDMA_FEASIBILITY.md linked to a nonexistent local
+MILESTONE_TASKS.md. Running the checker directly also exited 1 with that
+single broken link. Reproduce with `<PIO_PYTHON> -m unittest discover -s tools
+-p test_check_consistency.py -v` or `<PIO_PYTHON> tools/check_consistency.py`.
+Correction points to the existing canonical ../en/MILESTONE_TASKS.md, without
+creating a redundant translated roadmap. Initial complete output is preserved
+in logs/test/iteration-015-verification-consistency-tests.log and its result
+JSON. No firmware/test assertion was weakened; production code is unchanged.
+
+### Iteration 015 tool-access and inspection notes
+
+One authorized validation launcher was rejected before execution because
+automatic approval review hit an account usage limit, explicitly not an unsafe
+action finding. The resumed authorization check succeeded; the launcher was
+then created and executed. That rejected attempt produced no build/test result.
+An inspection glob passed as a Windows rg filename returned OS error 123;
+explicit paths corrected the lookup. A probe for a Chinese BUILD_MEMORY file
+reported it absent; canonical chronological memory remains English. Neither
+inspection issue changed firmware or invalidated executed test results.
+
+
+### ERR-026 second-run checker correction
+
+The link correction removed the broken-target error. The second suite still
+exited 1 (five passed/two failed): the newly generalized firmware-reference
+regex also matched the suffix in Esp32Firmware and consumed following prose
+as a version. Added a word boundary to the English field name; validation
+of explicit firmware/protocol fields remains required. Both failed run logs
+are retained, the second under iteration-015-corrected-consistency-tests.
+This is a checker defect, not a firmware defect; final rerun follows.
+
+
+### ERR-026 verification — CLOSED, 2026-11-18
+
+Final consistency suite exit 0, 7/7 PASS; direct checker exit 0. Logs/results:
+logs/test/iteration-015-final-consistency-tests* and final-consistency*.
+All negative fixtures remain asserted; both failed attempts are preserved.
+
+### ERR-006 recurrence — package inventory encoding, Iteration 015
+
+Initial `pio pkg list -e heltec_wifi_lora_32_V3` exited 1 with
+UnicodeEncodeError while printing its tree in a legacy console. Complete
+output remains in logs/build/iteration-015-toolchain.log. Repeating S3 and
+native inventories with PYTHONUTF8=1/PYTHONIOENCODING=utf-8 each exited 0;
+logs/build/iteration-015-packages-utf8.log. This was metadata display, not a
+firmware build failure or dependency upgrade. Package listing includes shared
+installed packages; it is not a claim that all listed packages are linked.
+
+### Iteration 015 unresolved dependency and hardware findings
+
+ERR-008/009/010/021/023 remain OPEN. Current S3 watchdog, UART, allocation and
+NVS source review/resources are appended to DEPENDENCY_BUDGET_AUDIT.md;
+BENCH_RUNBOOK.md specifies the unexecuted ERR-021 fixture and recovery gate.
+Native eviction/reboot characterization is expected M2 behavior; it limits
+future DATA delivery guarantees, without changing production policy. No new
+production defect was reproduced and no physical failure was observed.
+
+
+### ERR-015 recurrence — Iteration 015 staged log formatting
+
+Second commit staged check `git diff --cached --check` exited 2 because the
+new packages-utf8 log had an extra blank line at EOF. Original bytes retained
+privately in .pio/iteration-015/packages-utf8-original.log; normalized only
+trailing display whitespace/EOF, preserving package output and exit codes.
+Restaged check follows; this is publication formatting, not a build/test failure.
+
+
+### ERR-015 Iteration 015 verification — CLOSED
+
+Restaged `git diff --cached --check` exited 0. Second scoped commit ba56667
+succeeded. Only the new log EOF changed; all actual package records remain.

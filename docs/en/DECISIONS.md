@@ -181,3 +181,23 @@ The official V3 board definition is supported by installed platform55.03.311; no
 Keep firmware0.2.0-alpha.1, protocol1, NVS namespace/key/schema1/blob, all app/codec/session/driver state policy and main.cpp unchanged. The selected-driver label changes to SX1262. Maintain915 MHz/10 dBm and the original fixed research PHY; the Moxon is a design baseline, with no fabricated match/gain/RF result. No scheduler/ADR or application integration. ERR-021 remains inherited and open; no third-party patch/watchdog modification. Source migration/build completion does not complete physical M0-M2.
 
 Native compiles the actual new adapter through bounded test-only SPI/RadioLib call recorders, preserving all290 original cases and adding12. The sole old assertion change is the driver label. Initial duplicate fixture declaration failure is preserved (ERR-025); corrected full302 and capture13 pass. These tests verify arguments/forwarding and actual driver interactions, not chip behavior or physical IRQ/TCXO/regulator/RF. Platform/app integration gaps remain. Current operator docs require RF termination even for a single integrated-radio board and same-board private ROM backups; cross-MCU image restore is not a migration procedure.
+
+
+## ADR-019 — Current contract and host-only scheduling research
+
+Accepted 2026-11-18, Iteration 015. Use a concise AGENTS contract with stable
+links to PROGRESS, ownership, acceptance and historical records. Mark the old
+CODEX_START_PROMPT as archived and separate current progress from historical
+snapshots. A small checker derives board/environment and version facts from
+production/config files, checks selected current links/status, and excludes
+archives; no permanent test-count or commit-SHA invariant is introduced.
+
+Add Python-standard-library airtime/reservation tooling and a single bilingual
+TDMA_FEASIBILITY design note. Unknown timing inputs remain explicit, ACK costs
+include complete frames/metadata, retries reserve full rounds and all outputs
+are analytical hypotheses. Do not activate reserved messages, scheduler,
+bitmap/retry/ADR, change versions or alter production policy. Characterize the
+eight-session cache rather than enlarging it; admission/schedule-associated
+state is a future M4 decision. ERR-021 stays open without a proven dependency
+mitigation. Preserve all historical records. Publish the named branch/PR for
+review; this iteration does not authorize automatic merge into canonical main.

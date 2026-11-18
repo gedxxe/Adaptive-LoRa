@@ -1,0 +1,259 @@
+{
+  "baseline": "0d0e71c368e88093b081bf9182e1f1babd189a9a",
+  "branch": "iteration-015-prehardware-stabilization",
+  "client_date": "2026-11-18",
+  "files": [
+    {
+      "path": "AGENTS.md",
+      "responsibility": "Current agent contract, ownership, scope, checks, records and PR workflow."
+    },
+    {
+      "path": "CHANGELOG.md",
+      "responsibility": "Unreleased stabilization/research release item."
+    },
+    {
+      "path": "CODEX_START_PROMPT.md",
+      "responsibility": "Archival notice; complete original task body preserved."
+    },
+    {
+      "path": "README.md",
+      "responsibility": "Current target, architecture, actual evidence, commands and research/physical distinction."
+    },
+    {
+      "path": "README.zh-CN.md",
+      "responsibility": "Current target, architecture, actual evidence, commands and research/physical distinction."
+    },
+    {
+      "path": "docs/en/ARCHITECTURE.md",
+      "responsibility": "Correct active module label, initialization order and dependency/staged-state wording."
+    },
+    {
+      "path": "docs/en/BENCH_RUNBOOK.md",
+      "responsibility": "Planned, electrically reviewed ERR-021 injection/recovery procedure, not executed."
+    },
+    {
+      "path": "docs/en/BUILD_MEMORY.md",
+      "responsibility": "Append-only Iteration 015 chronology, commands, results, failures and next action."
+    },
+    {
+      "path": "docs/en/DECISIONS.md",
+      "responsibility": "Append-only ADR-019 current-contract and host-only research decision."
+    },
+    {
+      "path": "docs/en/DEPENDENCY_BUDGET_AUDIT.md",
+      "responsibility": "Current S3 source audit, watchdog/UART/allocation risk and ELF/static memory evidence."
+    },
+    {
+      "path": "docs/en/ERROR_LOG.md",
+      "responsibility": "Preserved checker/metadata/access failures and open dependency/hardware dispositions."
+    },
+    {
+      "path": "docs/en/MILESTONE_TASKS.md",
+      "responsibility": "M3 timing/compatibility prerequisites and later admission/bitmap/scaling gates."
+    },
+    {
+      "path": "docs/en/PROGRESS.md",
+      "responsibility": "One current snapshot and explicitly separated historical snapshots."
+    },
+    {
+      "path": "docs/en/TDMA_FEASIBILITY.md",
+      "responsibility": "Proposed M3/future contracts, model assumptions/results, timer and bounded deduplication analysis."
+    },
+    {
+      "path": "docs/en/TEST_PLAN.md",
+      "responsibility": "Exact new coverage and physical acceptance limitations."
+    },
+    {
+      "path": "docs/zh-CN/ARCHITECTURE.md",
+      "responsibility": "Correct active module label, initialization order and dependency/staged-state wording."
+    },
+    {
+      "path": "docs/zh-CN/BENCH_RUNBOOK.md",
+      "responsibility": "Planned, electrically reviewed ERR-021 injection/recovery procedure, not executed."
+    },
+    {
+      "path": "docs/zh-CN/DECISIONS.md",
+      "responsibility": "Append-only ADR-019 current-contract and host-only research decision."
+    },
+    {
+      "path": "docs/zh-CN/DEPENDENCY_BUDGET_AUDIT.md",
+      "responsibility": "Current S3 source audit, watchdog/UART/allocation risk and ELF/static memory evidence."
+    },
+    {
+      "path": "docs/zh-CN/PROGRESS.md",
+      "responsibility": "One current snapshot and explicitly separated historical snapshots."
+    },
+    {
+      "path": "docs/zh-CN/TDMA_FEASIBILITY.md",
+      "responsibility": "Proposed M3/future contracts, model assumptions/results, timer and bounded deduplication analysis."
+    },
+    {
+      "path": "docs/zh-CN/TEST_PLAN.md",
+      "responsibility": "Exact new coverage and physical acceptance limitations."
+    },
+    {
+      "path": "logs/build/iteration-015-packages-utf8.log",
+      "responsibility": "Actual command output/result, case/scenario evidence or verification fingerprint; not physical measurements."
+    },
+    {
+      "path": "logs/build/iteration-015-production-inputs.sha256",
+      "responsibility": "Actual command output/result, case/scenario evidence or verification fingerprint; not physical measurements."
+    },
+    {
+      "path": "logs/build/iteration-015-resource-probe.log",
+      "responsibility": "Actual command output/result, case/scenario evidence or verification fingerprint; not physical measurements."
+    },
+    {
+      "path": "logs/build/iteration-015-review.json",
+      "responsibility": "Actual command output/result, case/scenario evidence or verification fingerprint; not physical measurements."
+    },
+    {
+      "path": "logs/build/iteration-015-toolchain.log",
+      "responsibility": "Actual command output/result, case/scenario evidence or verification fingerprint; not physical measurements."
+    },
+    {
+      "path": "logs/build/iteration-015-validation.json",
+      "responsibility": "Actual command output/result, case/scenario evidence or verification fingerprint; not physical measurements."
+    },
+    {
+      "path": "logs/build/iteration-015-verification-esp32-result.json",
+      "responsibility": "Actual command output/result, case/scenario evidence or verification fingerprint; not physical measurements."
+    },
+    {
+      "path": "logs/build/iteration-015-verification-esp32.log",
+      "responsibility": "Actual command output/result, case/scenario evidence or verification fingerprint; not physical measurements."
+    },
+    {
+      "path": "logs/test/iteration-015-corrected-consistency-tests-result.json",
+      "responsibility": "Actual command output/result, case/scenario evidence or verification fingerprint; not physical measurements."
+    },
+    {
+      "path": "logs/test/iteration-015-corrected-consistency-tests.log",
+      "responsibility": "Actual command output/result, case/scenario evidence or verification fingerprint; not physical measurements."
+    },
+    {
+      "path": "logs/test/iteration-015-final-consistency-result.json",
+      "responsibility": "Actual command output/result, case/scenario evidence or verification fingerprint; not physical measurements."
+    },
+    {
+      "path": "logs/test/iteration-015-final-consistency-tests-result.json",
+      "responsibility": "Actual command output/result, case/scenario evidence or verification fingerprint; not physical measurements."
+    },
+    {
+      "path": "logs/test/iteration-015-final-consistency-tests.log",
+      "responsibility": "Actual command output/result, case/scenario evidence or verification fingerprint; not physical measurements."
+    },
+    {
+      "path": "logs/test/iteration-015-final-consistency.log",
+      "responsibility": "Actual command output/result, case/scenario evidence or verification fingerprint; not physical measurements."
+    },
+    {
+      "path": "logs/test/iteration-015-final-scenarios-result.json",
+      "responsibility": "Actual command output/result, case/scenario evidence or verification fingerprint; not physical measurements."
+    },
+    {
+      "path": "logs/test/iteration-015-final-scenarios.log",
+      "responsibility": "Actual command output/result, case/scenario evidence or verification fingerprint; not physical measurements."
+    },
+    {
+      "path": "logs/test/iteration-015-publication-consistency-result.json",
+      "responsibility": "Actual command output/result, case/scenario evidence or verification fingerprint; not physical measurements."
+    },
+    {
+      "path": "logs/test/iteration-015-publication-consistency-tests-result.json",
+      "responsibility": "Actual command output/result, case/scenario evidence or verification fingerprint; not physical measurements."
+    },
+    {
+      "path": "logs/test/iteration-015-publication-consistency-tests.log",
+      "responsibility": "Actual command output/result, case/scenario evidence or verification fingerprint; not physical measurements."
+    },
+    {
+      "path": "logs/test/iteration-015-publication-consistency.log",
+      "responsibility": "Actual command output/result, case/scenario evidence or verification fingerprint; not physical measurements."
+    },
+    {
+      "path": "logs/test/iteration-015-scenarios.md",
+      "responsibility": "Actual command output/result, case/scenario evidence or verification fingerprint; not physical measurements."
+    },
+    {
+      "path": "logs/test/iteration-015-tdma-scenarios.json",
+      "responsibility": "Actual command output/result, case/scenario evidence or verification fingerprint; not physical measurements."
+    },
+    {
+      "path": "logs/test/iteration-015-verification-capture-result.json",
+      "responsibility": "Actual command output/result, case/scenario evidence or verification fingerprint; not physical measurements."
+    },
+    {
+      "path": "logs/test/iteration-015-verification-capture.log",
+      "responsibility": "Actual command output/result, case/scenario evidence or verification fingerprint; not physical measurements."
+    },
+    {
+      "path": "logs/test/iteration-015-verification-consistency-tests-result.json",
+      "responsibility": "Actual command output/result, case/scenario evidence or verification fingerprint; not physical measurements."
+    },
+    {
+      "path": "logs/test/iteration-015-verification-consistency-tests.log",
+      "responsibility": "Actual command output/result, case/scenario evidence or verification fingerprint; not physical measurements."
+    },
+    {
+      "path": "logs/test/iteration-015-verification-model-result.json",
+      "responsibility": "Actual command output/result, case/scenario evidence or verification fingerprint; not physical measurements."
+    },
+    {
+      "path": "logs/test/iteration-015-verification-model.log",
+      "responsibility": "Actual command output/result, case/scenario evidence or verification fingerprint; not physical measurements."
+    },
+    {
+      "path": "logs/test/iteration-015-verification-native-result.json",
+      "responsibility": "Actual command output/result, case/scenario evidence or verification fingerprint; not physical measurements."
+    },
+    {
+      "path": "logs/test/iteration-015-verification-native.log",
+      "responsibility": "Actual command output/result, case/scenario evidence or verification fingerprint; not physical measurements."
+    },
+    {
+      "path": "test/test_sequence_tracker/test_main.cpp",
+      "responsibility": "Five new production-tracker capacity, eviction, session and restart characterizations."
+    },
+    {
+      "path": "tools/check_consistency.py",
+      "responsibility": "Selected current-contract/version/board/adapter/link/status/archive checks."
+    },
+    {
+      "path": "tools/tdma_feasibility.py",
+      "responsibility": "Pure host-only exact airtime and worst-case serial schedule budget, CLI and deterministic scenario grid."
+    },
+    {
+      "path": "tools/test_check_consistency.py",
+      "responsibility": "Seven positive/negative checker fixtures."
+    },
+    {
+      "path": "tools/test_tdma_feasibility.py",
+      "responsibility": "16 independent airtime/budget/validation/CLI tests."
+    }
+  ],
+  "cpp_responsibilities": {
+    "src/main.cpp": "Unchanged 15-line Arduino composition and setup/loop delegate.",
+    "src/app/firmware_runtime.cpp": "Unchanged role/configuration lifecycle, radio/app/serial dispatch and controlled reboot.",
+    "src/app/nvs_config_store.cpp": "Unchanged validated load/save/readback policy through ConfigStorage.",
+    "src/app/preferences_config_storage.cpp": "Unchanged sole Preferences backend operations.",
+    "src/app/provisioning_console.cpp": "Unchanged bounded command parsing and staged configuration.",
+    "src/client/client_app.cpp": "Unchanged HELLO identity/session issuance, ACK validation, timeout and RX recovery.",
+    "src/gateway/gateway_app.cpp": "Unchanged HELLO validation/deduplication and echoed ACK response.",
+    "src/common/config/device_config.cpp": "Unchanged pure configuration validation and explicit persistent encoding.",
+    "src/common/diagnostics/serial_logger.cpp": "Unchanged bounded log formatting, queue and serial drain.",
+    "src/common/protocol/frame_codec.cpp": "Unchanged explicit LE v1 codec, validation and ACK identity.",
+    "src/common/protocol/sequence_tracker.cpp": "Unchanged bounded replay/session cache and sequence renewal.",
+    "src/common/radio/radio_driver.cpp": "Unchanged sole radio state/deadline/error policy through hardware interface.",
+    "src/common/radio/sx1262_hardware.cpp": "Unchanged sole RadioLib/SPI/GPIO/ISR SX1262 adapter.",
+    "test/test_sequence_tracker/test_main.cpp": "Five new production-tracker capacity, eviction, session and restart characterizations."
+  },
+  "production_changed": false,
+  "main_lines": 15,
+  "original_log_files_unchanged": 313,
+  "append_only_record_prefixes_preserved": 4,
+  "original_contract_body_preserved": true,
+  "physical_validation": "NOT RUN",
+  "publication_intent": "Push dedicated branch and create review PR; do not merge.",
+  "publication_files_scanned": 458
+}

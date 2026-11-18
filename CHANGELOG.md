@@ -5,6 +5,17 @@ changes. It is not a substitute for the append-only build memory.
 
 ## Unreleased
 
+### Pre-hardware stabilization and host-only research — 2026-11-18
+
+- Synchronize the current agent contract and bilingual status; archive the old
+  task contract and correct the active architecture label/boot order.
+- Preserve all 302 native regressions and add five tracker-capacity/restart
+  characterizations. Production source, NVS, PHY, protocol and versions are unchanged.
+- Add tested host-only airtime/reservation tooling, 216 analytical scenarios and
+  current-document consistency checks. No production TDMA/bitmap/retry/ADR is enabled.
+- Keep failed checker evidence and open dependency/physical gates. No board, NVS
+  or RF test is claimed; the dedicated branch is submitted for review without merge.
+
 ### Heltec V3.2 HF hardware migration - 2026-11-17
 
 - Replace the active hardware target with ESP32-S3/SX1262 on Heltec WiFi LoRa 32 V3.2 HF: schematic pins,1.8 V TCXO, DC-DC and CP2102/UART0. Preserve one image, NVS roles, protocol1 and firmware0.2.0-alpha.1.

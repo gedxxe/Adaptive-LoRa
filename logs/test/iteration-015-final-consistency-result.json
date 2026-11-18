@@ -1,0 +1,9 @@
+{
+  "command": "<PIO_PYTHON> tools/check_consistency.py",
+  "exit_code": 0,
+  "runner_seconds": 0.25,
+  "log": "logs/test/iteration-015-final-consistency.log",
+  "publication_policy": "Full stdout/stderr with local workspace/PlatformIO/user paths replaced by disclosed placeholders and EOL/trailing-display normalization. Raw retained privately in ignored audit cache.",
+  "client_date": "2026-11-18",
+  "physical_validation": "NOT RUN"
+}

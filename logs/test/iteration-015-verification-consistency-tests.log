@@ -1,0 +1,42 @@
+test_archived_body_is_preserved_but_notice_is_required (test_check_consistency.ConsistencyTests.test_archived_body_is_preserved_but_notice_is_required) ... FAIL
+test_bad_build_environment_is_reported (test_check_consistency.ConsistencyTests.test_bad_build_environment_is_reported) ... ok
+test_bad_current_region_markers_are_rejected (test_check_consistency.ConsistencyTests.test_bad_current_region_markers_are_rejected) ... ok
+test_broken_current_link_is_reported (test_check_consistency.ConsistencyTests.test_broken_current_link_is_reported) ... ok
+test_current_repository_passes (test_check_consistency.ConsistencyTests.test_current_repository_passes) ... FAIL
+test_history_cannot_hide_wrong_current_version (test_check_consistency.ConsistencyTests.test_history_cannot_hide_wrong_current_version) ... ok
+test_physical_pass_claim_is_rejected (test_check_consistency.ConsistencyTests.test_physical_pass_claim_is_rejected) ... ok
+
+======================================================================
+FAIL: test_archived_body_is_preserved_but_notice_is_required (test_check_consistency.ConsistencyTests.test_archived_body_is_preserved_but_notice_is_required)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKSPACE>\tools\test_check_consistency.py", line 62, in test_archived_body_is_preserved_but_notice_is_required
+    self.assertEqual([], check(self.root))
+AssertionError: Lists differ: [] != ['docs/zh-CN/TDMA_FEASIBILITY.md: broken relative link MILESTONE_TASKS.md']
+
+Second list contains 1 additional elements.
+First extra element 0:
+'docs/zh-CN/TDMA_FEASIBILITY.md: broken relative link MILESTONE_TASKS.md'
+
+- []
++ ['docs/zh-CN/TDMA_FEASIBILITY.md: broken relative link MILESTONE_TASKS.md']
+
+======================================================================
+FAIL: test_current_repository_passes (test_check_consistency.ConsistencyTests.test_current_repository_passes)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKSPACE>\tools\test_check_consistency.py", line 38, in test_current_repository_passes
+    self.assertEqual([], check(self.root))
+AssertionError: Lists differ: [] != ['docs/zh-CN/TDMA_FEASIBILITY.md: broken relative link MILESTONE_TASKS.md']
+
+Second list contains 1 additional elements.
+First extra element 0:
+'docs/zh-CN/TDMA_FEASIBILITY.md: broken relative link MILESTONE_TASKS.md'
+
+- []
++ ['docs/zh-CN/TDMA_FEASIBILITY.md: broken relative link MILESTONE_TASKS.md']
+
+----------------------------------------------------------------------
+Ran 7 tests in 0.649s
+
+FAILED (failures=2)
