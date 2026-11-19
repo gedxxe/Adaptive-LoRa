@@ -8,6 +8,11 @@
 #include <cstring>
 #include <esp_timer.h>
 
+constexpr int SDA_OLED = 17;
+constexpr int SCL_OLED = 18;
+constexpr int RST_OLED = 21;
+constexpr int Vext = 36;
+
 // Captures the real SerialLogger's output. This models byte capacity/short
 // writes only, not USB, interrupts, locks, a UART or elapsed write latency.
 class HostSerial {
