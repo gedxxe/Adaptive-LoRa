@@ -1,3 +1,15 @@
-# M0-M2 physical acceptance readiness
+# M0–M2 physical acceptance readiness
 
-The active procedure is BENCH_RUNBOOK.md for Heltec WiFi LoRa 32 V3.2 HF. Source migration and host verification are complete, but no board was flashed or physically tested. Confirm delivery/PCB/RF variant, terminate the integrated radio before power, take same-board private ROM backups and verify security/layout before application boot. A single board still contains its radio, so the earlier removable-radio MCU procedure is inapplicable. Measure serial, supply, TCXO, BUSY/DIO1/reset and NVS before the two-device closed-cohort HELLO/ACK run. ERR-021 and ERR-023 remain open. Replay/negative-identity/corrupt-NVS fixtures and actual recovery remain required. M0-M2 physical acceptance is IN PROGRESS; M3-M8 have not started. The migration audit contains the procurement/GPIO/API/risk tables; LOGGING_GUIDE.md retains the capture/CSV rules.
+The two V3.4-marked boards and stock monopoles are reported in hand. The
+firmware builds for the documented V3 pinout, with an opt-in OLED candidate.
+The delivered RF variant, pin mapping, USB bridge, flash and OLED have yet
+to be confirmed. Windows listed only Bluetooth serial ports during the
+Iteration 016 inspection. No firmware was uploaded and no RF or NVS capture
+was collected.
+
+Identify each board and verify RF termination before power. Make separate
+same-board ROM backups and check flash layout/security before application
+boot. Follow the [bench runbook](BENCH_RUNBOOK.md) for provisioning, OLED
+checks, the authorized 3 m link and distance survey. ERR-021 BUSY recovery
+and ERR-023 SDK startup formatting remain open. M0–M2 physical acceptance
+is in progress. M3 development needs measured timing and M2 evidence.

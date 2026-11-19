@@ -1,12 +1,12 @@
 # M0-M2 Heltec bench runbook
 
-This procedure is for the single active Heltec WiFi LoRa 32 V3.2 HF image.
+This procedure covers the reported Heltec WiFi LoRa 32 V3.4 pair.
 It has not been executed on hardware. Read HARDWARE.md and the migration
 audit first; source/build completion does not close physical acceptance.
 
 ## Before power or upload
 
-1. Confirm the received board is V3.2 HF with S3FN8/SX1262 and IPEX1.0.
+1. Check each PCB’s V3.4 marking, MCU, radio, RF SKU and connector against the V3 reference.
    Record front/back markings, RF option, unit alias, cable and supply.
 2. Connect a matching 50-ohm RF load or suitable antenna/pigtail before any
    power. This also applies to a single board: the radio is integrated,
@@ -48,7 +48,7 @@ pio run -e heltec_wifi_lora_32_V3 -t upload --upload-port COM_BOARD
 pio device monitor --port COM_BOARD --baud 115200
 ```
 
-These upload/monitor commands have not been run in Iteration014. Keep RF
+The upload and monitor commands remain pending for the two V3.4 boards. Keep RF
 termination connected throughout. Do not erase all flash, flash a factory
 image at0 in place of the reviewed upload images, or use force as routine
 recovery. Any intentional NVS erase/corruption fixture needs explicit
@@ -71,7 +71,7 @@ config set role gateway
 config set network-id 1
 config set node-id 1
 config set gateway-id 1
-config set hello-interval-ms 5000
+config set hello-interval-ms 15000
 config save
 status
 reboot
@@ -93,20 +93,70 @@ progress stops, preserve the failed run, remove power safely with RF still
 terminated, and inspect. Do not assume a default watchdog will recover
 ERR-021 or that a successful normal run closes that fault path.
 
+## V3.4 board and OLED checks
+
+For each board, record alias, front/back revision and component markings,
+RF SKU, antenna label/band, connector, port alias, flash size, supply and
+firmware SHA-256. Keep private device identifiers and backups out of the
+repository. Compare the [reference matrix](HARDWARE.md) before assuming V3.4
+retains the OLED circuit, TCXO or RF switch. Check one board at a time.
+Confirm a clean boot and reset, loaded NVS, selected SX1262 driver status,
+and the actual supply voltage/current under load.
+
+Use the default build for the reference comparison. After checking the
+OLED pins, Vext polarity/settling and controller/address, build the candidate
+with `pio run -e heltec_wifi_lora_32_V3_oled`. Use the same candidate image
+for both roles. With a suitable load, check provisioning, radio-fault and
+WAIT screens, use serial `status` to read OLED timing, and check whether a
+missing/failed display leaves serial and radio service active. Do not drive
+Vext or load this build onto an unconfirmed board. Compare power, resets,
+log drops, ACK results and transaction duration with OLED on and off under
+the same authorized link conditions. Record the firmware hash for each run.
+
+## RF approval and interval calculation
+
+The firmware retains 915.0 MHz as a research setting. For Indonesian LPWAN,
+the [2025 amendment, Annex I section II](https://jdih.komdigi.go.id/produk_hukum/unduh/id/949/t/peraturan%2Bmenteri%2Bkomunikasi%2Bdan%2Bdigital%2Bnomor%2B2%2Btahun%2B2025)
+lists 920–923 MHz with up to 250 kHz per channel and 1% each direction. The
+compiled 915.0 MHz center lies outside that band. Confirm the applicable
+rules, equipment authorization and an approved channel/EIRP/antenna setup
+before radiating. Obtain a reviewed alternate build if the authorized
+frequency differs. Software does not enforce duty cycle.
+
+At SF7/BW125/CR4/5, preamble 8, explicit header and CRC, the host model gives
+66.816 ms per 28-byte HELLO and 82.176 ms per 37-byte ACK. For one exchange
+per period, the 1% minimum periods are 6.6816 s uplink and 8.2176 s downlink.
+At 15 s the modeled fractions are 0.44544% and 0.54784%. At 5 s they are
+1.33632% and 1.64352%. Budget starts after reset, extra duplicate ACKs, every
+other emission and the applicable observation period. The 15 s candidate
+is an interval calculation for a two-board run. Confirm both settings after
+reboot, particularly the client interval. The gateway uses its interval
+for display freshness.
+
 ## Two-device HELLO/ACK
 
-Start Gateway first, then Client. Keep the fixed915 MHz/BW125/SF7/CR4/5,
-preamble8, explicit header, CRC, sync0x12 and10 dBm; document permitted
-operating conditions and antenna/feed before radiated work. Both use TCXO1.8 V,
-DC-DC and the same firmware. Do not modify PHY to hide a wiring/power problem.
+After approval, start Gateway first, then Client. Begin at roughly 3 m with
+both monopoles vertical. Record the approved frequency, BW125, SF7, CR4/5,
+preamble 8, explicit header, CRC, sync 0x12 and TX power. Keep PHY, power,
+monopole type, height, orientation, feed and duration fixed for comparison.
+Record both OLEDs and check each receive direction in serial. Extend the
+survey to 10, 25, 50, 100, 200 and 400 m only as conditions allow. Short
+windows are exploratory. Use at least 200 fully observed HELLO completions
+for each condition selected for acceptance.
 
 Close interactive monitors before capture. Example future command:
 
 ```powershell
-python tools/capture_bench.py --gateway COM_GATEWAY --client COM_CLIENT --seconds 1200 --out logs/test/RUN-YYYYMMDD-HHMMSS
+python tools/capture_bench.py --gateway COM_GATEWAY --client COM_CLIENT --seconds 3600 --out logs/test/RUN-YYYYMMDD-HHMMSS
 # For one terminated board:
 python tools/capture_bench.py --board COM_BOARD --seconds 180 --out logs/test/RUN-YYYYMMDD-HHMMSS-board
 ```
+
+For separate hosts use `--board COM_GATEWAY` and `--board COM_CLIENT` with
+matching run IDs and distinct suffixes. Start the loggers before the selected
+cohort. At a 15 s interval, 1,200 s is too short for 200 completed HELLOs.
+Allow at least 3,000 s plus startup, transaction time and closing margin,
+and check the completed cohort count. Host observation clocks need not agree.
 
 Use PlatformIO Python/pyserial. Every capture needs a new directory and a
 completed RUN_RECORD.md copied from the current template. The utility sets
@@ -126,8 +176,13 @@ identity association, gateway-header versus echoed-client fields, counters
 and CSV extraction. Host read timestamps are not synchronized radio clocks.
 
 The provisional short-range engineering target is99% accepted transactions
-on the stated denominator, not a field guarantee. Report RSSI/SNR, latency,
-errors, resets, supply and exclusions. Reproduce timeout by controlled
+on the stated denominator, not a field guarantee. Report both directional RSSI/SNR distributions and client transaction
+duration with sample count, min, median, p95 and max. Mark absent metrics N/A.
+Record ACK starts and completions separately, timeouts, TX failures, reset
+boundaries, and log drops. Join using the HELLO identity and the echoed ACK
+identity. Missing serial lines compromise capture completeness and cannot
+be classified as lost RF packets. OLED screenshots are supplementary.
+Report supply and exclusions as well. Reproduce timeout by controlled
 reception loss, then restore and check later new transactions. M2 has no
 automatic packet retry. Duplicate replay and wrong-identity/malformed ACK
 checks need reviewed physical injection fixtures; native cases are separate.

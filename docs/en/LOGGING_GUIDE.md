@@ -107,3 +107,17 @@ Denominators:
 The runbook's existing >=99% short-range target applies to declared transaction success C/A and is an unvalidated engineering acceptance target, not industrial reliability. RF injection/timeout interventions are separate runs, never mixed into the normal cohort. Capture/tool unit tests and native simulations cannot be included in physical denominators.
 
 Future BEACON/slot/bitmap/ADR event names listed earlier are reserved for later milestones; their absence is not an M0-M2 capture failure.
+
+
+## Iteration 016 OLED diagnostics
+
+In the OLED build, `OLED_INIT` records the first successful refresh or a
+startup failure. A later failure emits `OLED_ERROR` once. Serial `status`
+adds `OLED_STATUS` with `worst_i2c_us` and `worst_refresh_io_us`. The first
+is the longest measured write API span, the second is the sum of write API
+spans for the most expensive completed refresh. They exclude skipped loop
+iterations, CPU-only formatting and bus setup. Zero means no completed
+measurement for that accumulator yet. Neither field measures RF latency.
+Use structured HELLO/ACK records for cohort totals. OLED counters wrap at
+2^32 and reset per boot. Frames and existing serial transaction events keep
+their prior format.

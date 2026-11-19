@@ -142,3 +142,12 @@ CRC/header/CR/preamble/LDRO、异长 payload、bitmap 完整开销、每轮 ACK�
 假设与候选合同见 TDMA_FEASIBILITY；guard/切换/处理未知，不报告实物 capacity。
 line/branch 百分比、物理时序、heap/stack、NVS 耐久和 RF 均未测量。
 收到板和安全审查 fixture 后再按 runbook 执行，不能用主机结果关闭实物门槛。
+
+
+## Iteration 016
+
+默认和 OLED 候选两种 S3 构建分别验证。Native 用模拟 GPIO/I²C/时钟与 radio 执行实际
+Runtime、应用和显示逻辑，覆盖初始化顺序、分块、变化页、计数、缺失指标、新鲜度与
+故障隔离。同一 HELLO/ACK 在显示关闭、启用和故障的模拟条件下保持一致。实板要确认
+V3.4 引脚、RF SKU、供电及备份，再做 OLED 开关对照和获准短距采样。验收条件每组至少
+200 次完整 HELLO TX，并留原始串口、两个方向指标、OLED 时序、日志丢失和复位结果。

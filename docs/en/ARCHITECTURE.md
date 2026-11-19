@@ -1,11 +1,13 @@
 # Architecture
 
-The active hardware is Heltec WiFi LoRa 32 V3.2 HF. Iteration014 changes only the hardware adapter, pins, build/serial selection and selected-driver diagnostic. Protocol1, NVSschema1 and application/driver state policy remain compatible. See HARDWARE_MIGRATION_AUDIT.md for source evidence and physical limits.
+The reference build targets Heltec WiFi LoRa 32 V3. The reported V3.4 pair
+requires hardware confirmation. Protocol 1 and NVS schema 1 remain the M2
+baseline. See [HARDWARE.md](HARDWARE.md) for evidence by revision.
 
 ## 1. Design overview
 
 The project uses one firmware image for two physically identical
-Heltec WiFi LoRa 32 V3.2 HF devices.
+Heltec WiFi LoRa 32 V3 devices.
 
 ``` text
                          One firmware image
@@ -30,7 +32,7 @@ Heltec WiFi LoRa 32 V3.2 HF devices.
                                 |
                        RadioLib SX1262
                                 |
-                         Heltec V3.2 HF onboard SX1262
+                         Heltec V3 onboard SX1262
 ```
 
 Role selection is configuration-driven, not hardware-detected. The
@@ -52,6 +54,13 @@ tasks rather than separate, drifting codebases.
 8.  Poll the driver, advance the application at a fresh timestamp, service bounded
     serial input and drain diagnostics. Dependency calls can wait synchronously;
     cooperative state machines do not establish a hard loop-time bound.
+
+In the OLED build, Esp32Firmware owns the display before the runtime. The
+runtime starts OLED power/reset sequencing even for invalid configuration.
+It takes snapshots after primary loop work and skips OLED service during TX,
+client ACK wait and reboot. Application snapshots provide counters and the
+last qualifying reception; OLED never changes radio, application or NVS state.
+A failed OLED operation latches a display fault and produces a one-time event.
 
 A configuration schema mismatch must not be interpreted as a valid role.
 Provide a clear diagnostic and require re-provisioning or a deliberate
