@@ -25,7 +25,11 @@ void ClientApp::begin(uint32_t now) {
     recoverAt_ = now;
 }
 void ClientApp::finish(const char* result, const RadioEvent* event, bool txFailure) {
-    if (event) ++successes_;
+    if (event) {
+        ++successes_;
+        lastAck_ = {true, event->metrics, config_.gatewayId,
+                    static_cast<uint64_t>(esp_timer_get_time()), event->rssi, event->snr};
+    }
     else if (txFailure) ++txFailures_;
     else ++timeouts_;
     log_.event(event ? "ACK_RX" : (txFailure ? "HELLO_FAILED" : "ACK_TIMEOUT"), result, &outstanding_, event);

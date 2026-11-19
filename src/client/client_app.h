@@ -1,5 +1,6 @@
 #pragma once
 #include "common/diagnostics/serial_logger.h"
+#include "common/diagnostics/display_snapshot.h"
 #include "common/protocol/sequence_tracker.h"
 
 namespace adaptive_lora {
@@ -8,6 +9,10 @@ public:
     ClientApp(const DeviceConfig& config, RadioTransport& radio, SerialLogger& log, BootIdGenerator generate);
     void begin(uint32_t now);
     void update(uint32_t now, const RadioEvent& event, bool allowNew = true);
+    ClientTelemetry telemetry() const {
+        return {lastAck_, attempts_, successes_, timeouts_, txFailures_, sessionFailed_};
+    }
+    bool awaitingAck() const { return state_ == State::WAIT_ACK; }
 private:
     bool renewSession(uint32_t now);
     bool sessionFailed_ = false;
@@ -30,5 +35,6 @@ private:
     uint32_t timeouts_ = 0;
     uint32_t txFailures_ = 0;
     uint64_t sentAtUs_ = 0;
+    LastReception lastAck_;
 };
 }

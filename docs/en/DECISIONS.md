@@ -201,3 +201,28 @@ eight-session cache rather than enlarging it; admission/schedule-associated
 state is a future M4 decision. ERR-021 stays open without a proven dependency
 mitigation. Preserve all historical records. Publish the named branch/PR for
 review; this iteration does not authorize automatic merge into canonical main.
+
+
+## ADR-020 — Optional onboard OLED diagnostics
+
+Accepted 2026-11-19. Keep the original V3 firmware environment as an OLED-off
+reference. The OLED candidate extends it with the same board, firmware version,
+RadioLib pin, PHY and NVS layout. Use the installed Arduino Wire library and
+project-local SSD1306 commands/glyphs. This avoids importing the Heltec
+framework and a full pixel framebuffer. The vendor controller/address and V3
+variant aliases support that implementation choice. Delivered V3.4 wiring,
+RF variant and component revisions require physical evidence.
+
+Esp32Firmware owns the display. Runtime starts Vext/reset sequencing and
+later sends read-only snapshots after radio, app and serial work. One changed
+page chunk is serviced per eligible loop. The display stops on I²C failure
+and logs the reason once. The OLED skips TX, client ACK wait and reboot.
+Wire allocates buffers and uses SDK locks. The configured timeout and chunk
+limit bound requested I/O, while actual service latency needs measurement.
+
+Telemetry uses application events, separating ACK starts and completions and
+keeping a validity flag for receive metrics. These diagnostics wrap counters
+modulo 2^32 and reset at reboot. Link state uses a monotonic freshness window
+from the last qualifying receive. Preserve byte-level HELLO/ACK and schema 1.
+Keep the bench frequency at its existing research value until an authorized
+operating profile is selected. Physical evidence is required before M2 closes.

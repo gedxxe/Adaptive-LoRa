@@ -1022,3 +1022,148 @@ only, with main unchanged. Tested firmware/native/model/capture inputs remain
 unchanged since their passing runs; additional changes are documentation and
 log formatting only. Final commit/push/remote/PR identifiers are reported after
 actual execution rather than predicted in this record.
+
+
+## ITERATION-016 preflight and initial verification — 2026-11-19
+
+Codex fetched origin and verified clean main at
+`e34e7296135b47ecd3af479fe0593f4118bc734b`, merge of PR #5, then created
+`iteration-016-v34-physical-validation`. Two V3.4-marked boards and stock
+monopoles are user reported. Serial enumeration showed six Bluetooth ports,
+no Heltec port. No device opened. Published V3.2 schematic and installed
+Arduino V3 variant provide reference pin and peripheral evidence only.
+
+Firmware 0.2.0-alpha.1, protocol 1, schema 1 and RadioLib 7.8.1. The initial
+reference S3 build exited 0. It included Wire due to dependency discovery
+(RAM 33,576, flash 373,992), so Wire is now explicitly excluded from the
+OLED-off environment. Initial OLED build exited 1 with missing dependency
+output paths during overlapping PlatformIO operations. Initial native exited
+1 on a Unity symbol collision in the new fixture; renamed helper, corrected
+native 316/316 PASS exit 0. Capture 13/13 and model 16/16 exit 0. Full initial
+outputs are retained under the iteration-016-first prefixes. ERR-027/028
+record the failures. Sequential firmware verification follows. No physical
+NVS, display, RF, packet counts, timing or antenna measurements.
+
+
+## ITERATION-016 final software evidence — 2026-11-19
+
+Codex, branch iteration-016-v34-physical-validation, base e34e7296135b47ecd3af479fe0593f4118bc734b.
+Firmware 0.2.0-alpha.1, protocol 1, NVS schema 1. Historical logs retain their
+original board revision and outcomes. The current blank run template adds
+OLED/airtime fields for the integrated V3.4 pair.
+
+| Command | Exit | Result and full log |
+|---|---:|---|
+| `pio run -e heltec_wifi_lora_32_V3` | 0 | 178.62 s. logs/build/iteration-016-final-esp32.log |
+| `pio run -e heltec_wifi_lora_32_V3_oled` | 0 | 187.16 s. logs/build/iteration-016-final-oled.log |
+| `pio test -e native` | 0 | 316/316 PASS, zero skipped, 79.632 s. logs/test/iteration-016-corrected-native.log |
+| `<PIO_PYTHON> -m unittest discover -s tools -p test_capture_bench.py -v` | 0 | 13/13 fake serial. logs/test/iteration-016-first-capture.log |
+| `<PIO_PYTHON> -m unittest discover -s tools -p test_tdma_feasibility.py -v` | 0 | 16/16 analytical. logs/test/iteration-016-first-model.log |
+| `<PIO_PYTHON> -m unittest discover -s tools -p test_check_consistency.py -v` | 0 | 7/7. logs/test/iteration-016-final-consistency-tests.log |
+| `<PIO_PYTHON> tools/check_consistency.py` | 0 | PASS. logs/test/iteration-016-final-consistency.log |
+
+All 307 prior native names/order retained. Nine additions cover Gateway ACK
+counts and errors, Client accepted versus rejected ACK/timeout/TX failures,
+64-bit freshness/WAIT/STALE, formatting including N/A and maximum counts,
+GPIO/reset ordering, changed-page updates and transfer failure, identical HELLO
+bytes and ACK acceptance across OLED off/on/failure, and provisioning with
+OLED and no radio operations. These exercise the production logic with fakes.
+See validation.json and corrected-native.log for exact names. Logs replace
+local path prefixes and normalize display whitespace. Raw temporary build
+output is private. ERR-027 and ERR-028 retain the failed runs and corrections.
+
+The final S3 output resolves espressif32 55.3.311, Arduino 3.3.11, IDF libs
+5.5.5+sha.b774170ff46, Xtensa 14.2.0+20260121 and RadioLib 7.8.1. Wire 3.3.11
+is framework-supplied. No new external library. Baseline RAM/flash
+32,096/342,560, OLED off 32,184/342,852 (+88/+292), OLED on 33,960/377,488
+(+1,776/+34,636 relative to off). ELF probes verify Wire exclusion from off
+and sizeof 384/9,088/10,040 bytes for OledStatusDisplay/FirmwareRuntime/
+Esp32Firmware in the OLED build. These sizes overlap. See
+logs/build/iteration-016-resource-probe.log. No physical heap, stack or I²C
+latency measurements. Firmware SHA-256s are in iteration-016-validation.json.
+
+Changes: PlatformIO selects the reference or OLED image. The display module
+owns power/reset, formatting and bounded I²C. Esp32Firmware owns lifetime,
+FirmwareRuntime controls when snapshots and I/O occur, and Gateway/Client
+count qualifying role events without changing existing transaction accounting.
+RadioDriver exposes read-only state. Test fakes inject only boundary calls.
+Bilingual AGENTS/README, hardware/readiness, architecture, test, bench and
+logging docs describe the new candidate. ADR-020 records the choices. The
+last inventory in iteration-016-review.json lists files by path.
+
+Focused review: main remains 15 lines. The SX1262 adapter remains the only
+radio owner. No change to RadioDriver state transitions, SerialLogger queue,
+NvsConfigStore/Preferences, FrameCodec, SequenceTracker or radio pin/PHY
+constants. Session progression and ACK validation keep their original order.
+Gateway reception/duplicates are counted only at deduplication, ACK starts
+only on transmit success and completions on TX_DONE. Failed RadioDriver calls
+bump a diagnostic counter. Application totals wrap as unsigned uint32_t.
+The display reserves two 176-byte text pages in RAM and sends one bounded
+chunk with up to 31 bytes. Formatting and rendering run on the loop task.
+Wire allocates buffers on begin and uses synchronous SDK locks. Even in RX,
+DIO1 can arrive while a transfer is in progress. Runtime observes maxima for
+write spans and summed refresh I/O and gates TX/ACK wait/reboot. No physical
+latency bound follows. ERR-008/009/010/021/023 remain open.
+
+Native role fixtures use network/GW/client IDs 1/1/2 and interval 15,000 ms
+for the new scenarios. Hardware roles unprovisioned. 915.0 MHz remains a
+provisional research setting outside the Indonesian 920–923 MHz reference
+LPWAN band. Analytic HELLO/ACK airtimes 66.816/82.176 ms, modeled 15 s duty
+fraction 0.44544%/0.54784% for a single normal pair. No duty limiter added.
+Actual RF SKU, antenna marks, connector, wiring, crystal, DC-DC, USB/flash
+and supply remain unconfirmed. No port opened, upload, erase, receive metric,
+NVS persistence, OLED photo, RF capture, PDR, packet count, orientation,
+latency or reset measurements. M0–M2 physical IN PROGRESS. Next: confirm
+hardware, RF setup and same-board backups, then obtain authorized OLED-off
+and OLED-on 3 m closed-cohort captures before M3 timing work.
+
+
+## ITERATION-016.1 — Hardware synchronization and bench readiness, 2026-11-19
+
+Codex continued the clean iteration-016-v34-physical-validation branch from
+28d53a69665e87f9229191f6ed652e812c2265d6. PR #6 was open, main was
+e34e7296135b47ecd3af479fe0593f4118bc734b. Firmware 0.2.0-alpha.1, protocol 1,
+NVS schema 1, RadioLib 7.8.1. Owner confirms two ESP32-S3/SX1262 Heltec WiFi
+LoRa 32 V3.4 boards with the V3.2 wiring, stock monopoles and 902–928 MHz
+procurement. Owner reports the SMT and crystal changes. V3.2 schematic is
+the electrical reference. Physical SKU, antenna characteristics, board
+circuit measurements, supply, flash security/layout and OLED remain pending.
+
+| Executed command | Exit | Result |
+|---|---:|---|
+| `pio run -e heltec_wifi_lora_32_V3` | 0 | OLED off. RAM 32,184 / flash 342,852 B |
+| `pio run -e heltec_wifi_lora_32_V3_oled` | 0 | OLED on. RAM 33,960 / flash 377,488 B |
+| `pio test -e native` | 0 | 316/316 passed, zero skipped, identical cases/order |
+| `<PIO_PYTHON> -m unittest discover -s tools -p test_capture_bench.py -v` | 0 | 13/13 |
+| `<PIO_PYTHON> -m unittest discover -s tools -p test_tdma_feasibility.py -v` | 0 | 16/16 |
+| `<PIO_PYTHON> -m unittest discover -s tools -p test_check_consistency.py -v` | 0 | 7/7 |
+| `<PIO_PYTHON> tools/check_consistency.py` | 0 | PASS |
+| `pio device list` | 0 | Six Bluetooth virtual ports, no CP2102 |
+
+Complete results are indexed in logs/build/iteration-016.1-validation.json.
+Firmware commands ran sequentially. Both firmware.bin SHA-256 hashes match
+Iteration 016 exactly. espressif32 55.3.311, Arduino 3.3.11, IDF libs
+5.5.5+sha.b774170ff46, Xtensa 14.2.0+20260121. No required check failed.
+Checked installed esptool help without selecting/opening a device. No ROM
+or upload example was executed. Publication logs sanitize machine paths and
+Bluetooth instance identifiers. Raw output remains private.
+
+AGENTS, bilingual README/HARDWARE/ARCHITECTURE/PROGRESS/readiness describe
+owner facts, manufacturer reference and open physical measurements. The board
+pin header changes comments only. The runbooks and blank run template correct
+Windows enumeration, private ROM backups, OLED upload and explicit Gateway
+1/1/1 and Client 1/2/1 with 15,000 ms on both. Detailed local regulatory
+analysis is removed from active procedures. Prior records remain intact.
+DEPENDENCY_BUDGET_AUDIT and ERROR_LOG record the I²C/radio review. The 3 ms
+operation timeout excludes lock waits, and Gateway IRQ service can slip to
+the next loop during a display transfer. Direct measurement is pending. No
+reproduced software defect, implementation, pin, PHY or protocol change.
+No new architectural decision or user-visible release behavior.
+
+No physical provisioning, serial port open, flash, erase, reset or capture.
+Distance, orientation, packet counts, power, PDR, RSSI/SNR, ACK results and
+IRQ/display/NVS/RF timings are NOT MEASURED. ERR-008/009/010/021/023 remain
+open. M0–M2 physical acceptance is IN PROGRESS. Identify the first board in
+Windows with a suitable RF load, known data cable and manual ROM entry.
+Then preserve the same-board backup, verify layout/security and repeat for
+the other board before the OLED upload. PR #6 remains open for review.

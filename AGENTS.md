@@ -8,9 +8,12 @@ Single-Radio LoRa Industrial Energy Monitoring Networks. Energy monitoring is
 an application domain, not a protocol dependency. Keep customer identities,
 private systems and machine-specific paths out of publication content.
 
-The sole active target is **Heltec WiFi LoRa 32 V3.2 HF**: ESP32-S3FN8,
-SX1262, 8 MB flash, 512 KB chip SRAM and CP2102/UART0 at 115200 baud.
-Do not assume PSRAM or substitute another board revision/RF variant.
+The bench pair is **Heltec WiFi LoRa 32 V3.4**, ESP32-S3/SX1262, with two
+stock monopoles and a user-confirmed 902–928 MHz procurement variant. The
+owner confirms V3.2 wiring and pin mapping and reports SMT and crystal
+improvements. Use the V3.2 schematic and Arduino V3 variant as references.
+Verify each board's physical SKU, antenna and peripheral behavior at the
+bench. Do not assume PSRAM.
 Build environment: `heltec_wifi_lora_32_V3`, Arduino/C++17, with
 `jgromes/RadioLib@7.8.1`. Firmware `0.2.0-alpha.1`, protocol `1`, NVS schema `1`.
 Authoritative versions/settings are VERSION, PROTOCOL_VERSION,
@@ -18,11 +21,10 @@ include/project_config.h and platformio.ini; resolved package versions and
 actual test results belong in [PROGRESS.md](docs/en/PROGRESS.md).
 
 The fixed-PHY M0–M2 HELLO/ACK firmware exists and has host/build evidence.
-**M0–M2 physical acceptance is IN PROGRESS.** Board receipt, markings, flash/NVS,
-power, timing, RF and antenna measurements remain outstanding. M3–M8 production
-features are NOT STARTED. Iteration 015 adds explicitly host-only research;
-it does not enable production scheduling or adaptation. Historical hardware
-and results remain valid in their original context.
+**M0–M2 physical acceptance is IN PROGRESS.** Confirm the physical SKU,
+electrical behavior, flash/NVS, supply and timing at the bench. M3–M8
+production features are NOT STARTED. The Iteration 015 scheduling work is
+host research. Historical records retain their original hardware and results.
 
 ## Read before editing
 
@@ -47,24 +49,24 @@ instructions. Do not update old logs or historical results to match this target.
 ## Hardware and operating constraints
 
 Pins and PHY belong in include/board_pins.h and include/radio_config.h.
-NSS/SCK/MOSI/MISO/RESET/BUSY/DIO1 are GPIO 8/9/10/11/12/13/14.
+The V3 reference uses GPIO 8/9/10/11/12/13/14 for NSS/SCK/MOSI/MISO/RESET/BUSY/DIO1.
 DIO2 controls the RF switch; DIO3 supplies the 1.8 V TCXO. Pass oscillator and
-DC-DC selection explicitly. Reserve OLED, LED, Vext, battery-control, UART,
-USB, boot/flash/crystal/JTAG resources as specified in HARDWARE.md. Do not
-implement display, Vext or battery functions without a requirement.
+DC-DC selection explicitly. The OLED candidate uses the Arduino variant’s OLED and Vext aliases in the
+opt-in `heltec_wifi_lora_32_V3_oled` build. Verify GPIO17/18/21/36, Vext
+polarity and SSD1306/0x3C before using it on the delivered boards. Preserve
+other pin reservations in HARDWARE.md.
 
 Retain 915.0 MHz provisional, BW125, data SF7, reserved control SF9, CR4/5,
 preamble 8, explicit header, CRC, sync 0x12, 10 dBm and 1 MHz SPI. Future ADR
 research is limited to SF7–SF9/BW125; no automatic bandwidth/power changes.
 One radio time-shares control and data; it cannot receive multiple SFs at once.
 
-Before power, confirm the V3.2 HF board/IPEX connector and connect a suitable
+Before power, identify the board, RF variant and antenna connector and connect a suitable
 50-ohm antenna or load, including when the factory image is unknown. Use a
 stable regulated 5 V supply with at least 500 mA input capability; measure
 actual supply margin/current and check battery polarity. Do not parallel
 regulators or back-power through GPIO. Moxon fabrication, matching and gain
-are unmeasured. Board coverage does not authorize 915 MHz operation; retain
-frequency/EIRP/access/certification checks before radiated deployment.
+are unmeasured. Radiated testing requires an authorized RF setup.
 
 ## Ownership and compatibility
 
@@ -88,6 +90,7 @@ and ARCHITECTURE; do not write per-packet telemetry to NVS.
 | NvsConfigStore | Load/save/verify policy through non-owning ConfigStorage |
 | PreferencesConfigStorage | Sole Preferences/NVS adapter |
 | DeviceConfig / FrameCodec / SequenceTracker | Pure validation, explicit serialization and bounded session history |
+| OledStatusDisplay | Optional SSD1306 diagnostics using runtime snapshots after radio service |
 | ProvisioningConsole / SerialLogger | Bounded command parsing / queued diagnostics; no radio ownership |
 
 Test actual production modules through existing low-level seams; never copy
@@ -115,15 +118,17 @@ third-party libraries or add abstractions speculatively.
 
 ## Scope and next work
 
-Next: inspect delivered boards, make verified same-board private backups,
-then follow the terminated-RF NVS/radio/two-device acceptance procedure.
+Next: enumerate one terminated board at a time in Windows, make verified
+same-board private backups, and follow the bench runbook. Set
+`config set hello-interval-ms 15000` on both roles for the smoke test and
+OLED freshness.
 Measure transitions, IRQ latency, processing and drift before choosing M3
 guards. Host-only feasibility tooling is preliminary research; production
 BEACON/TDMA, bitmap, selective retry and ADR require separate milestone work.
 Do not create scheduler/ADR directories merely for planning.
 
 Do not add Wi-Fi/backhaul, Modbus/RS485, databases/dashboards, LoRaWAN/SX1302,
-OTA, multi-SF concurrent reception, OLED/battery features or unrelated
+OTA, multi-SF concurrent reception, battery features or unrelated
 libraries. Keep one radio adapter until another has a concrete reviewed need.
 Avoid factories, dependency-injection frameworks and unrelated refactoring.
 
@@ -133,6 +138,7 @@ Before reporting a coding iteration complete, run and check exit codes:
 
 ```sh
 pio run -e heltec_wifi_lora_32_V3
+pio run -e heltec_wifi_lora_32_V3_oled
 pio test -e native
 python -m unittest discover -s tools -p test_capture_bench.py -v
 python -m unittest discover -s tools -p test_tdma_feasibility.py -v
@@ -166,8 +172,9 @@ use codex/ by default unless the task names a branch. Preserve historical
 branches and records. Commit/push/create PR only when authorized by the user.
 Integrate reviewed work through normal merge commits. Never force-push,
 rebase, squash or delete historical branches during synchronization.
-Iteration 015 authorizes publication of iteration-015-prehardware-stabilization
-and a PR into main, **not automatic merge**. Keep main unchanged until review.
+PR #5 merged Iteration 015 at `e34e7296135b47ecd3af479fe0593f4118bc734b`.
+Iteration 016 authorizes the branch `iteration-016-v34-physical-validation`
+and a PR for review. Keep main unchanged until review.
 
 Publish sanitized project files only. Exclude caches, binaries, credentials,
 local configuration, private backups and unlicensed research PDFs. Preserve

@@ -1,4 +1,5 @@
 #include "gateway_app.h"
+#include <esp_timer.h>
 
 namespace adaptive_lora {
 GatewayApp::GatewayApp(const DeviceConfig& config, RadioTransport& radio, SerialLogger& log, BootIdGenerator generate)
@@ -8,11 +9,13 @@ bool GatewayApp::renewSession(uint32_t now) {
     const bool recovering = sessionFailed_;
     if (!sequence_.renew(generate_)) {
         sessionFailed_ = true;
+        telemetry_.sessionUnavailable = true;
         sessionRetryAt_ = now + kSessionRecoveryUs;
         log_.event("SESSION_ERROR", "boot_id_unavailable");
         return false;
     }
     sessionFailed_ = false;
+    telemetry_.sessionUnavailable = false;
     if (recovering) log_.event("SESSION_NEW", "identity_recovered");
     return true;
 }
@@ -24,6 +27,7 @@ void GatewayApp::listen(uint32_t now) {
     const int16_t code = radio_.receive();
     if (code) {
         ++recoveryAttempts_;
+        ++telemetry_.radioErrors;
         recoverAt_ = now + kRadioRecoveryUs;
         log_.event("RADIO_ERROR", "rx_start_failed", nullptr, nullptr, code);
     } else recoveryAttempts_ = 0;
@@ -31,6 +35,8 @@ void GatewayApp::listen(uint32_t now) {
 void GatewayApp::update(uint32_t now, const RadioEvent& event, bool allowNew) {
     if (allowNew && sessionFailed_) renewSession(now);
     if (event.type == RadioEventType::TX_DONE) {
+        if (ackInFlight_) ++telemetry_.ackCompletions;
+        ackInFlight_ = false;
         log_.event("TX_DONE", "ack_sent", &ack_);
     } else if (event.type == RadioEventType::RX_DONE) {
         Frame hello;
@@ -42,6 +48,10 @@ void GatewayApp::update(uint32_t now, const RadioEvent& event, bool allowNew) {
             const auto observed = tracker_.observe({hello.networkId, hello.sourceId, hello.bootId, hello.sequence});
             if (observed == SequenceResult::STALE) log_.event("FRAME_REJECT", "stale_sequence", &hello, &event);
             else {
+                if (observed == SequenceResult::DUPLICATE) ++telemetry_.duplicates;
+                else ++telemetry_.uniqueHellos;
+                telemetry_.hello = {true, event.metrics, hello.sourceId,
+                                    static_cast<uint64_t>(esp_timer_get_time()), event.rssi, event.snr};
                 log_.event(observed == SequenceResult::DUPLICATE ? "DUPLICATE" : "HELLO_RX",
                            observed == SequenceResult::DUPLICATE ? "reack" : "accepted", &hello, &event);
                 ack_ = Frame{};
@@ -63,11 +73,20 @@ void GatewayApp::update(uint32_t now, const RadioEvent& event, bool allowNew) {
                     const int16_t code = radio_.transmit(bytes, length, now);
                     log_.event(code ? "RADIO_ERROR" : "TX_START", code ? "ack_start_failed" : "ack", &ack_, nullptr, code,
                                code ? 0 : radio_.timeOnAir(length));
-                    if (!code) log_.event("ACK_TX", "started", &hello);
+                    if (code) ++telemetry_.radioErrors;
+                    else {
+                        ++telemetry_.ackStarts;
+                        ackInFlight_ = true;
+                        log_.event("ACK_TX", "started", &hello);
+                    }
                 }
             }
         }
     } else if (event.type != RadioEventType::NONE) {
+        if (event.type == RadioEventType::ERROR) {
+            ++telemetry_.radioErrors;
+            ackInFlight_ = false;
+        }
         log_.event(event.type == RadioEventType::RX_TIMEOUT ? "RX_TIMEOUT" :
                    event.type == RadioEventType::CRC_ERROR ? "CRC_ERROR" : "RADIO_ERROR",
                    "receive_or_tx_error", nullptr, &event, event.code);

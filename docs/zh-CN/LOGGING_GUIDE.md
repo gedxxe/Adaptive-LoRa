@@ -23,3 +23,12 @@ Timeout/TX失败按K/result/code区分；RADIO_ERROR和HELLO_FAILED可属于同�
 transactions.csv每K一行，明确api/start/done/R/dup/ACKstart/done/accepted/terminal/latency/error及unknown；关闭边界对齐LINK_COUNTS attempts/success/timeouts/txfail增量。正常物理run需>=200个完整T，另报A/启动失败/排除边界。PDR=|R交T|/|T|（另报未配对R异常）；事务ACK成功=|C|/|A|，C/T另列。ACK条件率写明分母，duplicate事件率用有效接收事件数。分母0为N/A，不截断分子、不混boot、不从IRQ猜总CRC失败、不挑有利窗口。既有短距>=99%目标按C/A，是未验证工程目标；注入/断链另跑，不把host/native结果算物理样本。完整CSV列/关联表以英文为准。
 
 上文future BEACON/slot/bitmap/ADR事件属于后续milestone，M0-M2无这些事件不算采集失败。
+
+
+## Iteration 016 OLED
+
+OLED 环境首次显示成功或初始化失败记录一次 OLED_INIT，后续总线失败记录一次
+OLED_ERROR。status 输出 OLED_STATUS，worst_i2c_us 为单次 write API 最长时长，
+worst_refresh_io_us 为已完成刷新中 write API 时间总和的最大值。跳过的循环、纯 CPU
+格式化及 bus setup 不计。零值表示该项尚未积累测量。射频 cohort 用原始 HELLO/ACK
+事件统计，屏幕计数按 2^32 回绕，重启归零。既有事务记录格式保留。

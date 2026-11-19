@@ -15,7 +15,7 @@ Adaptive-LoRa research title: Reliability-aware TDMA Scheduling and Link Adaptat
 
 ## M0 — Hardware and toolchain baseline
 
-- Inspect both delivered Heltec WiFi LoRa 32 V3.2 HF boards and confirm their RF variant.
+- Inspect both V3.4-marked Heltec boards and confirm the wiring and RF variant.
 - Confirm board/module revisions and pin orientation.
 - Verify GPIO continuity against `HARDWARE.md`.
 - Verify radio 3.3 V supply and antenna connection.

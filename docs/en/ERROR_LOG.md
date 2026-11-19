@@ -424,3 +424,60 @@ Restaged check follows; this is publication formatting, not a build/test failure
 
 Restaged `git diff --cached --check` exited 0. Second scoped commit ba56667
 succeeded. Only the new log EOF changed; all actual package records remain.
+
+
+## ERR-027 — Iteration 016 native helper name collision
+
+Initial `pio test -e native` exited 1. The OLED fixture helper `resetTest`
+collided with a Unity symbol. Renamed the test-only helper to
+`resetOledFixture`. Corrected native run exited 0 with 316/316 passing.
+See logs/test/iteration-016-first-native.log and corrected-native.log with
+their iteration prefixes. No production failure was observed.
+
+## ERR-028 — Iteration 016 shared PlatformIO build output
+
+The first OLED build exited 1 when generated FrameworkArduino dependency
+paths disappeared during overlapping PlatformIO operations. The missing
+files occurred during framework compilation. A sequential rebuild of both
+variants is underway. Initial output remains in
+logs/build/iteration-016-first-oled.log. The first display-disabled build
+also pulled in Wire through dependency discovery despite the preprocessor
+guard. The default environment now excludes Wire explicitly. The separate
+OLED environment includes it.
+
+### Iteration 016 physical evidence and dependency holds
+
+The host listed Bluetooth ports only. No device ROM, OLED, NVS, power,
+link or RF measurements were taken. ERR-008/009/010/021/023 stay open.
+Arduino Wire accepts an I²C timeout, while its SDK/locks still need measured
+latency. The new display work therefore runs last and is suppressed in
+known TX, ACK-wait and reboot windows. RX IRQ arrival during a transfer
+remains possible. Do not claim isolated bench timings from native tests.
+
+
+### ERR-028 verification — CLOSED for the build
+
+Running the display-disabled and OLED-enabled builds sequentially completed
+with exit 0. The disabled image has no Wire or display service symbols.
+The opt-in image links both. Keep the retained first build and corrected
+logs for comparison. Physical Wire and OLED timing remain unmeasured.
+
+A restricted Windows CIM retry reported access denied. An approved read-only
+CIM enumeration succeeded and again found Bluetooth serial ports only. The
+runtime has not been connected to a board.
+
+
+### Iteration 016.1 bench status and ERR-008 clarification
+
+`pio device list` exited 0 and listed six Bluetooth virtual ports. It did
+not show a CP2102 port. The transcript does not diagnose a cable or driver
+fault. Hardware instance IDs are sanitized in logs/test/iteration-016.1-verification-ports.log.
+No port was opened. Windows troubleshooting is in BENCH_RUNBOOK.md.
+
+Source review found no reproduced OLED/radio defect. Wire's 3 ms timeout
+covers individual backend operations and leaves lock waits outside the
+budget. Gateway DIO1 service can be delayed during an RX-overlapping display
+write. Measure it as described in DEPENDENCY_BUDGET_AUDIT.md. ERR-008,
+ERR-021 and ERR-023 are still open. One repository inspection used the
+unsupported Windows rg filename glob README* (OS error 123). The explicit
+README paths corrected that lookup. All required builds and tests exited 0.

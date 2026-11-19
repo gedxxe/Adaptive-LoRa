@@ -1,6 +1,8 @@
 # Adaptive-LoRa
 
-开发基线：[Heltec 迁移 PR #4](https://github.com/gedxxe/Adaptive-LoRa/pull/4) 已合并，以 `main` 为规范基线。Iteration 015 另提 PR 审查，不自动合并。后续工作从最新 `main` 开始，保留历史迭代分支和工程记录；验证证据/发布状态见 [PROGRESS.md](docs/zh-CN/PROGRESS.md)。
+Iteration 015 已经通过 [PR #5](https://github.com/gedxxe/Adaptive-LoRa/pull/5) 合入
+main，基线为 `e34e7296135b47ecd3af479fe0593f4118bc734b`。Iteration 016 为用户报告的
+两块 V3.4 准备首次台架链路测试。
 
 **研究标题：** Reliability-aware TDMA Scheduling and Link Adaptation for Single-Radio LoRa Industrial Energy Monitoring Networks.
 
@@ -13,8 +15,8 @@ Adaptive-LoRa 是独立的单射频 LoRa P2P 网络研究与嵌入式固件项�
 | 证据 | 当前基线 |
 |---|---|
 | 固件 / 协议 | `0.2.0-alpha.1` / `1` |
-| ESP32 编译 | PASS |
-| Native 测试 | 307/307 PASS：原 302 全部通过，加五项去重边界测试 |
+| ESP32 编译 | OLED 开关两种均 PASS |
+| Native 测试 | 316/316 PASS，含九项 OLED/遥测新测试 |
 | Capture / 模型测试 | 13/13 / 16/16 PASS，仅主机 |
 | Documentation consistency | 7/7 tests PASS; checker exit 0 |
 | 已实现 | 有界显式帧、角色配置、HELLO/ACK 身份检查、去重、超时/恢复、sequence/session 处理 |
@@ -22,11 +24,14 @@ Adaptive-LoRa 是独立的单射频 LoRa P2P 网络研究与嵌入式固件项�
 
 Host 执行实际 Client/Gateway 状态机，使用有界 fake transport、时钟及串口适配。丢包、延迟、对象重建、radio 返回码与 IRQ 输入均不等于实测，见 [driver 审查](docs/zh-CN/RADIO_DRIVER_AUDIT.md)。精确证据见 [进度](docs/zh-CN/PROGRESS.md)、[软件审查](docs/zh-CN/SOFTWARE_AUDIT.md) 及英文 [BUILD_MEMORY](docs/en/BUILD_MEMORY.md)。
 
-## 硬件与暂定PHY
+## 硬件和暂定 PHY
 
-唯一活动目标为 **Heltec WiFi LoRa 32 V3.2 HF**，ESP32-S3FN8、SX1262、8 MB Flash和CP2102/UART0；不假定PSRAM。采购选型是HF902–928 MHz选项，到货数量和PCB标记尚未确认。RadioLib固定7.8.1，GPIO8–14接radio，DIO3 TCXO1.8 V，DC-DC；串口115200，原生USB CDC关闭。OLED、电池监测未实现。
-
-保留915 MHz/BW125/SF7/CR4/5/preamble8/explicit/CRC/sync0x12/10 dBm/SPI1 MHz，SF9控制仍预留。915 MHz Moxon作为设计基线，制作、gain和matching未实测。上电前阅读 [硬件说明](docs/zh-CN/HARDWARE.md) 和 [迁移审查](docs/zh-CN/HARDWARE_MIGRATION_AUDIT.md)。过去硬件描述在历史记录/Git中保留。
+本研究使用两块 Heltec WiFi LoRa 32 V3.4，配有 ESP32-S3、SX1262 和原装单极天线。
+用户确认采购选项为 902–928 MHz，V3.4 沿用 V3.2 的线路和引脚，改进涉及 SMT 工艺和
+晶振。V3.2 原理图是电气参考。实物 SKU、天线特性和外设行为仍待检查。
+固定研究 PHY 为 915.0 MHz、BW125、SF7、CR4/5、前导 8、显式头、PHY CRC、sync 0x12、
+10 dBm、SPI 1 MHz，控制 SF9 保留。辐射测试须使用获准的射频配置。参见
+[硬件说明](docs/zh-CN/HARDWARE.md) 和 [台架流程](docs/zh-CN/BENCH_RUNBOOK.md)。
 
 ## 架构原则
 
@@ -44,21 +49,33 @@ RadioTransport 引用分离 app 与 RadioDriver 状态策略；非拥有 RadioHa
 
 ```sh
 pio run -e heltec_wifi_lora_32_V3
+pio run -e heltec_wifi_lora_32_V3_oled
 pio test -e native
 ```
 
 目标为 Arduino / heltec_wifi_lora_32_V3，RadioLib7.8.1。已有Core6.1.19、pioarduino/espressif32 55.03.311和Arduino3.3.11/IDF5.5.5保持，使用Xtensa GCC14.2.0；host GCC6.3.0、native1.2.1、Unity2.6.1。platform尚未固定，其他机器须记录实际依赖；hash清单和日志标识各次验证快照。
 
+## OLED 诊断
+
+默认构建关闭显示。OLED 候选使用 V3 参考 SSD1306 0x3C、GPIO17/18/21 与低有效
+Vext GPIO36，实物核对后再使用。显示交替呈现链路和计数。WAIT 为无有效接收，
+ONLINE 为 Gateway 最近有效 HELLO 或 Client 接受 ACK 尚在两倍间隔加一秒的窗口内，
+ONLINE 仅表示近期有有效接收，不能说明持续连接。两板均设 15000 ms 时，距上次
+有效接收满 31 秒进入 STALE。缺失指标显示 N/A。串口 status 提供 OLED 状态
+及 I²C 和刷新总线时间最大值，Gateway ACK 开始与完成分开统计。
+
 ## 配置与后续实物流程
 
 串口 115200。支持 help、status、config show、config set role gateway|client、network-id/node-id/gateway-id、config save、reboot；可设 hello-interval-ms 1000–3600000，默认事务结束后等待 5000 ms。
 
-初始 network/node/gateway 为 Gateway 1/1/1、Client 1/2/1；角色命令不修改 ID，应全部明确设置。config show 显示暂存值，status 显示启动加载值。Network 1–65535，node/gateway 1–65534。实物流程见暂缓的 [BENCH_RUNBOOK](docs/zh-CN/BENCH_RUNBOOK.md) 和 [模板](logs/test/RUN_RECORD_TEMPLATE.md)；当前没有烧录或 RF 验证。
+首轮联通检查在两板均执行 `config set hello-interval-ms 15000`，保存并重启后用
+`status` 核对。Gateway 使用该间隔判断 OLED 新鲜度。初始 network/node/gateway 为
+Gateway 1/1/1、Client 1/2/1；角色命令不修改 ID，应全部明确设置。config show 显示暂存值，status 显示启动加载值。Network 1–65535，node/gateway 1–65534。实物流程见 [BENCH_RUNBOOK](docs/zh-CN/BENCH_RUNBOOK.md) 和 [模板](logs/test/RUN_RECORD_TEMPLATE.md)；当前没有烧录或 RF 验证。
 
 ## 开发路线
 
 1. M0–M2 继续软件验证及依赖时延/分配边界分析。
-2. 采购/制作/组装后，验证 NVS/重启、电气/IRQ 和双设备 HELLO/ACK。
+2. 逐块识别 Windows 串口并备份，再验证 NVS、重启、电气/IRQ 和双板 HELLO/ACK。
 3. M3 测量切换/漂移后实现单 Client beacon/TDMA。
 4. M4–M6 逐步实现 bitmap/选择性重试、版本化保守 ADR、同步恢复。
 5. M7–M8 受控天线对比及明确标注的逻辑节点仿真。

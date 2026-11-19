@@ -1,7 +1,38 @@
 # Development progress
 
 <!-- current-state:start -->
-## Current state — Iteration 015
+## Current state — Iteration 016.1
+
+Client date 2026-11-19. PR #5 merged Iteration 015 into main at
+`e34e7296135b47ecd3af479fe0593f4118bc734b`. The review branch is
+`iteration-016-v34-physical-validation`.
+
+| Item | Evidence |
+|---|---|
+| Firmware / protocol | `0.2.0-alpha.1` / `1` |
+| Build environment | `heltec_wifi_lora_32_V3`, opt-in `heltec_wifi_lora_32_V3_oled` |
+| Board | Two Heltec WiFi LoRa 32 V3.4 boards, ESP32-S3/SX1262, stock monopoles, owner-confirmed 902–928 MHz procurement. V3.2 is the electrical reference. |
+| Native tests | 316/316 PASS, including nine new OLED/telemetry cases |
+| Capture / model tests | 13/13 and 16/16 PASS, host only |
+| Firmware builds | Both PASS. OLED off RAM 32,184 / flash 342,852 bytes. OLED on 33,960 / 377,488 bytes. |
+| Documentation | 7/7 PASS and direct checker PASS |
+| Physical acceptance | IN PROGRESS; NOT RUN |
+
+The owner confirms V3.2 wiring and reports SMT/crystal improvements in V3.4.
+Physical SKU, antenna markings and characteristics, USB, flash security and
+layout, peripheral behavior and timing remain unverified. The local serial list shows
+six Bluetooth virtual ports and no CP2102. Both rebuilt images match Iteration 016
+byte-for-byte. The fixed 915.0 MHz
+profile and opt-in OLED are preserved. M3–M8 production work remains unstarted.
+The [bench runbook](BENCH_RUNBOOK.md) starts with one-board CP2102 enumeration,
+then same-board backups, OLED checks and separate 15,000 ms provisioning.
+See [HARDWARE.md](HARDWARE.md) for the evidence split and [BUILD_MEMORY.md](BUILD_MEMORY.md)
+for software checks. No physical acceptance result has been recorded.
+<!-- current-state:end -->
+
+## Iteration 015 historical snapshot
+
+### Iteration 015 review branch before merge
 
 Client date: 2026-11-18. Canonical main is the merged Iteration 014 baseline
 `0d0e71c368e88093b081bf9182e1f1babd189a9a` ([PR #4](https://github.com/gedxxe/Adaptive-LoRa/pull/4)).
@@ -56,7 +87,7 @@ same-board private ROM backups/security/layout, then execute the
 [BENCH_RUNBOOK.md](BENCH_RUNBOOK.md). Capture the controlled normal/negative/
 recovery cases and measure switching, processing and drift before an M3
 implementation review. ERR-021 recovery acceptance remains a separate hold.
-<!-- current-state:end -->
+
 
 ## Historical snapshots through Iteration 014
 

@@ -2,7 +2,8 @@
 
 ## 当前Heltec目标
 
-唯一活动硬件为Heltec WiFi LoRa 32 V3.2 HF，ESP32-S3FN8/SX1262。
+两块 Heltec WiFi LoRa 32 V3.4 配 ESP32-S3/SX1262。用户确认沿用 V3.2 布线，
+编译使用 Arduino V3 variant，电气参考为 V3.2 原理图。
 Esp32Firmware先拥有PreferencesConfigStorage和Sx1262Hardware，再构造引用它们的FirmwareRuntime。
 一份镜像读取有效NVS角色后只运行GatewayApp或ClientApp；配置无效保持provisioning且禁应用TX。
 main.cpp仍为15行构造和setup/loop委托。
@@ -10,7 +11,7 @@ main.cpp仍为15行构造和setup/loop委托。
 RadioDriver保留全部状态/超时/错误策略，Sx1262Hardware独占RadioLib/SPI/GPIO。
 板GPIO8–14、TCXO1.8 V、DIO2开关及DC-DC与CP2102/UART0设置见迁移审查。
 FrameCodec、DeviceConfig、SequenceTracker及NVSschema1/协议1保持。
-不新增OLED、电池、Wi-Fi、TDMA、bitmap、重传调度或ADR。
+OLED 使用可选构建。电池、Wi-Fi、TDMA、bitmap、重传调度和 ADR 仍留待后续。
 
 Native执行实际生产模块；新增adapter用有界调用记录检查配置和转发，不模拟射频。
 SDK调用仍可能同步等待，ERR-021未因迁移修复。完整平台服务和通用payload/event接口仍缺失。
@@ -186,3 +187,11 @@ app 为协作式状态机，但 SDK/RadioLib 同步等待仍存在，不声明�
 config show 是暂存配置，status 才是加载配置。生产代码、schema 1、v1 字节未改。
 AGENTS 为当前合同，CODEX_START_PROMPT 明确归档；主机 TDMA 模型不进入固件。
 当前平台接口和通用 payload/event API 缺口仍保留，不声称已全部实现。
+
+
+## Iteration 016 显示与遥测
+
+当前以 Heltec V3 参考构建支持 V3.4 候选双板，实物布线另行核实。OLED 候选环境由
+Esp32Firmware 持有显示，Runtime 在主要工作之后服务，TX、Client 等 ACK 和 reboot
+期间暂停。Gateway/Client 只提供只读计数与最近有效接收。GPIO、电源/复位和 I²C
+独立于 radio、协议和 NVS。OLED 失败单独记录一次并停止显示更新。

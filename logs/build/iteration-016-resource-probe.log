@@ -1,0 +1,15 @@
+Command: xtensa-esp32s3-elf-nm -C -S .pio\build\heltec_wifi_lora_32_V3\firmware.elf
+Exit: 0
+Selected symbols:
+(no OLED service or Wire symbols)
+Command: xtensa-esp32s3-elf-nm -C -S .pio\build\heltec_wifi_lora_32_V3_oled\firmware.elf
+Exit: 0
+Selected symbols:
+420093a0 00000135 T adaptive_lora::OledStatusDisplay::service(unsigned long long)
+42006bdc 000000cc T TwoWire::endTransmission(bool)
+3fc97390 00000064 B Wire
+Command: xtensa-esp32s3-elf-gdb -batch .pio\build\heltec_wifi_lora_32_V3_oled\firmware.elf -ex p sizeof(adaptive_lora::OledStatusDisplay) -ex p sizeof(adaptive_lora::FirmwareRuntime) -ex p sizeof(adaptive_lora::Esp32Firmware)
+Exit: 0
+$1 = 384
+$2 = 9088
+$3 = 10040

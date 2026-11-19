@@ -18,7 +18,7 @@ A result at one level does not prove the next level.
 
 Record:
 
-- exact Heltec WiFi LoRa 32 V3.2 HF board revision and visible markings;
+- exact Heltec WiFi LoRa 32 revision and visible markings;
 - exact integrated SX1262 board marking and pin orientation;
 - GPIO-to-module continuity;
 - radio supply voltage at idle and during TX;
@@ -385,3 +385,25 @@ future beacon size limits and timer/deduplication contracts are in
 and all physical timing, heap/stack, NVS durability and RF evidence remain
 NOT MEASURED. Perform the bench runbook and planned ERR-021 injection only
 when actual hardware/instruments and safe reviewed fixtures are available.
+
+
+## Iteration 016 verification
+
+Use the default S3 build and the opt-in `heltec_wifi_lora_32_V3_oled` build.
+The latter uses the installed Wire backend. Native exercises actual runtime,
+apps, formatter and display state machine with scripted GPIO/I²C/clock and
+radio responses. Check initialization order, update chunk size, unchanged
+pages, timing counters, missing metrics, counter separation, timeout ordering,
+WAIT/ONLINE/STALE and failure isolation. The runtime comparison must produce
+the same HELLO bytes and accept the echoed ACK with OLED off, on and faulted.
+See BUILD_MEMORY for executed results.
+
+On hardware, follow the bench runbook. First verify board identity, external
+supply, RF termination, ROM backups, OLED wiring/polarity and radio startup.
+Compare authorized OLED-on and OLED-off runs under matched conditions. Record
+timing maxima via serial status, confirm OLED pages against individual serial
+events, and check PDR, ACK success, transaction duration, resets and log drops.
+A final selected condition requires at least 200 complete HELLO transmissions.
+Keep original serial bytes, capture metadata, hash, interval and reset bounds.
+Collect directional RSSI/SNR from the corresponding accepted HELLO/ACK records.
+No physical OLED, NVS or RF acceptance result is available yet.

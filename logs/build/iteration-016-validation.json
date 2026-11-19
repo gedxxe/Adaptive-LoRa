@@ -1,0 +1,141 @@
+{
+  "baseline": "e34e7296135b47ecd3af479fe0593f4118bc734b",
+  "client_date": "2026-11-19",
+  "firmware": "0.2.0-alpha.1",
+  "protocol": 1,
+  "nvs_schema": 1,
+  "radiolib": "7.8.1",
+  "firmware_builds": {
+    "heltec_wifi_lora_32_V3": {
+      "sha256": "51756890f9b54ff5ca5c993954f317b8a21d201a9edac53deb5f58e5259612c8",
+      "ram_bytes": 32184,
+      "flash_bytes": 342852,
+      "log": "logs/build/iteration-016-final-esp32.log",
+      "display_symbols": []
+    },
+    "heltec_wifi_lora_32_V3_oled": {
+      "sha256": "854640e2532d34dec4d49fb7f36733175f5bc73d66a2f56c45bfc913504c0a59",
+      "ram_bytes": 33960,
+      "flash_bytes": 377488,
+      "log": "logs/build/iteration-016-final-oled.log",
+      "display_symbols": [
+        "420093a0 00000135 T adaptive_lora::OledStatusDisplay::service(unsigned long long)",
+        "42006bdc 000000cc T TwoWire::endTransmission(bool)",
+        "3fc97390 00000064 B Wire"
+      ]
+    }
+  },
+  "native": {
+    "previous_retained": 307,
+    "total": 316,
+    "skipped": 0,
+    "added": [
+      "test_gateway_counts_hello_and_ack_events_separately",
+      "test_gateway_failed_ack_start_is_not_a_start_or_completion",
+      "test_client_only_updates_metrics_on_accepted_ack_and_keeps_accounting",
+      "test_freshness_exact_boundary_across_32bit_wrap",
+      "test_format_provisioning_unknown_and_maximum_counters",
+      "test_oled_power_reset_then_bus_and_bounded_changed_pages",
+      "test_display_mid_frame_error_stops_future_bus_work",
+      "test_runtime_oled_off_on_and_failure_preserve_hello_ack",
+      "test_runtime_provisioning_initializes_oled_without_radio_calls"
+    ]
+  },
+  "capture": 13,
+  "tdma_model": 16,
+  "documentation": 7,
+  "physical": "NOT RUN",
+  "serial_enumeration": "Six Bluetooth serial ports, no Heltec USB serial device observed. No port opened.",
+  "command_results": {
+    "logs/build/iteration-016-final-esp32-result.json": {
+      "command": "pio run -e heltec_wifi_lora_32_V3",
+      "exit_code": 0,
+      "runner_seconds": 179.172,
+      "log": "logs/build/iteration-016-final-esp32.log",
+      "publication_policy": "Full stdout/stderr with local workspace/PlatformIO/user paths replaced by disclosed placeholders and EOL/trailing-display normalization. Raw retained privately in ignored audit cache.",
+      "client_date": "2026-11-19",
+      "physical_validation": "NOT RUN"
+    },
+    "logs/build/iteration-016-final-oled-result.json": {
+      "command": "pio run -e heltec_wifi_lora_32_V3_oled",
+      "exit_code": 0,
+      "runner_seconds": 187.703,
+      "log": "logs/build/iteration-016-final-oled.log",
+      "publication_policy": "Full stdout/stderr with local workspace/PlatformIO/user paths replaced by disclosed placeholders and EOL/trailing-display normalization. Raw retained privately in ignored audit cache.",
+      "client_date": "2026-11-19",
+      "physical_validation": "NOT RUN"
+    },
+    "logs/build/iteration-016-first-esp32-result.json": {
+      "command": "pio run -e heltec_wifi_lora_32_V3",
+      "exit_code": 0,
+      "runner_seconds": 195.125,
+      "log": "logs/build/iteration-016-first-esp32.log",
+      "publication_policy": "Full stdout/stderr with local workspace/PlatformIO/user paths replaced by disclosed placeholders and EOL/trailing-display normalization. Raw retained privately in ignored audit cache.",
+      "client_date": "2026-11-19",
+      "physical_validation": "NOT RUN"
+    },
+    "logs/build/iteration-016-first-oled-result.json": {
+      "command": "pio run -e heltec_wifi_lora_32_V3_oled",
+      "exit_code": 1,
+      "runner_seconds": 172.672,
+      "log": "logs/build/iteration-016-first-oled.log",
+      "publication_policy": "Full stdout/stderr with local workspace/PlatformIO/user paths replaced by disclosed placeholders and EOL/trailing-display normalization. Raw retained privately in ignored audit cache.",
+      "client_date": "2026-11-19",
+      "physical_validation": "NOT RUN"
+    },
+    "logs/test/iteration-016-corrected-native-result.json": {
+      "command": "pio test -e native",
+      "exit_code": 0,
+      "runner_seconds": 81.188,
+      "log": "logs/test/iteration-016-corrected-native.log",
+      "publication_policy": "Full stdout/stderr with local workspace/PlatformIO/user paths replaced by disclosed placeholders and EOL/trailing-display normalization. Raw retained privately in ignored audit cache.",
+      "client_date": "2026-11-19",
+      "physical_validation": "NOT RUN"
+    },
+    "logs/test/iteration-016-final-consistency-result.json": {
+      "command": "<PIO_PYTHON> tools/check_consistency.py",
+      "exit_code": 0,
+      "runner_seconds": 0.157,
+      "log": "logs/test/iteration-016-final-consistency.log",
+      "publication_policy": "Full stdout/stderr with local workspace/PlatformIO/user paths replaced by disclosed placeholders and EOL/trailing-display normalization. Raw retained privately in ignored audit cache.",
+      "client_date": "2026-11-19",
+      "physical_validation": "NOT RUN"
+    },
+    "logs/test/iteration-016-final-consistency-tests-result.json": {
+      "command": "<PIO_PYTHON> -m unittest discover -s tools -p test_check_consistency.py -v",
+      "exit_code": 0,
+      "runner_seconds": 0.828,
+      "log": "logs/test/iteration-016-final-consistency-tests.log",
+      "publication_policy": "Full stdout/stderr with local workspace/PlatformIO/user paths replaced by disclosed placeholders and EOL/trailing-display normalization. Raw retained privately in ignored audit cache.",
+      "client_date": "2026-11-19",
+      "physical_validation": "NOT RUN"
+    },
+    "logs/test/iteration-016-first-capture-result.json": {
+      "command": "<PIO_PYTHON> -m unittest discover -s tools -p test_capture_bench.py -v",
+      "exit_code": 0,
+      "runner_seconds": 1.563,
+      "log": "logs/test/iteration-016-first-capture.log",
+      "publication_policy": "Full stdout/stderr with local workspace/PlatformIO/user paths replaced by disclosed placeholders and EOL/trailing-display normalization. Raw retained privately in ignored audit cache.",
+      "client_date": "2026-11-19",
+      "physical_validation": "NOT RUN"
+    },
+    "logs/test/iteration-016-first-model-result.json": {
+      "command": "<PIO_PYTHON> -m unittest discover -s tools -p test_tdma_feasibility.py -v",
+      "exit_code": 0,
+      "runner_seconds": 0.953,
+      "log": "logs/test/iteration-016-first-model.log",
+      "publication_policy": "Full stdout/stderr with local workspace/PlatformIO/user paths replaced by disclosed placeholders and EOL/trailing-display normalization. Raw retained privately in ignored audit cache.",
+      "client_date": "2026-11-19",
+      "physical_validation": "NOT RUN"
+    },
+    "logs/test/iteration-016-first-native-result.json": {
+      "command": "pio test -e native",
+      "exit_code": 1,
+      "runner_seconds": 166.093,
+      "log": "logs/test/iteration-016-first-native.log",
+      "publication_policy": "Full stdout/stderr with local workspace/PlatformIO/user paths replaced by disclosed placeholders and EOL/trailing-display normalization. Raw retained privately in ignored audit cache.",
+      "client_date": "2026-11-19",
+      "physical_validation": "NOT RUN"
+    }
+  }
+}

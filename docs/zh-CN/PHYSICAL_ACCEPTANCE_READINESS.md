@@ -1,3 +1,13 @@
-# M0–M2实物准备
+# M0–M2 实物准备
 
-当前流程为BENCH_RUNBOOK.md，目标Heltec WiFi LoRa 32 V3.2 HF。源码迁移和host验证已完成，没有烧录或实物测试。到货/PCB/RF确认后先接RF终端，上电/首次app boot前完成同板ROM私有备份、安全/分区检查。单板仍有集成radio，不能使用以前拆除外置radio的单MCU流程。先测串口/供电/TCXO/BUSY/DIO1/reset/NVS，再做双板闭合cohort HELLO/ACK；ERR-021/023和真实重复/错身份/corrupt-NVS/恢复fixture继续开放。M0–M2实物IN PROGRESS，M3–M8未开始。采购/GPIO/API/风险见迁移审查，采集/CSV规则见LOGGING_GUIDE。
+用户确认两块 Heltec WiFi LoRa 32 V3.4，配 ESP32-S3、SX1262 和原装单极天线。
+采购选项为 902–928 MHz，V3.4 沿用 V3.2 的线路和引脚，原理图仍以 V3.2 为参考。
+实物 SKU、天线标记/特性、USB、flash、供电、OLED 和射频时序需台架核实。
+编译与 native 证据单独记录。
+
+逐块检查射频接头，上电前接合适负载，用直连数据线识别 CP2102 COM 口。先在 ROM 模式
+私有备份，并核对 flash 布局和安全状态，再上传。按 [台架流程](BENCH_RUNBOOK.md) 核对
+可选 OLED、两种角色分别设 15000 ms，获准后做双板联通与捕获，再逐步测距。
+
+ERR-021 BUSY 恢复与 ERR-023 SDK 提前格式化 NVS 仍开放。M0–M2 实物验收进行中，
+M3 需要 M2 证据和实测时序。

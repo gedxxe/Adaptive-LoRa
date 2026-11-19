@@ -2,6 +2,7 @@
 #include <Arduino.h>
 #include <esp_system.h>
 #include <esp_random.h>
+#include <esp_timer.h>
 #include <cstdio>
 #include <cinttypes>
 
@@ -33,12 +34,24 @@ void FirmwareRuntime::status() {
         radio_.initialized() ? radio_.chip() : "N/A", kFirmwareVersion, kProtocolVersion, kBuildId,
         static_cast<int>(esp_reset_reason()), log_.dropped());
     log_.text(line);
+#if defined(ADAPTIVE_LORA_OLED)
+    if (display_) {
+        std::snprintf(line, sizeof(line),
+            "event=OLED_STATUS,result=%s,worst_i2c_us=%" PRIu32 ",worst_refresh_io_us=%" PRIu32,
+            display_->error() ? display_->error() : (display_->ready() ? "ready" : "starting"),
+            display_->worstIoUs(), display_->worstRefreshUs());
+        log_.text(line);
+    }
+#endif
 }
 void FirmwareRuntime::setup() {
     Serial.begin(kSerialBaud);
     loadError_ = store_.load(loaded_);
     log_.begin(loaded_);
     console_.begin(loaded_);
+#if defined(ADAPTIVE_LORA_OLED)
+    if (display_) display_->start(static_cast<uint64_t>(esp_timer_get_time()));
+#endif
     log_.event("BOOT", kFirmwareVersion);
     log_.event(loadError_ ? "CONFIG_INVALID" : "CONFIG_VALID", loadError_ ? loadError_ : "loaded");
     if (loadError_) {
@@ -105,6 +118,37 @@ void FirmwareRuntime::loop() {
         rebootAt_ = micros() + 100000;
     }
     log_.drain();
-    if (rebootStopped_ && deadlineReached(micros(), rebootAt_)) ESP.restart();
+    if (rebootStopped_ && deadlineReached(micros(), rebootAt_)) {
+        ESP.restart();
+        return;
+    }
+#if defined(ADAPTIVE_LORA_OLED)
+    if (display_ && !rebootPending_ && !radio_.transmitting() && !(client_ && client_->awaitingAck()))
+        serviceDisplay();
+#endif
 }
+#if defined(ADAPTIVE_LORA_OLED)
+void FirmwareRuntime::serviceDisplay() {
+    const auto now = static_cast<uint64_t>(esp_timer_get_time());
+    if (display_->needsSnapshot(now)) {
+        DisplaySnapshot snapshot;
+        snapshot.config = loaded_;
+        snapshot.configError = loadError_;
+        snapshot.radioReady = radio_.healthy();
+        snapshot.radioState = radio_.stateName();
+        snapshot.logDropped = log_.dropped();
+        if (gateway_) snapshot.gateway = gateway_->telemetry();
+        if (client_) snapshot.client = client_->telemetry();
+        display_->render(snapshot, now);
+    }
+    display_->service(now);
+    if (display_->error() && !displayErrorLogged_) {
+        displayErrorLogged_ = true;
+        log_.event(displayReadyLogged_ ? "OLED_ERROR" : "OLED_INIT", display_->error());
+    } else if (display_->ready() && !displayReadyLogged_) {
+        displayReadyLogged_ = true;
+        log_.event("OLED_INIT", "ready");
+    }
+}
+#endif
 }  // namespace adaptive_lora

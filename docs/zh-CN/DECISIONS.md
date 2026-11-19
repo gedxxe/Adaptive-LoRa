@@ -100,3 +100,16 @@ CSV使用关闭HELLO cohort，区分A/T/R/ACKstart/done/C；A含启动失败，P
 消息、scheduler、bitmap/retry/ADR，不改版本/生产策略。表征八 session 缓存，不扩容；
 按 admission/schedule 维护状态留给 M4。ERR-021 无已证实缓解而继续开放，历史记录保留。
 仅发布指定分支/PR 供审查，不自动合并规范 main。
+
+
+## ADR-020 — 可选板载 OLED 诊断
+
+2026-11-19。保留原 V3 环境作为关闭 OLED 的参考，候选环境沿用 board、版本、RadioLib、
+PHY 和 NVS 布局。使用框架自带 Wire 和项目内 SSD1306 命令/字形，无需引入 Heltec 库或
+全像素 framebuffer。控制器/地址和 variant alias 有 V3 参考，V3.4 电路及 RF SKU 待测。
+
+Esp32Firmware 持有显示。Runtime 启动 Vext/复位，在 radio、应用和串口服务后传入只读
+快照，每次处理一段变化页，TX、Client 等 ACK 及重启期间暂停。I²C 失败停止更新并记录
+一次。Wire 使用 SDK 锁并分配缓冲区，请求时限与实际延时分别记录。遥测分别统计 ACK
+开始/完成，接收指标保留有效位，计数按 2^32 回绕、重启归零，单调时钟判断新鲜度。
+保留协议字节和 schema 1，审批前不更改研究频点。M2 仍需实物证据。

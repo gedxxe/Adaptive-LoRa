@@ -5,6 +5,16 @@ changes. It is not a substitute for the append-only build memory.
 
 ## Unreleased
 
+### V3.4 bench preparation and OLED diagnostics — 2026-11-19
+
+- Document the reported V3.4 pair and supplied monopoles, with the V3.2
+  schematic and V3 Arduino variant identified as reference evidence.
+- Add opt-in SSD1306 provisioning, link and counter pages with bounded
+  cooperative transfers. The default build omits OLED I/O.
+- Expose Gateway/Client telemetry while preserving HELLO/ACK, NVS schema 1
+  and the fixed PHY. Document the authorized 3 m bench procedure and
+  OLED-on/OLED-off comparison. Physical acceptance remains open.
+
 ### Pre-hardware stabilization and host-only research — 2026-11-18
 
 - Synchronize the current agent contract and bilingual status; archive the old

@@ -114,3 +114,22 @@ RadioLib 构造分配 ArduinoHal，默认 SPI stream 每次仍分配两个 scrat
 完整 OOM 恢复；STATIC_ONLY 会增加 stack，未启用。UART capacity/write 均涉及 SDK
 锁，不证明非阻塞。ERR-008/009/010、Runtime 前 NVS 初始化/格式化 ERR-023 仍开放。
 heap/stack 峰值、碎片、真实时延和熵均未测量。完整边界矩阵见英文对应节。
+
+
+## Iteration 016.1 — OLED 与 radio 时序复核
+
+OLED 最快每秒生成一次快照，每轮至多一次写入，跳过未变的页。绘制负载最多 31 字节，
+连地址在 400 kHz、每字节 9 clocks 下约 0.72 ms，未计起停、时钟拉伸及软件耗时。
+Wire 3.3.11 使用链接的 esp32-hal-i2c-ng.c，首次地址探测和后续发送分别收到 3 ms。
+Wire 和总线获取锁可能等待，3 ms 并非循环硬上限。返回的显示错误会锁定显示故障并
+记录一次，无法抢占未返回的调用。
+
+Runtime 先 poll radio，TX、Client 等 ACK 及 reboot 时不运行显示。Gateway RX 期间
+DIO1 仍可能在写屏时发生，下一轮才处理，可能推迟读包与 ACK。空闲 Client 的下次 HELLO
+也可略晚。相对 1 s ACK 窗口该时长较小，但对 turnaround 测量有意义。用 DIO1、SCL 和
+radio NSS 轨迹与 OLED 开关对照实测，不据此声称已发生丢包或超时。
+
+Gateway 从去重结果计数，ACK 开始与 TX_DONE 分开。Client 仅接受匹配 ACK 才更新接收
+数据，缺失显示 N/A。两端均设 15000 ms 时 31 s 变 STALE，ONLINE 表示近期接收。
+计数按 2^32 回绕，重启归零。未复现软件缺陷。原 316 项测试及两种镜像通过，镜像与
+Iteration 016 一致。ERR-008/021 仍开放，实物时序待测。

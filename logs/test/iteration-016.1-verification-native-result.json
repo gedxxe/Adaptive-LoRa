@@ -1,0 +1,9 @@
+{
+  "command": "pio test -e native",
+  "exit_code": 0,
+  "runner_seconds": 69.266,
+  "log": "logs/test/iteration-016.1-verification-native.log",
+  "publication_policy": "Full stdout/stderr with local workspace/PlatformIO/user paths replaced by disclosed placeholders and EOL/trailing-display normalization. Raw retained privately in ignored audit cache.",
+  "client_date": "2026-11-19",
+  "physical_validation": "NOT RUN"
+}

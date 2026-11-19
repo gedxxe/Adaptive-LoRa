@@ -1,0 +1,154 @@
+{
+  "base": "28d53a69665e87f9229191f6ed652e812c2265d6",
+  "branch": "iteration-016-v34-physical-validation",
+  "pr": 6,
+  "main": "e34e7296135b47ecd3af479fe0593f4118bc734b",
+  "client_date": "2026-11-19",
+  "images": {
+    "heltec_wifi_lora_32_V3": {
+      "sha256": "51756890f9b54ff5ca5c993954f317b8a21d201a9edac53deb5f58e5259612c8",
+      "same_as_iteration_016": true,
+      "ram_bytes": 32184,
+      "flash_bytes": 342852
+    },
+    "heltec_wifi_lora_32_V3_oled": {
+      "sha256": "854640e2532d34dec4d49fb7f36733175f5bc73d66a2f56c45bfc913504c0a59",
+      "same_as_iteration_016": true,
+      "ram_bytes": 33960,
+      "flash_bytes": 377488
+    }
+  },
+  "native": {
+    "pass": 316,
+    "skip": 0,
+    "same_case_names_and_order": true
+  },
+  "capture": 13,
+  "airtime_model": 16,
+  "documentation": 7,
+  "ports": {
+    "Bluetooth": 6,
+    "CP2102": 0,
+    "opened_ports": 0
+  },
+  "physical_validation": "NOT RUN",
+  "results": {
+    "logs/build/iteration-016.1-verification-esp32-result.json": {
+      "command": "pio run -e heltec_wifi_lora_32_V3",
+      "exit_code": 0,
+      "runner_seconds": 15.735,
+      "log": "logs/build/iteration-016.1-verification-esp32.log",
+      "publication_policy": "Full stdout/stderr with local workspace/PlatformIO/user paths replaced by disclosed placeholders and EOL/trailing-display normalization. Raw retained privately in ignored audit cache.",
+      "client_date": "2026-11-19",
+      "physical_validation": "NOT RUN"
+    },
+    "logs/build/iteration-016.1-verification-oled-result.json": {
+      "command": "pio run -e heltec_wifi_lora_32_V3_oled",
+      "exit_code": 0,
+      "runner_seconds": 15.921,
+      "log": "logs/build/iteration-016.1-verification-oled.log",
+      "publication_policy": "Full stdout/stderr with local workspace/PlatformIO/user paths replaced by disclosed placeholders and EOL/trailing-display normalization. Raw retained privately in ignored audit cache.",
+      "client_date": "2026-11-19",
+      "physical_validation": "NOT RUN"
+    },
+    "logs/test/iteration-016.1-verification-capture-result.json": {
+      "command": "<PIO_PYTHON> -m unittest discover -s tools -p test_capture_bench.py -v",
+      "exit_code": 0,
+      "runner_seconds": 0.797,
+      "log": "logs/test/iteration-016.1-verification-capture.log",
+      "publication_policy": "Full stdout/stderr with local workspace/PlatformIO/user paths replaced by disclosed placeholders and EOL/trailing-display normalization. Raw retained privately in ignored audit cache.",
+      "client_date": "2026-11-19",
+      "physical_validation": "NOT RUN"
+    },
+    "logs/test/iteration-016.1-verification-consistency-result.json": {
+      "command": "<PIO_PYTHON> tools/check_consistency.py",
+      "exit_code": 0,
+      "runner_seconds": 0.141,
+      "log": "logs/test/iteration-016.1-verification-consistency.log",
+      "publication_policy": "Full stdout/stderr with local workspace/PlatformIO/user paths replaced by disclosed placeholders and EOL/trailing-display normalization. Raw retained privately in ignored audit cache.",
+      "client_date": "2026-11-19",
+      "physical_validation": "NOT RUN"
+    },
+    "logs/test/iteration-016.1-verification-consistency-tests-result.json": {
+      "command": "<PIO_PYTHON> -m unittest discover -s tools -p test_check_consistency.py -v",
+      "exit_code": 0,
+      "runner_seconds": 0.781,
+      "log": "logs/test/iteration-016.1-verification-consistency-tests.log",
+      "publication_policy": "Full stdout/stderr with local workspace/PlatformIO/user paths replaced by disclosed placeholders and EOL/trailing-display normalization. Raw retained privately in ignored audit cache.",
+      "client_date": "2026-11-19",
+      "physical_validation": "NOT RUN"
+    },
+    "logs/test/iteration-016.1-verification-model-result.json": {
+      "command": "<PIO_PYTHON> -m unittest discover -s tools -p test_tdma_feasibility.py -v",
+      "exit_code": 0,
+      "runner_seconds": 0.391,
+      "log": "logs/test/iteration-016.1-verification-model.log",
+      "publication_policy": "Full stdout/stderr with local workspace/PlatformIO/user paths replaced by disclosed placeholders and EOL/trailing-display normalization. Raw retained privately in ignored audit cache.",
+      "client_date": "2026-11-19",
+      "physical_validation": "NOT RUN"
+    },
+    "logs/test/iteration-016.1-verification-native-result.json": {
+      "command": "pio test -e native",
+      "exit_code": 0,
+      "runner_seconds": 69.266,
+      "log": "logs/test/iteration-016.1-verification-native.log",
+      "publication_policy": "Full stdout/stderr with local workspace/PlatformIO/user paths replaced by disclosed placeholders and EOL/trailing-display normalization. Raw retained privately in ignored audit cache.",
+      "client_date": "2026-11-19",
+      "physical_validation": "NOT RUN"
+    },
+    "logs/test/iteration-016.1-verification-ports-result.json": {
+      "command": "pio device list",
+      "exit_code": 0,
+      "runner_seconds": 0.515,
+      "log": "logs/test/iteration-016.1-verification-ports.log",
+      "publication_policy": "Full stdout/stderr with local workspace/PlatformIO/user paths replaced by disclosed placeholders and EOL/trailing-display normalization. Raw retained privately in ignored audit cache. Bluetooth hardware instance details redacted; raw retained privately.",
+      "client_date": "2026-11-19",
+      "physical_validation": "NOT RUN"
+    }
+  },
+  "changed_paths": [
+    "AGENTS.md",
+    "README.md",
+    "README.zh-CN.md",
+    "docs/en/ARCHITECTURE.md",
+    "docs/en/BENCH_RUNBOOK.md",
+    "docs/en/BUILD_MEMORY.md",
+    "docs/en/DEPENDENCY_BUDGET_AUDIT.md",
+    "docs/en/ERROR_LOG.md",
+    "docs/en/HARDWARE.md",
+    "docs/en/PHYSICAL_ACCEPTANCE_READINESS.md",
+    "docs/en/PROGRESS.md",
+    "docs/zh-CN/ARCHITECTURE.md",
+    "docs/zh-CN/BENCH_RUNBOOK.md",
+    "docs/zh-CN/DEPENDENCY_BUDGET_AUDIT.md",
+    "docs/zh-CN/HARDWARE.md",
+    "docs/zh-CN/PHYSICAL_ACCEPTANCE_READINESS.md",
+    "docs/zh-CN/PROGRESS.md",
+    "include/board_pins.h",
+    "logs/build/iteration-016.1-validation.json",
+    "logs/build/iteration-016.1-verification-esp32-result.json",
+    "logs/build/iteration-016.1-verification-esp32.log",
+    "logs/build/iteration-016.1-verification-oled-result.json",
+    "logs/build/iteration-016.1-verification-oled.log",
+    "logs/test/RUN_RECORD_TEMPLATE.md",
+    "logs/test/iteration-016.1-verification-capture-result.json",
+    "logs/test/iteration-016.1-verification-capture.log",
+    "logs/test/iteration-016.1-verification-consistency-result.json",
+    "logs/test/iteration-016.1-verification-consistency-tests-result.json",
+    "logs/test/iteration-016.1-verification-consistency-tests.log",
+    "logs/test/iteration-016.1-verification-consistency.log",
+    "logs/test/iteration-016.1-verification-model-result.json",
+    "logs/test/iteration-016.1-verification-model.log",
+    "logs/test/iteration-016.1-verification-native-result.json",
+    "logs/test/iteration-016.1-verification-native.log",
+    "logs/test/iteration-016.1-verification-ports-result.json",
+    "logs/test/iteration-016.1-verification-ports.log"
+  ],
+  "historical_log_paths_preserved": 365,
+  "review": {
+    "pin_header_change": "comments only",
+    "both_role_provisioning_blocks_verified": true,
+    "previous_radio_fault_procedure_preserved": true,
+    "reproduced_software_defect": false
+  }
+}

@@ -1,6 +1,8 @@
 # Adaptive-LoRa
 
-Development baseline: `main` includes the [Heltec migration PR](https://github.com/gedxxe/Adaptive-LoRa/pull/4) and remains canonical. Iteration 015 is submitted separately for review. Start future work from current `main`; preserve historical iteration branches and engineering records. See [PROGRESS.md](docs/en/PROGRESS.md) for validation evidence and publication status.
+Iteration 015 merged through [PR #5](https://github.com/gedxxe/Adaptive-LoRa/pull/5).
+The firmware baseline is main at `e34e7296135b47ecd3af479fe0593f4118bc734b`.
+Iteration 016 prepares the reported V3.4 pair for the first bench link.
 
 **Research title:** Reliability-aware TDMA Scheduling and Link Adaptation for Single-Radio LoRa Industrial Energy Monitoring Networks.
 
@@ -13,9 +15,9 @@ The research direction is reliability-aware gateway scheduling and conservative 
 | Evidence | Current baseline |
 |---|---|
 | Firmware / protocol | `0.2.0-alpha.1` / `1` |
-| ESP32 compilation | PASS |
-| Native tests | 307/307 PASS: all 302 existing cases plus five deduplication boundary cases |
-| Implemented | Explicit bounded frames, provisioned roles, HELLO/ACK identity checks, duplicate suppression, timeout/recovery and sequence/session handling |
+| ESP32 compilation | PASS with OLED off and on |
+| Native tests | 316/316 PASS, including nine OLED and telemetry cases |
+| Implemented | Fixed-PHY HELLO/ACK, NVS role provisioning, RX/TX telemetry and opt-in OLED diagnostics |
 | Capture / analytical model tests | 13/13 / 16/16 PASS, host only |
 | Documentation consistency | 7/7 tests PASS; checker exit 0 |
 | Physical NVS/reboot/SPI/IRQ/RF/antenna | NOT VERIFIED; M0–M2 acceptance IN PROGRESS |
@@ -24,10 +26,12 @@ Host integration tests use the actual client/gateway state machines with bounded
 
 ## Hardware and provisional PHY
 
-The sole active target is **Heltec WiFi LoRa 32 V3.2 HF** with ESP32-S3FN8,
-SX1262, 8 MB flash and CP2102/UART0. Procurement is specified as the HF
-902-928 MHz option; receipt and board markings have not been checked. No
-PSRAM, OLED driver or battery-monitoring code is assumed.
+The bench pair is two Heltec WiFi LoRa 32 V3.4 boards with ESP32-S3, SX1262
+and stock monopoles. The owner confirms the 902–928 MHz procurement option
+and V3.2 wiring, with V3.4 changes to SMT implementation and the crystal.
+Use the V3.2 schematic as the electrical reference. Physical SKU labels,
+antenna characteristics and peripheral behavior still need bench checks.
+See [HARDWARE.md](docs/en/HARDWARE.md).
 
 RadioLib is pinned to **7.8.1**. The adapter uses the board's GPIO8-14 radio
 interface, a 1.8 V DIO3 TCXO supply and DC-DC regulator selection. Serial
@@ -89,6 +93,7 @@ Install PlatformIO Core and a native C++17-capable host toolchain, then run from
 
 ```sh
 pio run -e heltec_wifi_lora_32_V3
+pio run -e heltec_wifi_lora_32_V3_oled
 pio test -e native
 ```
 
@@ -111,16 +116,35 @@ The checker derives current versions and the firmware environment from source fi
 it excludes archived records. The analytical scenario report contains 216 cases
 with unmeasured timing costs left explicit. Neither is a physical test.
 
+## OLED diagnostics
+
+The default environment omits OLED I/O. The opt-in environment uses the V3
+SSD1306 reference at 0x3C, GPIO17/18/21 and active-low Vext GPIO36. Verify
+those details on the V3.4 boards before using the candidate image.
+
+The OLED alternates link and counter pages. WAIT means no qualifying reception.
+ONLINE means a qualifying HELLO at the gateway or an accepted ACK at the client
+within two configured HELLO intervals plus one second. It indicates recent
+receive activity. At the bench setting of 15,000 ms on both boards, STALE
+begins at 31 seconds without a qualifying reception.
+Missing metrics show N/A. Serial `status` reports display state and maximum
+I²C and refresh bus time. Gateway ACK starts and completions are separate.
+
 ## Provisioning and future bench procedure
 
 Serial: 115200 baud. Commands: `help`, `status`, `config show`, `config set role gateway|client`, `config set network-id N`, `config set node-id N`, `config set gateway-id N`, `config save`, `reboot`. Optional `config set hello-interval-ms <1000..3600000>`; default 5000 ms after transaction completion.
 
-Initial IDs (network/node/gateway) are gateway `1/1/1` and client `1/2/1`. Set all IDs explicitly; role edits preserve IDs. `config show` is staged state, `status` is loaded state. Network IDs are 1–65535; node/gateway IDs are 1–65534. See the deferred [bench runbook](docs/en/BENCH_RUNBOOK.md) and [run-record template](logs/test/RUN_RECORD_TEMPLATE.md); no upload or RF test has been performed.
+For the smoke test, run `config set hello-interval-ms 15000` on **both** boards,
+save, reboot and confirm the loaded value with `status`. The gateway uses its
+interval for OLED freshness. Initial IDs (network/node/gateway) are gateway
+`1/1/1` and client `1/2/1`. Set all IDs explicitly; role edits preserve IDs. `config show` is staged state, `status` is loaded state. Network IDs are 1–65535; node/gateway IDs are 1–65534. Start with one-board Windows enumeration and private same-board ROM backups.
+See the [bench runbook](docs/en/BENCH_RUNBOOK.md) and [run-record template](logs/test/RUN_RECORD_TEMPLATE.md). Physical acceptance is pending. Radiated tests require an
+authorized RF setup.
 
 ## Development roadmap
 
 1. Finish software verification and resolve dependency timing/allocation assumptions within M0–M2.
-2. After procurement/assembly, verify NVS/reboot, pins/supply/IRQ and the two-device HELLO/ACK link.
+2. Verify each delivered board, then measure NVS/reboot, pins, supply, IRQ, OLED timing and the authorized two-device HELLO/ACK link.
 3. M3: one-client beacon/TDMA after measuring radio transitions and clock drift.
 4. M4–M6: bitmap/selective retry, versioned conservative ADR and synchronization recovery, with fault tests before physical acceptance.
 5. M7–M8: controlled reference-vs-Moxon evaluation and explicitly labelled logical-node simulations.
