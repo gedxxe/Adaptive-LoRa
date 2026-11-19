@@ -15,6 +15,7 @@ public:
     bool receiving() const override { return state_ == State::RX; }
     bool healthy() const override { return initialized_ && state_ != State::FAULT; }
     bool initialized() const { return initialized_; }
+    const char* stateName() const;
     const char* chip() const { return "SX1262_driver_id_not_exposed"; }
     uint32_t timeOnAir(size_t length) override { return hardware_.getTimeOnAir(length); }
 private:

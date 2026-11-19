@@ -13,6 +13,11 @@ public:
 private:
     PreferencesConfigStorage configStorage_;
     Sx1262Hardware radioHardware_;
+#if defined(ADAPTIVE_LORA_OLED)
+    OledStatusDisplay display_;
+    FirmwareRuntime runtime_{configStorage_, radioHardware_, &display_};
+#else
     FirmwareRuntime runtime_{configStorage_, radioHardware_};
+#endif
 };
 }  // namespace adaptive_lora

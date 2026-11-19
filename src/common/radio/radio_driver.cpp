@@ -1,6 +1,16 @@
 #include "radio_driver.h"
 
 namespace adaptive_lora {
+const char* RadioDriver::stateName() const {
+    switch (state_) {
+        case State::OFF: return "OFF";
+        case State::IDLE: return "IDLE";
+        case State::RX: return "RX";
+        case State::TX: return "TX";
+        case State::FAULT: return "FAULT";
+    }
+    return "UNKNOWN";
+}
 int16_t RadioDriver::begin() {
     int16_t code = hardware_.begin();
     if (code == radio_status::none) code = hardware_.explicitHeader();

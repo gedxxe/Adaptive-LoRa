@@ -9,6 +9,7 @@
 #include "client/client_app.h"
 #include "gateway/gateway_app.h"
 #include "common/radio/radio_driver.h"
+#include "common/diagnostics/oled_status_display.h"
 
 namespace adaptive_lora {
 #if __has_include(<optional>)
@@ -19,8 +20,9 @@ namespace runtime_optional = std::experimental;
 #endif
 class FirmwareRuntime {
 public:
-    FirmwareRuntime(ConfigStorage& storage, RadioHardware& hardware)
-        : store_(storage), radio_(hardware) {}
+    FirmwareRuntime(ConfigStorage& storage, RadioHardware& hardware,
+                    OledStatusDisplay* display = nullptr)
+        : store_(storage), radio_(hardware), display_(display) {}
     void setup();
     void loop();
 private:
@@ -38,5 +40,11 @@ private:
     bool rebootPending_ = false;
     bool rebootStopped_ = false;
     uint32_t rebootAt_ = 0;
+    OledStatusDisplay* display_;
+#if defined(ADAPTIVE_LORA_OLED)
+    void serviceDisplay();
+    bool displayReadyLogged_ = false;
+    bool displayErrorLogged_ = false;
+#endif
 };
 }

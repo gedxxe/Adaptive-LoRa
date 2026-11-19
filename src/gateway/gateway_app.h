@@ -1,5 +1,6 @@
 #pragma once
 #include "common/diagnostics/serial_logger.h"
+#include "common/diagnostics/display_snapshot.h"
 #include "common/protocol/sequence_tracker.h"
 
 namespace adaptive_lora {
@@ -8,6 +9,7 @@ public:
     GatewayApp(const DeviceConfig& config, RadioTransport& radio, SerialLogger& log, BootIdGenerator generate);
     void begin(uint32_t now);
     void update(uint32_t now, const RadioEvent& event, bool allowNew = true);
+    GatewayTelemetry telemetry() const { return telemetry_; }
 private:
     bool renewSession(uint32_t now);
     bool sessionFailed_ = false;
@@ -22,5 +24,7 @@ private:
     Frame ack_{};
     uint32_t recoverAt_ = 0;
     unsigned recoveryAttempts_ = 0;
+    GatewayTelemetry telemetry_;
+    bool ackInFlight_ = false;
 };
 }
