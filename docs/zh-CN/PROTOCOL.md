@@ -7,6 +7,20 @@ Bitmap、选择性重传和 ADR。
 
 本项目是自定义 LoRa P2P 协议，不是 LoRaWAN。
 
+当前 v1 编解码仅接受 HELLO 和 ACK，表中后续类型 ID 只是预留。两种角色由 NVS
+配置选择，共用同一镜像、codec、单 RadioDriver 和单 SX1262。DIO1 只置位，主循环
+处理。当前固定 915.0 MHz（暂定）、SF7/BW125、CR4/5、前导 8、显式头、CRC、
+sync 0x12、10 dBm。控制 SF9 预留。Client 处理 TX_DONE 后等 ACK 一秒，driver
+TX 时限两秒。M2 超时后开始新事务，原 HELLO 不自动重传。
+
+M3–M6 段为计划。候选 BEACON 布局、相对 slot 锚点与 lease 见
+[TDMA_FEASIBILITY](TDMA_FEASIBILITY.md)。DATA 载荷与版本兼容规则需另审。时隙需覆盖
+空口时间、准备及实测漂移 guard。固定时隙候选的起点为本地 beacon 锚点加上行偏移，
+再加时隙索引乘时隙长。设置期限前要验证时隙在帧内。丢 beacon 时停止当帧 DATA，连续丢失、lease 过期或
+Gateway session 变化使同步失效。M6 定义公共 PHY 上的 rejoin。ADR 阈值/窗口还需实测。已提交的 profile 分配只在
+约定的超帧边界改变。未来按既有调度在阶段或时隙边界调谐硬件，当前没有该路径。
+论文、设计、现有软件和后续实物证据见 [研究到代码矩阵](../research/ALGORITHM_TRACEABILITY.md)。
+
 ## 2. 帧限制
 
 - 完整应用帧最大 96 字节。

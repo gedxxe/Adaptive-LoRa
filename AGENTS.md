@@ -174,7 +174,8 @@ Integrate reviewed work through normal merge commits. Never force-push,
 rebase, squash or delete historical branches during synchronization.
 PR #5 merged Iteration 015 at `e34e7296135b47ecd3af479fe0593f4118bc734b`.
 Iteration 016 authorizes the branch `iteration-016-v34-physical-validation`
-and a PR for review. Keep main unchanged until review.
+and a PR for review. PR #6 merged the bench preparation at
+`541e2e8b985f7cd67ca4d1f1af323c46aed4333e`.
 
 Publish sanitized project files only. Exclude caches, binaries, credentials,
 local configuration, private backups and unlicensed research PDFs. Preserve

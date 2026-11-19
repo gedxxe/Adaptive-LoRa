@@ -8,6 +8,22 @@ bitmap ACK, retries, and ADR.
 
 This is a custom LoRa P2P protocol. It is not LoRaWAN.
 
+Sections 2–7 define the current M2 wire contract. Sections 8–11 describe
+later designs. IDs in the type allocation table reserve values only. The
+current encoder and decoder accept HELLO and ACK and reject every reserved
+future type. The [research traceability matrix](../research/ALGORITHM_TRACEABILITY.md)
+explains the differences between published mechanisms, project proposals,
+software checks and bench evidence.
+
+Gateway and Client share the same codec and the same firmware image. The
+saved NVS role selects the application. FirmwareRuntime polls one RadioDriver
+and then services the active role. Sx1262Hardware owns the peripheral, and
+DIO1 latches an event for the loop. Both roles start at 915.0 MHz (provisional),
+SF7/BW125, CR4/5, preamble 8, explicit header, CRC, sync 0x12 and 10 dBm.
+SF9 control remains a future allocation. The client ACK deadline is one second
+from serviced TX_DONE. The driver uses a two-second TX deadline. M2 does not
+retry the same outgoing HELLO after timeout.
+
 ## 2. Frame limits and byte order
 
 - Maximum complete application frame: 96 bytes.
@@ -108,7 +124,7 @@ M2 implements accepted ACK status 0 only, exactly nine payload bytes. Reject non
 - The deduplication key is
   `network_id + source_id + boot_id + sequence`.
 
-M2 retains eight session keys, each with a 64-sequence replay window. Seen HELLOs are re-ACKed without a second accepted delivery; older sequences in a retained session are rejected as stale. Oldest-session eviction and gateway reboot remove history. This bounded two-unit cache does not implement persistent/authenticated replay protection or later DATA delivery guarantees. Re-evaluate capacity/lifetime at M4.
+M2 retains eight session keys, each with a 64-sequence replay window. Seen HELLOs are re-ACKed without a second accepted delivery; older sequences in a retained session are rejected as stale. Round-robin replacement of an entry and gateway reboot remove history. This bounded two-unit cache does not implement persistent/authenticated replay protection or later DATA delivery guarantees. Re-evaluate capacity/lifetime at M4.
 
 ## 7. Validation rules
 
@@ -129,7 +145,7 @@ The decoder must validate, in this order or an equivalent safe order:
 Do not read a field before confirming the input contains its bytes. Do
 not copy a payload into a destination buffer before confirming capacity.
 
-## 8. M3 beacon and schedule fields
+## 8. Planned M3 beacon and schedule fields
 
 M3 introduces a common control-PHY beacon. At minimum, it must carry:
 
@@ -151,7 +167,19 @@ The gateway uses its own TX completion and local monotonic clock. Guard
 time must be based on measured radio switching and clock drift, not an
 arbitrary constant.
 
-## 9. M4 ACK_BITMAP
+The candidate BEACON payload, field widths, slot and lease constraints and
+local anchor semantics are in [TDMA_FEASIBILITY.md](TDMA_FEASIBILITY.md).
+The future DATA type is reserved. Its application payload and versioning
+rules require review before any implementation. Slot and guard durations
+must include the packet airtime, preparation, uncertainty and measured
+drift. In the fixed-slot candidate, slot start is the local beacon anchor
+plus the advertised uplink offset plus the assigned slot index times the
+slot duration. Validate the offset and slot end against the announced frame
+before arming any deadline. A missed beacon suppresses that frame’s DATA.
+Repeated misses, lease expiry or a changed gateway session invalidate synchronization.
+M6 will specify explicit rejoin on the common control PHY.
+
+## 9. Planned M4 ACK_BITMAP
 
 The ACK bitmap header identifies the superframe using `frame_id` and
 carries the active `schedule_version`.
@@ -184,7 +212,7 @@ Client states must distinguish:
 
 `MISSING` and `ACK_UNKNOWN` are not interchangeable.
 
-## 10. Selective retransmission
+## 10. Planned selective retransmission
 
 - Retry slots are deterministic and tied to the active schedule.
 - A client retries only in its assigned retry slot.
@@ -198,7 +226,7 @@ Client states must distinguish:
 - Initial maximum: two retries, configurable.
 - After retry exhaustion, record the failure and sequence identity.
 
-## 11. Conservative ADR
+## 11. Planned conservative ADR
 
 ADR is gateway-controlled and introduced only in M5.
 
@@ -213,7 +241,9 @@ or TX power in the first ADR release.
 
 The gateway evaluates rolling per-client evidence: RSSI, SNR, PDR/PER,
 ACK outcomes, and retries. Thresholds must be centralized and marked
-experimental until measured.
+experimental until measured. No production thresholds or hysteresis
+windows have been selected. A confirmed binary or interpretation change
+requires the version and coexistence review in §12.
 
 Use the versioned handshake:
 
@@ -225,7 +255,9 @@ Use the versioned handshake:
 5.  If the client does not receive a valid commit, it keeps the previous
     committed profile.
 
-Never switch PHY in the middle of a superframe.
+Commit a different profile assignment only at an agreed superframe boundary.
+Future scheduled retunes apply the already active profile at a declared
+phase or slot boundary. The current driver has no such retune path.
 
 ## 12. Protocol versioning
 

@@ -1,7 +1,29 @@
 # Development progress
 
 <!-- current-state:start -->
-## Current state — Iteration 016.1
+## Current state — Iteration 018
+
+Main includes PR #6 at `541e2e8b985f7cd67ca4d1f1af323c46aed4333e`.
+The research branch is `codex/iteration-018-research-traceability`.
+
+| Item | Current evidence |
+|---|---|
+| Firmware / protocol | `0.2.0-alpha.1` / `1` |
+| Build environment | `heltec_wifi_lora_32_V3` and opt-in `heltec_wifi_lora_32_V3_oled` |
+| Board | Heltec WiFi LoRa 32 V3.4, ESP32-S3/SX1262. V3.2 electrical reference. |
+| Software scope | M2 HELLO/ACK. Reserved-type rejection test expanded. No firmware change. |
+| Research | Four fixed papers. Fifteen figure entries, three attributed crops and six original SVG illustrations. |
+| Software verification | Both S3 builds PASS and binary-identical to 016.1. Native 316/316, capture 13/13, airtime 16/16, docs 7/7 and direct checker PASS. |
+| Physical acceptance | IN PROGRESS; NOT RUN |
+
+[Research references](../references/README.md) and the
+[traceability matrix](../research/ALGORITHM_TRACEABILITY.md) separate paper
+claims, project design, host evidence and physical measurements. No M3–M8
+production feature is active. Next physical step follows the existing
+[BENCH_RUNBOOK.md](BENCH_RUNBOOK.md).
+<!-- current-state:end -->
+
+## Historical snapshot — Iteration 016.1
 
 Client date 2026-11-19. PR #5 merged Iteration 015 into main at
 `e34e7296135b47ecd3af479fe0593f4118bc734b`. The review branch is
@@ -28,7 +50,6 @@ The [bench runbook](BENCH_RUNBOOK.md) starts with one-board CP2102 enumeration,
 then same-board backups, OLED checks and separate 15,000 ms provisioning.
 See [HARDWARE.md](HARDWARE.md) for the evidence split and [BUILD_MEMORY.md](BUILD_MEMORY.md)
 for software checks. No physical acceptance result has been recorded.
-<!-- current-state:end -->
 
 ## Iteration 015 historical snapshot
 

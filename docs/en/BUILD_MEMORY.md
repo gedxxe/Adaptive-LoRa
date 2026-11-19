@@ -1167,3 +1167,63 @@ open. M0–M2 physical acceptance is IN PROGRESS. Identify the first board in
 Windows with a suitable RF load, known data cable and manual ROM entry.
 Then preserve the same-board backup, verify layout/security and repeat for
 the other board before the OLED upload. PR #6 remains open for review.
+
+
+## ITERATION-018 — Research-to-code traceability, 2026-11-19
+
+Codex based codex/iteration-018-research-traceability on fetched origin/main
+541e2e8b985f7cd67ca4d1f1af323c46aed4333e, merge of PR #6. The prior worktree
+had no tracked changes and four untracked source PDFs. All remain intact
+and ignored narrowly under paper-references/*.pdf. No paper was previously
+tracked. The owner authorized commit and push of the research branch with
+the documentation and permitted artwork. Firmware 0.2.0-alpha.1, protocol 1,
+config schema 1, RadioLib 7.8.1.
+
+Inspected printed pages and zero-based indices of 15 figures with pdfinfo,
+pdftotext and pdftoppm from the local files. Rendered all selected pages and
+visually inspected them. Cropped original LoRaHART Figs. 1–3 from 600 DPI
+renders under CC BY 4.0. R1's BY-NC-ND, R2's reserved rights and R4's IEEE
+notice were checked. Six SVGs use independently composed explanatory boxes
+and do not include original restricted artwork or experimental data. Rendered
+all six SVGs with a local headless browser and visually checked all nine final
+assets. The figure register records captions, reproducible crop bounds,
+licenses, file identities and design/code links. No restricted PDFs, original
+paper art from R1/R2/R4, or local render sheets enter the publication tree.
+
+Reference README summarizes the four primary works. The traceability matrix
+maps their decisions to verified functions and exact tests, lists evidence by
+level, and audits shared codec, session/deduplication, radio ownership, ACK,
+IRQ and failure boundaries. Bilingual PROTOCOL clarifies implemented versus
+planned sections, slot calculations, recovery and the distinction between
+profile commits and scheduled retunes. README, AGENTS and PROGRESS refresh
+navigation and the merged baseline. One existing test in test_frame_codec
+now verifies all reserved IDs and representative unknown IDs on both encode
+and decode. No production source files, firmware constants, architecture,
+protocol version or release behavior changed. No new ADR or changelog item.
+
+| Executed command | Exit | Exact result |
+|---|---:|---|
+| `pio run -e heltec_wifi_lora_32_V3` | 0 | PASS, RAM 32,184 B, flash 342,852 B. logs/build/iteration-018-verification-esp32.log |
+| `pio run -e heltec_wifi_lora_32_V3_oled` | 0 | PASS, RAM 33,960 B, flash 377,488 B. logs/build/iteration-018-verification-oled.log |
+| `pio test -e native` | 0 | Initial 316/316 PASS. logs/test/iteration-018-verification-native.log |
+| `pio test -e native` | 0 | After codec test expansion 316/316 PASS, zero skipped, same case order. logs/test/iteration-018-final-native.log |
+| `<PIO_PYTHON> -m unittest discover -s tools -p test_capture_bench.py -v` | 0 | 13/13 PASS, fake serial. logs/test/iteration-018-verification-capture.log |
+| `<PIO_PYTHON> -m unittest discover -s tools -p test_tdma_feasibility.py -v` | 0 | 16/16 PASS, analytical. logs/test/iteration-018-verification-model.log |
+| `<PIO_PYTHON> -m unittest discover -s tools -p test_check_consistency.py -v` | 0 | 7/7 PASS. logs/test/iteration-018-final-consistency-tests.log |
+| `<PIO_PYTHON> tools/check_consistency.py` | 0 | PASS. logs/test/iteration-018-final-consistency.log |
+
+Full logs normalize path prefixes and display whitespace. Raw outputs remain
+in ignored .pio/iteration-018. Compared firmware SHA-256 values to the merged
+016.1 evidence. Both match byte-for-byte. Actual platform 55.3.311, Arduino
+3.3.11, IDF libs 5.5.5+sha.b774170ff46, Xtensa 14.2.0+20260121. Validation
+JSON records each result, asset fingerprint, published links and test names.
+Main remains a 15-line delegate. The PDF renderer printed a MiKTeX OS-support
+notice but produced complete text and image outputs. No required check failed.
+
+Roles were exercised in host tests only. No USB port, flash, reboot, NVS or
+RF operation was performed. Distances, supply, RF packet count, RSSI/SNR, PDR,
+latency, collision and antenna metrics are NOT MEASURED. ERR-008/009/010/021/023
+remain open. M0–M2 physical IN PROGRESS, M3–M8 production NOT STARTED. Next
+bench step is the existing one-board enumeration and preservation procedure.
+M3 will need measured radio service/turnaround and drift plus an explicit
+BEACON/DATA compatibility review before any production scheduler work.

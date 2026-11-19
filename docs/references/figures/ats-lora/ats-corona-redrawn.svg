@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="260" viewBox="0 0 960 260" role="img" aria-labelledby="title desc">
+<title id="title">Three ways to group a geographic field</title>
+<desc id="desc">Project illustration based on ATS-LoRa, Figs. 1–4 (§III).. Equal radial step Distance bands with equal increments.. Equal area Choose radial boundaries to equalize area.. Equal-area sectors Partition the area by angle and distance.. Comparator only. The paper uses coordinates. Indoor link quality needs its own measurements.</desc>
+<rect width="960" height="260" fill="#f7f9fc"/>
+<g font-family="Arial, Helvetica, sans-serif">
+<text x="18" y="37" fill="#182a3a" font-size="27" font-weight="700">Three ways to group a geographic field</text>
+<text x="18" y="63" fill="#42566a" font-size="15" font-weight="400">Project illustration based on ATS-LoRa, Figs. 1–4 (§III).</text>
+<rect x="16.0" y="88" width="288.0" height="115" rx="6" fill="#daeaf3" stroke="#9aafbd"/>
+<text x="29.0" y="115" fill="#182a3a" font-size="17" font-weight="700">Equal radial step</text>
+<text x="29.0" y="140" fill="#182a3a" font-size="14" font-weight="400">Distance bands with</text>
+<text x="29.0" y="161" fill="#182a3a" font-size="14" font-weight="400">equal increments.</text>
+<rect x="336.0" y="88" width="288.0" height="115" rx="6" fill="#dcedea" stroke="#9aafbd"/>
+<text x="349.0" y="115" fill="#182a3a" font-size="17" font-weight="700">Equal area</text>
+<text x="349.0" y="140" fill="#182a3a" font-size="14" font-weight="400">Choose radial boundaries</text>
+<text x="349.0" y="161" fill="#182a3a" font-size="14" font-weight="400">to equalize area.</text>
+<rect x="656.0" y="88" width="288.0" height="115" rx="6" fill="#e5e8f3" stroke="#9aafbd"/>
+<text x="669.0" y="115" fill="#182a3a" font-size="17" font-weight="700">Equal-area sectors</text>
+<text x="669.0" y="140" fill="#182a3a" font-size="14" font-weight="400">Partition the area by</text>
+<text x="669.0" y="161" fill="#182a3a" font-size="14" font-weight="400">angle and distance.</text>
+<text x="18" y="234" fill="#344e62" font-size="14" font-weight="400">Comparator only. The paper uses coordinates. Indoor link quality needs its own measurements.</text>
+</g>
+</svg>

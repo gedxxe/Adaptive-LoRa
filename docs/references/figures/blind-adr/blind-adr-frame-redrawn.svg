@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="260" viewBox="0 0 960 260" role="img" aria-labelledby="title desc">
+<title id="title">Two scheduling decisions after a beacon</title>
+<desc id="desc">Project illustration based on Blind ADR, Figs. 3–4 (§§3.1–3.2).. Synchronize Receive the periodic gateway beacon.. Choose profile The end device selects SF from the observed beacon.. Choose opportunity The device draws a slot in its selected SF lane.. Adaptive-LoRa reserves both profile and slot decisions for the gateway. Parallel SF lanes are excluded.</desc>
+<rect width="960" height="260" fill="#f7f9fc"/>
+<g font-family="Arial, Helvetica, sans-serif">
+<text x="18" y="37" fill="#182a3a" font-size="27" font-weight="700">Two scheduling decisions after a beacon</text>
+<text x="18" y="63" fill="#42566a" font-size="15" font-weight="400">Project illustration based on Blind ADR, Figs. 3–4 (§§3.1–3.2).</text>
+<rect x="16.0" y="88" width="288.0" height="115" rx="6" fill="#daeaf3" stroke="#9aafbd"/>
+<text x="29.0" y="115" fill="#182a3a" font-size="17" font-weight="700">Synchronize</text>
+<text x="29.0" y="140" fill="#182a3a" font-size="14" font-weight="400">Receive the periodic</text>
+<text x="29.0" y="161" fill="#182a3a" font-size="14" font-weight="400">gateway beacon.</text>
+<path d="M 310.0 146 h 18 m -6 -5 l 6 5 -6 5" fill="none" stroke="#3e5e75" stroke-width="2"/>
+<rect x="336.0" y="88" width="288.0" height="115" rx="6" fill="#dcedea" stroke="#9aafbd"/>
+<text x="349.0" y="115" fill="#182a3a" font-size="17" font-weight="700">Choose profile</text>
+<text x="349.0" y="140" fill="#182a3a" font-size="14" font-weight="400">The end device selects SF</text>
+<text x="349.0" y="161" fill="#182a3a" font-size="14" font-weight="400">from the observed beacon.</text>
+<path d="M 630.0 146 h 18 m -6 -5 l 6 5 -6 5" fill="none" stroke="#3e5e75" stroke-width="2"/>
+<rect x="656.0" y="88" width="288.0" height="115" rx="6" fill="#e5e8f3" stroke="#9aafbd"/>
+<text x="669.0" y="115" fill="#182a3a" font-size="17" font-weight="700">Choose opportunity</text>
+<text x="669.0" y="140" fill="#182a3a" font-size="14" font-weight="400">The device draws a slot</text>
+<text x="669.0" y="161" fill="#182a3a" font-size="14" font-weight="400">in its selected SF lane.</text>
+<text x="18" y="234" fill="#344e62" font-size="14" font-weight="400">Adaptive-LoRa reserves both profile and slot decisions for the gateway. Parallel SF lanes are excluded.</text>
+</g>
+</svg>

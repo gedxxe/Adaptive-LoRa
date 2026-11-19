@@ -1,0 +1,21 @@
+test_hand_calculated_packet_vectors (test_tdma_feasibility.AirtimeTests.test_hand_calculated_packet_vectors) ... ok
+test_header_crc_coding_and_preamble_terms (test_tdma_feasibility.AirtimeTests.test_header_crc_coding_and_preamble_terms) ... ok
+test_low_data_rate_optimization_and_override (test_tdma_feasibility.AirtimeTests.test_low_data_rate_optimization_and_override) ... ok
+test_rejects_unsupported_or_invalid_phy (test_tdma_feasibility.AirtimeTests.test_rejects_unsupported_or_invalid_phy) ... ok
+test_zero_and_phy_maximum_lengths (test_tdma_feasibility.AirtimeTests.test_zero_and_phy_maximum_lengths) ... ok
+test_airtime_floor_can_disprove_fit_with_unknown_timings (test_tdma_feasibility.ScheduleTests.test_airtime_floor_can_disprove_fit_with_unknown_timings) ... ok
+test_application_header_and_heterogeneous_payloads (test_tdma_feasibility.ScheduleTests.test_application_header_and_heterogeneous_payloads) ... ok
+test_cli_rejects_invalid_client_count_before_allocating (test_tdma_feasibility.ScheduleTests.test_cli_rejects_invalid_client_count_before_allocating) ... ok
+test_cli_writes_parseable_report (test_tdma_feasibility.ScheduleTests.test_cli_writes_parseable_report) ... ok
+test_complete_bitmap_size_and_control_phy (test_tdma_feasibility.ScheduleTests.test_complete_bitmap_size_and_control_phy) ... ok
+test_exact_superframe_boundary_and_one_microsecond_over (test_tdma_feasibility.ScheduleTests.test_exact_superframe_boundary_and_one_microsecond_over) ... ok
+test_explicit_hypothetical_costs_are_all_charged (test_tdma_feasibility.ScheduleTests.test_explicit_hypothetical_costs_are_all_charged) ... ok
+test_rejects_invalid_schedule_inputs (test_tdma_feasibility.ScheduleTests.test_rejects_invalid_schedule_inputs) ... ok
+test_retry_budget_includes_ack_each_round (test_tdma_feasibility.ScheduleTests.test_retry_budget_includes_ack_each_round) ... ok
+test_scenario_grid_is_complete_and_deterministic (test_tdma_feasibility.ScheduleTests.test_scenario_grid_is_complete_and_deterministic) ... ok
+test_unknown_is_not_zero_or_a_fit_claim (test_tdma_feasibility.ScheduleTests.test_unknown_is_not_zero_or_a_fit_claim) ... ok
+
+----------------------------------------------------------------------
+Ran 16 tests in 0.215s
+
+OK

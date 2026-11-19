@@ -1,8 +1,9 @@
 # Adaptive-LoRa
 
-Iteration 015 已经通过 [PR #5](https://github.com/gedxxe/Adaptive-LoRa/pull/5) 合入
-main，基线为 `e34e7296135b47ecd3af479fe0593f4118bc734b`。Iteration 016 为用户报告的
-两块 V3.4 准备首次台架链路测试。
+规范 main 基线为 `541e2e8b985f7cd67ca4d1f1af323c46aed4333e`，已合入
+[PR #6](https://github.com/gedxxe/Adaptive-LoRa/pull/6) 的 V3.4 台架准备。
+[四篇论文及图表](docs/references/README.md) 和 [研究到代码矩阵](docs/research/ALGORITHM_TRACEABILITY.md)
+分别记录论文机制、项目设计、现有实现与测试。M0–M2 仍需实物验收。
 
 **研究标题：** Reliability-aware TDMA Scheduling and Link Adaptation for Single-Radio LoRa Industrial Energy Monitoring Networks.
 

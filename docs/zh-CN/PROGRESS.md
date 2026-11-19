@@ -1,7 +1,27 @@
 # 开发进度
 
 <!-- current-state:start -->
-## 当前状态 — Iteration 016.1
+## 当前状态 — Iteration 018
+
+main 已合入 PR #6，提交 `541e2e8b985f7cd67ca4d1f1af323c46aed4333e`。
+研究分支为 `codex/iteration-018-research-traceability`。
+
+| 项目 | 当前证据 |
+|---|---|
+| 固件 / 协议 | `0.2.0-alpha.1` / `1` |
+| 构建环境 | `heltec_wifi_lora_32_V3` 与可选 `heltec_wifi_lora_32_V3_oled` |
+| 硬件 | Heltec WiFi LoRa 32 V3.4，ESP32-S3/SX1262，V3.2 电气参考。 |
+| 软件范围 | M2 HELLO/ACK，扩充拒绝预留 ID 测试，生产固件不变。 |
+| 研究 | 保留四篇论文，登记十五图，三幅授权裁图、六幅原创 SVG。 |
+| 软件验证 | 两种 S3 编译通过，与 016.1 二进制一致。Native 316/316、采集 13/13、空口模型 16/16、文档 7/7 及 checker 通过。 |
+| Physical acceptance | IN PROGRESS; NOT RUN |
+
+[论文与图表](../references/README.md) 和 [追溯矩阵](../research/ALGORITHM_TRACEABILITY.md)
+区分论文结论、项目设计、软件检查与实物测量。M3–M8 生产功能未启动。实物下一步见
+[台架流程](BENCH_RUNBOOK.md)。
+<!-- current-state:end -->
+
+## Iteration 016.1 历史快照
 
 客户端日期 2026-11-19。Iteration 015 经 PR #5 合入 main，合并提交为
 `e34e7296135b47ecd3af479fe0593f4118bc734b`。当前审查分支
@@ -24,7 +44,6 @@ CP2102。重建两种镜像均与 Iteration 016 二进制一致。固定 915.0 M
 M3–M8 生产功能未开始。按 [台架流程](BENCH_RUNBOOK.md) 逐块识别 CP2102，再完成同板
 备份、OLED 检查和两板各自 15000 ms 配置。硬件证据见 [HARDWARE](HARDWARE.md)，
 软件结果见 [英文构建记录](../en/BUILD_MEMORY.md)。未取得实物验收结果。
-<!-- current-state:end -->
 
 ## Iteration 015 历史快照
 

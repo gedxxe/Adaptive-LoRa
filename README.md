@@ -1,8 +1,9 @@
 # Adaptive-LoRa
 
-Iteration 015 merged through [PR #5](https://github.com/gedxxe/Adaptive-LoRa/pull/5).
-The firmware baseline is main at `e34e7296135b47ecd3af479fe0593f4118bc734b`.
-Iteration 016 prepares the reported V3.4 pair for the first bench link.
+The firmware baseline is main at `541e2e8b985f7cd67ca4d1f1af323c46aed4333e`,
+which includes the V3.4 bench preparation from [PR #6](https://github.com/gedxxe/Adaptive-LoRa/pull/6).
+The [reference review](docs/references/README.md) and [research-to-code matrix](docs/research/ALGORITHM_TRACEABILITY.md)
+trace the four primary papers to the proposed design and current tests.
 
 **Research title:** Reliability-aware TDMA Scheduling and Link Adaptation for Single-Radio LoRa Industrial Energy Monitoring Networks.
 
