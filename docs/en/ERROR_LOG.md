@@ -465,3 +465,19 @@ logs for comparison. Physical Wire and OLED timing remain unmeasured.
 A restricted Windows CIM retry reported access denied. An approved read-only
 CIM enumeration succeeded and again found Bluetooth serial ports only. The
 runtime has not been connected to a board.
+
+
+### Iteration 016.1 bench status and ERR-008 clarification
+
+`pio device list` exited 0 and listed six Bluetooth virtual ports. It did
+not show a CP2102 port. The transcript does not diagnose a cable or driver
+fault. Hardware instance IDs are sanitized in logs/test/iteration-016.1-verification-ports.log.
+No port was opened. Windows troubleshooting is in BENCH_RUNBOOK.md.
+
+Source review found no reproduced OLED/radio defect. Wire's 3 ms timeout
+covers individual backend operations and leaves lock waits outside the
+budget. Gateway DIO1 service can be delayed during an RX-overlapping display
+write. Measure it as described in DEPENDENCY_BUDGET_AUDIT.md. ERR-008,
+ERR-021 and ERR-023 are still open. One repository inspection used the
+unsupported Windows rg filename glob README* (OS error 123). The explicit
+README paths corrected that lookup. All required builds and tests exited 0.

@@ -1,7 +1,7 @@
 #pragma once
 
-// Heltec WiFi LoRa 32 V3.2 HF schematic and Arduino V3 variant.
-// Confirm the delivered PCB revision before applying power.
+// Heltec WiFi LoRa 32 V3.4. The owner confirms the V3.2 wiring and pin map.
+// Electrical reference: Heltec V3.2 schematic and Arduino V3 variant.
 namespace adaptive_lora::pins {
 constexpr int sck = 9;
 constexpr int miso = 11;

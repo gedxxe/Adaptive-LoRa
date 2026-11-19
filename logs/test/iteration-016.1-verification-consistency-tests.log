@@ -1,0 +1,12 @@
+test_archived_body_is_preserved_but_notice_is_required (test_check_consistency.ConsistencyTests.test_archived_body_is_preserved_but_notice_is_required) ... ok
+test_bad_build_environment_is_reported (test_check_consistency.ConsistencyTests.test_bad_build_environment_is_reported) ... ok
+test_bad_current_region_markers_are_rejected (test_check_consistency.ConsistencyTests.test_bad_current_region_markers_are_rejected) ... ok
+test_broken_current_link_is_reported (test_check_consistency.ConsistencyTests.test_broken_current_link_is_reported) ... ok
+test_current_repository_passes (test_check_consistency.ConsistencyTests.test_current_repository_passes) ... ok
+test_history_cannot_hide_wrong_current_version (test_check_consistency.ConsistencyTests.test_history_cannot_hide_wrong_current_version) ... ok
+test_physical_pass_claim_is_rejected (test_check_consistency.ConsistencyTests.test_physical_pass_claim_is_rejected) ... ok
+
+----------------------------------------------------------------------
+Ran 7 tests in 0.635s
+
+OK

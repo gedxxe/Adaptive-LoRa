@@ -1,7 +1,7 @@
 # 开发进度
 
 <!-- current-state:start -->
-## 当前状态 — Iteration 016
+## 当前状态 — Iteration 016.1
 
 客户端日期 2026-11-19。Iteration 015 经 PR #5 合入 main，合并提交为
 `e34e7296135b47ecd3af479fe0593f4118bc734b`。当前审查分支
@@ -11,17 +11,19 @@
 |---|---|
 | 固件 / 协议 | `0.2.0-alpha.1` / `1` |
 | 构建环境 | `heltec_wifi_lora_32_V3`，可选 `heltec_wifi_lora_32_V3_oled` |
-| 板卡 | 用户报告两块标记 V3.4 的 Heltec WiFi LoRa 32 与原装单极天线。V3 参考为 ESP32-S3FN8/SX1262。 |
+| 板卡 | 两块 Heltec WiFi LoRa 32 V3.4，ESP32-S3/SX1262，配原装单极天线。用户确认采购 902–928 MHz，电气参考为 V3.2。 |
 | Native | 316/316 PASS，其中九项 OLED/遥测新测试 |
 | Capture / 模型 | 13/13 和 16/16 PASS，仅主机 |
 | 固件构建 | 两种均 PASS。OLED 关 RAM 32,184 / flash 342,852 bytes，开 33,960 / 377,488 bytes。 |
 | 文档 | 7/7 PASS，直接检查 PASS |
 | Physical acceptance | IN PROGRESS; NOT RUN |
 
-实板 RF SKU、线路和天线频段仍待确认。串口枚举未看到 Heltec，未打开设备端口或烧录。
-可选 OLED 使用 V3 参考引脚，协议 v1、角色配置、SX1262 所有权保持。M3–M8 生产功能未
-开始。按 [HARDWARE](HARDWARE.md) 和 [BENCH_RUNBOOK](BENCH_RUNBOOK.md) 核对板、
-RF 终端、ROM 备份及合规频点后再测试。
+用户确认 V3.4 沿用 V3.2 引脚和线路，改进涉及 SMT 和晶振。实物 SKU、天线特性、USB、
+flash 安全与布局、外设行为及实际时序仍待核实。本机只列出六个蓝牙虚拟串口，未见
+CP2102。重建两种镜像均与 Iteration 016 二进制一致。固定 915.0 MHz 和可选 OLED 延续，
+M3–M8 生产功能未开始。按 [台架流程](BENCH_RUNBOOK.md) 逐块识别 CP2102，再完成同板
+备份、OLED 检查和两板各自 15000 ms 配置。硬件证据见 [HARDWARE](HARDWARE.md)，
+软件结果见 [英文构建记录](../en/BUILD_MEMORY.md)。未取得实物验收结果。
 <!-- current-state:end -->
 
 ## Iteration 015 历史快照

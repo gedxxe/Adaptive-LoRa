@@ -200,3 +200,46 @@ Peak/minimum/largest heap, stack high-water, latency, entropy and fragmentation
 remain NOT MEASURED. SDK startup can still erase/reinitialize NVS before
 Runtime on specified initialization errors (ERR-023); private same-board
 backups and the recovery gate remain required.
+
+
+## Iteration 016.1 — OLED service and radio IRQ review
+
+The optional display schedules a new snapshot no faster than once per second
+and skips unchanged pages. Each eligible cooperative loop performs at most
+one write. A draw write has at most 31 payload bytes, including the control
+prefix and 24 pixels. The address and 31 bytes take about 0.72 ms at 400 kHz
+with nine clocks per byte, before start/stop, clock stretching and software.
+That is a calculation. The panel and bus remain unmeasured.
+
+The installed Wire 3.3.11 forwards 3 ms to Arduino's I²C backend. The OLED
+link map selects esp32-hal-i2c-ng.c. It passes that value to the first address
+probe and the subsequent transmit separately. Wire and the bus backend also
+acquire semaphores with portMAX_DELAY. The OLED is the sole application bus
+user, but the configured timeout does not cap total loop delay. A returning
+init or transfer error latches the display fault, stops further OLED service
+and logs once. That recovery cannot preempt a blocking backend call.
+
+FirmwareRuntime polls radio before display work and suppresses the display
+during TX, client ACK wait and reboot. A Gateway HELLO can complete during
+an OLED write in RX. DIO1 latch/level then allows the next poll to observe the
+IRQ, so synchronous I²C work can delay RX buffer service and ACK turnaround.
+Client ACK wait excludes new OLED writes. Idle client OLED work can delay
+starting the next HELLO. The 3 ms timeout is small relative to the 1 s ACK
+window, but milliseconds of jitter matter for turnaround measurements. The
+source review did not establish packet loss or a deadline regression.
+
+Gateway counts qualifying HELLOs at deduplication and separates successful
+ACK start from TX_DONE. Client reception metrics update only after an accepted
+ACK; the sample validity flag controls N/A. Monotonic age is local app receive
+observation time, not an IRQ timestamp. With both intervals at 15,000 ms,
+ONLINE lasts until age reaches 31 s. It describes recent valid reception.
+Totals wrap modulo 2^32 and reset with the device. Review found no reproduced
+software defect. Existing regression coverage exercised both role state
+machines, fake I²C failure isolation and freshness boundaries. Both rebuilt
+images are byte-identical to Iteration 016. No timing policy or implementation
+change is justified by this source evidence alone.
+
+Measure DIO1-to-first-radio-SPI service and ACK turnaround on the Gateway while
+SCL is active, then compare matched OLED-on/off captures and OLED_STATUS
+maxima. Investigate the I²C chunk/timeout only if traces attribute an observed
+regression to display work. ERR-008 and ERR-021 remain open.

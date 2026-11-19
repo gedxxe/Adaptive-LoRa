@@ -26,10 +26,12 @@ Host integration tests use the actual client/gateway state machines with bounded
 
 ## Hardware and provisional PHY
 
-The two Heltec WiFi LoRa 32 boards are reported to carry V3.4 markings and
-come with monopoles. The ESP32-S3FN8, SX1262, 8 MB flash and CP2102/UART0
-specifications come from the V3 reference. Check the delivered RF variant,
-antennas and peripheral wiring before bench use. See [HARDWARE.md](docs/en/HARDWARE.md).
+The bench pair is two Heltec WiFi LoRa 32 V3.4 boards with ESP32-S3, SX1262
+and stock monopoles. The owner confirms the 902–928 MHz procurement option
+and V3.2 wiring, with V3.4 changes to SMT implementation and the crystal.
+Use the V3.2 schematic as the electrical reference. Physical SKU labels,
+antenna characteristics and peripheral behavior still need bench checks.
+See [HARDWARE.md](docs/en/HARDWARE.md).
 
 RadioLib is pinned to **7.8.1**. The adapter uses the board's GPIO8-14 radio
 interface, a 1.8 V DIO3 TCXO supply and DC-DC regulator selection. Serial
@@ -122,8 +124,9 @@ those details on the V3.4 boards before using the candidate image.
 
 The OLED alternates link and counter pages. WAIT means no qualifying reception.
 ONLINE means a qualifying HELLO at the gateway or an accepted ACK at the client
-within two configured HELLO intervals plus one second. STALE begins at that
-boundary. Configure the same interval on both boards for the freshness display.
+within two configured HELLO intervals plus one second. It indicates recent
+receive activity. At the bench setting of 15,000 ms on both boards, STALE
+begins at 31 seconds without a qualifying reception.
 Missing metrics show N/A. Serial `status` reports display state and maximum
 I²C and refresh bus time. Gateway ACK starts and completions are separate.
 
@@ -131,7 +134,12 @@ I²C and refresh bus time. Gateway ACK starts and completions are separate.
 
 Serial: 115200 baud. Commands: `help`, `status`, `config show`, `config set role gateway|client`, `config set network-id N`, `config set node-id N`, `config set gateway-id N`, `config save`, `reboot`. Optional `config set hello-interval-ms <1000..3600000>`; default 5000 ms after transaction completion.
 
-Initial IDs (network/node/gateway) are gateway `1/1/1` and client `1/2/1`. Set all IDs explicitly; role edits preserve IDs. `config show` is staged state, `status` is loaded state. Network IDs are 1–65535; node/gateway IDs are 1–65534. See the [bench runbook](docs/en/BENCH_RUNBOOK.md) and [run-record template](logs/test/RUN_RECORD_TEMPLATE.md); no upload or RF test has been performed.
+For the smoke test, run `config set hello-interval-ms 15000` on **both** boards,
+save, reboot and confirm the loaded value with `status`. The gateway uses its
+interval for OLED freshness. Initial IDs (network/node/gateway) are gateway
+`1/1/1` and client `1/2/1`. Set all IDs explicitly; role edits preserve IDs. `config show` is staged state, `status` is loaded state. Network IDs are 1–65535; node/gateway IDs are 1–65534. Start with one-board Windows enumeration and private same-board ROM backups.
+See the [bench runbook](docs/en/BENCH_RUNBOOK.md) and [run-record template](logs/test/RUN_RECORD_TEMPLATE.md). Physical acceptance is pending. Radiated tests require an
+authorized RF setup.
 
 ## Development roadmap
 

@@ -1,9 +1,12 @@
 # 硬件与射频基线
 
-用户报告已收到两块标记 V3.4 的 Heltec WiFi LoRa 32 及配套单极天线。厂商 V3
-资料列出 ESP32-S3FN8、SX1262、8 MB flash、CP2102 和 128 × 64 OLED。公开图纸
-与改版记录到 V3.2。V3.4 的 SMT/晶振变化及连接沿用情况还需图纸或实物核对。
-两块板的 RF SKU、天线频段、前后布局、芯片与电气参数尚无独立确认。
+本研究使用两块 **Heltec WiFi LoRa 32 V3.4**，配有 ESP32-S3、SX1262 和原装单极天线。
+用户确认采购选项为 902–928 MHz，V3.4 沿用 V3.2 的电气线路和引脚分配，改进主要涉及
+SMT 工艺和晶振。V3.2 原理图继续作为本研究的电气参考。
+
+V3 系列厂商资料列出 ESP32-S3FN8、SX1262、8 MB flash、CP2102 和 128 × 64 OLED。
+两块板的实物 SKU、天线标记/频段/匹配、线路导通、晶振、USB/flash、供电及 OLED
+行为仍需直接检查。当前没有实物测量或采集记录。
 
 | 项目 | V3.2 图纸及 Arduino V3 参考 | 实物待查 |
 |---|---|---|
@@ -22,6 +25,7 @@ USB/5 V供电按手册至少500 mA能力，直接3.3 V至少150 mA；用稳定5 
 
 固定PHY为915.0 MHz、BW125、dataSF7、保留controlSF9、CR4/5、preamble8、explicit、PHY CRC、sync0x12、10 dBm、SPI1 MHz/mode0/MSB。SX1262支持SF5–SF12，但研究仍限制SF7–SF9，不新增动态PHY/功率/调度。
 
-按用户要求保留915 MHz研究设置，不据此声称辐射许可；部署前仍须核对适用频率/EIRP/access/设备要求。EIRP=输出+天线gain-feed loss，未知参数不能当零。915 MHz Moxon作为设计基线接受，但制作、SWR、gain和方向图未测，不声称920–923 MHz匹配。后续对比须保持相同PHY、功率、feed、距离、高度、极化和时长。
+915.0 MHz 是固定的暂定研究频点。辐射测试须使用获准的射频配置。首轮链路使用原装单极天线，
+先核对天线标记和适用频段。Moxon 不属于本轮测试。
 
 实物验收按BENCH_RUNBOOK：确认板/RF版本、Flash/security/USB、供电、RF终端、TCXO/BUSY/DIO1/reset、串口和实际HELLO/ACK。编译/native不证明这些。ERR-021仍阻挡卡BUSY无人值守恢复，未改库或watchdog；ERR-023是SDK runtime前可能格式化NVS，须在app boot/配置改动前完成同板私有备份和恢复计划。

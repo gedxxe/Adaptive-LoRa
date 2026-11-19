@@ -1,13 +1,13 @@
 # Architecture
 
-The reference build targets Heltec WiFi LoRa 32 V3. The reported V3.4 pair
-requires hardware confirmation. Protocol 1 and NVS schema 1 remain the M2
-baseline. See [HARDWARE.md](HARDWARE.md) for evidence by revision.
+The bench pair is Heltec WiFi LoRa 32 V3.4. The owner confirms V3.2
+wiring, so the build uses the Arduino V3 variant and V3.2 electrical reference.
+Protocol 1 and NVS schema 1 remain the M2 baseline. See [HARDWARE.md](HARDWARE.md) for evidence by revision.
 
 ## 1. Design overview
 
 The project uses one firmware image for two physically identical
-Heltec WiFi LoRa 32 V3 devices.
+Heltec WiFi LoRa 32 V3.4 devices.
 
 ``` text
                          One firmware image

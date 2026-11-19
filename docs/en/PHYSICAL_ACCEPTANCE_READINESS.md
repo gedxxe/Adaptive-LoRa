@@ -1,15 +1,18 @@
 # M0–M2 physical acceptance readiness
 
-The two V3.4-marked boards and stock monopoles are reported in hand. The
-firmware builds for the documented V3 pinout, with an opt-in OLED candidate.
-The delivered RF variant, pin mapping, USB bridge, flash and OLED have yet
-to be confirmed. Windows listed only Bluetooth serial ports during the
-Iteration 016 inspection. No firmware was uploaded and no RF or NVS capture
-was collected.
+The owner confirms two Heltec WiFi LoRa 32 V3.4 boards with ESP32-S3, SX1262,
+stock monopoles, the 902–928 MHz procurement variant and V3.2 wiring. The
+V3.2 schematic stays the electrical reference. Physical SKU labels, antenna
+markings and characteristics, USB, flash, supply, OLED and RF timing await
+bench checks. Software build and native evidence are recorded separately.
 
-Identify each board and verify RF termination before power. Make separate
-same-board ROM backups and check flash layout/security before application
-boot. Follow the [bench runbook](BENCH_RUNBOOK.md) for provisioning, OLED
-checks, the authorized 3 m link and distance survey. ERR-021 BUSY recovery
-and ERR-023 SDK startup formatting remain open. M0–M2 physical acceptance
-is in progress. M3 development needs measured timing and M2 evidence.
+Start with one board at a time. Inspect each RF connector, attach a suitable
+load before first power and identify the CP2102 COM port with a direct data
+cable. Preserve a private same-board backup from ROM and review the flash
+layout/security before upload. Follow the [bench runbook](BENCH_RUNBOOK.md)
+for the opt-in OLED image, explicit 15,000 ms provisioning on each role and
+an authorized two-board smoke capture before any range survey.
+
+ERR-021 BUSY recovery and ERR-023 SDK startup formatting remain open.
+M0–M2 physical acceptance is in progress. M3 depends on M2 evidence and
+measured timing.

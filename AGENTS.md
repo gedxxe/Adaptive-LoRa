@@ -8,10 +8,12 @@ Single-Radio LoRa Industrial Energy Monitoring Networks. Energy monitoring is
 an application domain, not a protocol dependency. Keep customer identities,
 private systems and machine-specific paths out of publication content.
 
-The active build targets Heltec WiFi LoRa 32 V3. The reported bench pair is
-marked V3.4. ESP32-S3FN8, SX1262, 8 MB flash and CP2102/UART0 at 115200 baud
-are V3 reference specifications. Check the delivered RF variant and board
-compatibility before use. Do not assume PSRAM.
+The bench pair is **Heltec WiFi LoRa 32 V3.4**, ESP32-S3/SX1262, with two
+stock monopoles and a user-confirmed 902–928 MHz procurement variant. The
+owner confirms V3.2 wiring and pin mapping and reports SMT and crystal
+improvements. Use the V3.2 schematic and Arduino V3 variant as references.
+Verify each board's physical SKU, antenna and peripheral behavior at the
+bench. Do not assume PSRAM.
 Build environment: `heltec_wifi_lora_32_V3`, Arduino/C++17, with
 `jgromes/RadioLib@7.8.1`. Firmware `0.2.0-alpha.1`, protocol `1`, NVS schema `1`.
 Authoritative versions/settings are VERSION, PROTOCOL_VERSION,
@@ -19,11 +21,10 @@ include/project_config.h and platformio.ini; resolved package versions and
 actual test results belong in [PROGRESS.md](docs/en/PROGRESS.md).
 
 The fixed-PHY M0–M2 HELLO/ACK firmware exists and has host/build evidence.
-**M0–M2 physical acceptance is IN PROGRESS.** Two boards and the supplied monopoles are reported in hand. Electrical
-compatibility, RF SKU, flash/NVS, power and timing still need bench evidence. M3–M8 production
-features are NOT STARTED. Iteration 015 adds explicitly host-only research;
-it does not enable production scheduling or adaptation. Historical hardware
-and results remain valid in their original context.
+**M0–M2 physical acceptance is IN PROGRESS.** Confirm the physical SKU,
+electrical behavior, flash/NVS, supply and timing at the bench. M3–M8
+production features are NOT STARTED. The Iteration 015 scheduling work is
+host research. Historical records retain their original hardware and results.
 
 ## Read before editing
 
@@ -65,8 +66,7 @@ Before power, identify the board, RF variant and antenna connector and connect a
 stable regulated 5 V supply with at least 500 mA input capability; measure
 actual supply margin/current and check battery polarity. Do not parallel
 regulators or back-power through GPIO. Moxon fabrication, matching and gain
-are unmeasured. Board coverage does not authorize 915 MHz operation; retain
-frequency/EIRP/access/certification checks before radiated deployment.
+are unmeasured. Radiated testing requires an authorized RF setup.
 
 ## Ownership and compatibility
 
@@ -118,8 +118,10 @@ third-party libraries or add abstractions speculatively.
 
 ## Scope and next work
 
-Next: inspect delivered boards, make verified same-board private backups,
-then follow the terminated-RF NVS/radio/two-device acceptance procedure.
+Next: enumerate one terminated board at a time in Windows, make verified
+same-board private backups, and follow the bench runbook. Set
+`config set hello-interval-ms 15000` on both roles for the smoke test and
+OLED freshness.
 Measure transitions, IRQ latency, processing and drift before choosing M3
 guards. Host-only feasibility tooling is preliminary research; production
 BEACON/TDMA, bitmap, selective retry and ADR require separate milestone work.

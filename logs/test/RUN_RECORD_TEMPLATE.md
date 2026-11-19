@@ -9,7 +9,7 @@ Copy into a new run directory as `RUN_RECORD.md`. Never overwrite an earlier run
 - Firmware binary SHA-256: TBD
 - Gateway role / network / node / gateway IDs: TBD
 - Client role / network / node / gateway IDs: TBD
-- Board revisions / flash / USB paths (both units): TBD
+- Board aliases / physical revisions and SKU labels / flash / USB VID/PID, device descriptions and COM ports: TBD
 - Module markings / pin orientation / continuity evidence: TBD
 - Radio idle and TX rail voltage / regulator / decoupling: NOT MEASURED
 - Antenna(s), connector, feed line, matching evidence: TBD
@@ -22,7 +22,6 @@ Copy into a new run directory as `RUN_RECORD.md`. Never overwrite an earlier run
 - Single board: integrated radio present, RF load connected before power: NOT RUN
 - OLED build on/off / Vext polarity / SSD1306 address / display pages: TBD
 - OLED status worst I²C and completed refresh I/O time / comparison run ID: NOT MEASURED
-- Per-direction summed airtime / observation interval / duty-cycle limits and review: TBD
 - ERR-021 approved bounded recovery disposition / current hold: OPEN, NOT VERIFIED
 - Instruments/calibration/sample rate/current-limit/physical power-removal method: TBD
 
@@ -50,4 +49,4 @@ Copy into a new run directory as `RUN_RECORD.md`. Never overwrite an earlier run
 - Negative ACK identity and duplicate RF injection fixtures/logs: NOT RUN (native results are separate)
 - Result, issue IDs, unresolved assumptions, next action: TBD
 
-Bench pair: reported Heltec WiFi LoRa 32 V3.4. Confirm the PCB, MCU, RF SKU, antenna and USB bridge per board. The integrated radio remains present in a single-board run; connect a suitable antenna/load before power and follow the current runbook. No cross-chip full-flash restore.
+Bench pair: Heltec WiFi LoRa 32 V3.4, owner-confirmed 902–928 MHz procurement variant and stock monopoles. Record the observed SKU, antenna and USB bridge for each board. The integrated radio remains present in a single-board run; connect a suitable antenna/load before power and follow the current runbook. No cross-chip full-flash restore.

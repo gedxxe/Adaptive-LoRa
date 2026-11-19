@@ -1116,3 +1116,54 @@ NVS persistence, OLED photo, RF capture, PDR, packet count, orientation,
 latency or reset measurements. M0–M2 physical IN PROGRESS. Next: confirm
 hardware, RF setup and same-board backups, then obtain authorized OLED-off
 and OLED-on 3 m closed-cohort captures before M3 timing work.
+
+
+## ITERATION-016.1 — Hardware synchronization and bench readiness, 2026-11-19
+
+Codex continued the clean iteration-016-v34-physical-validation branch from
+28d53a69665e87f9229191f6ed652e812c2265d6. PR #6 was open, main was
+e34e7296135b47ecd3af479fe0593f4118bc734b. Firmware 0.2.0-alpha.1, protocol 1,
+NVS schema 1, RadioLib 7.8.1. Owner confirms two ESP32-S3/SX1262 Heltec WiFi
+LoRa 32 V3.4 boards with the V3.2 wiring, stock monopoles and 902–928 MHz
+procurement. Owner reports the SMT and crystal changes. V3.2 schematic is
+the electrical reference. Physical SKU, antenna characteristics, board
+circuit measurements, supply, flash security/layout and OLED remain pending.
+
+| Executed command | Exit | Result |
+|---|---:|---|
+| `pio run -e heltec_wifi_lora_32_V3` | 0 | OLED off. RAM 32,184 / flash 342,852 B |
+| `pio run -e heltec_wifi_lora_32_V3_oled` | 0 | OLED on. RAM 33,960 / flash 377,488 B |
+| `pio test -e native` | 0 | 316/316 passed, zero skipped, identical cases/order |
+| `<PIO_PYTHON> -m unittest discover -s tools -p test_capture_bench.py -v` | 0 | 13/13 |
+| `<PIO_PYTHON> -m unittest discover -s tools -p test_tdma_feasibility.py -v` | 0 | 16/16 |
+| `<PIO_PYTHON> -m unittest discover -s tools -p test_check_consistency.py -v` | 0 | 7/7 |
+| `<PIO_PYTHON> tools/check_consistency.py` | 0 | PASS |
+| `pio device list` | 0 | Six Bluetooth virtual ports, no CP2102 |
+
+Complete results are indexed in logs/build/iteration-016.1-validation.json.
+Firmware commands ran sequentially. Both firmware.bin SHA-256 hashes match
+Iteration 016 exactly. espressif32 55.3.311, Arduino 3.3.11, IDF libs
+5.5.5+sha.b774170ff46, Xtensa 14.2.0+20260121. No required check failed.
+Checked installed esptool help without selecting/opening a device. No ROM
+or upload example was executed. Publication logs sanitize machine paths and
+Bluetooth instance identifiers. Raw output remains private.
+
+AGENTS, bilingual README/HARDWARE/ARCHITECTURE/PROGRESS/readiness describe
+owner facts, manufacturer reference and open physical measurements. The board
+pin header changes comments only. The runbooks and blank run template correct
+Windows enumeration, private ROM backups, OLED upload and explicit Gateway
+1/1/1 and Client 1/2/1 with 15,000 ms on both. Detailed local regulatory
+analysis is removed from active procedures. Prior records remain intact.
+DEPENDENCY_BUDGET_AUDIT and ERROR_LOG record the I²C/radio review. The 3 ms
+operation timeout excludes lock waits, and Gateway IRQ service can slip to
+the next loop during a display transfer. Direct measurement is pending. No
+reproduced software defect, implementation, pin, PHY or protocol change.
+No new architectural decision or user-visible release behavior.
+
+No physical provisioning, serial port open, flash, erase, reset or capture.
+Distance, orientation, packet counts, power, PDR, RSSI/SNR, ACK results and
+IRQ/display/NVS/RF timings are NOT MEASURED. ERR-008/009/010/021/023 remain
+open. M0–M2 physical acceptance is IN PROGRESS. Identify the first board in
+Windows with a suitable RF load, known data cable and manual ROM entry.
+Then preserve the same-board backup, verify layout/security and repeat for
+the other board before the OLED upload. PR #6 remains open for review.

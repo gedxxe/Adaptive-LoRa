@@ -26,11 +26,12 @@ Host 执行实际 Client/Gateway 状态机，使用有界 fake transport、时�
 
 ## 硬件和暂定 PHY
 
-用户报告已收到两块标记 V3.4 的 Heltec WiFi LoRa 32 和原装单极天线。V3 参考为
-ESP32-S3FN8/SX1262、8 MB flash、CP2102/UART0 115200。仍需确认两板 RF SKU、天线
-频段、Vext 和 OLED 引脚。现有 915.0 MHz 为研究设置。固定参数为 BW125、SF7、CR4/5、
-前导 8、显式头、PHY CRC、sync 0x12、10 dBm、SPI 1 MHz；SF9 保留。参见
-[HARDWARE](docs/zh-CN/HARDWARE.md) 和 [台架流程](docs/zh-CN/BENCH_RUNBOOK.md)。
+本研究使用两块 Heltec WiFi LoRa 32 V3.4，配有 ESP32-S3、SX1262 和原装单极天线。
+用户确认采购选项为 902–928 MHz，V3.4 沿用 V3.2 的线路和引脚，改进涉及 SMT 工艺和
+晶振。V3.2 原理图是电气参考。实物 SKU、天线特性和外设行为仍待检查。
+固定研究 PHY 为 915.0 MHz、BW125、SF7、CR4/5、前导 8、显式头、PHY CRC、sync 0x12、
+10 dBm、SPI 1 MHz，控制 SF9 保留。辐射测试须使用获准的射频配置。参见
+[硬件说明](docs/zh-CN/HARDWARE.md) 和 [台架流程](docs/zh-CN/BENCH_RUNBOOK.md)。
 
 ## 架构原则
 
@@ -59,19 +60,22 @@ pio test -e native
 默认构建关闭显示。OLED 候选使用 V3 参考 SSD1306 0x3C、GPIO17/18/21 与低有效
 Vext GPIO36，实物核对后再使用。显示交替呈现链路和计数。WAIT 为无有效接收，
 ONLINE 为 Gateway 最近有效 HELLO 或 Client 接受 ACK 尚在两倍间隔加一秒的窗口内，
-STALE 为已过期。两板设置相同间隔，缺失指标显示 N/A。串口 status 提供 OLED 状态
+ONLINE 仅表示近期有有效接收，不能说明持续连接。两板均设 15000 ms 时，距上次
+有效接收满 31 秒进入 STALE。缺失指标显示 N/A。串口 status 提供 OLED 状态
 及 I²C 和刷新总线时间最大值，Gateway ACK 开始与完成分开统计。
 
 ## 配置与后续实物流程
 
 串口 115200。支持 help、status、config show、config set role gateway|client、network-id/node-id/gateway-id、config save、reboot；可设 hello-interval-ms 1000–3600000，默认事务结束后等待 5000 ms。
 
-初始 network/node/gateway 为 Gateway 1/1/1、Client 1/2/1；角色命令不修改 ID，应全部明确设置。config show 显示暂存值，status 显示启动加载值。Network 1–65535，node/gateway 1–65534。实物流程见 [BENCH_RUNBOOK](docs/zh-CN/BENCH_RUNBOOK.md) 和 [模板](logs/test/RUN_RECORD_TEMPLATE.md)；当前没有烧录或 RF 验证。
+首轮联通检查在两板均执行 `config set hello-interval-ms 15000`，保存并重启后用
+`status` 核对。Gateway 使用该间隔判断 OLED 新鲜度。初始 network/node/gateway 为
+Gateway 1/1/1、Client 1/2/1；角色命令不修改 ID，应全部明确设置。config show 显示暂存值，status 显示启动加载值。Network 1–65535，node/gateway 1–65534。实物流程见 [BENCH_RUNBOOK](docs/zh-CN/BENCH_RUNBOOK.md) 和 [模板](logs/test/RUN_RECORD_TEMPLATE.md)；当前没有烧录或 RF 验证。
 
 ## 开发路线
 
 1. M0–M2 继续软件验证及依赖时延/分配边界分析。
-2. 采购/制作/组装后，验证 NVS/重启、电气/IRQ 和双设备 HELLO/ACK。
+2. 逐块识别 Windows 串口并备份，再验证 NVS、重启、电气/IRQ 和双板 HELLO/ACK。
 3. M3 测量切换/漂移后实现单 Client beacon/TDMA。
 4. M4–M6 逐步实现 bitmap/选择性重试、版本化保守 ADR、同步恢复。
 5. M7–M8 受控天线对比及明确标注的逻辑节点仿真。

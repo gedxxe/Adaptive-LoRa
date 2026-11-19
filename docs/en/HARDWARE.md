@@ -1,15 +1,21 @@
 # Hardware and RF baseline
 
-Two Heltec WiFi LoRa 32 boards with V3.4 markings and supplied monopoles are
-reported in hand. The V3 family specification lists ESP32-S3FN8, SX1262,
-8 MB flash, CP2102 and a 128 × 64 OLED. The published revision log and linked
-schematics document changes through V3.2. The reported V3.4 SMT and crystal
-changes and continued wiring are plausible, but need a V3.4 drawing or
-inspection. No front/back photos, markings beyond V3.4, continuity readings,
-antenna markings or RF SKU were supplied in this session. An HF SKU compatible
-with the test frequency is required for the proposed bench link.
+The bench pair is two **Heltec WiFi LoRa 32 V3.4** boards with ESP32-S3,
+SX1262 and stock monopole antennas. The owner confirms the 902–928 MHz
+procurement variant, the V3.2 electrical wiring and pin mapping, and V3.4
+improvements to SMT implementation and the crystal oscillator. The V3.2
+schematic remains the electrical reference for these boards.
 
-Sources: [Heltec product specifications and schematics](https://heltec.org/project/wifi-lora-32-v3/),
+The manufacturer V3 family lists ESP32-S3FN8, SX1262, 8 MB flash, CP2102 and
+a 128 × 64 OLED. The published revision diagrams provide the V3.2 reference
+and the installed Arduino V3 variant supplies the build pin aliases. The
+owner confirmation identifies the research hardware. Physical SKU labels,
+antenna markings/band/matching, board continuity, oscillator behavior,
+USB/flash, supply and OLED behavior remain to be checked directly. No physical
+measurement or board capture is recorded.
+
+Sources: [Heltec V3.2 schematic](https://s.heltec.cn/download/WiFi_LoRa_32_V3/WiFi_LoRa_32_V3.2_Schematic_Diagram.pdf),
+[Heltec product specifications and schematics](https://heltec.org/project/wifi-lora-32-v3/),
 [Heltec hardware revision log](https://docs.heltec.org/en/node/esp32/wifi_lora_32/hardware_update_log.html)
 and [Heltec V3 reference driver](https://github.com/HelTecAutomation/Heltec_ESP32/blob/master/src/heltec.cpp).
 The [Iteration 014 migration audit](HARDWARE_MIGRATION_AUDIT.md) records the
@@ -65,19 +71,9 @@ before changing power to compensate for a link problem.
 | SPI | 1 MHz, mode0, MSB first |
 | TCXO / radio regulator | DIO3 1.8 V / DC-DC |
 
-SX1262 supports SF5-SF12, but this research baseline remains SF7-SF9 at
-BW125. No dynamic PHY, TX-power adaptation or scheduler is added. Retaining
-915 MHz at the user's request does not establish permission for radiated
-operation; applicable channel/EIRP/access/equipment checks remain necessary
-before deployment. EIRP equals conducted power plus antenna gain minus feed
-loss, which cannot be calculated honestly until the antenna/feed are known.
-
-The 915 MHz Moxon is accepted as the design baseline. Fabrication, impedance,
-SWR, gain and actual radiation pattern remain unmeasured; no matching claim
-for920-923 MHz follows. Use identical radios, PHY, power, distance, placement,
-polarization, feed and run duration for a later reference-versus-Moxon
-comparison. Preserve packet/ACK counts and RSSI/SNR distributions; changing
-location or distance invalidates a claimed controlled comparison.
+The current research PHY is fixed. Radiated tests require an authorized RF
+setup. The planned Moxon is outside this bench iteration. Use the two stock
+monopoles for the first link after confirming their markings and suitability.
 
 ## Bring-up evidence still required
 

@@ -2,7 +2,8 @@
 
 ## 当前Heltec目标
 
-构建采用 Heltec V3 的 ESP32-S3FN8/SX1262 参考。两块 V3.4 的兼容性待实测。
+两块 Heltec WiFi LoRa 32 V3.4 配 ESP32-S3/SX1262。用户确认沿用 V3.2 布线，
+编译使用 Arduino V3 variant，电气参考为 V3.2 原理图。
 Esp32Firmware先拥有PreferencesConfigStorage和Sx1262Hardware，再构造引用它们的FirmwareRuntime。
 一份镜像读取有效NVS角色后只运行GatewayApp或ClientApp；配置无效保持provisioning且禁应用TX。
 main.cpp仍为15行构造和setup/loop委托。
