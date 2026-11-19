@@ -1,24 +1,22 @@
 # 硬件与射频基线
 
-当前唯一目标为Heltec WiFi LoRa 32 V3.2 HF，ESP32-S3FN8/SX1262、8 MB Flash、512 KB SRAM、CP2102，不假定PSRAM。采购选型已确定，但到货数量、实际板标记和silicon stepping未检查。首个验收配置是一台Gateway和一台Client，使用相同硬件。
+用户报告已收到两块标记 V3.4 的 Heltec WiFi LoRa 32 及配套单极天线。厂商 V3
+资料列出 ESP32-S3FN8、SX1262、8 MB flash、CP2102 和 128 × 64 OLED。公开图纸
+与改版记录到 V3.2。V3.4 的 SMT/晶振变化及连接沿用情况还需图纸或实物核对。
+两块板的 RF SKU、天线频段、前后布局、芯片与电气参数尚无独立确认。
 
-要求HF版本，厂家覆盖863–928 MHz，采购选项902–928 MHz；不接受LF470–510 MHz或其他Heltec产品替代。需要卖家确认、V3.2 HF正反面照片、数据USB-C线、稳定5 V、IPEX1.0匹配pigtail、合适天线/50欧姆负载。完整来源、revision/GPIO矩阵见HARDWARE_MIGRATION_AUDIT。
+| 项目 | V3.2 图纸及 Arduino V3 参考 | 实物待查 |
+|---|---|---|
+| LoRa | NSS/SCK/MOSI/MISO/RESET/BUSY/DIO1 为 8/9/10/11/12/13/14 | 比对网络，观察 RESET、BUSY 和 DIO1 |
+| 射频供电 | DIO2 控制 RF switch，DIO3 供 1.8 V TCXO，DC-DC | 核实器件标记、开关和供电拓扑 |
+| OLED | SSD1306 128 × 64、7-bit 地址 0x3C，SDA/SCL/RESET 为 17/18/21 | 核对线路、地址 ACK 和实际屏幕响应 |
+| Vext | GPIO36 低有效，OLED 用 Vext，radio 用 VDD_3V3 | 确认极性及稳定时间 |
+| USB 和 flash | CP2102 UART0 43/44，8 MB flash | 逐块枚举，读 ROM 标识和分区/安全状态 |
+| RF 接头/天线 | 参考 IPEX 1.0，V3 有多个频段 SKU | 识别两板 SKU 和原装天线频段及匹配 |
 
-| 信号 | GPIO |
-|---|---:|
-| NSS | 8 |
-| SCK | 9 |
-| MOSI | 10 |
-| MISO | 11 |
-| RESET | 12 |
-| BUSY | 13 |
-| DIO1 | 14 |
-
-映射有V3.2图纸和Arduino variant依据，实板仍须核对。DIO2控制板上RF switch，DIO3为32 MHz TCXO供电1.8 V，radio使用已装DC-DC网络；不额外分配TXEN/RXEN。唯一Sx1262Hardware拥有RadioLib/SPI/GPIO/IRQ操作。
-
-保留OLED17/18/21、LED35、Vext36、ADC_Ctrl37、UART43/44、PRG0和其他strap/Flash/晶振/JTAG资源。19/20原生USB路由的R3/R29在参考图上为NC，USB-C默认接CP2102，不可把两个USB transceiver并接。
-
-V3.2 GPIO36低有效控制Vext LDO；Radio和RF bias用VDD_3V3，OLED用Vext，本次不初始化OLED或外设供电。以后加显示功能时先设安全锁存，开启电源并按要求稳定后再释放reset。GPIO37高/上拉使能新分压检测，不复制早期逻辑；充电IC为LGS4056HDA，本次不做电池功能。
+OLED 候选构建明确指定 Arduino variant 的 OLED 引脚，而非 Wire 默认 41/42。
+主构建保持显示关闭，既有 LoRa 引脚常量保留。外设资源与来源见
+[英文参考矩阵](../en/HARDWARE.md) 和历史迁移记录。确认实物后再启用 OLED。
 
 USB/5 V供电按手册至少500 mA能力，直接3.3 V至少150 mA；用稳定5 V并留余量。测TX电压/电流、reset和温升，检查电池极性，不并联任意电源或从GPIO反向供电。射频在板上不能拆除，未知factory固件或已保存角色可能TX，所以第一次上电和单板操作前也要接好IPEX1.0对应50欧姆负载/天线，禁止开路发射，初始10 dBm。
 

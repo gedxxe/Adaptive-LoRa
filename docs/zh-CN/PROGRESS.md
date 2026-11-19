@@ -1,7 +1,32 @@
 # 开发进度
 
 <!-- current-state:start -->
-## 当前状态 — Iteration 015
+## 当前状态 — Iteration 016
+
+客户端日期 2026-11-19。Iteration 015 经 PR #5 合入 main，合并提交为
+`e34e7296135b47ecd3af479fe0593f4118bc734b`。当前审查分支
+`iteration-016-v34-physical-validation`。
+
+| 项目 | 证据 |
+|---|---|
+| 固件 / 协议 | `0.2.0-alpha.1` / `1` |
+| 构建环境 | `heltec_wifi_lora_32_V3`，可选 `heltec_wifi_lora_32_V3_oled` |
+| 板卡 | 用户报告两块标记 V3.4 的 Heltec WiFi LoRa 32 与原装单极天线。V3 参考为 ESP32-S3FN8/SX1262。 |
+| Native | 316/316 PASS，其中九项 OLED/遥测新测试 |
+| Capture / 模型 | 13/13 和 16/16 PASS，仅主机 |
+| 固件构建 | 两种均 PASS。OLED 关 RAM 32,184 / flash 342,852 bytes，开 33,960 / 377,488 bytes。 |
+| 文档 | 7/7 PASS，直接检查 PASS |
+| Physical acceptance | IN PROGRESS; NOT RUN |
+
+实板 RF SKU、线路和天线频段仍待确认。串口枚举未看到 Heltec，未打开设备端口或烧录。
+可选 OLED 使用 V3 参考引脚，协议 v1、角色配置、SX1262 所有权保持。M3–M8 生产功能未
+开始。按 [HARDWARE](HARDWARE.md) 和 [BENCH_RUNBOOK](BENCH_RUNBOOK.md) 核对板、
+RF 终端、ROM 备份及合规频点后再测试。
+<!-- current-state:end -->
+
+## Iteration 015 历史快照
+
+### Iteration 015 合入前审查记录
 
 客户端日期：2026-11-18。规范 main 基线为已合并的 Iteration 014：
 `0d0e71c368e88093b081bf9182e1f1babd189a9a`（[PR #4](https://github.com/gedxxe/Adaptive-LoRa/pull/4)）。
@@ -46,7 +71,7 @@ Runtime 前 NVS 格式化风险仍开放。没有复现新的生产缺陷，也�
 下一步核对两块 V3.2 HF 实物，上电前接 RF 终端，核实同板 ROM 私有备份、安全状态
 和分区，然后按 [BENCH_RUNBOOK.md](BENCH_RUNBOOK.md) 采集正常、负向和恢复证据。
 测量切换、处理和漂移后再审查 M3 实现；ERR-021 恢复仍是独立验收门槛。
-<!-- current-state:end -->
+
 
 ## 截至 Iteration 014 的历史快照
 

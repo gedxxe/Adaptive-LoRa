@@ -1,49 +1,37 @@
 # Hardware and RF baseline
 
-The active target is **Heltec WiFi LoRa 32 V3.2 HF**, with ESP32-S3FN8,
-SX1262,8 MB SiP flash,512 KB SRAM and CP2102. No PSRAM is assumed.
-The procurement target is confirmed, but delivery, individual PCB markings
-and silicon stepping have not been inspected. The first acceptance setup
-needs two identical boards, one configured Gateway and one Client.
+Two Heltec WiFi LoRa 32 boards with V3.4 markings and supplied monopoles are
+reported in hand. The V3 family specification lists ESP32-S3FN8, SX1262,
+8 MB flash, CP2102 and a 128 × 64 OLED. The published revision log and linked
+schematics document changes through V3.2. The reported V3.4 SMT and crystal
+changes and continued wiring are plausible, but need a V3.4 drawing or
+inspection. No front/back photos, markings beyond V3.4, continuity readings,
+antenna markings or RF SKU were supplied in this session. An HF SKU compatible
+with the test frequency is required for the proposed bench link.
 
-Use the HF version, not the470-510 MHz LF version. Manufacturer HF coverage
-is863-928 MHz; the ordered902-928 MHz option is within that range. V4,
-Wireless Stick Lite and Tracker are different products. Require seller
-confirmation and clear front/back V3.2 HF photographs. Source URLs,
-fingerprints, revision comparison and the complete GPIO matrix are in
-[HARDWARE_MIGRATION_AUDIT.md](HARDWARE_MIGRATION_AUDIT.md).
+Sources: [Heltec product specifications and schematics](https://heltec.org/project/wifi-lora-32-v3/),
+[Heltec hardware revision log](https://docs.heltec.org/en/node/esp32/wifi_lora_32/hardware_update_log.html)
+and [Heltec V3 reference driver](https://github.com/HelTecAutomation/Heltec_ESP32/blob/master/src/heltec.cpp).
+The [Iteration 014 migration audit](HARDWARE_MIGRATION_AUDIT.md) records the
+V3.2 schematic and source details in their original context.
 
-## Radio and reserved resources
+| Item | Reference evidence | Delivered V3.4 confirmation needed |
+|---|---|---|
+| Identity and PCB | Heltec V3 family | Front/back markings, layout, MCU and radio package markings, SKU and matching network |
+| Radio SPI and interrupt | V3.2 schematic and installed variant. NSS 8, SCK 9, MOSI 10, MISO 11, RESET 12, BUSY 13, DIO1 14 (variant alias DIO0) | Compare nets and observe reset, BUSY and DIO1 with high-impedance probes |
+| Oscillator and PA path | V3.2 reference has DIO3 TCXO at 1.8 V, DC-DC regulator and DIO2 RF switch | Verify oscillator marking/voltage, populated regulator and switch path |
+| OLED | V3 source selects SSD1306 128 × 64 at 7-bit 0x3C. Variant OLED aliases are SDA 17, SCL 18, RESET 21 | Check reset and bus routing, address ACK and working panel. A bus ACK alone identifies an address, not the controller |
+| Vext | V3.2 switched LDO, GPIO36 active low. Radio uses VDD_3V3 and OLED uses Vext | Confirm off/on polarity and rail settling before enabling OLED firmware |
+| USB and flash | V3 reference CP2102/UART0 TX43/RX44, 8 MB flash | Enumerate one board at a time, verify ROM identity/flash/security/layout |
+| RF connector and antennas | V3 reference IPEX 1.0. Heltec offers several frequency variants | Verify each connector, RF SKU, monopole markings/band and matching |
 
-| Signal | ESP32-S3 GPIO |
-|---|---:|
-| NSS | 8 |
-| SCK | 9 |
-| MOSI | 10 |
-| MISO | 11 |
-| RESET | 12 |
-| BUSY | 13 |
-| DIO1 | 14 |
-
-This mapping is checked against the V3.2 schematic and Arduino variant;
-confirm that the delivered board matches before use. DIO2 drives the onboard
-RF switch and DIO3 supplies the32 MHz TCXO. RadioLib 7.8.1 uses explicit
-TCXO1.8 V and DC-DC selection, matching the vendor code and populated
-L8/C54 network. Do not assign additional MCU TXEN/RXEN or TCXO-control pins.
-Only Sx1262Hardware owns the radio/SPI/GPIO/IRQ adapter.
-
-Reserve OLED17/18/21, LED35, Vext36, ADC_Ctrl37, CP2102 UART43/44 and PRG0.
-GPIO19/20 have optional native-USB routing; R3/R29 are unpopulated in the
-reference schematic. The normal USB-C connection uses CP2102. Do not join
-two USB transceivers on the same data pair. Respect straps0/3/45/46,
-flash/internal resources, crystal15/16 and external-JTAG choices.
-
-V3.2 Vext is a switched LDO controlled active-low by GPIO36. The radio
-and RF-switch bias use VDD_3V3; OLED uses Vext. This firmware leaves OLED,
-Vext control and battery sensing unused. Later display startup must set a
-safe output latch, enable the rail, allow proper settling, then release
-OLED reset. GPIO37 high/pull-up enables the revised battery-divider path;
-earlier revision logic must not be copied. The charge IC is LGS4056HDA.
+The installed Arduino-ESP32 3.3.11 `heltec_wifi_lora_32_V3` variant defines
+OLED aliases separately from default `Wire` pins 41/42. The optional OLED
+build uses the aliases explicitly and asserts their values at compile time.
+No existing radio pin constants were edited. Keep board/peripheral pin and
+power assignments under their current owners. Reserve LED35, battery
+control37, UART43/44, USB19/20, boot straps, crystal and flash/JTAG resources
+as documented in the migration audit.
 
 ## Power, RF feed and handling
 
@@ -54,7 +42,7 @@ external-load capacity. Measure voltage/current during TX; check for resets,
 connector polarity, heating and supply transients. Do not parallel arbitrary
 supply outputs or back-power an unpowered board through GPIO.
 
-The LoRa connector is IPEX1.0. Fit a compatible 50-ohm pigtail and appropriate
+The reference LoRa connector is IPEX 1.0. Verify the delivered connector before mating it. Fit a compatible 50-ohm pigtail and appropriate
 antenna or RF load **before power**, including single-board and first-boot
 work. The integrated radio cannot be unplugged as a separate module, and
 an unknown factory image or valid saved role may transmit. Never transmit

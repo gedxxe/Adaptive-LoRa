@@ -1,7 +1,35 @@
 # Development progress
 
 <!-- current-state:start -->
-## Current state — Iteration 015
+## Current state — Iteration 016
+
+Client date 2026-11-19. PR #5 merged Iteration 015 into main at
+`e34e7296135b47ecd3af479fe0593f4118bc734b`. The review branch is
+`iteration-016-v34-physical-validation`.
+
+| Item | Evidence |
+|---|---|
+| Firmware / protocol | `0.2.0-alpha.1` / `1` |
+| Build environment | `heltec_wifi_lora_32_V3`, opt-in `heltec_wifi_lora_32_V3_oled` |
+| Board | Two Heltec WiFi LoRa 32 V3.4 markings and supplied monopoles reported. V3 reference uses ESP32-S3FN8/SX1262. |
+| Native tests | 316/316 PASS, including nine new OLED/telemetry cases |
+| Capture / model tests | 13/13 and 16/16 PASS, host only |
+| Firmware builds | Both PASS. OLED off RAM 32,184 / flash 342,852 bytes. OLED on 33,960 / 377,488 bytes. |
+| Documentation | 7/7 PASS and direct checker PASS |
+| Physical acceptance | IN PROGRESS; NOT RUN |
+
+Board RF SKU, actual wiring and antenna band are outstanding. No Heltec USB
+serial device was visible during enumeration. No port was opened or firmware
+uploaded. The opt-in OLED driver uses the V3 reference pins and leaves
+protocol v1, role provisioning and the SX1262 owner in place. M3–M8 production
+work remains unstarted. Use [HARDWARE.md](HARDWARE.md) and the
+[bench runbook](BENCH_RUNBOOK.md) to confirm board identity, RF termination,
+ROM backups and authorized operating conditions before tests.
+<!-- current-state:end -->
+
+## Iteration 015 historical snapshot
+
+### Iteration 015 review branch before merge
 
 Client date: 2026-11-18. Canonical main is the merged Iteration 014 baseline
 `0d0e71c368e88093b081bf9182e1f1babd189a9a` ([PR #4](https://github.com/gedxxe/Adaptive-LoRa/pull/4)).
@@ -56,7 +84,7 @@ same-board private ROM backups/security/layout, then execute the
 [BENCH_RUNBOOK.md](BENCH_RUNBOOK.md). Capture the controlled normal/negative/
 recovery cases and measure switching, processing and drift before an M3
 implementation review. ERR-021 recovery acceptance remains a separate hold.
-<!-- current-state:end -->
+
 
 ## Historical snapshots through Iteration 014
 
