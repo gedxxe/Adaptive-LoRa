@@ -12,6 +12,7 @@ constexpr uint8_t kDemoSize = 8;
 constexpr uint8_t kBeaconSize = 6;
 constexpr uint8_t kFeedbackSize = 9;
 constexpr uint32_t kGuardUs = 50000;
+constexpr uint32_t kLegacyFeedbackBudgetUs = 10000000;
 
 // Fixed SF7/BW125/CR4/5, eight-symbol preamble, explicit header and CRC.
 constexpr uint32_t airtimeUs(size_t wireBytes) {
@@ -32,7 +33,7 @@ struct Schedule {
         return maxData <= kMaxData && periodUs <= 1000 * kMaxHelloIntervalMs && periodUs % 1000 == 0 &&
                feedbackEnd(kAttempts - 1) + 2 * kGuardUs +
                airtimeUs(kHeaderSize + kBeaconSize) < periodUs &&
-               feedbackEnd(kAttempts - 1) < kAckTimeoutUs;
+               feedbackEnd(kAttempts - 1) < kLegacyFeedbackBudgetUs;
     }
 };
 

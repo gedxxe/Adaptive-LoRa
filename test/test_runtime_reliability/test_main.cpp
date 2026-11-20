@@ -76,14 +76,14 @@ void test_permanent_zero_initial_gateway_suppresses_ack() {
 void test_delayed_rx_cannot_accept_ack_after_deadline() {
     Fixture f; f.start(); f.at(1000000); const auto request = f.tx(); f.done(1000010); Serial.output.clear();
     f.hardware.delayUs[static_cast<size_t>(HardwareCall::READ)] = 20;
-    f.rx(response(request), 11000000); f.drain(); TEST_ASSERT_EQUAL_UINT64(11000020, f.now());
+    f.rx(response(request), 2000000); f.drain(); TEST_ASSERT_EQUAL_UINT64(2000020, f.now());
     lacks("result=accepted"); has("event=ACK_TIMEOUT"); has("ack_identity_or_state_mismatch");
 }
 void test_tx_done_processing_delay_anchors_ack_window_after_poll() {
     Fixture f; f.start(); f.at(1000000); const auto request = f.tx();
     f.hardware.delayUs[static_cast<size_t>(HardwareCall::FINISH_TX)] = 20;
     f.done(2999990); TEST_ASSERT_EQUAL_UINT64(3000010, f.now());
-    f.rx(response(request), 12999995); f.drain(); has("result=accepted");
+    f.rx(response(request), 3999995); f.drain(); has("result=accepted");
 }
 void test_slow_config_save_preserves_full_post_stop_reboot_interval() {
     Fixture f; f.start(); f.storage.delayUs[static_cast<size_t>(StorageCall::WRITE)] = 200000;
@@ -204,17 +204,17 @@ void test_delayed_ack_rejection_across_uint32_wrap() {
     Fixture f; f.start(); const uint64_t start = uint64_t(UINT32_MAX) - 1000000;
     f.at(start); const auto request = f.tx(); f.done(start + 500000);
     f.hardware.delayUs[static_cast<size_t>(HardwareCall::READ)] = 20; Serial.output.clear();
-    f.rx(response(request), start + 10499990); f.drain(); lacks("result=accepted"); has("event=ACK_TIMEOUT");
+    f.rx(response(request), start + 1499990); f.drain(); lacks("result=accepted"); has("event=ACK_TIMEOUT");
 }
 void test_serial_wait_defers_ack_timeout_service_until_next_loop() {
     Fixture f; f.start(); f.at(1000000); f.done(1000010); Serial.output.clear();
-    host_clock::set(11000000); Serial.writeDelayUs = 20; f.command("status\n");
-    TEST_ASSERT_EQUAL_UINT64(11000020, f.now()); lacks("event=ACK_TIMEOUT");
+    host_clock::set(2000000); Serial.writeDelayUs = 20; f.command("status\n");
+    TEST_ASSERT_EQUAL_UINT64(2000020, f.now()); lacks("event=ACK_TIMEOUT");
     Serial.writeDelayUs = 0; f.step(); f.drain(); has("event=ACK_TIMEOUT");
 }
 void test_save_delay_defers_ack_timeout_but_cannot_accept_late_ack() {
     Fixture f; f.start(); f.at(1000000); const auto packet = f.tx(); f.done(1000010); Serial.output.clear();
-    host_clock::set(11000000); f.storage.delayUs[static_cast<size_t>(StorageCall::WRITE)] = 200000; f.command("config save\n");
+    host_clock::set(2000000); f.storage.delayUs[static_cast<size_t>(StorageCall::WRITE)] = 200000; f.command("config save\n");
     lacks("event=ACK_TIMEOUT"); f.rx(response(packet), f.now()); f.drain(); lacks("result=accepted"); has("event=ACK_TIMEOUT");
 }
 void test_tx_start_delay_remains_inside_existing_driver_deadline_budget() {

@@ -126,11 +126,11 @@ void test_client_only_updates_metrics_on_accepted_ack_and_keeps_accounting() {
     host_clock::set(16000003);
     client.update(16000003, {});
     client.update(16000004, radio.completeTx());
-    host_clock::set(26000004);
-    client.update(26000004, {});
-    host_clock::set(41000004);
+    host_clock::set(17000004);
+    client.update(17000004, {});
+    host_clock::set(32000004);
     radio.failNextTx = true;
-    client.update(41000004, {});
+    client.update(32000004, {});
     const auto state = client.telemetry();
     TEST_ASSERT_EQUAL_UINT32(3, state.attempts);
     TEST_ASSERT_EQUAL_UINT32(1, state.successes);
@@ -145,8 +145,8 @@ void test_freshness_exact_boundary_across_32bit_wrap() {
     TEST_ASSERT_EQUAL(int(LinkFreshness::WAIT), int(sample.freshness(received, 15000)));
     sample = {true, false, 1, received, 0, 0};
     TEST_ASSERT_EQUAL(int(LinkFreshness::ONLINE), int(sample.freshness(received, 15000)));
-    TEST_ASSERT_EQUAL(int(LinkFreshness::ONLINE), int(sample.freshness(received + 39999999, 15000)));
-    TEST_ASSERT_EQUAL(int(LinkFreshness::STALE), int(sample.freshness(received + 40000000, 15000)));
+    TEST_ASSERT_EQUAL(int(LinkFreshness::ONLINE), int(sample.freshness(received + 30999999, 15000)));
+    TEST_ASSERT_EQUAL(int(LinkFreshness::STALE), int(sample.freshness(received + 31000000, 15000)));
 }
 
 void test_format_provisioning_unknown_and_maximum_counters() {

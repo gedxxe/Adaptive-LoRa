@@ -15,6 +15,7 @@ DeviceConfig config(DeviceRole role) {
     DeviceConfig c;
     c.role = role;
     c.nodeId = role == DeviceRole::CLIENT ? 2 : 1;
+    c.helloIntervalMs = 10000;
     return c;
 }
 CapturedPacket encoded(const Frame& f) {
