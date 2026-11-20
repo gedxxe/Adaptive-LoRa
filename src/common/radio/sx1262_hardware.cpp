@@ -32,9 +32,12 @@ int16_t Sx1262Hardware::begin() {
     SPI.begin(pins::sck, pins::miso, pins::mosi, pins::nss);
     // begin() enables DIO2 RF switching and CRC in pinned RadioLib 7.8.1.
     // Explicit oscillator/regulator arguments are board requirements.
-    return radio_.begin(phy::frequencyMhz, phy::bandwidthKhz, phy::dataSf,
+    const int16_t code = radio_.begin(phy::frequencyMhz, phy::bandwidthKhz, phy::dataSf,
         phy::codingRateDenominator, phy::privateSyncWord, phy::txPowerDbm,
         phy::preambleSymbols, phy::tcxoVoltage, phy::useRegulatorLdo);
+    // RadioLib preserves its 60 mA default across PA selection. Apply the
+    // datasheet high-power OCP after begin(), before enabling driver IRQs.
+    return code ? code : radio_.setCurrentLimit(phy::txCurrentLimitMa);
 }
 void Sx1262Hardware::enableDio1() { radio_.setDio1Action(onDio1); }
 bool Sx1262Hardware::irqSignalled() { return irq_ || digitalRead(pins::dio1); }

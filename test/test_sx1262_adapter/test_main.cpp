@@ -13,27 +13,36 @@ void test_module_constructor_uses_v32_radio_pins_and_spi_settings() {
     TEST_ASSERT_EQUAL_UINT32(1000000, s.spiHz);
     TEST_ASSERT_EQUAL_INT(MSBFIRST, s.bitOrder); TEST_ASSERT_EQUAL_INT(SPI_MODE0, s.mode);
 }
-void test_begin_selects_v32_tcxo_dcdc_and_unchanged_research_phy() {
+void test_begin_selects_v32_tcxo_dcdc_and_restored_research_phy() {
     Sx1262Hardware h; TEST_ASSERT_EQUAL_INT(0, h.begin()); const auto& s = state();
     TEST_ASSERT_EQUAL_INT(9, s.spiSck); TEST_ASSERT_EQUAL_INT(11, s.spiMiso);
     TEST_ASSERT_EQUAL_INT(10, s.spiMosi); TEST_ASSERT_EQUAL_INT(8, s.spiCs);
     TEST_ASSERT_EQUAL_INT(SPI_BEGIN, s.trace[0]); TEST_ASSERT_EQUAL_INT(BEGIN, s.trace[1]);
     TEST_ASSERT_EQUAL_FLOAT(915, s.frequency); TEST_ASSERT_EQUAL_FLOAT(125, s.bandwidth);
     TEST_ASSERT_EQUAL_UINT8(7, s.sf); TEST_ASSERT_EQUAL_UINT8(5, s.cr);
-    TEST_ASSERT_EQUAL_UINT8(0x12, s.sync); TEST_ASSERT_EQUAL_INT8(10, s.power);
+    TEST_ASSERT_EQUAL_UINT8(0x12, s.sync); TEST_ASSERT_EQUAL_INT8(22, s.power);
     TEST_ASSERT_EQUAL_UINT16(8, s.preamble); TEST_ASSERT_EQUAL_FLOAT(1.8f, s.tcxo);
+    TEST_ASSERT_EQUAL_FLOAT(140.0f, s.currentLimit);
+    TEST_ASSERT_EQUAL_INT(CURRENT_LIMIT, s.trace[2]);
     TEST_ASSERT_FALSE(s.ldo);
 }
 void test_begin_failure_reaches_actual_driver_without_enabling_irq() {
     Sx1262Hardware h; RadioDriver driver(h); state().codes[BEGIN] = -701;
     TEST_ASSERT_EQUAL_INT(-701, driver.begin());
+    TEST_ASSERT_EQUAL_UINT(0, state().calls[CURRENT_LIMIT]); TEST_ASSERT_EQUAL_UINT(0, state().calls[HEADER]);
+    TEST_ASSERT_EQUAL_UINT(0, state().calls[IRQ]);
+}
+void test_current_limit_failure_keeps_radio_inactive() {
+    Sx1262Hardware h; RadioDriver driver(h); state().codes[CURRENT_LIMIT] = -708;
+    TEST_ASSERT_EQUAL_INT(-708, driver.begin());
+    TEST_ASSERT_FALSE(driver.healthy());
     TEST_ASSERT_EQUAL_UINT(0, state().calls[HEADER]); TEST_ASSERT_EQUAL_UINT(0, state().calls[IRQ]);
 }
 void test_actual_driver_reasserts_header_crc_before_irq_registration() {
     Sx1262Hardware h; RadioDriver driver(h); TEST_ASSERT_EQUAL_INT(0, driver.begin());
     const auto& s = state(); TEST_ASSERT_EQUAL_UINT8(2, s.crc);
-    TEST_ASSERT_EQUAL_INT(HEADER, s.trace[2]); TEST_ASSERT_EQUAL_INT(CRC, s.trace[3]);
-    TEST_ASSERT_EQUAL_INT(IRQ, s.trace[4]); TEST_ASSERT_NOT_NULL(s.callback);
+    TEST_ASSERT_EQUAL_INT(HEADER, s.trace[3]); TEST_ASSERT_EQUAL_INT(CRC, s.trace[4]);
+    TEST_ASSERT_EQUAL_INT(IRQ, s.trace[5]); TEST_ASSERT_NOT_NULL(s.callback);
     TEST_ASSERT_EQUAL_STRING("SX1262_driver_id_not_exposed", driver.chip());
 }
 void test_header_and_crc_failures_stop_driver_initialization() {
@@ -86,8 +95,9 @@ void tearDown() { TEST_ASSERT_FALSE(state().overflow); }
 int main() {
     UNITY_BEGIN();
     RUN_TEST(test_module_constructor_uses_v32_radio_pins_and_spi_settings);
-    RUN_TEST(test_begin_selects_v32_tcxo_dcdc_and_unchanged_research_phy);
+    RUN_TEST(test_begin_selects_v32_tcxo_dcdc_and_restored_research_phy);
     RUN_TEST(test_begin_failure_reaches_actual_driver_without_enabling_irq);
+    RUN_TEST(test_current_limit_failure_keeps_radio_inactive);
     RUN_TEST(test_actual_driver_reasserts_header_crc_before_irq_registration);
     RUN_TEST(test_header_and_crc_failures_stop_driver_initialization);
     RUN_TEST(test_dio_callback_only_latches_until_consumed);

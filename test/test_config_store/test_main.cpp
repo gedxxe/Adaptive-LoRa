@@ -15,7 +15,8 @@ constexpr uint8_t goldenClient[24] = {
     0x88, 0x13, 0x00, 0x00, 0xe7, 0x73, 0xe5, 0x84
 };
 constexpr uint8_t expectedNamespace[] = {0x6d, 0x69, 0x64, 0x65, 0x61, 0x2d, 0x70, 0x32, 0x70, 0};
-DeviceConfig client() { DeviceConfig c; c.role = DeviceRole::CLIENT; return c; }
+// Keep the original schema-1 fixture to check existing saved intervals.
+DeviceConfig client() { DeviceConfig c; c.role = DeviceRole::CLIENT; c.helloIntervalMs = 5000; return c; }
 DeviceConfig gateway() { auto c = client(); c.role = DeviceRole::GATEWAY; c.nodeId = c.gatewayId; return c; }
 DeviceConfig sentinel() { auto c = gateway(); c.networkId = 91; c.nodeId = c.gatewayId = 73; c.helloIntervalMs = 9000; return c; }
 void sameConfig(const DeviceConfig& a, const DeviceConfig& b) {

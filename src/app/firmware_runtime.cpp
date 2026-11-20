@@ -8,6 +8,13 @@
 
 namespace adaptive_lora {
 namespace {
+#if defined(ADAPTIVE_LORA_SCHEDULED)
+constexpr auto wireVersion = scheduled::kVersion;
+constexpr const char* profile = "scheduled";
+#else
+constexpr auto wireVersion = kProtocolVersion;
+constexpr const char* profile = "m2";
+#endif
 uint32_t freshBootId(uint32_t previous) {
     // Valid-value bound only; entropy quality depends on ESP32-S3 SDK setup.
     for (unsigned attempt = 0; attempt < kBootIdAttempts; ++attempt) {
@@ -28,11 +35,11 @@ void FirmwareRuntime::status() {
     showConfig(loaded_, loadError_ ? "inactive_defaults" : "loaded", loadError_ ? loadError_ : "valid");
     char line[320];
     std::snprintf(line, sizeof(line),
-        "event=STATUS,mode=%s,radio=%s,chip=%s,fw=%s,protocol=%u,build_id=%s,reset_reason=%d,log_dropped=%" PRIu32,
+        "event=STATUS,mode=%s,radio=%s,chip=%s,fw=%s,protocol=%u,build_id=%s,reset_reason=%d,log_dropped=%" PRIu32 ",profile=%s",
         loadError_ ? "PROVISIONING" : (radio_.healthy() ? roleName(loaded_.role) : "RADIO_FAULT"),
         radio_.initialized() ? (radio_.healthy() ? "ready" : "fault") : "disabled",
-        radio_.initialized() ? radio_.chip() : "N/A", kFirmwareVersion, kProtocolVersion, kBuildId,
-        static_cast<int>(esp_reset_reason()), log_.dropped());
+        radio_.initialized() ? radio_.chip() : "N/A", kFirmwareVersion, wireVersion, kBuildId,
+        static_cast<int>(esp_reset_reason()), log_.dropped(), profile);
     log_.text(line);
 #if defined(ADAPTIVE_LORA_OLED)
     if (display_) {
@@ -47,6 +54,9 @@ void FirmwareRuntime::status() {
 void FirmwareRuntime::setup() {
     Serial.begin(kSerialBaud);
     loadError_ = store_.load(loaded_);
+#if defined(ADAPTIVE_LORA_SCHEDULED)
+    if (!loadError_ && !ScheduledLink::supports(loaded_)) loadError_ = "unsupported_schedule_config";
+#endif
     log_.begin(loaded_);
     console_.begin(loaded_);
 #if defined(ADAPTIVE_LORA_OLED)
@@ -62,6 +72,9 @@ void FirmwareRuntime::setup() {
     const int16_t code = radio_.begin();
     log_.event("RADIO_INIT", code ? "failed" : radio_.chip(), nullptr, nullptr, code);
     if (!code) {
+#if defined(ADAPTIVE_LORA_SCHEDULED)
+        scheduled_.emplace(loaded_, radio_, log_, freshBootId);
+#else
         if (loaded_.role == DeviceRole::GATEWAY) {
             gateway_.emplace(loaded_, radio_, log_, freshBootId);
             gateway_->begin(micros());
@@ -69,6 +82,7 @@ void FirmwareRuntime::setup() {
             client_.emplace(loaded_, radio_, log_, freshBootId);
             client_->begin(micros());
         }
+#endif
     }
     status();
 }
@@ -89,7 +103,12 @@ void FirmwareRuntime::command(ConsoleAction action) {
             break;
         }
         case ConsoleAction::SAVE: {
-            const char* error = store_.save(console_.staging());
+            const char* error = nullptr;
+#if defined(ADAPTIVE_LORA_SCHEDULED)
+            if (!validateConfig(console_.staging()) && !ScheduledLink::supports(console_.staging()))
+                error = "unsupported_schedule_config";
+#endif
+            if (!error) error = store_.save(console_.staging());
             log_.event(error ? "CONFIG_ERROR" : "CONFIG_SAVED", error ? error : "verified_reboot_required");
             break;
         }
@@ -106,9 +125,13 @@ void FirmwareRuntime::loop() {
     const uint32_t now = micros();
     const auto event = radio_.poll(now);
     // Radio calls may wait; apps must classify the completed event at fresh time.
+#if defined(ADAPTIVE_LORA_SCHEDULED)
+    if (scheduled_) scheduled_->update(static_cast<uint64_t>(esp_timer_get_time()), event, !rebootPending_);
+#else
     const uint32_t appNow = micros();
     if (gateway_) gateway_->update(appNow, event, !rebootPending_);
     if (client_) client_->update(appNow, event, !rebootPending_);
+#endif
     for (unsigned budget = 0; budget < 64 && Serial.available(); ++budget)
         command(console_.feed(static_cast<char>(Serial.read())));
     if (rebootPending_ && !rebootStopped_ && !radio_.transmitting()) {

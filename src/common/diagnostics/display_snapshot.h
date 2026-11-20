@@ -16,7 +16,7 @@ struct LastReception {
     LinkFreshness freshness(uint64_t now, uint32_t intervalMs) const {
         // Allow two expected intervals and one ACK window. Gateway freshness
         // uses its configured expectation, so set the same interval on both.
-        const uint64_t window = uint64_t(intervalMs) * 2000 + 1000000;
+        const uint64_t window = uint64_t(intervalMs) * 2000 + kAckTimeoutUs;
         return !seen ? LinkFreshness::WAIT :
                now >= atUs && now - atUs < window ? LinkFreshness::ONLINE : LinkFreshness::STALE;
     }

@@ -10,6 +10,9 @@
 #include "gateway/gateway_app.h"
 #include "common/radio/radio_driver.h"
 #include "common/diagnostics/oled_status_display.h"
+#if defined(ADAPTIVE_LORA_SCHEDULED)
+#include "scheduled_link.h"
+#endif
 
 namespace adaptive_lora {
 #if __has_include(<optional>)
@@ -35,8 +38,12 @@ private:
     ProvisioningConsole console_;
     RadioDriver radio_;
     SerialLogger log_;
+#if defined(ADAPTIVE_LORA_SCHEDULED)
+    runtime_optional::optional<ScheduledLink> scheduled_;
+#else
     runtime_optional::optional<GatewayApp> gateway_;
     runtime_optional::optional<ClientApp> client_;
+#endif
     bool rebootPending_ = false;
     bool rebootStopped_ = false;
     uint32_t rebootAt_ = 0;

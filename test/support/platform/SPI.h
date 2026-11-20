@@ -9,7 +9,7 @@ constexpr int MSBFIRST = 1, SPI_MODE0 = 0;
 constexpr int SS = 8, SCK = 9, MOSI = 10, MISO = 11;
 
 namespace host_adapter {
-enum Call { SPI_BEGIN, BEGIN, HEADER, CRC, IRQ, STANDBY, RX, TX,
+enum Call { SPI_BEGIN, BEGIN, CURRENT_LIMIT, HEADER, CRC, IRQ, STANDBY, RX, TX,
             FINISH_TX, FINISH_RX, FLAGS, LENGTH, READ, RSSI, SNR, TOA, COUNT };
 // Records arguments and scripted return values, never chip or driver state.
 struct State {
@@ -22,7 +22,7 @@ struct State {
     int spiSck = -1, spiMiso = -1, spiMosi = -1, spiCs = -1;
     uint32_t spiHz = 0;
     int bitOrder = -1, mode = -1;
-    float frequency = 0, bandwidth = 0, tcxo = 0;
+    float frequency = 0, bandwidth = 0, tcxo = 0, currentLimit = 0;
     uint8_t sf = 0, cr = 0, sync = 0, crc = 0;
     int8_t power = 0;
     uint16_t preamble = 0;

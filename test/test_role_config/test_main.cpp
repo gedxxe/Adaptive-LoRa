@@ -46,7 +46,7 @@ void test_blob_roundtrip() {
     TEST_ASSERT_EQUAL_UINT16(2, out.nodeId);
     TEST_ASSERT_EQUAL_UINT16(1, out.gatewayId);
     TEST_ASSERT_EQUAL_UINT16(1, out.networkId);
-    TEST_ASSERT_EQUAL_UINT32(5000, out.helloIntervalMs);
+    TEST_ASSERT_EQUAL_UINT32(10000, out.helloIntervalMs);
 }
 void test_blob_corruption_each_byte() {
     uint8_t bytes[kConfigBlobSize]; auto c = client();
