@@ -2,24 +2,15 @@
 
 ## 1. 协议范围
 
-协议第一版先实现固定 PHY 的 HELLO/ACK。后续再逐步加入 Beacon、TDMA、ACK
-Bitmap、选择性重传和 ADR。
+本项目使用自定义 LoRa P2P 协议。默认和 OLED 镜像使用 v1 HELLO/ACK；可选研究镜像
+使用 v2 BEACON、DATA 与 ACK_BITMAP，见 [定时链路规范](SCHEDULED_LINK.md)。两种
+编解码器各自仅接受对应版本与类型。`PROTOCOL_VERSION` 记录默认 v1；两种镜像共用
+固件版本及 NVS schema。两种角色由 NVS 选择，共用一个 RadioDriver 与 SX1262。
+DIO1 只置位，主循环处理。
 
-本项目是自定义 LoRa P2P 协议，不是 LoRaWAN。
-
-当前 v1 编解码仅接受 HELLO 和 ACK，表中后续类型 ID 只是预留。两种角色由 NVS
-配置选择，共用同一镜像、codec、单 RadioDriver 和单 SX1262。DIO1 只置位，主循环
-处理。当前固定 915.0 MHz（暂定）、SF7/BW125、CR4/5、前导 8、显式头、CRC、
-sync 0x12、10 dBm。控制 SF9 预留。Client 处理 TX_DONE 后等 ACK 一秒，driver
-TX 时限两秒。M2 超时后开始新事务，原 HELLO 不自动重传。
-
-M3–M6 段为计划。候选 BEACON 布局、相对 slot 锚点与 lease 见
-[TDMA_FEASIBILITY](TDMA_FEASIBILITY.md)。DATA 载荷与版本兼容规则需另审。时隙需覆盖
-空口时间、准备及实测漂移 guard。固定时隙候选的起点为本地 beacon 锚点加上行偏移，
-再加时隙索引乘时隙长。设置期限前要验证时隙在帧内。丢 beacon 时停止当帧 DATA，连续丢失、lease 过期或
-Gateway session 变化使同步失效。M6 定义公共 PHY 上的 rejoin。ADR 阈值/窗口还需实测。已提交的 profile 分配只在
-约定的超帧边界改变。未来按既有调度在阶段或时隙边界调谐硬件，当前没有该路径。
-论文、设计、现有软件和后续实物证据见 [研究到代码矩阵](../research/ALGORITHM_TRACEABILITY.md)。
+两种镜像均固定 915.0 MHz（暂定）、SF7/BW125、CR4/5、前导 8、显式头、CRC、
+sync 0x12，请求功率 22 dBm。控制 SF9 保留。M2 Client 处理 TX_DONE 后等待匹配 ACK
+十秒，driver TX 时限两秒。M2 等待配置间隔后发送新的 HELLO，原事务不重传。
 
 ## 2. 帧限制
 
@@ -100,24 +91,14 @@ boot_id，重置 Sequence，并重新建立会话。
 
 M2 去重保留 8 个 session key，每个有 64 个 sequence 的窗口；重复 HELLO 再次 ACK，不重复接受。窗口以前的 sequence 视为 stale。旧 session 淘汰和 Gateway 重启后历史丢失；此缓存不提供持久化重放保护或身份认证，M4 须重新评估容量和生命周期。
 
-## 7. ACK Bitmap
+## 7. v2 定时 Beacon、DATA 和 ACK_BITMAP
 
-ACK Bitmap 使用当前 `schedule_version` 的客户端顺序进行映射，bit
-顺序为每字节最低有效位优先。
+HELLO、ACK 只用于 v1。BEACON、DATA、ACK_BITMAP 只在 v2 研究镜像中启用，
+其余类型仍保留。帧布局、身份校验、按载荷计算时隙、位图和重传见
+[定时链路规范](SCHEDULED_LINK.md)。[早期可行性模型](TDMA_FEASIBILITY.md) 的候选
+布局仅供研究比较。
 
-- 1 个客户端：1 字节。
-- 10 个客户端：2 字节。
-- 70 个客户端：9 字节。
-
-Payload 包含 `active_client_count`、`bitmap_length` 和
-bitmap。最后一个字节未使用的高位必须为 0。
-
-客户端状态必须区分： - `ACK_RECEIVED` - `MISSING` - `ACK_UNKNOWN`
-
-重传使用确定性时隙，且复用原始 packet
-identity。初始最多重传两次。Gateway 必须去重。
-
-## 8. 保守 ADR
+## 8. 计划中的保守 ADR
 
 ADR 由 Gateway 控制，初期只允许 BW125 下的 SF7、SF8、SF9。
 

@@ -21,9 +21,15 @@ OLED 候选构建明确指定 Arduino variant 的 OLED 引脚，而非 Wire 默�
 主构建保持显示关闭，既有 LoRa 引脚常量保留。外设资源与来源见
 [英文参考矩阵](../en/HARDWARE.md) 和历史迁移记录。确认实物后再启用 OLED。
 
-USB/5 V供电按手册至少500 mA能力，直接3.3 V至少150 mA；用稳定5 V并留余量。测TX电压/电流、reset和温升，检查电池极性，不并联任意电源或从GPIO反向供电。射频在板上不能拆除，未知factory固件或已保存角色可能TX，所以第一次上电和单板操作前也要接好IPEX1.0对应50欧姆负载/天线，禁止开路发射，初始10 dBm。
+USB/5 V供电按手册至少500 mA能力，直接3.3 V至少150 mA；用稳定5 V并留余量。测TX电压/电流、reset和温升，检查电池极性，不并联任意电源或从GPIO反向供电。射频在板上不能拆除，未知出厂固件或已保存角色可能发射，第一次上电和单板操作前也须接好 IPEX1.0 对应的 50 欧姆负载或天线，禁止开路发射。
 
-固定PHY为915.0 MHz、BW125、dataSF7、保留controlSF9、CR4/5、preamble8、explicit、PHY CRC、sync0x12、10 dBm、SPI1 MHz/mode0/MSB。SX1262支持SF5–SF12，但研究仍限制SF7–SF9，不新增动态PHY/功率/调度。
+固定 PHY 为 915.0 MHz、BW125、SF7、CR4/5、前导 8、显式头、PHY CRC、sync 0x12、
+请求功率 22 dBm、SPI 1 MHz/mode 0/MSB。两种镜像均使用 SF7，SF9 保留。RadioLib
+7.8.1 在设定 PA 后恢复其 60 mA 默认过流保护，适配器随后设置 SX1262 高功率
+140 mA OCP 并检查返回值，见 [Semtech 数据手册](https://www.semtech.com/products/wireless-rf/lora-connect/sx1262)
+表 5-2。[Heltec V3 规格](https://heltec.org/project/wifi-lora-32-v3/)为 21 ± 1 dBm，
+实板传导功率、电流、电压跌落和温升待测。辐射须满足当地获准的频率、EIRP（传导功率加
+天线增益减馈线损耗）、空口占用及场地条件。
 
 915.0 MHz 是固定的暂定研究频点。辐射测试须使用获准的射频配置。首轮链路使用原装单极天线，
 先核对天线标记和适用频段。Moxon 不属于本轮测试。

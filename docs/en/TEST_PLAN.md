@@ -61,7 +61,7 @@ Acceptance:
 
 - Start at a short, clear line-of-sight distance.
 - Use the same fixed PHY on both ends.
-- Initial TX power: 10 dBm.
+- Requested TX power is 22 dBm. Verify the load, supply and authorized RF conditions before transmitting.
 - Use the 915 MHz Moxon only after confirming its connector and matching
   path.
 - Record antenna orientation and supply voltage.
@@ -124,11 +124,14 @@ Required first-stage tests:
 - duplicate identity detection;
 - role config validation;
 - invalid/partial config rejection;
-- ACK bitmap 1, 10, and 70-client boundaries when M4 is implemented.
+- Scheduled v2 production link tests cover one client end to end and validate bitmap length and padding for 1, 10 and 70 positions.
 
 Tests must not require Arduino or RadioLib for codec logic.
 
 ## 6. M3 — beacon and one-client TDMA
+
+Iteration 019 runs the v2 state machines under a fake transport. The
+following RF acceptance steps remain open. See [the v2 profile](SCHEDULED_LINK.md).
 
 Test:
 

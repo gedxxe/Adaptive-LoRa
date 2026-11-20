@@ -112,7 +112,7 @@ Do not erase NVS to force provisioning. The default OLED-off environment
 At 115200 baud run `status` first and record loaded values. Apply the following
 blocks to their respective ports. Check staged values with `config show`,
 require `CONFIG_SAVED`, then reboot under operator control and use `status` to
-confirm the loaded role, network, node, gateway, schema 1 and `15000` ms interval.
+confirm the loaded role, network, node, gateway, schema 1 and `10000` ms interval.
 A failed save is a stop point. Keep RF terminated while provisioning.
 
 Gateway:
@@ -122,7 +122,7 @@ config set role gateway
 config set network-id 1
 config set node-id 1
 config set gateway-id 1
-config set hello-interval-ms 15000
+config set hello-interval-ms 10000
 config show
 config save
 reboot
@@ -136,20 +136,26 @@ config set role client
 config set network-id 1
 config set node-id 2
 config set gateway-id 1
-config set hello-interval-ms 15000
+config set hello-interval-ms 10000
 config show
 config save
 reboot
 status
 ```
 
-Both intervals are deliberate. The Client waits 15 s after each transaction.
+Both intervals are deliberate. The Client waits 10 s after each transaction.
 The Gateway uses its interval to interpret freshness. With these settings, the
 OLED shows `WAIT` before the first qualifying reception and `ONLINE` for under
-31 s after the latest valid HELLO at Gateway or accepted ACK at Client. It then
+30 s after the latest valid HELLO at Gateway or accepted ACK at Client. It then
 shows `STALE`. `ONLINE` describes receive recency. It provides no guarantee
 that the peer is still reachable. Check `RADIO_INIT`, `OLED_INIT`, serial status
 and reset boundaries on each board before joining the pair.
+
+For M0–M2, confirm `profile=m2` and `protocol=1`. Before starting the
+22 dBm candidate, follow [HARDWARE.md](HARDWARE.md) to verify the load,
+supply margin and authorized RF conditions. A separate v2 test follows
+[SCHEDULED_LINK.md](SCHEDULED_LINK.md) after the baseline capture and uses
+the research image on both nodes.
 
 ## 5. Capture the two-board smoke test
 
@@ -185,7 +191,7 @@ Progress through 10, 25, 50, 100, 200 and 400 m only after the smoke test works.
 Keep antenna type, height, polarization, PHY and duration fixed for comparable
 conditions. Short survey windows are exploratory. Acceptance requires at least
 200 fully observed HELLO TX completions in each selected condition. Plan 3,600 s
-at the 15 s interval, with extra time if needed. Check packet count directly.
+at the 10 s interval, with extra time if needed. Check packet count directly.
 Separate hosts can capture with `--board COM_GATEWAY` and `--board COM_CLIENT`
 and matching run IDs with distinct suffixes. Follow
 [LOGGING_GUIDE.md](LOGGING_GUIDE.md) for cohort joins, PDR and ACK success,
@@ -195,7 +201,7 @@ Missing log lines leave the RF outcome unknown. Screenshots are supplementary.
 M0–M2 acceptance still needs board and electrical results, physical NVS
 save/reload, a closed-cohort normal link and separate controlled negative and
 recovery evidence. ERR-021 remains open. Timing results and M2 evidence precede
-production M3 work.
+expanding the one-client research profile.
 
 ## Planned ERR-021 fault injection — not executed
 

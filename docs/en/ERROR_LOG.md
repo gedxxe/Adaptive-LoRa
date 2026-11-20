@@ -481,3 +481,43 @@ write. Measure it as described in DEPENDENCY_BUDGET_AUDIT.md. ERR-008,
 ERR-021 and ERR-023 are still open. One repository inspection used the
 unsupported Windows rg filename glob README* (OS error 123). The explicit
 README paths corrected that lookup. All required builds and tests exited 0.
+
+## ERR-029 — Iteration 019 native timing and serial fixtures
+
+First `pio test -e native` exited 1. The old schema-1 config fixture treated
+5,000 ms as the default. OLED and runtime fixtures still advanced to 1 s
+ACK deadlines. The new scheduled fixture expected `result` immediately
+after the event field, although the logger inserts identity and PHY fields.
+PlatformIO also printed `Program received signal SIGINT (Interrupt)` for
+the failing config-store suite. Full output is preserved in
+`logs/test/iteration-019-verification-native.log`.
+
+The next run kept the old NVS fixture explicitly, advanced timing to the
+restored boundaries and matched diagnostics by record. It exited 1 with two
+scheduled log assertions still failing because two simulated boards wrote
+partial records to the same UART shim. PlatformIO reported SIGINT for that
+suite. See `logs/test/iteration-019-final-native.log`. Serialize the two
+fake UART drains and keep each complete record. The release run exited 0
+with 333/333 cases, no failures or skips.
+
+## ERR-030 — RadioLib retains low-power OCP after 22 dBm PA setup
+
+Inspect pinned RadioLib 7.8.1 `SX126x.cpp` LoRa initialization and
+`SX126x_config.cpp::setOutputPower`. Common initialization sets 60 mA, and
+the PA change restores the previous OCP register. Semtech's SX1262
+high-power `SetPaConfig` default is 140 mA. The firmware now explicitly
+sets 140 mA after successful `begin()`. An injected OCP error suppresses
+header, CRC and IRQ initialization. The three release builds and adapter
+tests passed. Actual power, current and supply headroom still need a loaded
+board measurement. ERR-021 and ERR-023 remain open.
+
+### Iteration 019 audit tooling notes
+
+PowerShell rejected a brace-expanded filename list; use separate explicit
+paths. Windows `rg` rejected `README*` and a test directory argument ending
+in `*`; use explicit paths or a `-g` filter. The first `Get-ChildItem`
+probe for `.github/workflows` found no directory. A probe for an Iteration
+018 scenario filename also found no file at that name. These lookups had no
+effect on source or validation. The first staged whitespace check found a
+trailing blank line in the Chinese architecture doc. Removing it cleared
+the check. No physical errors were injected on a board.

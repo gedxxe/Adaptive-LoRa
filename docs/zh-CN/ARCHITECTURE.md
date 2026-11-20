@@ -5,13 +5,16 @@
 两块 Heltec WiFi LoRa 32 V3.4 配 ESP32-S3/SX1262。用户确认沿用 V3.2 布线，
 编译使用 Arduino V3 variant，电气参考为 V3.2 原理图。
 Esp32Firmware先拥有PreferencesConfigStorage和Sx1262Hardware，再构造引用它们的FirmwareRuntime。
-一份镜像读取有效NVS角色后只运行GatewayApp或ClientApp；配置无效保持provisioning且禁应用TX。
+每种镜像通过 NVS 选择角色。默认 v1 镜像运行 GatewayApp 或 ClientApp；研究 v2 镜像由
+FirmwareRuntime 选择 ScheduledLink 的角色路径。配置无效时进入配置模式并禁止发射。
 main.cpp仍为15行构造和setup/loop委托。
 
 RadioDriver保留全部状态/超时/错误策略，Sx1262Hardware独占RadioLib/SPI/GPIO。
 板GPIO8–14、TCXO1.8 V、DIO2开关及DC-DC与CP2102/UART0设置见迁移审查。
 FrameCodec、DeviceConfig、SequenceTracker及NVSschema1/协议1保持。
-OLED 使用可选构建。电池、Wi-Fi、TDMA、bitmap、重传调度和 ADR 仍留待后续。
+默认 10000 ms。M2 从事务结束起计下一次上报，ACK 超时为 10 秒；已有 NVS 周期保留。
+OLED 为 M2 可选构建。[v2 研究镜像](SCHEDULED_LINK.md) 使用固定 SF7，支持单 Client
+时隙、位图反馈及三次重传。通用应用交付、多 Client 调度和 ADR 仍待实现。
 
 Native执行实际生产模块；新增adapter用有界调用记录检查配置和转发，不模拟射频。
 SDK调用仍可能同步等待，ERR-021未因迁移修复。完整平台服务和通用payload/event接口仍缺失。

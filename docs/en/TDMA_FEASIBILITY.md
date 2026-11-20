@@ -1,8 +1,10 @@
 # TDMA feasibility and M3 design notes
 
-Iteration 015, host-only preliminary research. Production remains firmware
-0.2.0-alpha.1, protocol 1, fixed-PHY HELLO/ACK. No BEACON, DATA, bitmap,
-scheduler or ADR code is activated by this work. M3–M8 production is NOT STARTED.
+This document records the Iteration 015 host-only model and candidate
+schedule-table design. The narrower Iteration 019 firmware uses one client,
+four rounds and fixed SF7. Its v2 wire layouts and calendar are specified in
+[SCHEDULED_LINK.md](SCHEDULED_LINK.md). The analytical grid below is retained
+for comparison and does not predict measured capacity or v2 timings.
 
 ## What the model calculates
 

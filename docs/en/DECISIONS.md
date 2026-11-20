@@ -226,3 +226,23 @@ modulo 2^32 and reset at reboot. Link state uses a monotonic freshness window
 from the last qualifying receive. Preserve byte-level HELLO/ACK and schema 1.
 Keep the bench frequency at its existing research value until an authorized
 operating profile is selected. Physical evidence is required before M2 closes.
+
+## ADR-021 — Separate v2 research image and restore the fixed PHY
+
+2026-11-20. Keep the default and OLED profiles on protocol 1 and use an
+explicit PlatformIO research profile for protocol 2. Both profiles use the
+existing NVS role and schema 1. Each wire decoder accepts its own version.
+Both roles use fixed SF7, one radio and its existing driver. The v2 calendar
+has one peer, uses serviced beacon completion anchors and derives slots from
+the advertised payload budget. An explicit missing bit and an unknown
+result both allow a retry in the next slot, with the same DATA bytes. An
+accepted bit must match the client boot ID and sequence. The retry budget is
+one initial transmission plus three retries, as confirmed by the user.
+
+Restore the confirmed 10,000 ms reporting default and 10,000 ms M2 ACK
+timeout. Saved intervals still load as recorded. The scheduled profile uses
+shorter feedback windows within that budget. Restore the 22 dBm SX1262
+request and set its 140 mA high-power OCP after RadioLib `begin()` preserves
+60 mA. The PA limit does not specify board input current. Keep V3.2 as the
+electrical reference for the V3.4 pair. Bench evidence is needed for actual
+output and the experimental guard. ADR remains planned.

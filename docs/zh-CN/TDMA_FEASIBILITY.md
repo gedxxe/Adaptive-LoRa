@@ -1,9 +1,8 @@
 # TDMA 可行性与 M3 设计说明
 
-Iteration 015 仅做主机初步研究。生产固件仍为 0.2.0-alpha.1、协议 1、
-固定 PHY HELLO/ACK；没有启用 BEACON、DATA、bitmap、调度器或 ADR。
-M3–M8 生产功能为 NOT STARTED。完整规范与来源见英文
-[TDMA_FEASIBILITY.md](../en/TDMA_FEASIBILITY.md)。
+本文保留 Iteration 015 的主机模型与候选调度表。Iteration 019 固件使用单 Client、
+四轮、固定 SF7，其 v2 空口规范见 [定时链路](SCHEDULED_LINK.md)。下文网格仅供比较，
+不能用于推断实测容量或 v2 时序。英文记录见 [TDMA_FEASIBILITY.md](../en/TDMA_FEASIBILITY.md)。
 
 ## 模型与计算假设
 

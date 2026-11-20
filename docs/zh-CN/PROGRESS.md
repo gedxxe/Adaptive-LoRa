@@ -1,7 +1,29 @@
 # 开发进度
 
 <!-- current-state:start -->
-## 当前状态 — Iteration 018
+## 当前状态 — Iteration 019
+
+审查分支 `codex/iteration-019-research-implementation` 从已发布的 Iteration 018
+`0735bb8ef5cb7c1d677c98f2123c4a3f6cb7a1ea` 开始。规范 `main` 基线仍为
+`541e2e8b985f7cd67ca4d1f1af323c46aed4333e`。
+
+| 项目 | 当前证据 |
+|---|---|
+| 固件 / 协议 | `0.2.0-alpha.1` / `1`（默认 M2）；可选定时 v2 |
+| 构建环境 | `heltec_wifi_lora_32_V3`、`_oled`、`_research` 均退出 0 |
+| 硬件 | 用户报告两块 Heltec WiFi LoRa 32 V3.4，ESP32-S3/SX1262、原装单极天线、采购 902–928 MHz，电气参考为 V3.2 |
+| 恢复配置 | 915.0 MHz、SF7/BW125/CR4/5、请求 22 dBm、PA OCP 140 mA、网络/Gateway/Client 1/1/2、默认上报和 M2 ACK 超时均 10000 ms、NVS schema 1 |
+| 定时软件 | 单 Client、按载荷计算时隙、累计位图反馈和三次重传。主机测试执行真实状态机。 |
+| 软件验证 | Native 333/333、采集 13/13、空口模型 16/16、文档测试 7/7 及直接一致性检查均通过。 |
+| Physical acceptance | IN PROGRESS; NOT RUN |
+
+先按 [M2 台架流程](BENCH_RUNBOOK.md) 操作。M3/M4 验收需两块板运行 v2，并测量传导
+功率、收发切换、IRQ 延迟及漂移。见 [v2 规范](SCHEDULED_LINK.md)、
+[仓库审查](../research/ITERATION_019_AUDIT.md) 与 [构建记录](../en/BUILD_MEMORY.md)。
+M5–M8 仍在计划中。本轮未操作硬件。
+<!-- current-state:end -->
+
+## Iteration 018 历史快照
 
 main 已合入 PR #6，提交 `541e2e8b985f7cd67ca4d1f1af323c46aed4333e`。
 研究分支为 `codex/iteration-018-research-traceability`。
@@ -19,7 +41,6 @@ main 已合入 PR #6，提交 `541e2e8b985f7cd67ca4d1f1af323c46aed4333e`。
 [论文与图表](../references/README.md) 和 [追溯矩阵](../research/ALGORITHM_TRACEABILITY.md)
 区分论文结论、项目设计、软件检查与实物测量。M3–M8 生产功能未启动。实物下一步见
 [台架流程](BENCH_RUNBOOK.md)。
-<!-- current-state:end -->
 
 ## Iteration 016.1 历史快照
 

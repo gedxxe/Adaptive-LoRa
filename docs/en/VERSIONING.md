@@ -34,7 +34,10 @@ milestone is complete.
 
 ## 3. Protocol version
 
-`PROTOCOL_VERSION` starts at `1`.
+`PROTOCOL_VERSION` records the default M2 protocol, currently `1`. The
+separate `heltec_wifi_lora_32_V3_research` image uses version `2`, declared in
+`scheduled_protocol.h`. Neither decoder accepts the other wire version.
+See [the scheduled protocol](SCHEDULED_LINK.md).
 
 Bump the protocol version for an incompatible change to:
 

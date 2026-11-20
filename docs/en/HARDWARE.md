@@ -52,8 +52,8 @@ The reference LoRa connector is IPEX 1.0. Verify the delivered connector before 
 antenna or RF load **before power**, including single-board and first-boot
 work. The integrated radio cannot be unplugged as a separate module, and
 an unknown factory image or valid saved role may transmit. Never transmit
-with an open RF connector. Start at 10 dBm; inspect the power/feed/placement
-before changing power to compensate for a link problem.
+with an open RF connector. Measure supply voltage during TX with a suitable
+50-ohm load and check feed and antenna placement before a range test.
 
 ## Fixed research PHY
 
@@ -62,18 +62,26 @@ before changing power to compensate for a link problem.
 | Frequency | 915.0 MHz, provisional research setting |
 | Bandwidth | 125 kHz |
 | Data SF | SF7 |
-| Reserved control SF | SF9; unused in M2 |
+| Reserved control SF | SF9; unused in both profiles |
 | Coding rate | 4/5 |
 | Preamble | 8 symbols |
 | Header / PHY CRC | Explicit / enabled |
 | Private sync | RadioLib one-byte0x12 |
-| TX power | 10 dBm |
+| TX power / PA overcurrent protection | 22 dBm requested / 140 mA configured |
 | SPI | 1 MHz, mode0, MSB first |
 | TCXO / radio regulator | DIO3 1.8 V / DC-DC |
 
-The current research PHY is fixed. Radiated tests require an authorized RF
-setup. The planned Moxon is outside this bench iteration. Use the two stock
+The current research PHY is fixed. RadioLib 7.8.1 restores its default 60 mA
+OCP after setting PA power. The adapter then applies the SX1262 high-power
+140 mA OCP setting (Semtech datasheet, table 5-2) and checks the return code.
+Neither value is a board measurement. Heltec specifies 21 ± 1 dBm for the V3
+family. Verify actual conducted output, current, supply droop and heating
+under the delivered hardware and load. Radiated tests require authorization
+for the frequency, EIRP (conducted power plus antenna gain minus feed loss),
+airtime and operating site. The planned Moxon is outside this bench iteration. Use the two stock
 monopoles for the first link after confirming their markings and suitability.
+See the [Semtech SX1262 documentation](https://www.semtech.com/products/wireless-rf/lora-connect/sx1262)
+and [Heltec V3 specifications](https://heltec.org/project/wifi-lora-32-v3/).
 
 ## Bring-up evidence still required
 

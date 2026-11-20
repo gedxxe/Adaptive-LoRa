@@ -51,7 +51,7 @@ pio device monitor --port COM_BOARD --baud 115200
 
 以 115200 baud 先查看 `status`，按板输入以下命令。核对暂存值并确认 `CONFIG_SAVED`
 后才手动重启。保存失败即停止。重启后以 `status` 核对已加载的角色、ID、schema 1 和
-15000 ms。
+10000 ms。
 
 Gateway：
 
@@ -60,7 +60,7 @@ config set role gateway
 config set network-id 1
 config set node-id 1
 config set gateway-id 1
-config set hello-interval-ms 15000
+config set hello-interval-ms 10000
 config show
 config save
 reboot
@@ -74,17 +74,21 @@ config set role client
 config set network-id 1
 config set node-id 2
 config set gateway-id 1
-config set hello-interval-ms 15000
+config set hello-interval-ms 10000
 config show
 config save
 reboot
 status
 ```
 
-两板均为 15 s。Client 每次事务结束后等 15 s。Gateway 使用该间隔判断屏幕新鲜度。
+两板均为 10 s。Client 每次事务结束后等 10 s。Gateway 使用该间隔判断屏幕新鲜度。
 WAIT 表示尚无有效接收。ONLINE 表示 Gateway 收到有效 HELLO 或 Client 接受 ACK 后
-不足 31 s，不能说明持续连接。达到 31 s 则显示 STALE。联通前查看 RADIO_INIT、
+不足 30 s，不能说明持续连接。达到 30 s 则显示 STALE。联通前查看 RADIO_INIT、
 OLED_INIT、status 和复位边界。
+
+M0–M2 联通前确认 `profile=m2`、`protocol=1`，并按 [硬件说明](HARDWARE.md)
+核对 22 dBm 镜像所需负载、供电余量及获准的射频条件。完成基线捕获后才使用两块
+同配置研究镜像执行独立的 [v2 定时链路测试](SCHEDULED_LINK.md)。
 
 ## 5. 先做双板联通，再扩展距离
 
@@ -103,7 +107,7 @@ python tools/capture_bench.py --gateway COM_GATEWAY --client COM_CLIENT --second
 在相同几何、供电、PHY 和间隔下比较 OLED 开关，查看 PDR、ACK 成功、事务时长、复位和
 日志丢失。记录 OLED_STATUS 的单次 I²C 和刷新 I/O 最大时长。可用高阻探头记录 DIO1、
 SCL、radio NSS，比较 DIO1 到首次 SPI 服务与 ACK 启动时延。OLED 耗时不等于 IRQ 延时。
-联通后才扩展 10/25/50/100/200/400 m。每个选定验收条件至少 200 次完整 HELLO TX，15 s
+联通后才扩展 10/25/50/100/200/400 m。每个选定验收条件至少 200 次完整 HELLO TX，10 s
 间隔建议预留 3600 s 并实际核对包数。独立主机使用 `--board` 和同 run ID 不同后缀。
 用 [日志规范](LOGGING_GUIDE.md) 统计 PDR 与成功率，缺失串口行不能当作 RF 丢包。
 实物 NVS、链路、异常和恢复证据齐备后才完成 M0–M2，M3 还需实测时序。

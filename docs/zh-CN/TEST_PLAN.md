@@ -16,16 +16,16 @@ RadioLib 版本。
 
 部署前还需确认当地允许的频率、信道和功率要求。
 
-## 3. M1 — LLCC68 初始化
+## 3. M1 — SX1262 初始化
 
-分别在两台设备上验证： - RadioLib LLCC68 初始化； - BUSY 和 DIO1
+分别在两台设备上验证： - RadioLib SX1262 初始化； - BUSY 和 DIO1
 事件； - Reset； - 电源稳定性； - 无重复 brownout 或 watchdog reset。
 
 配置无效时必须进入 Provisioning Mode，禁止正常无线发送。
 
 ## 4. M2 — HELLO / ACK
 
-短距离、无遮挡、固定 PHY 测试。初始发射功率 10 dBm。
+短距离、无遮挡、固定 PHY 测试。请求功率 22 dBm，发射前核对负载、供电和获准射频条件。
 
 至少记录 200 次 HELLO： - 尝试数量； - Gateway 接收数量； - ACK
 发送数量； - Client 成功确认数量； - Timeout； - Duplicate； -
@@ -45,6 +45,9 @@ wrap； - 重复包识别； - NVS 角色配置验证。
 M4 阶段增加 1、10、70 节点 Bitmap 测试。
 
 ## 6. M3–M8
+
+Iteration 019 使用模拟 radio transport 执行实际 v2 状态机。单 Client 路径和位图 1、
+10、70 位置的格式测试为主机证据，下面的实物验收仍未执行。见 [v2 规范](SCHEDULED_LINK.md)。
 
 - M3：单客户端 Beacon/TDMA、slot timing、radio switching 和 clock
   drift。

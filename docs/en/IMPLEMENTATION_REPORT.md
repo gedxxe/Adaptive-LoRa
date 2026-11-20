@@ -1,5 +1,8 @@
 # M0–M2 implementation report — 2026-11-12
 
+This report records the original M0–M2 delivery. See [PROGRESS.md](PROGRESS.md)
+for current hardware, configuration and verification.
+
 Publication copy: iteration 008 neutralized historical identity/path labels. All earlier versions, outcomes, chronology and hardware-validation limits below remain historical evidence; they were not obtained anew by renaming the project. See IDENTITY_AUDIT.md and logs/README.md.
 
 Current migration evidence: `logs/build/iteration-008-esp32.log` PASS and `logs/test/iteration-008-native.log` 92/92 PASS, including 38 integration cases; versions and firmware behavior preserved. Original hashes below remain historical. Radio/platform/application readiness and remaining gaps are in ARCHITECTURE.md section 9; physical validation remains absent.

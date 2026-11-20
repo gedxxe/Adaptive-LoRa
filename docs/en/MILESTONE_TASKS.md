@@ -48,24 +48,18 @@ Adaptive-LoRa research title: Reliability-aware TDMA Scheduling and Link Adaptat
 
 ## M3 — Beacon and one-client TDMA
 
-- Add `common/scheduler/` only now.
-- Define beacon payload and relative timing reference.
-- Add frame ID and schedule version.
-- Implement client synchronization and slot state.
-- Measure radio switching, IRQ timing, and clock drift.
-- Add measured guard time.
-- Test missed beacon and stale schedule.
-- Do not generalize to 70 clients in this milestone.
+The opt-in v2 implementation and native scenarios are in Iteration 019.
+Verify the serialized slot calendar on two boards. Measure IRQ service,
+TX launch and RX re-arm delay, clock drift and late/missed beacon recovery.
+Set guard margins from those measurements before expanding the schedule.
 
 ## M4 — ACK bitmap and selective retransmission
 
-- Add schedule-indexed bitmap encoding/decoding.
-- Test 1, 10, and 70 client bitmaps.
-- Add deterministic retry slots.
-- Add `MISSING` and `ACK_UNKNOWN` states.
-- Reuse packet identity on retry.
-- Test dropped DATA, dropped ACK bitmap, and duplicates.
-- Verify no duplicate application delivery.
+Iteration 019 implements one-client bitmap feedback and three scheduled
+retries, preserving DATA identity. Format checks cover 1, 10 and 70 logical
+positions. Verify lost DATA, lost feedback, duplicate suppression and retry
+exhaustion on the actual link. Review the multi-client schedule and bitmap
+binding before expanding the wire contract.
 
 ## M5 — Conservative ADR
 

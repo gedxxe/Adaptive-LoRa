@@ -1,7 +1,30 @@
 # Development progress
 
 <!-- current-state:start -->
-## Current state — Iteration 018
+## Current state — Iteration 019
+
+Branch `codex/iteration-019-research-implementation` starts at published
+Iteration 018, `0735bb8ef5cb7c1d677c98f2123c4a3f6cb7a1ea`. Canonical `main`
+remains `541e2e8b985f7cd67ca4d1f1af323c46aed4333e`.
+
+| Item | Current evidence |
+|---|---|
+| Firmware / protocol | `0.2.0-alpha.1` / `1` (default M2); opt-in scheduled v2 |
+| Build environment | `heltec_wifi_lora_32_V3`, `_oled`, `_research`; all exit 0 |
+| Board | Two owner-reported Heltec WiFi LoRa 32 V3.4, ESP32-S3/SX1262, stock monopoles, 902–928 MHz procurement; V3.2 electrical reference |
+| Restored baseline | 915.0 MHz, SF7/BW125/CR4/5, 22 dBm request, 140 mA PA OCP, network/gateway/client 1/1/2, 10,000 ms reporting default and M2 ACK timeout, NVS schema 1 |
+| Scheduled software | One client, payload-aware slots, cumulative bitmap feedback and three retries. Host tests run the actual state machines. |
+| Software checks | Native 333/333, capture 13/13, airtime model 16/16 and documentation tests 7/7 PASS. Direct consistency check PASS. |
+| Physical acceptance | IN PROGRESS; NOT RUN |
+
+Follow the [M2 bench runbook](BENCH_RUNBOOK.md) first. M3/M4 acceptance
+needs two boards running v2 and measurements of conducted power, TX/RX
+turnaround, IRQ jitter and drift. See the [v2 specification](SCHEDULED_LINK.md),
+[repository audit](../research/ITERATION_019_AUDIT.md) and [build memory](BUILD_MEMORY.md).
+M5–M8 remain planned. No hardware was accessed this iteration.
+<!-- current-state:end -->
+
+## Historical snapshot — Iteration 018
 
 Main includes PR #6 at `541e2e8b985f7cd67ca4d1f1af323c46aed4333e`.
 The research branch is `codex/iteration-018-research-traceability`.
@@ -21,7 +44,6 @@ The research branch is `codex/iteration-018-research-traceability`.
 claims, project design, host evidence and physical measurements. No M3–M8
 production feature is active. Next physical step follows the existing
 [BENCH_RUNBOOK.md](BENCH_RUNBOOK.md).
-<!-- current-state:end -->
 
 ## Historical snapshot — Iteration 016.1
 

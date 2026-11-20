@@ -2,27 +2,19 @@
 
 ## 1. Protocol scope
 
-The first protocol revision is a small, bounded binary protocol for a
-two-device HELLO/ACK link. Later milestones add beacon scheduling,
-bitmap ACK, retries, and ADR.
+Adaptive-LoRa uses a custom LoRa P2P protocol. The default and OLED builds
+use v1 HELLO/ACK. The opt-in research build uses v2 BEACON, DATA and
+ACK_BITMAP, specified in [SCHEDULED_LINK.md](SCHEDULED_LINK.md). Each
+decoder accepts its own version and types only. `PROTOCOL_VERSION` tracks
+the default v1 wire format. Firmware version and NVS schema are shared.
 
-This is a custom LoRa P2P protocol. It is not LoRaWAN.
-
-Sections 2–7 define the current M2 wire contract. Sections 8–11 describe
-later designs. IDs in the type allocation table reserve values only. The
-current encoder and decoder accept HELLO and ACK and reject every reserved
-future type. The [research traceability matrix](../research/ALGORITHM_TRACEABILITY.md)
-explains the differences between published mechanisms, project proposals,
-software checks and bench evidence.
-
-Gateway and Client share the same codec and the same firmware image. The
-saved NVS role selects the application. FirmwareRuntime polls one RadioDriver
-and then services the active role. Sx1262Hardware owns the peripheral, and
-DIO1 latches an event for the loop. Both roles start at 915.0 MHz (provisional),
-SF7/BW125, CR4/5, preamble 8, explicit header, CRC, sync 0x12 and 10 dBm.
-SF9 control remains a future allocation. The client ACK deadline is one second
-from serviced TX_DONE. The driver uses a two-second TX deadline. M2 does not
-retry the same outgoing HELLO after timeout.
+The saved role selects Gateway or Client in each image. FirmwareRuntime
+services one RadioDriver; Sx1262Hardware owns the peripheral and latches
+DIO1. Both profiles use provisional 915.0 MHz, SF7/BW125, CR4/5, preamble 8,
+explicit header, CRC, sync 0x12 and requested 22 dBm. SF9 stays reserved.
+M2 waits 10 seconds from serviced TX_DONE for a matching ACK. The driver
+TX timeout is two seconds. M2 starts a new HELLO after the configured
+reporting interval and never retries the original HELLO.
 
 ## 2. Frame limits and byte order
 
@@ -79,7 +71,8 @@ The magic value is written little-endian. Its on-air bytes are
 | `0x31` | REJOIN_GRANT   | M6          |
 | `0x7F` | DIAGNOSTIC     | As required |
 
-Do not implement reserved message types before their milestone.
+HELLO and ACK are v1 only. BEACON, DATA and ACK_BITMAP are enabled only in
+the v2 research profile. All other table entries remain reserved.
 
 ## 5. M2 HELLO / ACK payload
 
@@ -106,7 +99,7 @@ The client reports success only if all echoed fields match the
 outstanding HELLO. A valid ACK for another boot ID or sequence is not
 success.
 
-M2 implements accepted ACK status 0 only, exactly nine payload bytes. Reject nonzero status, zero echoed boot ID, invalid echoed source, or echoed source different from the ACK destination. All M2 traffic is unicast: source/destination must be 1–65534 and different; network may be 1–65535. Reserved future message types and nonzero frame/config/schedule fields are rejected until their milestones. This clarifies M2 validation without changing the v1 layout.
+M2 implements accepted ACK status 0 only, exactly nine payload bytes. Reject nonzero status, zero echoed boot ID, invalid echoed source, or echoed source different from the ACK destination. All M2 traffic is unicast: source/destination must be 1–65534 and different; network may be 1–65535. Reserved future message types and nonzero frame/config/schedule fields are rejected by v1. This clarifies M2 validation without changing the v1 layout.
 
 ## 6. Boot ID and sequence behavior
 
@@ -145,86 +138,12 @@ The decoder must validate, in this order or an equivalent safe order:
 Do not read a field before confirming the input contains its bytes. Do
 not copy a payload into a destination buffer before confirming capacity.
 
-## 8. Planned M3 beacon and schedule fields
+## 8–10. Scheduled BEACON, DATA and ACK_BITMAP (v2)
 
-M3 introduces a common control-PHY beacon. At minimum, it must carry:
-
-- frame ID;
-- schedule version;
-- active client count;
-- the client’s assigned slot information for the one-client test;
-- timing information needed to schedule the uplink relative to beacon
-  reception;
-- validity/lease information so a stale client stops normal uplink.
-
-For the one-client test, a fixed slot may be used. Do not assume that a
-one-client schedule format is automatically sufficient for 70 clients.
-Document and test any later schedule-table encoding before scaling.
-
-The client measures local monotonic time at beacon RX completion and
-schedules its assigned slot using the beacon’s relative timing fields.
-The gateway uses its own TX completion and local monotonic clock. Guard
-time must be based on measured radio switching and clock drift, not an
-arbitrary constant.
-
-The candidate BEACON payload, field widths, slot and lease constraints and
-local anchor semantics are in [TDMA_FEASIBILITY.md](TDMA_FEASIBILITY.md).
-The future DATA type is reserved. Its application payload and versioning
-rules require review before any implementation. Slot and guard durations
-must include the packet airtime, preparation, uncertainty and measured
-drift. In the fixed-slot candidate, slot start is the local beacon anchor
-plus the advertised uplink offset plus the assigned slot index times the
-slot duration. Validate the offset and slot end against the announced frame
-before arming any deadline. A missed beacon suppresses that frame’s DATA.
-Repeated misses, lease expiry or a changed gateway session invalidate synchronization.
-M6 will specify explicit rejoin on the common control PHY.
-
-## 9. Planned M4 ACK_BITMAP
-
-The ACK bitmap header identifies the superframe using `frame_id` and
-carries the active `schedule_version`.
-
-Payload structure:
-
-| Field                 |     Size | Description                                |
-|-----------------------|---------:|--------------------------------------------|
-| `active_client_count` |        1 | Number of scheduled clients                |
-| `bitmap_length`       |        1 | Must equal `ceil(active_client_count / 8)` |
-| `bitmap`              | variable | One bit per client in schedule order       |
-
-Bit order is least-significant bit first within each byte. Bit index `i`
-maps to schedule entry `i` for the matching schedule version. The
-schedule mapping must be stable and explicit.
-
-Examples:
-
-- 1 client → 1 byte.
-- 10 clients → 2 bytes.
-- 70 clients → 9 bytes.
-
-Unused high bits in the final byte must be zero.
-
-Client states must distinguish:
-
-- `ACK_RECEIVED`: valid bitmap received and this client’s bit is one.
-- `MISSING`: valid bitmap received and this client’s bit is zero.
-- `ACK_UNKNOWN`: no valid bitmap received before the ACK window expires.
-
-`MISSING` and `ACK_UNKNOWN` are not interchangeable.
-
-## 10. Planned selective retransmission
-
-- Retry slots are deterministic and tied to the active schedule.
-- A client retries only in its assigned retry slot.
-- A `MISSING` client may retry.
-- An `ACK_UNKNOWN` client may retry in its assigned retry slot because
-  the original packet may have reached the gateway while the bitmap was
-  lost.
-- Retry reuses the original logical packet identity and payload.
-- Gateway deduplication prevents duplicate application delivery.
-- Gateway may acknowledge a duplicate packet again.
-- Initial maximum: two retries, configurable.
-- After retry exhaustion, record the failure and sequence identity.
+[SCHEDULED_LINK.md](SCHEDULED_LINK.md) defines byte layouts, identity and
+validation, the payload-aware timing equations, feedback, and retries for
+the active v2 research profile. The older schedule-table candidates in
+[TDMA_FEASIBILITY.md](TDMA_FEASIBILITY.md) are historical design inputs.
 
 ## 11. Planned conservative ADR
 
@@ -261,7 +180,8 @@ phase or slot boundary. The current driver has no such retune path.
 
 ## 12. Protocol versioning
 
-`PROTOCOL_VERSION` describes the wire format. It is independent of
+`PROTOCOL_VERSION` describes the default M2 wire format. The scheduled
+research build declares v2 in `scheduled_protocol.h`. It is independent of
 firmware SemVer, `config_version`, and `schedule_version`.
 
 Bump the protocol version for incompatible changes to header layout,

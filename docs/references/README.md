@@ -1,11 +1,10 @@
 # Adaptive-LoRa research references
 
-The four references below inform the project’s planned gateway-scheduled TDMA,
-conservative ADR, ACK bitmap and selective retransmission. Each description
-separates the paper’s mechanism from the project’s adaptation. The production
-firmware currently exchanges fixed-PHY M2 HELLO and unicast ACK frames. The
-[traceability matrix](../research/ALGORITHM_TRACEABILITY.md) maps the proposals
-to the code and tests that exist today.
+The four references inform the project’s single-radio schedule and link
+adaptation research. The default firmware exchanges M2 HELLO and unicast ACK.
+The optional v2 research profile implements one-client TDMA and bitmap retries.
+The [traceability matrix](../research/ALGORITHM_TRACEABILITY.md) maps each
+mechanism to its adaptation and software evidence. ADR remains planned.
 
 The [figure source register](FIGURE_SOURCE_REGISTER.md) gives the exact
 captions, page indices, printed pages, licenses and asset provenance. The

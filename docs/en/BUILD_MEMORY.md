@@ -1227,3 +1227,71 @@ remain open. M0–M2 physical IN PROGRESS, M3–M8 production NOT STARTED. Next
 bench step is the existing one-board enumeration and preservation procedure.
 M3 will need measured radio service/turnaround and drift plus an explicit
 BEACON/DATA compatibility review before any production scheduler work.
+
+## Iteration 019 — Scheduled research implementation and audit
+
+Client date 2026-11-20. Started `codex/iteration-019-research-implementation`
+at fetched Iteration 018 `0735bb8ef5cb7c1d677c98f2123c4a3f6cb7a1ea`; main
+baseline `541e2e8b985f7cd67ca4d1f1af323c46aed4333e`. Firmware remains
+`0.2.0-alpha.1` and NVS schema 1. Default and OLED builds use v1. The v2
+research build uses the same role selection, one radio, and a separate codec.
+The [audit](../research/ITERATION_019_AUDIT.md) and [traceability](../research/ALGORITHM_TRACEABILITY.md)
+describe the findings and adaptations. All four PDF fingerprints matched the
+register. PDFs were excluded from Git and the source figures were untouched.
+
+Source responsibilities. `scheduled_protocol.cpp` validates and serializes
+v2 messages. Its header defines fixed-profile airtime and the slot calendar.
+`scheduled_link.cpp` runs both real roles through `RadioTransport`.
+`firmware_runtime.cpp` selects the proper role path and reports the wire
+profile. `sx1262_hardware.cpp` applies the restored PA configuration and
+checks OCP initialization. Project constants and the OLED freshness window
+follow the restored settings. `src/main.cpp` is the same 15-line delegate;
+v1 HELLO/ACK codec, golden frames, M2 role source, pins and NVS storage code
+are unchanged. Existing stored intervals survive. Operator examples use
+network 1, gateway 1, client 2 and 10,000 ms on both roles.
+
+Initial firmware builds passed before the OCP correction (`logs/build/iteration-019-verification-*.log`).
+First and second native runs exited 1 (`logs/test/iteration-019-verification-native.log`
+and `logs/test/iteration-019-final-native.log`). See ERR-029 for stale fixtures,
+host log interleaving and corrective work; ERR-030 records the power audit.
+The final checks below ran against the corrected source. Build and test
+transcripts normalize path prefixes to `<WORKSPACE>`, `<PLATFORMIO_HOME>`
+and `<USER_HOME>` and normalize display whitespace. Raw outputs stay under
+the ignored `.pio/iteration-019/` directory.
+
+| Command | Exit | Result and transcript |
+|---|---:|---|
+| `pio run -e heltec_wifi_lora_32_V3` | 0 | PASS, `logs/build/iteration-019-release-esp32.log` |
+| `pio run -e heltec_wifi_lora_32_V3_oled` | 0 | PASS, `logs/build/iteration-019-release-oled.log` |
+| `pio run -e heltec_wifi_lora_32_V3_research` | 0 | PASS, both roles in one image, `logs/build/iteration-019-release-research.log` |
+| `pio test -e native` | 0 | 333/333, 0 failed/skipped. Sixteen scheduled cases and one new OCP fault case. `logs/test/iteration-019-release-native.log` |
+| `<PIO_PYTHON> -m unittest discover -s tools -p test_capture_bench.py -v` | 0 | 13/13, fake serial, `logs/test/iteration-019-release-capture.log` |
+| `<PIO_PYTHON> -m unittest discover -s tools -p test_tdma_feasibility.py -v` | 0 | 16/16, analytical, `logs/test/iteration-019-release-model.log` |
+| `<PIO_PYTHON> -m unittest discover -s tools -p test_check_consistency.py -v` | 0 | 7/7, `logs/test/iteration-019-release-consistency-tests.log` |
+| `<PIO_PYTHON> tools/check_consistency.py` | 0 | PASS, `logs/test/iteration-019-release-consistency.log` |
+| `<PIO_PYTHON> tools/tdma_feasibility.py --scenarios --out logs/test/iteration-019-tdma-scenarios.json` | 0 | 216 earlier-model workload cases, `logs/test/iteration-019-verification-scenarios.log` |
+
+Resolved PlatformIO Core 6.1.19, Espressif32 55.3.311, Arduino 3.3.11,
+IDF libraries `5.5.5+sha.b774170ff46`, Xtensa `14.2.0+20260121`,
+RadioLib 7.8.1. PlatformIO reports static RAM / flash of 32,184 / 342,876
+bytes for M2, 33,960 / 377,532 with OLED, and 31,752 / 342,508 for research.
+Against the Iteration 018 default, the research profile uses 432 fewer RAM
+bytes and 344 fewer flash bytes. It replaces the M2 role path and omits
+OLED. These figures describe linked images. Heap, stack and timing high
+water marks remain NOT MEASURED.
+
+For fixed SF7 and 50 ms guards, `logs/test/iteration-019-v2-airtime.json`
+uses the existing Python `Phy()` and `airtime_us()` model independently.
+Set `B = airtime_us(34, Phy())`, `A = airtime_us(37, Phy())`, and
+`D = airtime_us(32 + grant, Phy())`. For grant lengths 0, 8 and 64,
+the last feedback close is `4 * (D + A) + 32 * 50000` µs after the beacon
+anchor and the full reservation is `B + 4 * (D + A) + 34 * 50000` µs.
+The cases are arithmetic, with no sampled delay, loss or clocks. Native
+tests simulate packet and ACK loss, repeat and duplicate handling, timing
+boundaries, mismatched identities and role recreation. They do not measure
+physical NVS, supply, IRQ, radio, range, PDR or guard reliability.
+
+Next, follow the same-board backup and authorized M0–M2 link procedure.
+Then measure the v2 one-client schedule, turnaround, IRQ jitter and drift
+with both boards running the research image. Verify controlled loss, retries
+and supply margin before increasing the client count or defining ADR.

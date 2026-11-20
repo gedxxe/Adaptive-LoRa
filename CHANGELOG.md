@@ -5,6 +5,17 @@ changes. It is not a substitute for the append-only build memory.
 
 ## Unreleased
 
+### One-client scheduled research profile — 2026-11-20
+
+- Add opt-in v2 beacon synchronization, payload-aware TDMA, bitmap feedback
+  and up to three identity-preserving retries. The default and OLED builds
+  still use v1 HELLO/ACK.
+- Restore the 10,000 ms default reporting interval and M2 ACK timeout. Keep
+  existing NVS values and schema 1. Update OLED freshness to use the ACK window.
+- Request 22 dBm at fixed 915.0 MHz/SF7/BW125 and explicitly configure SX1262
+  high-power protection. Conducted output, supply behavior and RF timing
+  remain unmeasured.
+
 ### V3.4 bench preparation and OLED diagnostics — 2026-11-19
 
 - Document the reported V3.4 pair and supplied monopoles, with the V3.2
