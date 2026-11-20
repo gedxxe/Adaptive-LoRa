@@ -5,10 +5,16 @@
 #include <esp_timer.h>
 #include <cstdio>
 #include <cinttypes>
+#if defined(ADAPTIVE_LORA_MULTICLIENT)
+#include "research_roster.h"
+#endif
 
 namespace adaptive_lora {
 namespace {
-#if defined(ADAPTIVE_LORA_SCHEDULED)
+#if defined(ADAPTIVE_LORA_MULTICLIENT)
+constexpr auto wireVersion = multiclient::kVersion;
+constexpr const char* profile = "multiclient";
+#elif defined(ADAPTIVE_LORA_SCHEDULED)
 constexpr auto wireVersion = scheduled::kVersion;
 constexpr const char* profile = "scheduled";
 #else
@@ -41,6 +47,15 @@ void FirmwareRuntime::status() {
         radio_.initialized() ? radio_.chip() : "N/A", kFirmwareVersion, wireVersion, kBuildId,
         static_cast<int>(esp_reset_reason()), log_.dropped(), profile);
     log_.text(line);
+#if defined(ADAPTIVE_LORA_MULTICLIENT)
+    if (!loadError_ && loaded_.role == DeviceRole::GATEWAY) {
+        const auto& roster = multiclient::kBenchRoster;
+        const uint32_t period = roster.periodUs ? roster.periodUs : multiclient::requiredPeriodUs(roster);
+        std::snprintf(line, sizeof(line), "event=SCHEDULE_CONFIG,period_us=%" PRIu32 ",roster_count=%u",
+                      period, roster.count);
+        log_.text(line);
+    }
+#endif
 #if defined(ADAPTIVE_LORA_OLED)
     if (display_) {
         std::snprintf(line, sizeof(line),
@@ -54,7 +69,10 @@ void FirmwareRuntime::status() {
 void FirmwareRuntime::setup() {
     Serial.begin(kSerialBaud);
     loadError_ = store_.load(loaded_);
-#if defined(ADAPTIVE_LORA_SCHEDULED)
+#if defined(ADAPTIVE_LORA_MULTICLIENT)
+    if (!loadError_ && loaded_.role == DeviceRole::GATEWAY && !multiclient::kBenchRoster.valid(loaded_.gatewayId))
+        loadError_ = "invalid_schedule_roster";
+#elif defined(ADAPTIVE_LORA_SCHEDULED)
     if (!loadError_ && !ScheduledLink::supports(loaded_)) loadError_ = "unsupported_schedule_config";
 #endif
     log_.begin(loaded_);
@@ -72,7 +90,9 @@ void FirmwareRuntime::setup() {
     const int16_t code = radio_.begin();
     log_.event("RADIO_INIT", code ? "failed" : radio_.chip(), nullptr, nullptr, code);
     if (!code) {
-#if defined(ADAPTIVE_LORA_SCHEDULED)
+#if defined(ADAPTIVE_LORA_MULTICLIENT)
+        multicli_.emplace(loaded_, radio_, log_, payload_, freshBootId, multiclient::kBenchRoster);
+#elif defined(ADAPTIVE_LORA_SCHEDULED)
         scheduled_.emplace(loaded_, radio_, log_, freshBootId);
 #else
         if (loaded_.role == DeviceRole::GATEWAY) {
@@ -104,7 +124,10 @@ void FirmwareRuntime::command(ConsoleAction action) {
         }
         case ConsoleAction::SAVE: {
             const char* error = nullptr;
-#if defined(ADAPTIVE_LORA_SCHEDULED)
+#if defined(ADAPTIVE_LORA_MULTICLIENT)
+            if (console_.staging().role == DeviceRole::GATEWAY &&
+                !multiclient::kBenchRoster.valid(console_.staging().gatewayId)) error = "invalid_schedule_roster";
+#elif defined(ADAPTIVE_LORA_SCHEDULED)
             if (!validateConfig(console_.staging()) && !ScheduledLink::supports(console_.staging()))
                 error = "unsupported_schedule_config";
 #endif
@@ -121,11 +144,46 @@ void FirmwareRuntime::command(ConsoleAction action) {
         case ConsoleAction::NONE: break;
     }
 }
+#if defined(ADAPTIVE_LORA_MULTICLIENT)
+SubmitResult FirmwareRuntime::submitPayload(const uint8_t* bytes, size_t length) {
+    if (!multicli_ || loaded_.role != DeviceRole::CLIENT || rebootPending_) return SubmitResult::INACTIVE;
+    return payload_.submit(bytes, length);
+}
+
+bool FirmwareRuntime::receivePayload(void* context, const PayloadDelivery& packet) {
+    auto& log = static_cast<FirmwareRuntime*>(context)->log_;
+    char line[256];
+    const int prefix = std::snprintf(line, sizeof(line),
+        "event=APP_PAYLOAD,source_id=%u,boot_id=%" PRIu32 ",frame_id=%" PRIu32 ",bytes=%u,hex=",
+        packet.source, packet.clientBoot, packet.frame, packet.size);
+    if (prefix < 0 || size_t(prefix) + size_t(packet.size) * 2 >= sizeof(line)) return false;
+    constexpr char digits[] = "0123456789abcdef";
+    size_t end = static_cast<size_t>(prefix);
+    for (uint8_t i = 0; i < packet.size; ++i) {
+        line[end++] = digits[packet.bytes[i] >> 4];
+        line[end++] = digits[packet.bytes[i] & 15];
+    }
+    line[end] = '\0';
+    const auto drops = log.dropped();
+    log.text(line);
+    return log.dropped() == drops;
+}
+#endif
 void FirmwareRuntime::loop() {
     const uint32_t now = micros();
     const auto event = radio_.poll(now);
     // Radio calls may wait; apps must classify the completed event at fresh time.
-#if defined(ADAPTIVE_LORA_SCHEDULED)
+#if defined(ADAPTIVE_LORA_MULTICLIENT)
+    const auto appNow = static_cast<uint64_t>(esp_timer_get_time());
+    if (multicli_) {
+        if (example_ && loaded_.role == DeviceRole::CLIENT && appNow >= nextReport_) {
+            nextReport_ = appNow + uint64_t(loaded_.helloIntervalMs) * 1000;
+            constexpr uint8_t example[] = {0x01, 0x00, 0x16, 0x80, 0x00, 0x05, 0x00, 0x7f};
+            submitPayload(example, sizeof(example));
+        }
+        multicli_->update(appNow, event, !rebootPending_);
+    }
+#elif defined(ADAPTIVE_LORA_SCHEDULED)
     if (scheduled_) scheduled_->update(static_cast<uint64_t>(esp_timer_get_time()), event, !rebootPending_);
 #else
     const uint32_t appNow = micros();

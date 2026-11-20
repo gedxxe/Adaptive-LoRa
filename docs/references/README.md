@@ -2,7 +2,9 @@
 
 The four references inform the project’s single-radio schedule and link
 adaptation research. The default firmware exchanges M2 HELLO and unicast ACK.
-The optional v2 research profile implements one-client TDMA and bitmap retries.
+The v2 research profile implements one-client TDMA and bitmap retries. The
+v3 profile adds exact-length grants, an application payload boundary and
+aggregate feedback for up to eight clients.
 The [traceability matrix](../research/ALGORITHM_TRACEABILITY.md) maps each
 mechanism to its adaptation and software evidence. ADR remains planned.
 

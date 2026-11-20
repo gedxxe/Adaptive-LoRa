@@ -121,3 +121,14 @@ measurement for that accumulator yet. Neither field measures RF latency.
 Use structured HELLO/ACK records for cohort totals. OLED counters wrap at
 2^32 and reset per boot. Frames and existing serial transaction events keep
 their prior format.
+
+## v3 scheduled payloads
+
+`status` identifies `protocol=3` and `profile=multiclient`. The gateway's
+`SCHEDULE_CONFIG` gives the period and roster size. Join `V3_DATA_TX`,
+`V3_DATA_RX` and `V3_PAYLOAD_RESULT` by frame, node and boot identity.
+`APP_PAYLOAD` prints hex from the bench receiver. A duplicate or conflict
+does not invoke that receiver again in the same frame. `V3_BITMAP_RX`
+distinguishes a valid missing bit from an unknown or expired ACK.
+`deadline_miss` records a skipped software launch. The logger's observation
+times include loop service latency. See the [v3 calendar](SCHEDULED_LINK.md).

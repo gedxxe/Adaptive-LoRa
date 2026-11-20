@@ -521,3 +521,32 @@ probe for `.github/workflows` found no directory. A probe for an Iteration
 effect on source or validation. The first staged whitespace check found a
 trailing blank line in the Chinese architecture doc. Removing it cleared
 the check. No physical errors were injected on a board.
+
+## ERR-031 — Compiler compatibility in the v3 envelope and mask code
+
+The first `pio run -e heltec_wifi_lora_32_V3_multiclient` exited 1. The
+Arduino header defines `bit(...)` as a macro, which expanded the same-named
+helper when `main.cpp` included the runtime. Renamed the helper to `slotBit`.
+The first targeted native run also exited 1 because the installed GCC 6
+treated `[[fallthrough]]` as an ignored attribute under `-Werror`. Combined
+the REQUEST/DATA cases with an explicit REQUEST length test. Initial logs
+are `logs/build/iteration-020-initial-multiclient.log` and
+`logs/test/iteration-020-probe-link.log`.
+
+## ERR-032 — Native runtime fixture stopped draining serial too early
+
+The first `pio test -e native_multiclient` recorded one failing gateway
+assertion before the pending `APP_PAYLOAD` line had drained through the
+64-byte test UART. PlatformIO also printed `CTRL_BREAK_EVENT` for the
+failed executable. Extend only the fixture's drain budget. The client
+wire test and invalid-configuration test passed in that run. See
+`logs/test/iteration-020-probe2-runtime.log`.
+
+### Iteration 020 timing limits and tooling
+
+The 1 s target cannot contain even one eight-byte client under the complete
+50 ms-guard retry calendar. The firmware rejects a forced 1 s period for
+the shipped roster and computes the documented 6,516 ms period. This is
+an admission result. Radio turnaround, BUSY delays and the guard still need
+physical measurement. ERR-021 and ERR-023 remain open. A Windows `rg` path
+with a wildcard returned error 123; the directory plus `-g` form succeeded.

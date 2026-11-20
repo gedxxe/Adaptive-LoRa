@@ -1,5 +1,10 @@
 # Figure source register
 
+The [v3 implementation diagram](../research/figures/v3-superframe.svg) was
+drawn for Iteration 020 from the production calendar and bitmap layout. The
+paper figures and the earlier explanatory drawings below remain available
+with their original attribution and adaptations.
+
 [Reference entry point and full citations](README.md). PDF index is zero-based
 in the supplied local file. Printed page is the visible article page, which
 is independent of the PDF index. Captions transcribe the local PDFs with line

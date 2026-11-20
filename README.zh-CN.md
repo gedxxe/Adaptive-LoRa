@@ -11,17 +11,17 @@ Adaptive-LoRa 是独立的单射频 LoRa P2P 网络研究与嵌入式固件项�
 
 ## 研究范围和当前状态
 
-默认镜像运行 M0–M2 固定 PHY HELLO/ACK。可选 `heltec_wifi_lora_32_V3_research`
-使用协议 v2，支持单 Client Beacon 同步、按载荷计算 TDMA 时隙、位图反馈和定时重传。
-两块板须使用同种镜像。多 Client 调度与 ADR 仍待实现。见 [定时链路规范](docs/zh-CN/SCHEDULED_LINK.md)。
+默认镜像运行 M0–M2 HELLO/ACK。可选 `heltec_wifi_lora_32_V3_multiclient` 使用
+协议 v3，支持最多八个 Client、按实际长度授权 DATA、累计位图和定时重传。
+`heltec_wifi_lora_32_V3_research` 保留单 Client v2 链路。所有节点使用同一协议，
+ADR 仍在计划中。见 [启动指南](docs/zh-CN/STARTUP_AND_PROVISIONING.md) 和 [定时链路规范](docs/zh-CN/SCHEDULED_LINK.md)。
 
 | 证据 | 当前基线 |
 |---|---|
 | 固件 / 协议 | `0.2.0-alpha.1` / `1` |
 | ESP32 编译与 Native 测试 | 见 [当前验证记录](docs/zh-CN/PROGRESS.md) |
-| Capture / 模型测试 | 13/13 / 16/16 PASS，仅主机 |
-| Documentation consistency | 7/7 tests PASS; checker exit 0 |
-| 已实现 | M2 HELLO/ACK、可选 OLED，以及独立的 v2 定时研究镜像 |
+| 采集、模型及文档检查 | 见 [构建记录](docs/en/BUILD_MEMORY.md) |
+| 已实现 | M2 HELLO/ACK、可选 OLED、单 Client v2 与多 Client v3 |
 | 实物 NVS/重启/SPI/IRQ/RF/天线 | NOT VERIFIED |
 
 Host 执行实际 Client/Gateway 状态机，使用有界 fake transport、时钟及串口适配。丢包、延迟、对象重建、radio 返回码与 IRQ 输入均不等于实测，见 [driver 审查](docs/zh-CN/RADIO_DRIVER_AUDIT.md)。精确证据见 [进度](docs/zh-CN/PROGRESS.md)、[软件审查](docs/zh-CN/SOFTWARE_AUDIT.md) 及英文 [BUILD_MEMORY](docs/en/BUILD_MEMORY.md)。
@@ -62,18 +62,19 @@ pio test -e native
 
 默认构建关闭显示。OLED 候选使用 V3 参考 SSD1306 0x3C、GPIO17/18/21 与低有效
 Vext GPIO36，实物核对后再使用。显示交替呈现链路和计数。WAIT 为无有效接收，
-ONLINE 为 Gateway 最近有效 HELLO 或 Client 接受 ACK 尚在两倍间隔加 10 秒 ACK 窗口内，
-仅表示近期有有效接收。两板均设 10000 ms 时，距上次有效接收满 30 秒进入 STALE。
+ONLINE 为 Gateway 最近有效 HELLO 或 Client 接受 ACK 尚在两倍间隔加 1 秒 ACK 窗口内，
+仅表示近期有有效接收。两板均设 3000 ms 时，距上次有效接收满 7 秒进入 STALE。
 缺失指标显示 N/A。串口 status 提供 OLED 状态
 及 I²C 和刷新总线时间最大值，Gateway ACK 开始与完成分开统计。
 
 ## 配置与后续实物流程
 
 串口 115200。支持 `help`、`status`、`config show`、`config set`、`config save`、`reboot`。
-`hello-interval-ms` 默认为 10000 ms。M2 从事务结束起计，v2 用作 Beacon 周期，周期须能
-容纳全部时隙。已有 NVS 值须明确修改后才会改变。
+`hello-interval-ms` 默认为 3000 ms。M2 从事务结束起计，丢 ACK 时还要计入发射和等待。
+旧版 v2 用此值作为 Beacon 周期。v3 用此值安排样例上报，超帧周期由 Gateway 名单独立
+计算。已有 NVS 值须明确修改后才会改变。
 
-首轮联通检查在两板均执行 `config set hello-interval-ms 10000`，保存并重启后用
+首轮 M2 联通检查在两板均执行 `config set hello-interval-ms 3000`，保存并重启后用
 `status` 核对。Gateway 使用该间隔判断 OLED 新鲜度。初始 network/node/gateway 为
 Gateway 1/1/1、Client 1/2/1；角色命令不修改 ID，应全部明确设置。config show 显示暂存值，status 显示启动加载值。Network 1–65535，node/gateway 1–65534。实物流程见 [BENCH_RUNBOOK](docs/zh-CN/BENCH_RUNBOOK.md) 和 [模板](logs/test/RUN_RECORD_TEMPLATE.md)；当前没有烧录或 RF 验证。
 
@@ -81,7 +82,7 @@ Gateway 1/1/1、Client 1/2/1；角色命令不修改 ID，应全部明确设置�
 
 1. M0–M2 继续软件验证及依赖时延/分配边界分析。
 2. 逐块识别 Windows 串口并备份，再验证 NVS、重启、电气/IRQ 和双板 HELLO/ACK。
-3. 测量单 Client 研究镜像的收发切换和漂移，核对保护时间及丢包恢复后再扩展调度。
+3. 量测 v3 研究镜像的收发切换和漂移，核对保护时间、共享重传及丢包恢复后再扩大名单。
 4. M4–M6 逐步实现 bitmap/选择性重试、版本化保守 ADR、同步恢复。
 5. M7–M8 受控天线对比及明确标注的逻辑节点仿真。
 6. 其他嵌入式应用集成前，另行审查 payload/event 和 platform-service 接口。

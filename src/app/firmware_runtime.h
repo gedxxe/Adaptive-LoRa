@@ -13,6 +13,9 @@
 #if defined(ADAPTIVE_LORA_SCHEDULED)
 #include "scheduled_link.h"
 #endif
+#if defined(ADAPTIVE_LORA_MULTICLIENT)
+#include "multiclient_link.h"
+#endif
 
 namespace adaptive_lora {
 #if __has_include(<optional>)
@@ -23,9 +26,18 @@ namespace runtime_optional = std::experimental;
 #endif
 class FirmwareRuntime {
 public:
+#if defined(ADAPTIVE_LORA_MULTICLIENT)
+    FirmwareRuntime(ConfigStorage& storage, RadioHardware& hardware, bool example = false,
+                    PayloadPort::Receiver receiver = nullptr, void* context = nullptr)
+        : store_(storage), radio_(hardware), payload_(receiver ? receiver : receivePayload,
+                                                     receiver ? context : this), example_(example) {}
+    SubmitResult submitPayload(const uint8_t* bytes, size_t length);
+    PayloadResult payloadResult() const { return payload_.result(); }
+#else
     FirmwareRuntime(ConfigStorage& storage, RadioHardware& hardware,
                     OledStatusDisplay* display = nullptr)
         : store_(storage), radio_(hardware), display_(display) {}
+#endif
     void setup();
     void loop();
 private:
@@ -38,7 +50,13 @@ private:
     ProvisioningConsole console_;
     RadioDriver radio_;
     SerialLogger log_;
-#if defined(ADAPTIVE_LORA_SCHEDULED)
+#if defined(ADAPTIVE_LORA_MULTICLIENT)
+    static bool receivePayload(void* context, const PayloadDelivery& packet);
+    PayloadPort payload_;
+    runtime_optional::optional<MulticlientLink> multicli_;
+    bool example_;
+    uint64_t nextReport_ = 0;
+#elif defined(ADAPTIVE_LORA_SCHEDULED)
     runtime_optional::optional<ScheduledLink> scheduled_;
 #else
     runtime_optional::optional<GatewayApp> gateway_;
@@ -47,7 +65,9 @@ private:
     bool rebootPending_ = false;
     bool rebootStopped_ = false;
     uint32_t rebootAt_ = 0;
+#if !defined(ADAPTIVE_LORA_MULTICLIENT)
     OledStatusDisplay* display_;
+#endif
 #if defined(ADAPTIVE_LORA_OLED)
     void serviceDisplay();
     bool displayReadyLogged_ = false;

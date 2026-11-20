@@ -10,9 +10,9 @@ Start with one board at a time. Inspect each RF connector, attach a suitable
 load before first power and identify the CP2102 COM port with a direct data
 cable. Preserve a private same-board backup from ROM and review the flash
 layout/security before upload. Follow the [bench runbook](BENCH_RUNBOOK.md)
-for the opt-in OLED image, explicit 10,000 ms provisioning on each role and
+for the opt-in OLED image, explicit 3,000 ms provisioning on each role and
 an authorized two-board smoke capture before any range survey.
 
 ERR-021 BUSY recovery and ERR-023 SDK startup formatting remain open.
-M0–M2 physical acceptance is in progress. The experimental one-client schedule also requires measured timing and a
+M0–M2 physical acceptance is in progress. The experimental multi-client schedule also requires measured timing and a
 separate two-board run after M2.

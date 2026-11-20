@@ -246,3 +246,26 @@ request and set its 140 mA high-power OCP after RadioLib `begin()` preserves
 60 mA. The PA limit does not specify board input current. Keep V3.2 as the
 electrical reference for the V3.4 pair. Bench evidence is needed for actual
 output and the experimental guard. ADR remains planned.
+
+## ADR-022 — Exact-length multi-client grants and shared retries
+
+2026-11-20. Keep the v1 M2 and v2 single-client wire formats. Add v3 in its
+own build environment. Only gateway-originated BEACON, SLOT_GRANT and
+ACK_BITMAP may use the group destination. Request and DATA use the client
+source ID and unicast gateway destination. A fixed roster limits admission
+to eight clients. The gateway grants exact lengths after receiving requests
+and uses the roster index for data ordering and both bitmap masks.
+
+Use a bounded, copied TX buffer and synchronous RX callback. A positive bit
+requires the callback to accept DATA and identifies the accepted client
+session. Declined delivery remains unset. The gateway retains one packet
+per active position for the frame. Each retry round reserves up to four
+shared slots and grants them only to missing candidates. Without a current
+grant, the client stays silent. Cumulative feedback can recover a lost ACK.
+
+Use a 3,000 ms reporting default and a 1,000 ms M2 ACK timeout. Existing
+NVS values remain authoritative. Preserve the 1,000 ms research target and
+derive a feasible superframe from the roster budgets, up to 10,000 ms. Keep
+the 50 ms provisional guard independent of those settings. v2 retains its
+own 10 s feedback budget. Both scheduled images use fixed SF7. Coordinated
+PHY changes need a versioned activation and fallback agreement.

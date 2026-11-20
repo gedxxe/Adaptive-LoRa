@@ -11,15 +11,19 @@ Adaptive-LoRa is an independent research and embedded firmware project for priva
 
 ## Research scope and current status
 
-The default build runs the M0–M2 fixed-PHY HELLO/ACK link. The opt-in `heltec_wifi_lora_32_V3_research` build runs protocol v2 with single-client beacon synchronization, payload-aware TDMA, bitmap feedback and scheduled retries. Use the same build profile on both boards. ADR and multi-client scheduling remain planned. See the [scheduled-link specification](docs/en/SCHEDULED_LINK.md).
+The default build runs the M0–M2 HELLO/ACK link. The opt-in
+`heltec_wifi_lora_32_V3_multiclient` build runs protocol v3 with up to eight
+clients, exact-length DATA slots, aggregate feedback and deterministic
+retries. `heltec_wifi_lora_32_V3_research` retains the v2 single-client link.
+Use one protocol profile across the network. ADR remains planned.
+See the [startup guide](docs/en/STARTUP_AND_PROVISIONING.md) and [wire specification](docs/en/SCHEDULED_LINK.md).
 
 | Evidence | Current baseline |
 |---|---|
 | Firmware / protocol | `0.2.0-alpha.1` / `1` |
 | ESP32 compilation and native tests | See the [current verification record](docs/en/PROGRESS.md) |
-| Implemented | M2 HELLO/ACK and optional OLED diagnostics, plus the separate scheduled v2 research profile |
-| Capture / analytical model tests | 13/13 / 16/16 PASS, host only |
-| Documentation consistency | 7/7 tests PASS; checker exit 0 |
+| Implemented | M2 HELLO/ACK, optional OLED, legacy v2 schedule and multi-client v3 payload delivery |
+| Capture, model and documentation verification | See [build memory](docs/en/BUILD_MEMORY.md) |
 | Physical NVS/reboot/SPI/IRQ/RF/antenna | NOT VERIFIED; M0–M2 acceptance IN PROGRESS |
 
 Host integration tests use the actual client/gateway state machines with bounded fake transport, clock and serial adapters. Simulated loss, delay, object recreation, radio-operation failures and IRQ inputs are not physical measurements. See the [driver audit and coverage](docs/en/RADIO_DRIVER_AUDIT.md). The [progress snapshot](docs/en/PROGRESS.md), [software audit](docs/en/SOFTWARE_AUDIT.md) and [build memory](docs/en/BUILD_MEMORY.md) record exact evidence and limitations.
@@ -126,17 +130,22 @@ those details on the V3.4 boards before using the candidate image.
 
 The OLED alternates link and counter pages. WAIT means no qualifying reception.
 ONLINE means a qualifying HELLO at the gateway or an accepted ACK at the client
-within two configured HELLO intervals plus the 10-second ACK window. It
-indicates recent receive activity. With 10,000 ms on both boards, STALE
-begins at 30 seconds without a qualifying reception.
+within two configured HELLO intervals plus the 1-second ACK window. It
+indicates recent receive activity. With 3,000 ms on both boards, STALE
+begins at 7 seconds without a qualifying reception.
 Missing metrics show N/A. Serial `status` reports display state and maximum
 I²C and refresh bus time. Gateway ACK starts and completions are separate.
 
 ## Provisioning and future bench procedure
 
-At 115200 baud, use `help`, `status`, `config show`, the `config set` commands, `config save` and `reboot`. The configured `hello-interval-ms` defaults to 10,000 ms. M2 waits this interval after a transaction completes. The research profile uses it as the beacon period and requires that the period fit its slot calendar. Existing NVS values persist until explicitly changed.
+At 115200 baud, use `help`, `status`, `config show`, the `config set`
+commands, `config save` and `reboot`. `hello-interval-ms` defaults to
+3,000 ms. M2 waits it after the transaction completes, so a lost ACK adds
+the ACK wait and transmit time. Legacy v2 uses the saved value as its
+period. v3 uses it for the report source and derives its own feasible
+superframe from the gateway roster. Existing NVS values persist until changed.
 
-For the smoke test, run `config set hello-interval-ms 10000` on **both** boards,
+For the M2 link check, run `config set hello-interval-ms 3000` on **both** boards,
 save, reboot and confirm the loaded value with `status`. The gateway uses its
 interval for OLED freshness. Initial IDs (network/node/gateway) are gateway
 `1/1/1` and client `1/2/1`. Set all IDs explicitly; role edits preserve IDs. `config show` is staged state, `status` is loaded state. Network IDs are 1–65535; node/gateway IDs are 1–65534. Start with one-board Windows enumeration and private same-board ROM backups.
@@ -147,7 +156,7 @@ authorized RF setup.
 
 1. Finish software verification and resolve dependency timing/allocation assumptions within M0–M2.
 2. Verify each delivered board, then measure NVS/reboot, pins, supply, IRQ, OLED timing and the authorized two-device HELLO/ACK link.
-3. Measure radio transitions and clock drift with the one-client research build, then validate its guard and packet-loss recovery before expanding the schedule.
+3. Measure radio transitions and clock drift with the v3 research build, then verify the guard, shared retries and loss recovery before expanding the roster.
 4. M4–M6: bitmap/selective retry, versioned conservative ADR and synchronization recovery, with fault tests before physical acceptance.
 5. M7–M8: controlled reference-vs-Moxon evaluation and explicitly labelled logical-node simulations.
 6. Add application payload/event and platform-service interfaces in a separate reviewed task before integrating other embedded applications.

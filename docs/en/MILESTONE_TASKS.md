@@ -46,20 +46,20 @@ Adaptive-LoRa research title: Reliability-aware TDMA Scheduling and Link Adaptat
 - Perform a short-range two-device RF run.
 - Update all memory files.
 
-## M3 — Beacon and one-client TDMA
+## M3 — Beacon and bounded TDMA
 
-The opt-in v2 implementation and native scenarios are in Iteration 019.
-Verify the serialized slot calendar on two boards. Measure IRQ service,
+Iteration 019 implements a v2 single-client link. Iteration 020 adds v3
+exact-length grants and exercises up to eight clients on the host. Verify
+the serialized slot calendar on two boards. Measure IRQ service,
 TX launch and RX re-arm delay, clock drift and late/missed beacon recovery.
 Set guard margins from those measurements before expanding the schedule.
 
 ## M4 — ACK bitmap and selective retransmission
 
-Iteration 019 implements one-client bitmap feedback and three scheduled
-retries, preserving DATA identity. Format checks cover 1, 10 and 70 logical
-positions. Verify lost DATA, lost feedback, duplicate suppression and retry
-exhaustion on the actual link. Review the multi-client schedule and bitmap
-binding before expanding the wire contract.
+The v3 gateway sends an aggregate bitmap and up to four shared retry grants
+after each round. Verify lost DATA, lost feedback, duplicate suppression and
+retry exhaustion on the actual link. A ten-client wire extension requires
+separate review and physical evidence for the guard.
 
 ## M5 — Conservative ADR
 

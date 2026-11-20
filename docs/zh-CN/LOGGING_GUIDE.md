@@ -32,3 +32,11 @@ OLED_ERROR。status 输出 OLED_STATUS，worst_i2c_us 为单次 write API 最长
 worst_refresh_io_us 为已完成刷新中 write API 时间总和的最大值。跳过的循环、纯 CPU
 格式化及 bus setup 不计。零值表示该项尚未积累测量。射频 cohort 用原始 HELLO/ACK
 事件统计，屏幕计数按 2^32 回绕，重启归零。既有事务记录格式保留。
+
+## v3 定时载荷
+
+`status` 显示 `protocol=3`、`profile=multiclient`，Gateway 的 `SCHEDULE_CONFIG`
+给出周期与名单人数。按帧号、节点和 boot ID 对照 `V3_DATA_TX`、`V3_DATA_RX` 及
+`V3_PAYLOAD_RESULT`。示例回调以 `APP_PAYLOAD` 输出十六进制内容，重复或冲突包不再
+调用回调。`V3_BITMAP_RX` 区分明确欠缺和未知反馈，`deadline_miss` 表示跳过软件发射。
+日志时刻包含主循环服务延迟。详见 [v3 时序](SCHEDULED_LINK.md)。

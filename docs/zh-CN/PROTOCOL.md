@@ -3,14 +3,14 @@
 ## 1. 协议范围
 
 本项目使用自定义 LoRa P2P 协议。默认和 OLED 镜像使用 v1 HELLO/ACK；可选研究镜像
-使用 v2 BEACON、DATA 与 ACK_BITMAP，见 [定时链路规范](SCHEDULED_LINK.md)。两种
-编解码器各自仅接受对应版本与类型。`PROTOCOL_VERSION` 记录默认 v1；两种镜像共用
+分为单 Client v2 与多 Client v3，见 [定时链路规范](SCHEDULED_LINK.md)。各版本
+编解码器仅接受对应版本与类型。`PROTOCOL_VERSION` 记录默认 v1；两种镜像共用
 固件版本及 NVS schema。两种角色由 NVS 选择，共用一个 RadioDriver 与 SX1262。
 DIO1 只置位，主循环处理。
 
-两种镜像均固定 915.0 MHz（暂定）、SF7/BW125、CR4/5、前导 8、显式头、CRC、
+各镜像均固定 915.0 MHz（暂定）、SF7/BW125、CR4/5、前导 8、显式头、CRC、
 sync 0x12，请求功率 22 dBm。控制 SF9 保留。M2 Client 处理 TX_DONE 后等待匹配 ACK
-十秒，driver TX 时限两秒。M2 等待配置间隔后发送新的 HELLO，原事务不重传。
+一秒，driver TX 时限两秒。M2 在事务结束后等待配置间隔（默认 3000 ms）再发送新的 HELLO。
 
 ## 2. 帧限制
 
@@ -91,10 +91,10 @@ boot_id，重置 Sequence，并重新建立会话。
 
 M2 去重保留 8 个 session key，每个有 64 个 sequence 的窗口；重复 HELLO 再次 ACK，不重复接受。窗口以前的 sequence 视为 stale。旧 session 淘汰和 Gateway 重启后历史丢失；此缓存不提供持久化重放保护或身份认证，M4 须重新评估容量和生命周期。
 
-## 7. v2 定时 Beacon、DATA 和 ACK_BITMAP
+## 7. v2 与 v3 定时协议
 
-HELLO、ACK 只用于 v1。BEACON、DATA、ACK_BITMAP 只在 v2 研究镜像中启用，
-其余类型仍保留。帧布局、身份校验、按载荷计算时隙、位图和重传见
+HELLO、ACK 只用于 v1。v2 和 v3 分别定义 BEACON、DATA、ACK_BITMAP。
+v3 另定义 `0x13` PAYLOAD_REQUEST 和 `0x14` SLOT_GRANT。ADR 及 rejoin 类型仍保留。帧布局、身份校验、按载荷计算时隙、位图和重传见
 [定时链路规范](SCHEDULED_LINK.md)。[早期可行性模型](TDMA_FEASIBILITY.md) 的候选
 布局仅供研究比较。
 

@@ -1,8 +1,28 @@
 # Research-to-code traceability
 
+## Iteration 020 multi-client firmware
+
+![Implementation diagram of the v3 superframe and bitmap](figures/v3-superframe.svg)
+
+| Research source | Adaptation | Implementation and host verification |
+|---|---|---|
+| R1, TS-VP-LoRa §§3.1–3.3 and Figs. 1–3. Beacon-based synchronization and airtime slots for different payload sizes. | Gateway announces a roster, collects actual byte counts, then grants sequential slots on one fixed SF7 channel. The beacon and grant establish local completion anchors. | [`MulticlientLink::gatewayRequest` and `client`](../../src/app/multiclient_link.cpp), [`Plan::dataStart`](../../src/common/protocol/multiclient_protocol.cpp). The 1/2/4/8-client suite compares production DATA slots, mixed payloads, frame expiry and application bytes using a fake half-duplex radio. |
+| R3, LoRaHART §§3, 5–6 and Figs. 1–3. Half-duplex scheduling and acknowledgment by position. | Each bitmap contains cumulative acceptance and the next retry grants. Missing clients share four reserved slots. Unknown feedback keeps a client silent for that round. The firmware retains accepted identity and bytes per roster position. | [`MulticlientLink::gatewayData` and `acceptFeedback`](../../src/app/multiclient_link.cpp). Native tests exercise rotating partial grants, all-loss exhaustion, byte-identical retry, cumulative recovery, duplicate and conflicting DATA, and wrong ACK identity. |
+| R4, ATS-LoRa §III and Fig. 6. Frame reservation and efficiency vary with assigned load. | Derive the configured roster's period from its worst-case payload budget. Use actual requested bytes to size the active calendar and reject oversubscribed schedules. No geographical zoning. | [`requiredPeriodUs` and `reservationUs`](../../src/common/protocol/multiclient_protocol.cpp), [capacity model](../../tools/model_multiclient.py). Native boundary checks and a matching analytical 8-client budget accompany 63 host scenarios through 70 logical clients. |
+| R2, Soy §§3–4 and Figs. 4–6. Link-quality inference from beacon RSSI. | Retain RSSI/SNR observations for future gateway decisions with minimum observation windows and hysteresis. v3 has no dynamic SF or retune policy. | [`RadioDriver::poll`](../../src/common/radio/radio_driver.cpp) supplies RX metrics. The PHY checks lock active SF to 7. A versioned agreement, fallback and an on-board retune budget remain prerequisites. |
+
+The [`PayloadPort`](../../src/app/payload_port.h) copies application bytes
+into a single pending buffer and exposes a synchronous receive callback.
+The separate [runtime tests](../../test/test_multiclient_runtime/test_main.cpp)
+verify that arbitrary bytes reach the real `RadioDriver` path and the stock
+gateway callback. See the [current results](../en/PROGRESS.md) and
+[wire, timing and capacity details](../en/SCHEDULED_LINK.md).
+
+## Iteration 019 single-client reference
+
 The [four references](../references/README.md) and [figure register](../references/FIGURE_SOURCE_REGISTER.md)
 identify the papers, figures and rights. The [v2 wire and timing specification](../en/SCHEDULED_LINK.md)
-defines the shipped research profile. The default firmware uses the v1
+defines the legacy single-client research profile. The default firmware uses the v1
 HELLO/ACK path. The [airtime feasibility study](../en/TDMA_FEASIBILITY.md)
 is an earlier analytical comparator.
 

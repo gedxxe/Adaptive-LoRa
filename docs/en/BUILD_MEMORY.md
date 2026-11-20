@@ -1295,3 +1295,69 @@ Next, follow the same-board backup and authorized M0–M2 link procedure.
 Then measure the v2 one-client schedule, turnaround, IRQ jitter and drift
 with both boards running the research image. Verify controlled loss, retries
 and supply margin before increasing the client count or defining ADR.
+
+## Iteration 020 — Multi-client scheduling and application delivery
+
+2026-11-20. Published Iteration 019 `979d873fad629aedcdf0e8a565b4ad3681bbea61`
+was fetched and absent from `origin/main` at
+`541e2e8b985f7cd67ca4d1f1af323c46aed4333e`. The working branch
+`codex/iteration-020-multiclient-payload-scheduling` starts at the published
+019 commit. The PR base is the 019 branch. Firmware version and NVS schema
+remain `0.2.0-alpha.1` and `1`. The v1 and v2 codecs retain their wire
+formats, and the v2 calendar keeps an independent 10 s feedback budget.
+
+`multiclient_protocol.cpp` validates the v3 wire format and calculates the
+calendar. `multiclient_link.cpp` runs both roles over `RadioTransport` with
+per-client delivery state and shared retry grants. `payload_port.h` owns
+the copied pending bytes and the receive callback. `FirmwareRuntime` wires
+that interface to the real role path and the bench example. The same binary
+selects a role from NVS. `main.cpp` is still the same 15-line entry point.
+Provisioning uses network 1, gateway 1 and unique client IDs 2–9 on the
+shipped roster. Saved intervals remain authoritative. The approved 3,000 ms
+report default, 1,000 ms M2 ACK timeout and 1,000 ms research target are
+independent. The v3 eight-client roster derives 6,516 ms, with SF7 and a
+provisional 50 ms guard. Live SF switching remains future work.
+
+The first ESP32 build failed on the Arduino `bit` macro, the first targeted
+native compile failed on a GCC 6 attribute, and a later native runtime
+fixture failed to drain the UART before checking the output. ERR-031 and
+ERR-032 retain the reproductions. The corrected release commands below
+completed with exit 0. Logs replace workspace, PlatformIO and user path
+prefixes with disclosed placeholders and normalize display whitespace.
+Earlier logs and paper assets are retained. No source PDFs are tracked.
+
+| Command | Exit | Result and transcript |
+|---|---:|---|
+| `pio run -e heltec_wifi_lora_32_V3` | 0 | PASS, `logs/build/iteration-020-release-esp32.log` |
+| `pio run -e heltec_wifi_lora_32_V3_oled` | 0 | PASS, `logs/build/iteration-020-release-oled.log` |
+| `pio run -e heltec_wifi_lora_32_V3_research` | 0 | PASS, `logs/build/iteration-020-release-research.log` |
+| `pio run -e heltec_wifi_lora_32_V3_multiclient` | 0 | PASS, `logs/build/iteration-020-release-multiclient.log` |
+| `pio test -e native` | 0 | 353/353 including 20 v3 codec, payload, scheduling and multi-node cases, `logs/test/iteration-020-release-native.log` |
+| `pio test -e native_multiclient` | 0 | 3/3 production runtime/client/gateway cases, `logs/test/iteration-020-release-runtime.log` |
+| `<PIO_PYTHON> -m unittest discover -s tools -p test_capture_bench.py -v` | 0 | 13/13, `logs/test/iteration-020-release-capture.log` |
+| `<PIO_PYTHON> -m unittest discover -s tools -p test_tdma_feasibility.py -v` | 0 | 16/16, `logs/test/iteration-020-release-model.log` |
+| `<PIO_PYTHON> -m unittest discover -s tools -p test_model_multiclient.py -v` | 0 | 3/3, `logs/test/iteration-020-release-capacity-tests.log` |
+| `<PIO_PYTHON> -m unittest discover -s tools -p test_check_consistency.py -v` | 0 | 9/9, `logs/test/iteration-020-release-consistency-tests.log` |
+| `<PIO_PYTHON> tools/check_consistency.py` | 0 | PASS, `logs/test/iteration-020-release-consistency.log` |
+| `<PIO_PYTHON> tools/model_multiclient.py --out logs/test/iteration-020-capacity.json` | 0 | 63 analytical scenarios, `logs/test/iteration-020-capacity.log` |
+
+All final tests passed with zero failures or skips. No new compiler warnings
+appeared in the final firmware logs. Resolved tools were PlatformIO Core
+6.1.19, Espressif32 55.3.311, Arduino 3.3.11, ESP-IDF libraries
+`5.5.5+sha.b774170ff46`, Xtensa `14.2.0+20260121` and RadioLib 7.8.1.
+
+| Image | Static RAM bytes | Flash bytes | RAM and flash change vs. Iteration 019 |
+|---|---:|---:|---|
+| M2 | 32,184 | 342,872 | 0 / −4 |
+| M2 OLED | 33,960 | 377,524 | 0 / −8 |
+| v2 research | 31,752 | 342,508 | 0 / 0 |
+| v3 multi-client | 32,472 | 346,280 | +720 / +3,772 vs. v2 |
+
+The analytical 64-byte, 50 ms cases reserve 6.515504 s for eight clients and
+7.274608 s for a hypothetical ten-client format. The 20-client case needs
+10.998448 s and has an oversized grant. The 70-client lower bound is
+27.020528 s without the unencodable controls. Native tests use host clocks
+and injected radio events. No board, USB, NVS, RF output, application stack
+watermark, turnaround or oscillator drift was measured. Next, capture
+two-node v3 timing and loss recovery on the authorized bench. Use those
+measurements before designing gateway-controlled ADR activation and fallback.

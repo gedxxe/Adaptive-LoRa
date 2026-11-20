@@ -1,7 +1,32 @@
 # Development progress
 
 <!-- current-state:start -->
-## Current state — Iteration 019
+## Current state — Iteration 020
+
+`codex/iteration-020-multiclient-payload-scheduling` stacks on the published
+Iteration 019 commit `979d873fad629aedcdf0e8a565b4ad3681bbea61`. The main
+baseline remains `541e2e8b985f7cd67ca4d1f1af323c46aed4333e`.
+
+| Item | Current evidence |
+|---|---|
+| Firmware / protocol | `0.2.0-alpha.1` / `1` by default, with separate v2 and v3 research profiles |
+| Board | Heltec WiFi LoRa 32 V3.4, ESP32-S3/SX1262, V3.2 electrical reference |
+| Timing | Default report 3,000 ms, M2 ACK 1,000 ms. v3 targets 1,000 ms and admits up to 10,000 ms. The shipped roster derives 6,516 ms using a provisional 50 ms guard. |
+| RF and storage | 915.0 MHz, SF7/BW125/CR4/5, 22 dBm requested, 140 mA PA OCP. Network/gateway/client defaults 1/1/2. Existing NVS schema 1 values persist. |
+| ESP32 builds | `heltec_wifi_lora_32_V3`, `_oled`, `_research`, `_multiclient` all passed |
+| Native | `native` 353/353 and `native_multiclient` 3/3 passed |
+| Host tools | Capture 13/13, legacy model 16/16, v3 model 3/3, documentation checks 9/9 and direct checker passed |
+| Physical acceptance | IN PROGRESS; NOT RUN |
+
+The v3 test network exercises 1, 2, 4 and 8 client state machines. DATA grants
+use the submitted length, and aggregate feedback grants shared retries only
+to missing clients. A ten-client extrapolation fits the ten-second budget
+under the model assumptions. The firmware admits up to eight. No physical
+test or measurement was taken. See the [startup guide](STARTUP_AND_PROVISIONING.md),
+[wire specification](SCHEDULED_LINK.md) and [build memory](BUILD_MEMORY.md).
+<!-- current-state:end -->
+
+## Historical snapshot — Iteration 019
 
 Branch `codex/iteration-019-research-implementation` starts at published
 Iteration 018, `0735bb8ef5cb7c1d677c98f2123c4a3f6cb7a1ea`. Canonical `main`
@@ -22,7 +47,6 @@ needs two boards running v2 and measurements of conducted power, TX/RX
 turnaround, IRQ jitter and drift. See the [v2 specification](SCHEDULED_LINK.md),
 [repository audit](../research/ITERATION_019_AUDIT.md) and [build memory](BUILD_MEMORY.md).
 M5–M8 remain planned. No hardware was accessed this iteration.
-<!-- current-state:end -->
 
 ## Historical snapshot — Iteration 018
 

@@ -1,0 +1,9 @@
+{
+  "command": "pio test -e native_multiclient",
+  "exit_code": 1,
+  "runner_seconds": 24.969,
+  "log": "logs/test/iteration-020-probe2-runtime.log",
+  "publication_policy": "Full stdout/stderr with local workspace/PlatformIO/user paths replaced by disclosed placeholders and EOL/trailing-display normalization. Raw retained privately in ignored audit cache.",
+  "client_date": "2026-11-20",
+  "physical_validation": "NOT RUN"
+}

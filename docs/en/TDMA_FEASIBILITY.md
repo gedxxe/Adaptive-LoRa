@@ -1,5 +1,9 @@
 # TDMA feasibility and M3 design notes
 
+The active v3 reservation, payload limits and 1/2/4/8-client implementation
+are documented in [SCHEDULED_LINK.md](SCHEDULED_LINK.md). The v3 model
+evaluates 10, 20 and 70 clients as extensions of the current format.
+
 This document records the Iteration 015 host-only model and candidate
 schedule-table design. The narrower Iteration 019 firmware uses one client,
 four rounds and fixed SF7. Its v2 wire layouts and calendar are specified in

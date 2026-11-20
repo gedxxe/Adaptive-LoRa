@@ -46,8 +46,9 @@ M4 阶段增加 1、10、70 节点 Bitmap 测试。
 
 ## 6. M3–M8
 
-Iteration 019 使用模拟 radio transport 执行实际 v2 状态机。单 Client 路径和位图 1、
-10、70 位置的格式测试为主机证据，下面的实物验收仍未执行。见 [v2 规范](SCHEDULED_LINK.md)。
+Iteration 019 在主机执行实际 v2 状态机。Iteration 020 测试实际 v3 Gateway 和 1、2、4、8
+个 Client，并通过 driver 接口验证运行时分派。下列实物验收仍未执行，见
+[定时协议](SCHEDULED_LINK.md)。
 
 - M3：单客户端 Beacon/TDMA、slot timing、radio switching 和 clock
   drift。
