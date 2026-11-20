@@ -1,5 +1,8 @@
 # TDMA 可行性与 M3 设计说明
 
+当前 v3 的名额、载荷上限、超帧预算及 10、20、70 节点的外推见
+[定时链路](SCHEDULED_LINK.md)。
+
 本文保留 Iteration 015 的主机模型与候选调度表。Iteration 019 固件使用单 Client、
 四轮、固定 SF7，其 v2 空口规范见 [定时链路](SCHEDULED_LINK.md)。下文网格仅供比较，
 不能用于推断实测容量或 v2 时序。英文记录见 [TDMA_FEASIBILITY.md](../en/TDMA_FEASIBILITY.md)。

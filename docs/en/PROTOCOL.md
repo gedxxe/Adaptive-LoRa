@@ -3,18 +3,19 @@
 ## 1. Protocol scope
 
 Adaptive-LoRa uses a custom LoRa P2P protocol. The default and OLED builds
-use v1 HELLO/ACK. The opt-in research build uses v2 BEACON, DATA and
-ACK_BITMAP, specified in [SCHEDULED_LINK.md](SCHEDULED_LINK.md). Each
+use v1 HELLO/ACK. The single-client research build uses v2. The multi-client build uses v3.
+Both are specified in [SCHEDULED_LINK.md](SCHEDULED_LINK.md). Each
 decoder accepts its own version and types only. `PROTOCOL_VERSION` tracks
 the default v1 wire format. Firmware version and NVS schema are shared.
 
 The saved role selects Gateway or Client in each image. FirmwareRuntime
 services one RadioDriver; Sx1262Hardware owns the peripheral and latches
-DIO1. Both profiles use provisional 915.0 MHz, SF7/BW125, CR4/5, preamble 8,
+DIO1. All profiles use provisional 915.0 MHz, SF7/BW125, CR4/5, preamble 8,
 explicit header, CRC, sync 0x12 and requested 22 dBm. SF9 stays reserved.
-M2 waits 10 seconds from serviced TX_DONE for a matching ACK. The driver
+M2 waits one second from serviced TX_DONE for a matching ACK. The driver
 TX timeout is two seconds. M2 starts a new HELLO after the configured
-reporting interval and never retries the original HELLO.
+reporting interval (3,000 ms by default) and never retries the original
+HELLO. The next interval begins when the transaction finishes.
 
 ## 2. Frame limits and byte order
 
@@ -64,6 +65,8 @@ The magic value is written little-endian. Its on-air bytes are
 | `0x10` | BEACON         | M3          |
 | `0x11` | DATA           | M3+         |
 | `0x12` | ACK_BITMAP     | M4          |
+| `0x13` | PAYLOAD_REQUEST | v3          |
+| `0x14` | SLOT_GRANT      | v3          |
 | `0x20` | CONFIG_PROPOSE | M5          |
 | `0x21` | CONFIG_ACCEPT  | M5          |
 | `0x22` | CONFIG_COMMIT  | M5          |
@@ -71,8 +74,9 @@ The magic value is written little-endian. Its on-air bytes are
 | `0x31` | REJOIN_GRANT   | M6          |
 | `0x7F` | DIAGNOSTIC     | As required |
 
-HELLO and ACK are v1 only. BEACON, DATA and ACK_BITMAP are enabled only in
-the v2 research profile. All other table entries remain reserved.
+HELLO and ACK are v1 only. BEACON, DATA and ACK_BITMAP exist in v2 and
+v3 with distinct layouts. PAYLOAD_REQUEST and SLOT_GRANT are v3 only.
+Future ADR and rejoin types remain reserved.
 
 ## 5. M2 HELLO / ACK payload
 
@@ -138,11 +142,11 @@ The decoder must validate, in this order or an equivalent safe order:
 Do not read a field before confirming the input contains its bytes. Do
 not copy a payload into a destination buffer before confirming capacity.
 
-## 8–10. Scheduled BEACON, DATA and ACK_BITMAP (v2)
+## 8–10. Scheduled research protocols (v2 and v3)
 
 [SCHEDULED_LINK.md](SCHEDULED_LINK.md) defines byte layouts, identity and
 validation, the payload-aware timing equations, feedback, and retries for
-the active v2 research profile. The older schedule-table candidates in
+the two scheduled profiles. The older schedule-table candidates in
 [TDMA_FEASIBILITY.md](TDMA_FEASIBILITY.md) are historical design inputs.
 
 ## 11. Planned conservative ADR
@@ -181,7 +185,7 @@ phase or slot boundary. The current driver has no such retune path.
 ## 12. Protocol versioning
 
 `PROTOCOL_VERSION` describes the default M2 wire format. The scheduled
-research build declares v2 in `scheduled_protocol.h`. It is independent of
+builds declare v2 in `scheduled_protocol.h` and v3 in `multiclient_protocol.h`. It is independent of
 firmware SemVer, `config_version`, and `schedule_version`.
 
 Bump the protocol version for incompatible changes to header layout,

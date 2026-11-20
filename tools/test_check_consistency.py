@@ -3,7 +3,7 @@ import shutil
 import tempfile
 import unittest
 
-from check_consistency import LINK_DOCS, check, current_text
+from check_consistency import APPROVED_SETTINGS, LINK_DOCS, check, current_text
 
 
 class ConsistencyTests(unittest.TestCase):
@@ -19,7 +19,7 @@ class ConsistencyTests(unittest.TestCase):
                     target = self.root / original.relative_to(source)
                     target.parent.mkdir(parents=True, exist_ok=True)
                     target.touch()
-        names = set(LINK_DOCS) | {"CODEX_START_PROMPT.md", "VERSION", "PROTOCOL_VERSION",
+        names = set(LINK_DOCS) | set(APPROVED_SETTINGS) | {"CODEX_START_PROMPT.md", "VERSION", "PROTOCOL_VERSION",
                 "platformio.ini", "THIRD_PARTY.md", "include/project_config.h",
                 "src/common/radio/sx1262_hardware.h", "src/app/esp32_firmware.h",
                 "logs/README.md", "logs/test/RUN_RECORD_TEMPLATE.md"}
@@ -69,6 +69,20 @@ class ConsistencyTests(unittest.TestCase):
     def test_bad_current_region_markers_are_rejected(self):
         with self.assertRaises(ValueError):
             current_text("<!-- current-state:start --> no end")
+
+    def test_timing_constants_are_independent(self):
+        self.mutate("include/project_config.h", "kAckTimeoutUs = 1000000", "kAckTimeoutUs = 3000000")
+        self.mutate("src/common/protocol/multiclient_protocol.h", "kTargetPeriodUs = 1000000", "kTargetPeriodUs = 3000000")
+        failures = check(self.root)
+        self.assertTrue(any("approved kAckTimeoutUs" in error for error in failures))
+        self.assertTrue(any("approved kTargetPeriodUs" in error for error in failures))
+
+    def test_phy_and_chinese_provisioning_regressions(self):
+        self.mutate("include/radio_config.h", "dataSf = 7", "dataSf = 9")
+        self.mutate("docs/zh-CN/STARTUP_AND_PROVISIONING.md", "hello-interval-ms 3000", "hello-interval-ms 15000")
+        failures = check(self.root)
+        self.assertTrue(any("approved dataSf" in error for error in failures))
+        self.assertTrue(any("STARTUP_AND_PROVISIONING" in error and "3000 ms" in error for error in failures))
 
 
 if __name__ == "__main__":

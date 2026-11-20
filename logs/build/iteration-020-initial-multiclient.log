@@ -1,0 +1,171 @@
+Processing heltec_wifi_lora_32_V3_multiclient (platform: espressif32; board: heltec_wifi_lora_32_V3; framework: arduino)
+--------------------------------------------------------------------------------
+Library Manager: Installing jgromes/RadioLib @ 7.8.1
+Unpacking 0% 10% 20% 30% 40% 50% 60% 70% 80% 90% 100%
+Library Manager: RadioLib@7.8.1 has been installed!
+Verbose mode can be enabled via `-v, --verbose` option
+CONFIGURATION: https://docs.platformio.org/page/boards/espressif32/heltec_wifi_lora_32_V3.html
+PLATFORM: Espressif 32 (55.3.311) > Heltec WiFi LoRa 32 (V3)
+HARDWARE: ESP32S3 240MHz, 320KB RAM, 8MB Flash
+DEBUG: Current (cmsis-dap) External (cmsis-dap, esp-bridge, esp-builtin, esp-prog, esp-prog-2, iot-bus-jtag, jlink, minimodule, olimex-arm-usb-ocd, olimex-arm-usb-ocd-h, olimex-arm-usb-tiny-h, olimex-jtag-tiny, tumpa)
+PACKAGES:
+ - contrib-piohome @ 3.4.4
+ - framework-arduinoespressif32 @ 3.3.11
+ - framework-arduinoespressif32-libs @ 5.5.5+sha.b774170ff46
+ - tool-esp-rom-elfs @ 2024.10.11
+ - tool-esptoolpy @ 5.3.0
+ - tool-openocd-esp32 @ 2.1200.20260424 (12.0)
+ - tool-xtensa-esp-elf-gdb @ 17.1.0+20260402
+ - toolchain-xtensa-esp-elf @ 14.2.0+20260121
+LDF: Library Dependency Finder -> https://bit.ly/configure-pio-ldf
+LDF Modes: Finder ~ chain, Compatibility ~ soft
+Found 44 compatible libraries
+Scanning dependencies...
+Dependency Graph
+|-- RadioLib @ 7.8.1
+|-- SPI @ 3.3.11
+|-- Preferences @ 3.3.11
+Building in release mode
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\libcc9\SPI\SPI.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\lib0fc\RadioLib\Hal.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\lib0fc\RadioLib\Module.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\lib0fc\RadioLib\hal\Arduino\ArduinoHal.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\lib0fc\RadioLib\hal\ESP-IDF\EspHal.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\lib0fc\RadioLib\hal\RPiPico\PicoHal.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\lib0fc\RadioLib\hal\Stm32duino\Stm32wlHal.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\lib0fc\RadioLib\modules\CC1101\CC1101.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\lib0fc\RadioLib\modules\LLCC68\LLCC68.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\lib0fc\RadioLib\modules\LR11x0\LR1110.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\lib0fc\RadioLib\modules\LR11x0\LR1120.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\lib0fc\RadioLib\modules\LR11x0\LR1121.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\lib0fc\RadioLib\modules\LR11x0\LR11x0.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\lib0fc\RadioLib\modules\LR11x0\LR11x0_commands.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\lib0fc\RadioLib\modules\LR11x0\LR11x0_crypto.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\lib0fc\RadioLib\modules\LR11x0\LR11x0_gnss.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\lib0fc\RadioLib\modules\LR11x0\LR11x0_wifi.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\lib0fc\RadioLib\modules\LR11x0\LR_common.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\lib0fc\RadioLib\modules\LR2021\LR2021.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\lib0fc\RadioLib\modules\LR2021\LR2021_cmds_chip_control.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\lib0fc\RadioLib\modules\LR2021\LR2021_cmds_flrc.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\lib0fc\RadioLib\modules\LR2021\LR2021_cmds_gfsk.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\lib0fc\RadioLib\modules\LR2021\LR2021_cmds_lora.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\lib0fc\RadioLib\modules\LR2021\LR2021_cmds_misc.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\lib0fc\RadioLib\modules\LR2021\LR2021_cmds_ook.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\lib0fc\RadioLib\modules\LR2021\LR2021_cmds_oqpsk.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\lib0fc\RadioLib\modules\LR2021\LR2021_cmds_radio.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\lib0fc\RadioLib\modules\LR2021\LR2021_cmds_ranging.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\lib0fc\RadioLib\modules\LR2021\LR2021_config.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\lib0fc\RadioLib\modules\RF69\RF69.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\lib0fc\RadioLib\modules\SX123x\SX1231.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\lib0fc\RadioLib\modules\SX123x\SX1233.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\lib0fc\RadioLib\modules\SX126x\STM32WLx.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\lib0fc\RadioLib\modules\SX126x\SX1261.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\lib0fc\RadioLib\modules\SX126x\SX1262.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\lib0fc\RadioLib\modules\SX126x\SX1268.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\lib0fc\RadioLib\modules\SX126x\SX126x.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\lib0fc\RadioLib\modules\SX126x\SX126x_LR_FHSS.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\lib0fc\RadioLib\modules\SX126x\SX126x_commands.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\lib0fc\RadioLib\modules\SX126x\SX126x_config.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\lib0fc\RadioLib\modules\SX127x\SX1272.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\lib0fc\RadioLib\modules\SX127x\SX1273.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\lib0fc\RadioLib\modules\SX127x\SX1276.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\lib0fc\RadioLib\modules\SX127x\SX1277.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\lib0fc\RadioLib\modules\SX127x\SX1278.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\lib0fc\RadioLib\modules\SX127x\SX1279.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\lib0fc\RadioLib\modules\SX127x\SX127x.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\lib0fc\RadioLib\modules\SX128x\SX1280.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\lib0fc\RadioLib\modules\SX128x\SX1281.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\lib0fc\RadioLib\modules\SX128x\SX1282.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\lib0fc\RadioLib\modules\SX128x\SX128x.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\lib0fc\RadioLib\modules\Si443x\Si4430.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\lib0fc\RadioLib\modules\Si443x\Si4431.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\lib0fc\RadioLib\modules\Si443x\Si4432.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\lib0fc\RadioLib\modules\Si443x\Si443x.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\lib0fc\RadioLib\modules\nRF24\nRF24.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\lib0fc\RadioLib\protocols\ADSB\ADSB.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\lib0fc\RadioLib\protocols\AFSK\AFSK.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\lib0fc\RadioLib\protocols\APRS\APRS.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\lib0fc\RadioLib\protocols\AX25\AX25.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\lib0fc\RadioLib\protocols\BellModem\BellModem.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\lib0fc\RadioLib\protocols\ExternalRadio\ExternalRadio.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\lib0fc\RadioLib\protocols\FSK4\FSK4.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\lib0fc\RadioLib\protocols\Hellschreiber\Hellschreiber.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\lib0fc\RadioLib\protocols\LoRaWAN\LoRaWAN.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\lib0fc\RadioLib\protocols\LoRaWAN\LoRaWANBands.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\lib0fc\RadioLib\protocols\LoRaWAN\LoRaWANPacMan.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\lib0fc\RadioLib\protocols\LoRaWAN\LoRaWANPackageTS003.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\lib0fc\RadioLib\protocols\LoRaWAN\LoRaWANPackageTS009.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\lib0fc\RadioLib\protocols\Morse\Morse.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\lib0fc\RadioLib\protocols\Pager\Pager.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\lib0fc\RadioLib\protocols\PhysicalLayer\PhysicalLayer.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\lib0fc\RadioLib\protocols\Print\ITA2String.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\lib0fc\RadioLib\protocols\Print\Print.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\lib0fc\RadioLib\protocols\RTTY\RTTY.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\lib0fc\RadioLib\protocols\SSTV\SSTV.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\lib0fc\RadioLib\utils\BCH.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\lib0fc\RadioLib\utils\CRC.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\lib0fc\RadioLib\utils\ConvCode.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\lib0fc\RadioLib\utils\Cryptography.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\lib0fc\RadioLib\utils\Utils.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\libdc0\Preferences\Preferences.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\src\app\firmware_runtime.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\src\app\multiclient_link.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\src\app\nvs_config_store.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\src\app\preferences_config_storage.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\src\app\provisioning_console.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\src\app\scheduled_link.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\src\client\client_app.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\src\common\config\device_config.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\src\common\diagnostics\oled_status_display.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\src\common\diagnostics\serial_logger.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\src\common\protocol\frame_codec.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\src\common\protocol\multiclient_protocol.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\src\common\protocol\scheduled_protocol.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\src\common\protocol\sequence_tracker.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\src\common\radio\radio_driver.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\src\common\radio\sx1262_hardware.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\src\gateway\gateway_app.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\src\main.cpp.o
+Building .pio\build\heltec_wifi_lora_32_V3_multiclient\bootloader.bin
+Generating partitions .pio\build\heltec_wifi_lora_32_V3_multiclient\partitions.bin
+esptool v5.3.0
+Creating ESP32-S3 image...
+Merged 2 ELF sections.
+Successfully created ESP32-S3 image.
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\FrameworkArduino\ColorFormat.c.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\FrameworkArduino\Esp.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\FrameworkArduino\FirmwareMSC.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\FrameworkArduino\FunctionalInterrupt.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\FrameworkArduino\HEXBuilder.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\FrameworkArduino\HWCDC.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\FrameworkArduino\HardwareSerial.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\FrameworkArduino\HashBuilder.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\FrameworkArduino\IPAddress.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\FrameworkArduino\MD5Builder.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\FrameworkArduino\MacAddress.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\FrameworkArduino\Print.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\FrameworkArduino\Stream.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\FrameworkArduino\StreamString.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\FrameworkArduino\StringUtils.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\FrameworkArduino\Tone.cpp.o
+In file included from src/main.cpp:1:
+<PLATFORMIO_HOME>/packages/framework-arduinoespressif32/cores/esp32/Arduino.h:112:17: error: expected unqualified-id before numeric constant
+  112 | #define bit(b) (1UL << (b))
+      |                 ^~~
+src/common/protocol/multiclient_protocol.h:21:19: note: in expansion of macro 'bit'
+   21 | constexpr uint8_t bit(uint8_t index) { return uint8_t(1u << index); }
+      |                   ^~~
+<PLATFORMIO_HOME>/packages/framework-arduinoespressif32/cores/esp32/Arduino.h:112:17: error: expected ')' before numeric constant
+  112 | #define bit(b) (1UL << (b))
+      |                ~^~~
+src/common/protocol/multiclient_protocol.h:21:19: note: in expansion of macro 'bit'
+   21 | constexpr uint8_t bit(uint8_t index) { return uint8_t(1u << index); }
+      |                   ^~~
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\FrameworkArduino\USB.cpp.o
+*** [.pio\build\heltec_wifi_lora_32_V3_multiclient\src\main.cpp.o] Error 1
+========================= [FAILED] Took 268.56 seconds =========================
+
+Environment                         Status    Duration
+----------------------------------  --------  ------------
+heltec_wifi_lora_32_V3_multiclient  FAILED    00:04:28.561
+==================== 1 failed, 0 succeeded in 00:04:28.561 ====================

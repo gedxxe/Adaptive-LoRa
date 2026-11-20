@@ -1,0 +1,117 @@
+Processing heltec_wifi_lora_32_V3_multiclient (platform: espressif32; board: heltec_wifi_lora_32_V3; framework: arduino)
+--------------------------------------------------------------------------------
+Verbose mode can be enabled via `-v, --verbose` option
+CONFIGURATION: https://docs.platformio.org/page/boards/espressif32/heltec_wifi_lora_32_V3.html
+PLATFORM: Espressif 32 (55.3.311) > Heltec WiFi LoRa 32 (V3)
+HARDWARE: ESP32S3 240MHz, 320KB RAM, 8MB Flash
+DEBUG: Current (cmsis-dap) External (cmsis-dap, esp-bridge, esp-builtin, esp-prog, esp-prog-2, iot-bus-jtag, jlink, minimodule, olimex-arm-usb-ocd, olimex-arm-usb-ocd-h, olimex-arm-usb-tiny-h, olimex-jtag-tiny, tumpa)
+PACKAGES:
+ - contrib-piohome @ 3.4.4
+ - framework-arduinoespressif32 @ 3.3.11
+ - framework-arduinoespressif32-libs @ 5.5.5+sha.b774170ff46
+ - tool-esp-rom-elfs @ 2024.10.11
+ - tool-esptoolpy @ 5.3.0
+ - tool-openocd-esp32 @ 2.1200.20260424 (12.0)
+ - tool-xtensa-esp-elf-gdb @ 17.1.0+20260402
+ - toolchain-xtensa-esp-elf @ 14.2.0+20260121
+LDF: Library Dependency Finder -> https://bit.ly/configure-pio-ldf
+LDF Modes: Finder ~ chain, Compatibility ~ soft
+Found 44 compatible libraries
+Scanning dependencies...
+Dependency Graph
+|-- RadioLib @ 7.8.1
+|-- SPI @ 3.3.11
+|-- Preferences @ 3.3.11
+Building in release mode
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\src\app\firmware_runtime.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\src\app\multiclient_link.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\src\common\protocol\multiclient_protocol.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\src\main.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\FrameworkArduino\USBCDC.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\FrameworkArduino\USBMSC.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\FrameworkArduino\WMath.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\FrameworkArduino\WString.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\FrameworkArduino\base64.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\FrameworkArduino\cbuf.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\FrameworkArduino\chip-debug-report.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\FrameworkArduino\esp32-hal-adc.c.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\FrameworkArduino\esp32-hal-bt.c.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\FrameworkArduino\esp32-hal-cpu.c.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\FrameworkArduino\esp32-hal-dac.c.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\FrameworkArduino\esp32-hal-gpio.c.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\FrameworkArduino\esp32-hal-hosted.c.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\FrameworkArduino\esp32-hal-i2c-ng.c.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\FrameworkArduino\esp32-hal-i2c-slave.c.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\FrameworkArduino\esp32-hal-i2c.c.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\FrameworkArduino\esp32-hal-ldo.c.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\FrameworkArduino\esp32-hal-ledc.c.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\FrameworkArduino\esp32-hal-log-wrapper.c.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\FrameworkArduino\esp32-hal-matrix.c.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\FrameworkArduino\esp32-hal-misc.c.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\FrameworkArduino\esp32-hal-periman.c.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\FrameworkArduino\esp32-hal-psram.c.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\FrameworkArduino\esp32-hal-rgb-led.c.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\FrameworkArduino\esp32-hal-rmt.c.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\FrameworkArduino\esp32-hal-sigmadelta.c.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\FrameworkArduino\esp32-hal-spi.c.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\FrameworkArduino\esp32-hal-time.c.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\FrameworkArduino\esp32-hal-timer.c.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\FrameworkArduino\esp32-hal-tinyusb.c.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\FrameworkArduino\esp32-hal-touch-ng.c.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\FrameworkArduino\esp32-hal-touch.c.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\FrameworkArduino\esp32-hal-uart.c.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\FrameworkArduino\firmware_msc_fat.c.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\FrameworkArduino\freertos_stats.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\FrameworkArduino\idf_openthread_mpool_wrapper.c.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\FrameworkArduino\libb64\cdecode.c.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\FrameworkArduino\libb64\cencode.c.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\FrameworkArduino\main.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\FrameworkArduino\stdlib_noniso.c.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\FrameworkArduino\wiring_pulse.c.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\FrameworkArduino\wiring_shift.c.o
+Archiving .pio\build\heltec_wifi_lora_32_V3_multiclient\libFrameworkArduino.a
+Indexing .pio\build\heltec_wifi_lora_32_V3_multiclient\libFrameworkArduino.a
+Linking .pio\build\heltec_wifi_lora_32_V3_multiclient\firmware.elf
+                            Memory Type Usage Summary
+┌─────────────────────┬──────────────┬──────────┬────────────────┬───────────────┐
+│ Memory Type/Section │ Used [bytes] │ Used [%] │ Remain [bytes] │ Total [bytes] │
+├─────────────────────┼──────────────┼──────────┼────────────────┼───────────────┤
+│ Flash Code          │       200872 │          │                │               │
+│    .text            │       200872 │          │                │               │
+│ Flash Data          │        78712 │          │                │               │
+│    .rodata          │        68096 │          │                │               │
+│    .eh_frame        │        10360 │          │                │               │
+│    .appdesc         │          256 │          │                │               │
+│ DIRAM               │        78664 │    23.02 │         263096 │        341760 │
+│    .text            │        46195 │    13.52 │                │               │
+│    .bss             │        17736 │     5.19 │                │               │
+│    .data            │        14733 │     4.31 │                │               │
+│ IRAM                │        16384 │    100.0 │              0 │         16384 │
+│    .text            │        15356 │    93.73 │                │               │
+│    .vectors         │         1028 │     6.27 │                │               │
+└─────────────────────┴──────────────┴──────────┴────────────────┴───────────────┘
+Total image size: 356896 bytes (.bin may be padded larger)
+Note: The reported total sizes may be smaller than those in the technical reference manual due to reserved memory and application configuration. The total flash size available for the application is not included by default, as it cannot be reliably determined due to the presence of other data like the bootloader, partition table, and application partition size. The total external RAM size is not included either, because the amount of RAM connected to the chip is detected at boot and is not known during the build.
+Retrieving maximum program size .pio\build\heltec_wifi_lora_32_V3_multiclient\firmware.elf
+Checking size .pio\build\heltec_wifi_lora_32_V3_multiclient\firmware.elf
+Advanced Memory Usage is available via "PlatformIO Home > Project Inspect"
+RAM:   [=         ]   9.9% (used 32472 bytes from 327680 bytes)
+Flash: [=         ]  10.4% (used 346280 bytes from 3342336 bytes)
+Building .pio\build\heltec_wifi_lora_32_V3_multiclient\firmware.bin
+esptool v5.3.0
+Creating ESP32-S3 image...
+Merged 3 ELF sections.
+Successfully created ESP32-S3 image.
+Creating binary "firmware.factory.bin" with:
+    Offset   | File
+ -  0x0000   | bootloader.bin
+ -  0x8000   | partitions.bin
+ -  0xe000   | boot_app0.bin
+ -  0x10000  | firmware.bin
+Successfully created combined binary image.
+========================= [SUCCESS] Took 40.30 seconds =========================
+
+Environment                         Status    Duration
+----------------------------------  --------  ------------
+heltec_wifi_lora_32_V3_multiclient  SUCCESS   00:00:40.300
+========================= 1 succeeded in 00:00:40.300 =========================

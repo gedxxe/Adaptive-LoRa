@@ -5,6 +5,18 @@ changes. It is not a substitute for the append-only build memory.
 
 ## Unreleased
 
+### Multi-client scheduled research link — 2026-11-20
+
+- Add an opt-in v3 image for up to eight scheduled clients. Gateway grants
+  use actual submitted byte counts. Aggregate feedback assigns shared
+  retry slots and tracks delivery independently per client.
+- Add a bounded 0–64-byte application interface and one bench payload source.
+  Preserve the v1 and v2 wire formats and NVS schema 1.
+- Set the default reporting interval to 3,000 ms and M2 ACK timeout to
+  1,000 ms. Derive v3 superframe timing independently of both values.
+- Add bilingual startup instructions and document the analytical capacity
+  above eight clients. Physical timing and RF acceptance remain open.
+
 ### One-client scheduled research profile — 2026-11-20
 
 - Add opt-in v2 beacon synchronization, payload-aware TDMA, bitmap feedback

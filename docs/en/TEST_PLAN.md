@@ -130,8 +130,10 @@ Tests must not require Arduino or RadioLib for codec logic.
 
 ## 6. M3 — beacon and one-client TDMA
 
-Iteration 019 runs the v2 state machines under a fake transport. The
-following RF acceptance steps remain open. See [the v2 profile](SCHEDULED_LINK.md).
+Iteration 019 runs v2 under a fake transport. Iteration 020 exercises the v3
+gateway and 1, 2, 4 or 8 production client instances. It also exercises
+v3 runtime dispatch through the low-level driver seam. The following RF
+acceptance steps remain open. See the [scheduled protocols](SCHEDULED_LINK.md).
 
 Test:
 

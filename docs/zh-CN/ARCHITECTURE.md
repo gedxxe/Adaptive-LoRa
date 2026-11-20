@@ -12,9 +12,10 @@ main.cpp仍为15行构造和setup/loop委托。
 RadioDriver保留全部状态/超时/错误策略，Sx1262Hardware独占RadioLib/SPI/GPIO。
 板GPIO8–14、TCXO1.8 V、DIO2开关及DC-DC与CP2102/UART0设置见迁移审查。
 FrameCodec、DeviceConfig、SequenceTracker及NVSschema1/协议1保持。
-默认 10000 ms。M2 从事务结束起计下一次上报，ACK 超时为 10 秒；已有 NVS 周期保留。
+默认 3000 ms。M2 从事务结束起计下一次上报，ACK 超时为 1 秒；已有 NVS 周期保留。
 OLED 为 M2 可选构建。[v2 研究镜像](SCHEDULED_LINK.md) 使用固定 SF7，支持单 Client
-时隙、位图反馈及三次重传。通用应用交付、多 Client 调度和 ADR 仍待实现。
+时隙、位图反馈及三次重传。v3 使用 MulticlientLink 与 PayloadPort 支持最多八个
+Client 和有界应用交付，通用事件接口和 ADR 仍待实现。
 
 Native执行实际生产模块；新增adapter用有界调用记录检查配置和转发，不模拟射频。
 SDK调用仍可能同步等待，ERR-021未因迁移修复。完整平台服务和通用payload/event接口仍缺失。

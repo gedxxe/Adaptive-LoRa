@@ -22,10 +22,11 @@ actual test results belong in [PROGRESS.md](docs/en/PROGRESS.md).
 
 The fixed-PHY M0–M2 HELLO/ACK firmware exists and has host/build evidence.
 **M0–M2 physical acceptance is IN PROGRESS.** Confirm the physical SKU,
-electrical behavior, flash/NVS, supply and timing at the bench. Iteration 019
-adds an opt-in single-client v2 research profile with beacon synchronization,
-TDMA, bitmap feedback and three retries. ADR and multi-client operation
-remain planned. Historical records retain their original hardware and results.
+electrical behavior, flash/NVS, supply and timing at the bench. Iteration 020
+adds an opt-in v3 research profile with up to eight clients, variable-length
+application payloads, aggregate feedback and shared retry slots. The v2
+single-client image remains available. ADR remains planned. Historical
+records retain their original hardware and results.
 
 ## Read before editing
 
@@ -88,6 +89,7 @@ and ARCHITECTURE; do not write per-packet telemetry to NVS.
 | FirmwareRuntime | Load configuration, initialize radio, select role and dispatch bounded loop work |
 | GatewayApp / ClientApp | Actual role state machines through RadioTransport |
 | ScheduledLink | Opt-in v2 role state machines and one-client schedule through RadioTransport |
+| MulticlientLink / PayloadPort | v3 roster admission, exact-length grants, shared retries and bounded application delivery |
 | RadioDriver | Sole radio state/deadline/error policy through RadioHardware |
 | Sx1262Hardware | Sole Module/SX1262/SPI/GPIO owner; ISR only sets a minimal flag |
 | NvsConfigStore | Load/save/verify policy through non-owning ConfigStorage |
@@ -99,17 +101,18 @@ and ARCHITECTURE; do not write per-packet telemetry to NVS.
 Test actual production modules through existing low-level seams; never copy
 state machines into fakes. Keep protocol logic free of MCU/radio dependencies
 where already pure and free of meter, fieldbus, backhaul, database and UI
-coupling. RadioTransport exists; complete clock/random/logging portability
-and a general application payload/event API do not. Record these gaps rather
-than claiming all target boundaries are implemented.
+coupling. The v3 payload API provides one volatile transmit buffer and a
+synchronous receive callback. Complete clock, random and logging portability
+and a general event API remain open.
 
 Keep fixed buffers, explicit little-endian serialization, 28-byte header,
 96-byte frame limit and nine-byte ACK payload. Preserve protocol v1 HELLO/ACK,
 error classifications and NVS namespace/key/schema/blob compatibility.
 ACK must match the outstanding client source/boot/sequence and deadline.
-The default reporting interval and M2 ACK timeout are both 10 s. Persisted
-intervals remain active until changed. Scheduled retries reuse identity and
-payload in assigned slots. The eight-session,
+The default reporting interval is 3 s and M2 ACK timeout is 1 s. Persisted
+intervals remain active until changed. The v3 superframe targets 1 s and
+admission derives a feasible period up to 10 s independently. Scheduled
+retries reuse identity and payload in assigned slots. The eight-session,
 64-sequence volatile cache is bounded M2 behavior, not a 70-client or reboot
 replay guarantee. Do not enlarge/change it without milestone justification.
 
@@ -125,12 +128,12 @@ third-party libraries or add abstractions speculatively.
 
 Next: enumerate one terminated board at a time in Windows, make verified
 same-board private backups, and follow the bench runbook. Set
-`config set hello-interval-ms 10000` on both roles for the smoke test and
-OLED freshness.
+`config set hello-interval-ms 3000` on both roles for the M2 link check and
+OLED freshness. See the [startup guide](docs/en/STARTUP_AND_PROVISIONING.md).
 Measure transitions, IRQ latency, processing and drift before closing M3/M4
-acceptance. The [v2 research calendar](docs/en/SCHEDULED_LINK.md) uses
-experimental guards. Keep multi-client scheduling, general application
-delivery and ADR as separate milestone work.
+acceptance. The [research calendars](docs/en/SCHEDULED_LINK.md) use
+experimental guards. PHY switching and ADR require a versioned agreement
+and measured retune budget.
 
 Do not add Wi-Fi/backhaul, Modbus/RS485, databases/dashboards, LoRaWAN/SX1302,
 OTA, multi-SF concurrent reception, battery features or unrelated
@@ -145,9 +148,12 @@ Before reporting a coding iteration complete, run and check exit codes:
 pio run -e heltec_wifi_lora_32_V3
 pio run -e heltec_wifi_lora_32_V3_oled
 pio run -e heltec_wifi_lora_32_V3_research
+pio run -e heltec_wifi_lora_32_V3_multiclient
 pio test -e native
+pio test -e native_multiclient
 python -m unittest discover -s tools -p test_capture_bench.py -v
 python -m unittest discover -s tools -p test_tdma_feasibility.py -v
+python -m unittest discover -s tools -p test_model_multiclient.py -v
 python -m unittest discover -s tools -p test_check_consistency.py -v
 python tools/check_consistency.py
 ```
@@ -179,9 +185,9 @@ branches and records. Commit/push/create PR only when authorized by the user.
 Integrate reviewed work through normal merge commits. Never force-push,
 rebase, squash or delete historical branches during synchronization.
 PR #6 merged the V3.4 bench baseline at `541e2e8b985f7cd67ca4d1f1af323c46aed4333e`.
-Iteration 019 starts from published Iteration 018 at
-`0735bb8ef5cb7c1d677c98f2123c4a3f6cb7a1ea`. Publish Iteration 019 to
-`codex/iteration-019-research-implementation` and leave main unchanged.
+Iteration 020 stacks on published Iteration 019 at
+`979d873fad629aedcdf0e8a565b4ad3681bbea61`. Review the 020 branch against
+`codex/iteration-019-research-implementation` while it remains unmerged.
 
 Publish sanitized project files only. Exclude caches, binaries, credentials,
 local configuration, private backups and unlicensed research PDFs. Preserve

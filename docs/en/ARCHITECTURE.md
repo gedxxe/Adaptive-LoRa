@@ -99,7 +99,7 @@ Node/gateway IDs 0 and 65535 are reserved. For the gateway, `node_id` equals
 The command parser must be bounded, reject malformed numeric values, and
 return a clear error without corrupting the last valid configuration.
 
-Implementation details (ADR-009): 128-byte line buffer, six-token maximum, 64-byte service budget per loop; overflow/control-byte lines are discarded through newline. Add `config set hello-interval-ms <1000..3600000>`; default 10,000 ms after a transaction completes. Values are staged, never applied to the loaded app until reboot. Role edits preserve IDs. Network 65535 is allowed; the 65535 broadcast reservation applies to node addresses.
+Implementation details (ADR-009): 128-byte line buffer, six-token maximum, 64-byte service budget per loop; overflow/control-byte lines are discarded through newline. Add `config set hello-interval-ms <1000..3600000>`; default 3,000 ms after a transaction completes. Values are staged, never applied to the loaded app until reboot. Role edits preserve IDs. Network 65535 is allowed; the 65535 broadcast reservation applies to node addresses.
 
 Schema 1 persists a single 24-byte explicit blob with corruption-detection hash and verifies readback. Invalid load keeps UNSET and leaves the radio uninitialized. `status` labels unavailable loaded values as `inactive_defaults`; `config show` reports staged values. Controlled reboot stops new requests, finishes or expires active TX, requests standby and restarts. Initial radio failure requires inspection/reboot; RX-start recovery is limited to three consecutive failures, spaced one second apart.
 
@@ -179,11 +179,13 @@ echoed identity.
 
 ## 7. Scheduled MAC flow
 
-The opt-in v2 image uses separate beacon, DATA and bitmap phases with up to
-three assigned retries. `FirmwareRuntime` supplies the maintained monotonic
+The opt-in v3 image uses beacon, length request, exact grant, DATA and
+aggregate feedback phases with up to three assigned retries. `PayloadPort`
+copies client bytes and invokes a bounded gateway receiver. The v2 image
+continues to provide its single-client protocol. `FirmwareRuntime` supplies the maintained monotonic
 clock reading after polling `RadioDriver`. It selects the v2 role from the
 same validated NVS configuration used by the M2 image. See the
-[v2 calendar](SCHEDULED_LINK.md) for phase offsets and bench limitations.
+[scheduled calendar](SCHEDULED_LINK.md) for phase offsets and bench limitations.
 
 All active phases use SF7. Future ADR would add a gateway-controlled profile
 assignment and a guarded retune between slots, plus an explicit rejoin
@@ -200,7 +202,7 @@ ERR-021 is not fixed by selecting SX1262.
 
 Codec/config/identity helpers remain platform-independent. Applications
 still call ESP timers and SerialLogger, so the full runtime is not a
-generic MCU port. A general application-payload/event API is also absent.
+generic MCU port. The v3 payload boundary provides bounded copy-in and receive callbacks. A general application event API remains open.
 The radio/storage reference boundaries support focused native tests,
 not an unimplemented cross-platform integration framework.
 
@@ -235,7 +237,7 @@ Adaptive-LoRa targets reusable embedded-network logic. The research title descri
 
 | Boundary | Verified current implementation | Target and remaining gap |
 |---|---|---|
-| Protocol core | Bounded LE FrameCodec, packet identity, sequence/session helpers and M2 gateway/client HELLO/ACK states | The opt-in v2 `ScheduledLink` uses a one-client calendar, bitmap feedback and deterministic retries. ADR and a general DATA delivery interface remain open. Apps still directly call the ESP timer and concrete SerialLogger. Core helper modules are platform-independent; the entire role runtime is not. |
+| Protocol core | Bounded LE FrameCodec, packet identity, sequence/session helpers and M2 gateway/client HELLO/ACK states | The v3 `MulticlientLink` provides up to eight scheduled clients and invokes the application receiver through `PayloadPort`. ADR and persistent delivery remain open. Apps still directly call the ESP timer and concrete SerialLogger. Core helper modules are platform-independent; the entire role runtime is not. |
 | Radio abstraction | Six-method RadioTransport reference, bounded RadioEvent and one RadioDriver state owner with an SX1262 adapter | Initialization, poll and stop remain concrete driver entry points. RadioHardware abstracts fixed-profile hardware calls for fault tests. Runtime retune and alternative adapters remain future work. |
 | Platform services | ESP32/Arduino FirmwareRuntime, NvsConfigStore, bounded console, pins, IRQ flag, hardware random and timer calls | A narrow ConfigStorage session/byte seam now supports store fault tests. No general clock/random/interrupt service or production port to other MCUs is implemented. |
 | Application integration | HELLO carries no application payload in the current client; codec can bound opaque payload bytes; diagnostics expose link events/counters as serial logs | No submission API, received-payload callback, link-event subscriber or reusable application statistics contract. Add these in a separate reviewed task before integrating another application. |

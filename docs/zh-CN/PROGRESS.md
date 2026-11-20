@@ -1,7 +1,30 @@
 # 开发进度
 
 <!-- current-state:start -->
-## 当前状态 — Iteration 019
+## 当前状态 — Iteration 020
+
+`codex/iteration-020-multiclient-payload-scheduling` 接续已发布的 Iteration 019
+`979d873fad629aedcdf0e8a565b4ad3681bbea61`。规范 `main` 仍为
+`541e2e8b985f7cd67ca4d1f1af323c46aed4333e`。
+
+| 项目 | 当前证据 |
+|---|---|
+| 固件 / 协议 | `0.2.0-alpha.1` / `1` 为默认，另有 v2 和 v3 研究镜像 |
+| 硬件 | Heltec WiFi LoRa 32 V3.4，ESP32-S3/SX1262，V3.2 电气参考 |
+| 时序 | 默认上报 3000 ms，M2 ACK 1000 ms。v3 目标 1000 ms、上限 10000 ms，按 50 ms 试验保护时间计算当前名单周期 6516 ms。 |
+| 射频与存储 | 915.0 MHz、SF7/BW125/CR4/5、请求功率 22 dBm、PA OCP 140 mA。默认网络/Gateway/Client 为 1/1/2，已有 NVS schema 1 配置保留。 |
+| ESP32 构建 | `heltec_wifi_lora_32_V3`、`_oled`、`_research`、`_multiclient` 均通过 |
+| Native | `native` 353/353，`native_multiclient` 3/3 均通过 |
+| 主机工具 | 采集 13/13、旧模型 16/16、v3 模型 3/3、文档测试 9/9、直接检查均通过 |
+| Physical acceptance | IN PROGRESS; NOT RUN |
+
+主机执行 v3 Gateway 及 1、2、4、8 个 Client 的实际状态机。DATA 按提交长度授权，
+反馈只向欠缺位置分配共享重传。十节点在模型假设下满足十秒预算，固件当前接纳上限
+为八个。未操作或测量实物。见 [启动指南](STARTUP_AND_PROVISIONING.md)、
+[定时协议](SCHEDULED_LINK.md) 和 [构建记录](../en/BUILD_MEMORY.md)。
+<!-- current-state:end -->
+
+## Iteration 019 历史快照
 
 审查分支 `codex/iteration-019-research-implementation` 从已发布的 Iteration 018
 `0735bb8ef5cb7c1d677c98f2123c4a3f6cb7a1ea` 开始。规范 `main` 基线仍为
@@ -21,7 +44,6 @@
 功率、收发切换、IRQ 延迟及漂移。见 [v2 规范](SCHEDULED_LINK.md)、
 [仓库审查](../research/ITERATION_019_AUDIT.md) 与 [构建记录](../en/BUILD_MEMORY.md)。
 M5–M8 仍在计划中。本轮未操作硬件。
-<!-- current-state:end -->
 
 ## Iteration 018 历史快照
 
