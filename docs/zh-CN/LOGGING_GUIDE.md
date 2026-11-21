@@ -1,4 +1,33 @@
-# 串口日志说明
+# 串口日志
+
+## v3 日志采集
+
+使用 [台架流程](BENCH_RUNBOOK.md) 中的命令采集，保留每块板的原始 `*.log`、
+chunk 索引和 `capture.json`。在 [试验记录](../../logs/test/RUN_RECORD_TEMPLATE.md)
+中填写固件哈希、板卡别名、角色和实际端口。
+原始文件仅私下保存。发布副本前检查个人姓名、本机路径、标识符和私有载荷，保留时间戳和试验结果。
+
+| 事件 | 含义 |
+|---|---|
+| `SCHEDULE_CONFIG` | Gateway 公告周期及名单容量，名单条目不表示在线 Client。 |
+| `V3_DATA_TX` | DATA 启动发送结果。`started` 表示驱动已启动发送，`deadline_miss` 表示跳过时隙。 |
+| `V3_DATA_RX` 与 `APP_PAYLOAD` | Gateway 校验与示例应用交付。完全重复的包不再计为交付。 |
+| `V3_BITMAP_RX` | Client 收到的反馈。有效位图中的缺失位与反馈未知或过期分别记录。 |
+| `V3_PAYLOAD_RESULT` | Client 事务结果，包括已接受、明确缺失或反馈未知。 |
+| `V3_LINK_SAMPLE` | 每次授权的离线 ADR 观测，记录首轮收到、重传收到或未收到有效 DATA，以及可用的 RSSI/SNR。 |
+| `V3_LINK_STATUS` 与 `OLED_STATUS` | 链路接收新鲜度和显示处理时延。`worst_step_us` 包含格式化和一次显示服务。 |
+
+按网络、帧号、Gateway 会话和 Client 身份匹配两端日志，并把同一事务的重传合并。
+根据启动边界和 Gateway 信标区分重用的帧号。完整事务与不完整事务分开统计。
+报告首轮交付率、重传后交付率和 Client ACK 成功率及其分母。两方向的 RSSI/SNR 分开统计。
+
+串口时间戳反映主循环记录事件的时刻。实测无线完成和处理延迟须用无线与总线波形。
+串口记录缺失、`log_dropped` 非零或试验被截断时单独处理。
+状态和刷新计数见 [屏幕诊断](DISPLAY_DIAGNOSTICS.md)，离线 ADR 输入见
+[定时链路规范](SCHEDULED_LINK.md#链路自适应实验)。
+
+<details>
+<summary>旧版 v1 HELLO/ACK 的采集及记录格式（Iteration 013 和 016）</summary>
 
 英文规范见 `docs/en/LOGGING_GUIDE.md`。M2 每行一个事件，使用逗号分隔的 `key=value`，未知值为 N/A。帧日志包含 network/source/destination、boot_id、sequence 和版本字段，以及固定 SF/BW/频率；接收成功时带 RSSI/SNR。
 
@@ -33,14 +62,4 @@ worst_refresh_io_us 为已完成刷新中 write API 时间总和的最大值。�
 格式化及 bus setup 不计。零值表示该项尚未积累测量。射频 cohort 用原始 HELLO/ACK
 事件统计，屏幕计数按 2^32 回绕，重启归零。既有事务记录格式保留。
 
-## v3 定时载荷
-
-`status` 显示 `protocol=3`、`profile=multiclient`，Gateway 的 `SCHEDULE_CONFIG`
-给出周期与名单人数。按帧号、节点和 boot ID 对照 `V3_DATA_TX`、`V3_DATA_RX` 及
-`V3_PAYLOAD_RESULT`。示例回调以 `APP_PAYLOAD` 输出十六进制内容，重复或冲突包不再
-调用回调。`V3_BITMAP_RX` 区分明确欠缺和未知反馈，`deadline_miss` 表示跳过软件发射。
-日志时刻包含主循环服务延迟。详见 [v3 时序](SCHEDULED_LINK.md)。
-
-v3 带屏环境增加 `V3_LINK_STATUS`，无安全刷新窗口时也可在串口查看实时状态。
-`OLED_STATUS` 包含 `worst_step_us` 和 `step_budget_us`，每步计入快照格式化及一次服务。
-屏幕计数说明见 [屏幕 诊断](DISPLAY_DIAGNOSTICS.md)。
+</details>

@@ -13,14 +13,14 @@ class ConsistencyTests(unittest.TestCase):
         self.root = Path(self.temp.name)
         source = Path(__file__).resolve().parents[1]
         # Empty targets suffice for link existence checks; copy only inspected inputs.
-        for folder in ("docs", "tools"):
+        for folder in ("docs", "tools", "src", "include", "test"):
             for original in (source / folder).rglob("*"):
-                if original.is_file() and original.suffix in (".md", ".py"):
+                if original.is_file() and original.suffix in (".md", ".py", ".svg", ".png", ".cpp", ".h"):
                     target = self.root / original.relative_to(source)
                     target.parent.mkdir(parents=True, exist_ok=True)
                     target.touch()
         names = set(LINK_DOCS) | set(APPROVED_SETTINGS) | {"CODEX_START_PROMPT.md", "VERSION", "PROTOCOL_VERSION",
-                "platformio.ini", "THIRD_PARTY.md", "include/project_config.h",
+                "platformio.ini", "THIRD_PARTY.md", "CHANGELOG.md", "include/project_config.h",
                 "src/common/radio/sx1262_hardware.h", "src/app/esp32_firmware.h",
                 "logs/README.md", "logs/test/RUN_RECORD_TEMPLATE.md"}
         for name in names:
@@ -83,10 +83,18 @@ class ConsistencyTests(unittest.TestCase):
 
     def test_phy_and_chinese_provisioning_regressions(self):
         self.mutate("include/radio_config.h", "dataSf = 7", "dataSf = 9")
-        self.mutate("docs/zh-CN/STARTUP_AND_PROVISIONING.md", "hello-interval-ms 3000", "hello-interval-ms 15000")
+        self.mutate("README.zh-CN.md", "hello-interval-ms 3000", "hello-interval-ms 15000")
         failures = check(self.root)
         self.assertTrue(any("approved dataSf" in error for error in failures))
-        self.assertTrue(any("STARTUP_AND_PROVISIONING" in error and "3000 ms" in error for error in failures))
+        self.assertTrue(any("README.zh-CN.md" in error and "3000 ms" in error for error in failures))
+
+    def test_client_example_requires_distinct_node_id(self):
+        self.mutate("README.md", "config set node-id 2", "config set node-id 1")
+        self.assertTrue(any("provisioning examples" in error for error in check(self.root)))
+
+    def test_diagram_translations_must_preserve_edges(self):
+        self.mutate("README.zh-CN.md", "requests --> active", "requests --> beacon")
+        self.assertTrue(any("shared Mermaid flow" in error for error in check(self.root)))
 
 
 if __name__ == "__main__":

@@ -3,7 +3,10 @@
 Do not implement all milestones in one large change. Complete one
 milestone, record evidence, and stop for review.
 
-Adaptive-LoRa research title: Reliability-aware TDMA Scheduling and Link Adaptation for Single-Radio LoRa Industrial Energy Monitoring Networks. This is the research direction; firmware 0.2.0-alpha.1 remains the fixed-PHY M0–M2 baseline.
+Adaptive-LoRa studies reliability-aware TDMA and link adaptation for
+single-radio LoRa industrial sensing. The default v3 image implements
+M3 scheduling and M4 feedback/retries on fixed PHY. See the
+[progress record](PROGRESS.md) for verification and open bench work.
 
 ## Integration boundary work — separately reviewed, not implemented here
 

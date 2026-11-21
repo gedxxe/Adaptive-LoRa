@@ -4,8 +4,9 @@
 
 Build `heltec_wifi_lora_32_V3_multiclient` for both roles. It uses SF7 for
 every phase and reports `profile=multiclient, protocol=3` in `status`. The
-[startup guide](STARTUP_AND_PROVISIONING.md) covers role selection and
-gateway admission. See [display diagnostics](DISPLAY_DIAGNOSTICS.md) for display
+[README](../../README.md#flash-and-configure) covers upload and role selection.
+To change roster IDs or byte budgets, edit [research_roster.h](../../include/research_roster.h)
+and rebuild the image. [Display diagnostics](DISPLAY_DIAGNOSTICS.md) covers
 telemetry and refresh scheduling. Use the v2 environment below for legacy tests.
 
 ### Wire format

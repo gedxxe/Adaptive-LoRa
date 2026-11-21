@@ -4,10 +4,15 @@ import configparser
 from pathlib import Path
 import re
 
-CURRENT_DOCS = ("AGENTS.md", "README.md", "README.zh-CN.md",
+READMES = ("README.md", "README.zh-CN.md")
+CURRENT_DOCS = ("AGENTS.md", *READMES,
                 "docs/en/PROGRESS.md", "docs/zh-CN/PROGRESS.md")
-GUIDES = ("docs/en/STARTUP_AND_PROVISIONING.md", "docs/zh-CN/STARTUP_AND_PROVISIONING.md")
-LINK_DOCS = CURRENT_DOCS + GUIDES + ("docs/en/TDMA_FEASIBILITY.md", "docs/zh-CN/TDMA_FEASIBILITY.md")
+LINK_DOCS = CURRENT_DOCS + ("PACKAGE_MANIFEST.md", "docs/research/ALGORITHM_TRACEABILITY.md") + tuple(
+    f"docs/{language}/{document}.md"
+    for language in ("en", "zh-CN")
+    for document in ("ARCHITECTURE", "BENCH_RUNBOOK", "LOGGING_GUIDE", "SCHEDULED_LINK",
+                     "STARTUP_AND_PROVISIONING", "TDMA_FEASIBILITY")
+)
 APPROVED_SETTINGS = {
     "include/project_config.h": {"kDefaultHelloIntervalMs": "3000", "kAckTimeoutUs": "1000000", "kConfigSchema": "1"},
     "include/radio_config.h": {"frequencyMhz": "915.0f", "bandwidthKhz": "125.0f", "dataSf": "7", "controlSf": "9",
@@ -58,10 +63,29 @@ def check(root):
         for key, value in settings.items():
             if not re.search(rf"\b{key}\s*=\s*{re.escape(value)}\s*;", contents):
                 errors.append(f"{name}: approved {key} must equal {value}")
-    for name in GUIDES:
-        commands = re.findall(r"^config set hello-interval-ms (\d+)$", (root / name).read_text(encoding="utf-8"), re.M)
-        if commands != ["3000", "3000"]:
-            errors.append(f"{name}: both provisioning examples must use 3000 ms")
+    ids = APPROVED_SETTINGS["src/common/config/device_config.h"]
+    interval = APPROVED_SETTINGS["include/project_config.h"]["kDefaultHelloIntervalMs"]
+    expected_commands = [
+        [f"config set role {role}", f"config set network-id {ids['networkId']}",
+         f"config set node-id {node}", f"config set gateway-id {ids['gatewayId']}",
+         f"config set hello-interval-ms {interval}", "config show", "config save"]
+        for role, node in (("gateway", ids["gatewayId"]), ("client", ids["nodeId"]))
+    ]
+    diagrams = []
+    for name in READMES:
+        text = (root / name).read_text(encoding="utf-8")
+        blocks = re.findall(r"^```text\n(config set role [^\n]+\n.*?)^```", text, re.M | re.S)
+        if [block.splitlines() for block in blocks] != expected_commands:
+            errors.append(f"{name}: gateway and client provisioning examples must match IDs and {interval} ms")
+        upload = f"pio run -e {environment} -t upload --upload-port $port"
+        monitor = f"pio device monitor --port $port --baud {base.get('monitor_speed')}"
+        if not {"pio device list", upload, monitor} <= set(text.splitlines()):
+            errors.append(f"{name}: default upload and serial commands must match platformio.ini")
+        graphs = re.findall(r"^```mermaid\n(flowchart TD\n.*?)^```", text, re.M | re.S)
+        # Compare diagram structure while allowing translated labels.
+        diagrams.append([re.sub(r'"[^"\n]*"|\|[^|\n]*\|', "", graph) for graph in graphs])
+    if len(diagrams[0]) != 1 or diagrams[0] != diagrams[1]:
+        errors.append("README diagrams: expected one shared Mermaid flow in both languages")
     header = (root / "include/project_config.h").read_text(encoding="utf-8")
     if not re.search(r'kFirmwareVersion\[\]\s*=\s*"' + re.escape(firmware) + '"', header):
         errors.append("project_config.h: firmware version differs from VERSION")

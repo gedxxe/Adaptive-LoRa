@@ -1,103 +1,128 @@
 # Adaptive-LoRa
 
-规范 main 基线为 `541e2e8b985f7cd67ca4d1f1af323c46aed4333e`，已合入
-[PR #6](https://github.com/gedxxe/Adaptive-LoRa/pull/6) 的 V3.4 台架准备。
-[四篇论文及图表](docs/references/README.md) 和 [研究到代码矩阵](docs/research/ALGORITHM_TRACEABILITY.md)
-分别记录论文机制、项目设计、现有实现与测试。M0–M2 仍需实物验收。
+[English](README.md)
 
-**研究标题：** Reliability-aware TDMA Scheduling and Link Adaptation for Single-Radio LoRa Industrial Energy Monitoring Networks.
+Adaptive-LoRa 是面向工业传感的定时 LoRa P2P 网络。一个 Heltec ESP32-S3/SX1262
+Gateway 使用单个半双工收发器，最多服务八个 Client。所有板卡运行同一固件，角色和节点
+ID 由已保存的配置决定。
 
-Adaptive-LoRa 是独立的单射频 LoRa P2P 网络研究与嵌入式固件项目。工业能耗监测仅作为通用研究场景；协议不依赖具体电表、现场总线、回传、数据库或部署。它不是 LoRaWAN。
+项目研究如何在信标、DATA 和反馈共用一个收发器的条件下提高交付的可预期性。
+Gateway 按实际载荷长度分配时隙，汇总确认，并为仍缺少 DATA 的 Client 分配重传机会。
+目前链路使用固定 PHY，同时采集自适应数据率（ADR）实验所需的链路数据。
 
-## 研究范围和当前状态
-
-默认 `heltec_wifi_lora_32_V3_multiclient` 使用协议 v3，支持八个 Client、
-按实际长度授权 DATA、累计位图和定时重传。保留 v1 HELLO/ACK 与单 Client v2 供对照。
-Gateway 为离线 ADR 分析记录每个 Client 的上行证据。网络内各节点使用同一固定 PHY。
-见 [启动指南](docs/zh-CN/STARTUP_AND_PROVISIONING.md) 和 [定时链路规范](docs/zh-CN/SCHEDULED_LINK.md)。
-
-| 证据 | 当前基线 |
+| 设置 | 值 |
 |---|---|
 | 固件 / 协议 | `0.2.0-alpha.1` / `3` |
-| ESP32 编译与 Native 测试 | 见 [当前验证记录](docs/zh-CN/PROGRESS.md) |
-| 采集、模型及文档检查 | 见 [构建记录](docs/en/BUILD_MEMORY.md) |
-| 已实现 | v3 TDMA、按长度授权、累计确认和共享重传 |
-| 实物 NVS/重启/SPI/IRQ/RF/天线 | NOT VERIFIED |
+| 默认 PlatformIO 目标 | `heltec_wifi_lora_32_V3_multiclient` |
+| 默认名单 | Gateway **1**，Client **2–9**，网络 **1** |
+| 应用载荷 | 每个 Client 最多 **64 字节** |
+| 研究 PHY | 暂定 **915.0 MHz**、**SF7**、**BW125**、**CR 4/5** |
+| 默认超帧 | **6.766 s**，按完整名单预留；时隙保护间隔暂定 **50 ms** |
 
-Host 执行实际 Client/Gateway 状态机，使用有界 fake transport、时钟及串口适配。丢包、延迟、对象重建、radio 返回码与 IRQ 输入均不等于实测，见 [driver 审查](docs/zh-CN/RADIO_DRIVER_AUDIT.md)。精确证据见 [进度](docs/zh-CN/PROGRESS.md)、[软件审查](docs/zh-CN/SOFTWARE_AUDIT.md) 及英文 [BUILD_MEMORY](docs/en/BUILD_MEMORY.md)。
+## 工作流程
 
-## 硬件和暂定 PHY
-
-本研究使用两块 Heltec WiFi LoRa 32 V3.4，配有 ESP32-S3、SX1262 和原装单极天线。
-用户确认采购选项为 902–928 MHz，V3.4 沿用 V3.2 的线路和引脚，改进涉及 SMT 工艺和
-晶振。V3.2 原理图是电气参考。实物 SKU、天线特性和外设行为仍待检查。
-固定研究 PHY 为 915.0 MHz、BW125、SF7、CR4/5、前导 8、显式头、PHY CRC、sync 0x12、
-请求发射功率 22 dBm、SPI 1 MHz。两种镜像均使用 SF7，控制 SF9 保留。辐射测试须
-使用获准的射频配置，先核对传导功率和供电余量。参见
-[硬件说明](docs/zh-CN/HARDWARE.md) 和 [台架流程](docs/zh-CN/BENCH_RUNBOOK.md)。
-
-## 架构原则
-
-一份镜像从 NVS 加载有效 GATEWAY/CLIENT 角色。配置缺失、损坏或不支持时进入 provisioning，禁止应用 TX。保存并受控重启后才应用编辑，不通过相同硬件自动推断角色。
-
-RadioTransport 引用分离 app 与 RadioDriver 状态策略；非拥有 RadioHardware 引用指向唯一 SX1262/SPI/GPIO owner Sx1262Hardware，native 故障测试执行实际 driver；NvsConfigStore 也通过五操作 ConfigStorage 在 native 执行，PreferencesConfigStorage 唯一拥有实际 Preferences，见 [存储审查](docs/zh-CN/CONFIG_STORE_AUDIT.md)，host readback 不证明实物持久性；Esp32Firmware先拥有两个concrete adapter，再构造引用注入FirmwareRuntime，native执行实际协调器/store/driver/apps/console，见 [runtime审查](docs/zh-CN/RUNTIME_AUDIT.md)；SDK shim仅模拟时钟/串口/reset/raw RNG，不证明实物熵或重启。随机生成最多8次raw调用；身份不可用禁止普通TX、记录SESSION_ERROR并按1秒间隔重试。修正时间边界和SDK/BUSY/分配限制见 [依赖预算审查](docs/zh-CN/DEPENDENCY_BUDGET_AUDIT.md)。codec/config/sequence 可在 host 测试，main.cpp 为 15 行入口。[架构文档](docs/zh-CN/ARCHITECTURE.md) 区分协议核、radio adapter、platform 服务和应用 payload/event 接口四个目标边界。当前 platform 仍依赖 ESP32/Arduino，通用应用提交/交付 API 尚不存在。协议核没有 Modbus、电表模型、Wi-Fi/MQTT、PostgreSQL 或 dashboard 集成；不能声称目标架构已经完成。
-
-## 仓库结构
-
-`include/` 集中 pins/PHY/限制；`src/app/` 为 runtime/NVS/console；`src/common/` 含 protocol/radio/config/diagnostics；`src/gateway/` 与 `src/client/` 为生产状态机；`test/` 为 native 单元/integration 和 fake；`docs/en/` 为规范、`docs/zh-CN/` 为中文配套；`logs/` 为脱敏证据，`tools/` 为 bench 捕获工具。
-
-## 编译与测试
-
-安装 PlatformIO Core 和支持 C++17 的 host 编译器，在根目录执行：
-
-```sh
-pio run -e heltec_wifi_lora_32_V3_multiclient
-pio test -e native
-pio test -e native_multiclient
+```mermaid
+flowchart TD
+    beacon["Gateway 广播名单与周期 BEACON"] --> requests["有待发数据的 Client 按名单顺序申请字节数"]
+    requests --> active{"有有效请求？"}
+    active -->|是| grant["Gateway 广播按长度分配的 SLOT_GRANT"]
+    active -->|否| next["等待下一次 BEACON"]
+    grant --> data["获授权的 Client 依次在时隙中发送 DATA"]
+    data --> bitmap["Gateway 发送累计确认 ACK_BITMAP"]
+    bitmap --> rounds{"还预留了后续反馈轮次？"}
+    rounds -->|是| retry{"Client 有有效的重传授权？"}
+    retry -->|是| resend["Client 重发同一标识的 DATA"]
+    retry -->|否| silent["Client 等待下一轮位图"]
+    resend --> bitmap
+    silent --> bitmap
+    rounds -->|否| next
+    next --> beacon
 ```
 
-目标为 Arduino / heltec_wifi_lora_32_V3，RadioLib7.8.1。已有Core6.1.19、pioarduino/espressif32 55.03.311和Arduino3.3.11/IDF5.5.5保持，使用Xtensa GCC14.2.0；host GCC6.3.0、native1.2.1、Unity2.6.1。platform尚未固定，其他机器须记录实际依赖；hash清单和日志标识各次验证快照。
+两端以无线完成事件的时间戳作为时序锚点。Client 要有当帧授权才能发射。若丢失反馈，
+本轮保持静默，后续累计位图仍可确认此前的交付。信标过期后，Client 持续接收以重新获取调度。
 
-## 配置与后续实物流程
+## 研究进展
 
-串口 115200。支持 `help`、`status`、`config show`、`config set`、`config save`、`reboot`。
-`hello-interval-ms` 默认为 3000 ms。M2 从事务结束起计，丢 ACK 时还要计入发射和等待。
-旧版 v2 用此值作为 Beacon 周期。v3 用此值安排样例上报，超帧周期由 Gateway 名单独立
-计算。已有 NVS 值须明确修改后才会改变。
+| 方向 | 已实现与验证 | 待研究或实测 |
+|---|---|---|
+| 同步与 TDMA | DIO1 完成时间戳、按长度授权和串行时隙；实际状态机已在主机上模拟 1、2、4、8 个 Client。 | 实测 IRQ 时延、启动发送、恢复接收和时钟漂移。 |
+| 交付与重传 | 累计 ACK 位图，每轮重传至多四个共享时隙。主机测试覆盖丢包、去重和重启恢复。 | 比较八个实物 Client 的首轮交付率及重传后交付率。 |
+| 链路自适应 | 按 Client 记录接收结果；离线 ADR 工具支持自定义阈值和滞回。 | 设计带版本的 PHY 切换协商、测量 SX1262 切换耗时，并验证控制帧丢失后的恢复。 |
+| 容量 | 默认八个 Client 的名单通过时序预算计算。 | 更大规模需要新的控制帧和调度设计。 |
 
-首轮 M2 联通检查在两板均执行 `config set hello-interval-ms 3000`，保存并重启后用
-`status` 核对。Gateway 使用该间隔判断 屏幕 新鲜度。初始 network/node/gateway 为
-Gateway 1/1/1、Client 1/2/1；角色命令不修改 ID，应全部明确设置。config show 显示暂存值，status 显示启动加载值。Network 1–65535，node/gateway 1–65534。实物流程见 [BENCH_RUNBOOK](docs/zh-CN/BENCH_RUNBOOK.md) 和 [模板](logs/test/RUN_RECORD_TEMPLATE.md)；当前没有烧录或 RF 验证。
+四篇论文分别为不同机制提供依据。TS-VP-LoRa 对应按载荷分配时隙；LoRaHART 对应
+汇总反馈；ATS-LoRa 对应容量预算；Soy 的研究对应链路自适应实验。
+[研究映射](docs/research/ALGORITHM_TRACEABILITY.md) 关联论文、代码与验证证据。
+[进度记录](docs/zh-CN/PROGRESS.md) 提供构建和主机测试结果。九板射频试验仍待完成。
 
-## 开发路线
+## 烧录与配置
 
-1. M0–M2 继续软件验证及依赖时延/分配边界分析。
-2. 逐块识别 Windows 串口并备份，再验证 NVS、重启、电气/IRQ 和双板 HELLO/ACK。
-3. 量测 v3 研究镜像的收发切换和漂移，核对保护时间、共享重传及丢包恢复后再扩大名单。
-4. M4–M6 逐步实现 bitmap/选择性重试、版本化保守 ADR、同步恢复。
-5. M7–M8 受控天线对比及明确标注的逻辑节点仿真。
-6. 其他嵌入式应用集成前，另行审查 payload/event 和 platform-service 接口。
+使用 Heltec WiFi LoRa 32 V3.4，上电前接入合适的 50 欧姆天线或负载。已保存角色的
+板卡可能在启动后发射。若需要保留现有镜像或配置，请先按
+[备份与射频台架流程](docs/zh-CN/BENCH_RUNBOOK.md) 操作，再打开串口或上传。使用获准的射频设置。
 
-验收见 [MILESTONE_TASKS](docs/en/MILESTONE_TASKS.md) 和 [TEST_PLAN](docs/zh-CN/TEST_PLAN.md)。
-[TDMA_FEASIBILITY](docs/zh-CN/TDMA_FEASIBILITY.md) 保留早期主机模型及假设。
+### 1. 向各板卡上传同一固件
 
-## 研究和复现原则
+在 VS Code 的 PlatformIO 中打开本仓库，或在项目根目录运行以下命令。
+用可传数据的 USB-C 线每次连接一块板。确认实际 COM 端口，关闭已打开的串口监视器后再上传。
+若终端找不到 `pio`，请使用 VS Code 的 PlatformIO 终端。
 
-保留时间顺序、失败尝试、错误修复、命令、版本及 compile/host/physical 的证据区别。历史公开副本只脱敏身份和路径，不改结果；旧 hash 标识原始工件，详见 [身份审查](docs/en/IDENTITY_AUDIT.md) 和 [日志说明](logs/README.md)。公开假设、受控条件和限制，不虚构容量、天线增益或实物验证。未经授权不分发论文全文。依赖外置，许可见 [THIRD_PARTY](THIRD_PARTY.md)；本次未选择项目统一再分发许可证。
-
-修改前阅读 [AGENTS.md](AGENTS.md)。英文为主文档，简体中文为第二语言。
-
-实物准备入口：[M0-M2 readiness](docs/zh-CN/PHYSICAL_ACCEPTANCE_READINESS.md)，含集成射频板与 pair 门槛、采集/CSV和ERR-021/SDK启动限制。流程未执行；上传/改配置前先私有备份，证据用新目录。
-
-
-其他主机检查使用已安装的 PlatformIO Python，分别执行：
-
-```sh
-python -m unittest discover -s tools -p test_capture_bench.py -v
-python -m unittest discover -s tools -p test_tdma_feasibility.py -v
-python -m unittest discover -s tools -p test_check_consistency.py -v
-python tools/check_consistency.py
+```powershell
+pio device list
+$port = 'COMx' # 换成观测到的端口
+pio run -e heltec_wifi_lora_32_V3_multiclient -t upload --upload-port $port
+pio device monitor --port $port --baud 115200
 ```
 
-一致性检查从源文件读取当前版本和环境，排除历史记录；分析模型包含 216 个场景，
-未知切换/处理/guard 不填零。两者都不属于实物测试，M0–M2 实物验收仍 IN PROGRESS。
+在 VS Code 侧栏可依次选择 **PlatformIO → Project Tasks →
+heltec_wifi_lora_32_V3_multiclient → General → Upload**，再打开 **Monitor**。
+使用相同分区布局的常规上传以保留 NVS。若没有板卡对应的 COM 端口，按
+[USB 排查步骤](docs/zh-CN/BENCH_RUNBOOK.md#windows-设备管理器) 检查。
+
+### 2. 设置 Gateway 和 Client 角色
+
+在串口监视器中逐行发送命令。所有板卡使用相同的网络 ID 和 Gateway ID。
+第一个 Client 的 node ID 为 **2**，其余 Client 各用一个不同的 **3–9**。
+
+**Gateway**
+
+```text
+config set role gateway
+config set network-id 1
+config set node-id 1
+config set gateway-id 1
+config set hello-interval-ms 3000
+config show
+config save
+```
+
+**第一个 Client**
+
+```text
+config set role client
+config set network-id 1
+config set node-id 2
+config set gateway-id 1
+config set hello-interval-ms 3000
+config show
+config save
+```
+
+收到 `CONFIG_SAVED` 后发送 `reboot`。必要时重连串口，再执行 `status`，核对已加载
+的角色、ID、`protocol=3` 和 `profile=multiclient`。Gateway 报告
+`roster_count=8` 和 `period_us=6766000`。即使只有一块 Client 在线，数量仍是名单
+容量。3 s 设置用于产生示例载荷，实际发送时机由 Gateway 的调度决定。
+
+### 3. 验证链路
+
+先用一个 Gateway 和一个 Client。对同一帧，确认 Gateway 输出 `APP_PAYLOAD`，
+Client 输出 `V3_PAYLOAD_RESULT` 且 `result=accepted`。再测试 Gateway 断电与恢复。
+双板通过后，逐步增加至 2、4、8 个 Client。包数、日志采集和时序测量见
+[台架流程](docs/zh-CN/BENCH_RUNBOOK.md)。
+
+## 延伸阅读
+
+- [协议与时隙调度](docs/zh-CN/SCHEDULED_LINK.md)
+- [研究文献与代码映射](docs/research/ALGORITHM_TRACEABILITY.md)
+- [当前证据与待完成的里程碑](docs/zh-CN/PROGRESS.md)

@@ -1,23 +1,16 @@
-# Adaptive-LoRa package manifest
+# Package contents
 
-Project: Adaptive-LoRa
+The default firmware is v3 for the Heltec WiFi LoRa 32 V3.4
+ESP32-S3/SX1262 target, using V3.2 as the electrical reference.
+See [firmware and operating instructions](README.md) and the
+[latest validation results](docs/en/PROGRESS.md).
 
-Research title: Reliability-aware TDMA Scheduling and Link Adaptation for Single-Radio LoRa Industrial Energy Monitoring Networks.
+The repository includes source, test cases, capture and analysis tools,
+bilingual guides and sanitized engineering evidence. Generated binaries,
+toolchain caches, private board backups, local credentials and full-text
+research PDFs stay outside the publication. See [third-party rights](THIRD_PARTY.md)
+and the [figure register](docs/references/FIGURE_SOURCE_REGISTER.md).
 
-Firmware: 0.2.0-alpha.1; protocol: 1. English is canonical; Simplified Chinese is secondary.
-
-## Included publication content
-
-- One-image Heltec WiFi LoRa 32 V3.2 HF / ESP32-S3 / SX1262 firmware, configuration, role state machines and bounded protocol modules.
-- Native unit/integration tests: 302/302 PASS, including all290 previous cases and12 production-adapter cases;13 capture utility tests are recorded separately.
-- Engineering requirements, architecture/gap analysis, provisional hardware facts, milestone plan and deferred bench procedure.
-- Sanitized build/test transcripts, chronological iteration/error/decision records and source/artifact fingerprints.
-- A bounded bench-capture helper; no actual bench run is claimed.
-
-## Provenance and limits
-
-The original documentation-only package revision was 2.0, dated 2026-11-12 (iteration 000). It contained no firmware/build/RF evidence at that time. Later implementation records establish the current software baseline; the earlier outcomes are not rewritten as new validation.
-
-The confirmed target is Heltec WiFi LoRa 32 V3.2 HF; delivery quantity, PCB markings and physical setup have not been inspected. The915 MHz Moxon remains the design baseline. Physical NVS/reboot/SPI/IRQ/RF/antenna behavior remains unverified.
-
-Generated SDKs/caches/binaries, private originals, local settings, credentials and full-text research papers are not publication content. Review IDENTITY_AUDIT.md, logs/README.md and THIRD_PARTY.md for redaction and licensing provenance. No later MAC feature is implemented by the hardware migration.
+Package revision 2.0 was documentation-only in Iteration 000. The later
+v1 Heltec migration and its 302 native cases remain historical evidence in
+the [progress archive](docs/en/PROGRESS.md#historical-snapshots-through-iteration-014).

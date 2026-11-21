@@ -1,4 +1,40 @@
-# Logging Guide
+# Serial logging
+
+## Protocol v3 capture
+
+Use the capture command in the [bench procedure](BENCH_RUNBOOK.md).
+Keep the original per-board `*.log` files, chunk indexes and `capture.json`.
+Note the firmware hash, board aliases, roles and observed ports in the
+[run record](../../logs/test/RUN_RECORD_TEMPLATE.md).
+Keep raw files private. Review publication copies for personal names, local
+paths, identifiers and private payloads. Preserve timestamps and run outcomes.
+
+| Event | Interpretation |
+|---|---|
+| `SCHEDULE_CONFIG` | The Gateway's advertised period and roster size. Roster entries do not imply active Clients. |
+| `V3_DATA_TX` | DATA launch result. `started` means the driver started TX. `deadline_miss` means the slot was skipped. |
+| `V3_DATA_RX` and `APP_PAYLOAD` | Gateway validation and delivery to the example application sink. An exact duplicate does not count as another delivery. |
+| `V3_BITMAP_RX` | Client's feedback observation. A received bitmap with a missing bit differs from unknown or expired feedback. |
+| `V3_PAYLOAD_RESULT` | The Client's transaction outcome, including accepted or exhausted with missing or unknown feedback. |
+| `V3_LINK_SAMPLE` | Per-grant observation for offline ADR. Includes first delivery, retry delivery or no valid DATA and any available RSSI/SNR. |
+| `V3_LINK_STATUS` and `OLED_STATUS` | Live link freshness and display service timing. `worst_step_us` includes formatting and one service call. |
+
+Correlate Gateway and Client records using network, frame, Gateway session
+and Client identity. Keep the Client's retries together. Use the boot
+boundaries and Gateway beacons from the captures to resolve reused frame
+numbers. Count fully observed transactions separately from partial ones.
+Report first-pass delivery, delivery after retries and Client ACK success
+with their denominators. Keep directional RSSI and SNR separate.
+
+Serial timestamps measure when the loop logs an event. Use radio and bus
+traces to measure physical completion and service delays. Missing serial
+events, nonzero `log_dropped` and truncated runs require separate treatment.
+Use the [diagnostic guide](DISPLAY_DIAGNOSTICS.md) for freshness and timing
+counters, and [the scheduled link reference](SCHEDULED_LINK.md#link-adaptation-experiments)
+for offline ADR inputs.
+
+<details>
+<summary>Legacy v1 HELLO/ACK capture and record formats (Iterations 013 and 016)</summary>
 
 ## Serial format
 
@@ -122,18 +158,4 @@ Use structured HELLO/ACK records for cohort totals. display counters wrap at
 2^32 and reset per boot. Frames and existing serial transaction events keep
 their prior format.
 
-## v3 scheduled payloads
-
-`status` identifies `protocol=3` and `profile=multiclient`. The gateway's
-`SCHEDULE_CONFIG` gives the period and roster size. Join `V3_DATA_TX`,
-`V3_DATA_RX` and `V3_PAYLOAD_RESULT` by frame, node and boot identity.
-`APP_PAYLOAD` prints hex from the bench receiver. A duplicate or conflict
-does not invoke that receiver again in the same frame. `V3_BITMAP_RX`
-distinguishes a valid missing bit from an unknown or expired ACK.
-`deadline_miss` records a skipped software launch. The logger's observation
-times include loop service latency. See the [v3 calendar](SCHEDULED_LINK.md).
-
-The v3 display build adds `V3_LINK_STATUS` for live freshness when a quiet
-tail is unavailable. `OLED_STATUS` also reports `worst_step_us` and
-`step_budget_us`. A step includes snapshot formatting and one service call.
-See [display diagnostics](DISPLAY_DIAGNOSTICS.md) for the screen counters.
+</details>

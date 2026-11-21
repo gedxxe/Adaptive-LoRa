@@ -72,7 +72,7 @@ are unmeasured. Radiated testing requires an authorized RF setup.
 
 ## Ownership and compatibility
 
-Use one firmware image. Valid NVS role selects GatewayApp or ClientApp;
+Use one firmware image. A valid NVS role selects the gateway or client path;
 missing/corrupt/incompatible config enters provisioning with application TX
 disabled. Never infer role from identical hardware. Config edits are staged,
 validated, saved with readback, then activated only after controlled reboot.
@@ -131,14 +131,12 @@ third-party libraries or add abstractions speculatively.
 
 ## Scope and next work
 
-Next: enumerate one terminated board at a time in Windows, make verified
-same-board private backups, and follow the bench runbook. Set
-`config set hello-interval-ms 3000` on both roles for the M2 link check and
-Display freshness. See the [startup guide](docs/en/STARTUP_AND_PROVISIONING.md).
-Measure transitions, IRQ latency, processing and drift before closing M3/M4
-acceptance. The [research calendars](docs/en/SCHEDULED_LINK.md) use
-experimental guards. PHY switching and ADR require a versioned agreement
-and measured retune budget.
+Use the [README](README.md#flash-and-configure) for v3 upload and provisioning.
+Keep electrical checks and backups in the [bench procedure](docs/en/BENCH_RUNBOOK.md).
+Start RF testing with one Gateway and one Client, then expand through eight
+Clients. Measure radio turnaround, IRQ latency and drift before closing
+M3/M4. PHY switching requires a versioned agreement, recovery path and
+measured retune budget.
 
 Do not add Wi-Fi/backhaul, Modbus/RS485, databases/dashboards, LoRaWAN/SX1302,
 OTA, multi-SF concurrent reception, battery features or unrelated

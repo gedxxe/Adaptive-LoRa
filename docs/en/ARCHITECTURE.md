@@ -2,44 +2,22 @@
 
 The bench pair is Heltec WiFi LoRa 32 V3.4. The owner confirms V3.2
 wiring, so the build uses the Arduino V3 variant and V3.2 electrical reference.
-Protocol 1 and NVS schema 1 remain the M2 baseline. See [HARDWARE.md](HARDWARE.md) for evidence by revision.
+The default research image uses protocol v3 and NVS schema 1. See
+[HARDWARE.md](HARDWARE.md) for evidence by revision.
 
 ## 1. Design overview
 
-The project uses one firmware image for two physically identical
-Heltec WiFi LoRa 32 V3.4 devices.
+Every board runs the same image. `FirmwareRuntime` loads and validates role
+and IDs from NVS, then starts the corresponding `MulticlientLink` state
+machine. Invalid or missing configuration leaves application TX disabled.
+The v1 target still runs `GatewayApp` or `ClientApp`, and the v2 target uses
+`ScheduledLink`. Use the same protocol version on every board in a test.
 
-``` text
-                         One firmware image
-                                |
-                             Boot
-                                |
-                       Load config from NVS
-                                |
-                    Validate schema and device IDs
-                                |
-                 +--------------+--------------+
-                 |              |              |
-              GATEWAY         CLIENT        Invalid / unset
-                 |              |              |
-            GatewayApp       ClientApp    Provisioning mode
-                 |              |          (TX disabled)
-                 +--------------+--------------+
-                                |
-                         RadioDriver
-                                |
-                       Sx1262Hardware
-                                |
-                       RadioLib SX1262
-                                |
-                         Heltec V3 onboard SX1262
-```
-
-Role selection is configuration-driven, not hardware-detected. The
-boards are identical, so the firmware cannot infer which physical unit
-is intended to be the gateway. Keep both roles and shared modules in one
-repository and one Codex workspace where possible; use milestone-scoped
-tasks rather than separate, drifting codebases.
+`MulticlientLink` uses `PayloadPort` for application delivery and reaches the
+SX1262 through the sole radio owner, `RadioDriver`. The [protocol flow in the
+README](../../README.md#how-it-works) shows how Gateway grants, DATA slots
+and feedback fit together. [Scheduled research links](SCHEDULED_LINK.md)
+specifies the wire format and timing rules.
 
 ## 2. Boot and runtime flow
 

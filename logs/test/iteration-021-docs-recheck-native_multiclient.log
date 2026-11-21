@@ -1,0 +1,31 @@
+Verbosity level can be increased via `-v, -vv, or -vvv` option
+Collected 15 tests
+
+Processing test_multiclient_runtime in native_multiclient environment
+--------------------------------------------------------------------------------
+Building...
+Testing...
+test\test_multiclient_runtime\test_main.cpp:632: runtime_client_submits_arbitrary_bytes_to_actual_driver	[PASSED]
+test\test_multiclient_runtime\test_main.cpp:633: runtime_gateway_delivers_binary_to_its_real_application_boundary	[PASSED]
+test\test_multiclient_runtime\test_main.cpp:634: runtime_fail_safe_for_missing_config_or_gateway_id_in_roster	[PASSED]
+test\test_multiclient_runtime\test_main.cpp:636: v3_oled_rotates_in_order_after_skipped_refresh_windows	[PASSED]
+test\test_multiclient_runtime\test_main.cpp:637: v3_client_draws_boot_screen_before_listening_for_beacons	[PASSED]
+test\test_multiclient_runtime\test_main.cpp:638: v3_client_starts_listening_at_oled_startup_deadline	[PASSED]
+test\test_multiclient_runtime\test_main.cpp:639: v3_client_starts_listening_after_oled_bus_failure	[PASSED]
+test\test_multiclient_runtime\test_main.cpp:640: v3_oled_renders_link_data_and_bitmap	[PASSED]
+test\test_multiclient_runtime\test_main.cpp:641: v3_gateway_defers_all_i2c_until_after_final_feedback_and_protects_beacon	[PASSED]
+test\test_multiclient_runtime\test_main.cpp:642: v3_client_repaints_after_full_roster_calendar	[PASSED]
+test\test_multiclient_runtime\test_main.cpp:643: v3_client_protects_peer_slots_then_refreshes_and_recovers_after_outage	[PASSED]
+test\test_multiclient_runtime\test_main.cpp:644: v3_gateway_oled_progresses_when_beacon_launch_fails	[PASSED]
+test\test_multiclient_runtime\test_main.cpp:645: v3_oled_recovers_from_transient_i2c_error_during_beacon_search	[PASSED]
+test\test_multiclient_runtime\test_main.cpp:646: v3_oled_overrun_disables_display_and_preserves_provisioning	[PASSED]
+test\test_multiclient_runtime\test_main.cpp:647: v3_gateway_keeps_next_beacon_after_oled_overrun_in_quiet_tail	[PASSED]
+---- native_multiclient:test_multiclient_runtime [PASSED] Took 4.49 seconds ----
+
+=================================== SUMMARY ===================================
+Environment         Test                      Status    Duration
+------------------  ------------------------  --------  ------------
+native_multiclient  test_multiclient_runtime  PASSED    00:00:04.494
+================= 15 test cases: 15 succeeded in 00:00:04.494 =================
+
+Exit code: 0

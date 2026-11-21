@@ -3,8 +3,7 @@
 <!-- current-state:start -->
 ## 当前状态 — Iteration 021
 
-本地 屏幕 集成分支从已发布的 Iteration 020 提交
-`75a99dfb0474680f90eb9d9685e5a079595f8e26` 开始。
+Iteration 021 已通过 [PR #8](https://github.com/gedxxe/Adaptive-LoRa/pull/8) 合入 `main`。
 
 | 项目 | 当前证据 |
 |---|---|
@@ -17,9 +16,12 @@
 | Host | 356/356 项 native 回归、15/15 项 v3 运行时测试、23/23 项最终 v3 链路专项测试 |
 | Physical acceptance | IN PROGRESS; NOT RUN |
 
+操作入口见 [README](../../README.zh-CN.md)。M3 调度和 M4 反馈与重传已在
+八 Client 配置上实现并通过主机验证。M5 已有上行采样和离线分析，空口协商、切换与
+恢复仍待完成。实板先做双节点试验，再逐步扩展到八个 Client。
+
 PHY、NVS schema、上报周期、M2 ACK 超时、v3 线格式和相对无线时隙保持原样。
-镜像选择见 [启动指南](STARTUP_AND_PROVISIONING.md)，
-Client 开始监听前最多预留 400 ms 绘制 WAIT。屏幕含义见 [屏幕 诊断](DISPLAY_DIAGNOSTICS.md)，
+Client 开始监听前最多预留 400 ms 绘制 WAIT。状态含义见[显示诊断](DISPLAY_DIAGNOSTICS.md)，
 完整回归见 [构建记录](../en/BUILD_MEMORY.md)。
 操作者报告独立 SF9/CR 4/6 实验约增加五米，期间仍偶发 STALE。暂无原始采集日志可分析。
 v3 开发镜像使用 SF7。

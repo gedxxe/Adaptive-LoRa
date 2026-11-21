@@ -1,0 +1,10 @@
+test_bench_roster_matches_firmware_reservation (test_model_multiclient.MulticlientBudgetTests.test_bench_roster_matches_firmware_reservation) ... ok
+test_extrapolation_does_not_admit_large_rosters (test_model_multiclient.MulticlientBudgetTests.test_extrapolation_does_not_admit_large_rosters) ... ok
+test_guard_and_payload_sweep (test_model_multiclient.MulticlientBudgetTests.test_guard_and_payload_sweep) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.027s
+
+OK
+
+Exit code: 0

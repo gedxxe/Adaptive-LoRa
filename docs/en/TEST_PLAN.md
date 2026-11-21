@@ -1,5 +1,10 @@
 # Test Plan
 
+For the current v3 firmware, follow the [bench sequence](BENCH_RUNBOOK.md)
+from one pair through eight Clients. Use the same image and fixed PHY across
+the test. [Progress](PROGRESS.md) distinguishes host tests from physical
+acceptance. The earlier M0–M2 sections below are for explicit v1 comparisons.
+
 ## 1. Test levels
 
 Keep evidence separate across:
