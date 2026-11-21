@@ -226,3 +226,130 @@ modulo 2^32 and reset at reboot. Link state uses a monotonic freshness window
 from the last qualifying receive. Preserve byte-level HELLO/ACK and schema 1.
 Keep the bench frequency at its existing research value until an authorized
 operating profile is selected. Physical evidence is required before M2 closes.
+
+## ADR-021 — Separate v2 research image and restore the fixed PHY
+
+2026-11-20. Keep the default and OLED profiles on protocol 1 and use an
+explicit PlatformIO research profile for protocol 2. Both profiles use the
+existing NVS role and schema 1. Each wire decoder accepts its own version.
+Both roles use fixed SF7, one radio and its existing driver. The v2 calendar
+has one peer, uses serviced beacon completion anchors and derives slots from
+the advertised payload budget. An explicit missing bit and an unknown
+result both allow a retry in the next slot, with the same DATA bytes. An
+accepted bit must match the client boot ID and sequence. The retry budget is
+one initial transmission plus three retries, as confirmed by the user.
+
+Restore the confirmed 10,000 ms reporting default and 10,000 ms M2 ACK
+timeout. Saved intervals still load as recorded. The scheduled profile uses
+shorter feedback windows within that budget. Restore the 22 dBm SX1262
+request and set its 140 mA high-power OCP after RadioLib `begin()` preserves
+60 mA. The PA limit does not specify board input current. Keep V3.2 as the
+electrical reference for the V3.4 pair. Bench evidence is needed for actual
+output and the experimental guard. ADR remains planned.
+
+## ADR-022 — Exact-length multi-client grants and shared retries
+
+2026-11-20. Keep the v1 M2 and v2 single-client wire formats. Add v3 in its
+own build environment. Only gateway-originated BEACON, SLOT_GRANT and
+ACK_BITMAP may use the group destination. Request and DATA use the client
+source ID and unicast gateway destination. A fixed roster limits admission
+to eight clients. The gateway grants exact lengths after receiving requests
+and uses the roster index for data ordering and both bitmap masks.
+
+Use a bounded, copied TX buffer and synchronous RX callback. A positive bit
+requires the callback to accept DATA and identifies the accepted client
+session. Declined delivery remains unset. The gateway retains one packet
+per active position for the frame. Each retry round reserves up to four
+shared slots and grants them only to missing candidates. Without a current
+grant, the client stays silent. Cumulative feedback can recover a lost ACK.
+
+Use a 3,000 ms reporting default and a 1,000 ms M2 ACK timeout. Existing
+NVS values remain authoritative. Preserve the 1,000 ms research target and
+derive a feasible superframe from the roster budgets, up to 10,000 ms. Keep
+the 50 ms provisional guard independent of those settings. v2 retains its
+own 10 s feedback budget. Both scheduled images use fixed SF7. Coordinated
+PHY changes need a versioned activation and fallback agreement.
+
+## ADR-023 — Schedule OLED work after the v3 radio phases
+
+2026-11-20. Keep dedicated v3 OLED and headless builds. Publish a read-only
+v3 telemetry snapshot from validated application events. The v3 runtime
+services the display only in a quiet tail, after radio and serial work,
+and with no pending IRQ. Local client completion leaves peer DATA and
+feedback windows protected. Clients without a usable beacon anchor listen
+without display I/O. Provisioning can render with the radio inactive.
+
+Require 10 ms for one display step plus half a radio guard before the next
+beacon. Latch a display fault after a measured step over 10 ms. The gate
+preserves the existing v3 calendar and packet format. The Wire timeout and
+host tests do not establish a physical upper bound for a started call.
+
+## ADR-024 — Keep one v3 firmware build target
+
+2026-11-20. At the owner's request, retire the separate headless v3 ESP32
+environment. The OLED environment inherits directly from the base Heltec
+board and keeps both v3 and OLED build flags. Native headless and OLED tests
+continue to exercise their respective runtime paths. Earlier build evidence
+records the targets that existed when those checks ran.
+
+## ADR-025 — Client OLED boot screen before beacon acquisition
+
+2026-11-20. Give the v3 OLED Client up to 400 ms after successful radio
+initialization to draw its first WAIT frame while the radio remains in
+standby. The main loop continues to service serial commands. A ready
+panel, a display error or deadline expiry releases the Client to listen.
+After startup, the existing quiet-tail guard applies. This avoids starting
+I²C during asynchronous beacon acquisition and does not change the
+Gateway's beacon schedule.
+
+## ADR-026 — Advance v3 OLED pages after a complete repaint
+
+2026-11-20. Start the five-second page dwell once the panel has the complete
+page. Draw the next title after its body and resume a split repaint at the
+same position. Add 150 ms after the radio reservation for the automatically
+derived OLED gateway period when the configured cap has room. The supplied
+roster changes from 6,516 to 6,666 ms. Relative radio slots, guards, packet
+layout and persisted configuration stay the same. Keep the existing IRQ,
+I²C and next-beacon checks before each step.
+
+## ADR-027 — Confirm bitmap transmission before opening gateway retry slots
+
+2026-11-20. Keep the next receive mask clear until the radio reports
+TX_DONE for the preceding feedback round. Apply the mask only in the
+matching frame and retry round, by the first retry slot's start. Later
+feedback can still carry cumulative acceptance. This change uses the
+existing radio event and v3 wire format.
+
+## ADR-028 — Keep v3 diagnostics available during beacon search
+
+2026-11-20. Protect an active calendar and the next expected beacon RX
+completion plus 25 ms. An expired calendar can no longer schedule Client
+TX. Keep continuous RX during search and check for pending IRQs between
+single OLED steps. A new valid beacon reinstates calendar protection.
+The Gateway reserves possible peer activity after beacon or grant TX
+errors, then gives the display the remaining tail. Leave the previous
+session identity available for replay checks.
+
+Use 250 ms of display reserve for the automatically derived OLED period
+where the 10 s cap allows it. The bench period is 6,766 ms. Allow OLED
+reset and redraw after a two-second fault backoff in a permitted window.
+Once Wire is initialized, reset the panel without cycling the Vext rail
+or reinstalling the bus. The v3 wire format still admits at most eight
+clients. A 70-node design requires different capacity and control framing.
+
+## ADR-030 — Separate radio completion time from slot launch time
+
+2026-11-21. Latch the first DIO1 edge with the ESP timer and consume it
+under a bounded cross-core critical section. The radio driver uses
+poll-entry time when only the DIO1 level is available. V3 validates
+receptions and anchors Beacon and Grant by completion time. Launch
+checks use the current clock to keep expired slots silent. The
+specified development roster is Gateway 1 and Clients 2–9.
+
+## ADR-031 — Make multiclient the default and evaluate ADR offline
+
+2026-11-21. The default v3 environment includes the board display. Keep
+separate v1 and v2 compatibility builds. Log uplink evidence for each
+granted client after the final bitmap completes. Use experiment-provided
+thresholds and hysteresis for offline SF recommendations. Keep active
+v3 on SF7 while control agreement, recovery and retune costs are open.

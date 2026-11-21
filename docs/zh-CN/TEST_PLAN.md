@@ -16,16 +16,16 @@ RadioLib 版本。
 
 部署前还需确认当地允许的频率、信道和功率要求。
 
-## 3. M1 — LLCC68 初始化
+## 3. M1 — SX1262 初始化
 
-分别在两台设备上验证： - RadioLib LLCC68 初始化； - BUSY 和 DIO1
+分别在两台设备上验证： - RadioLib SX1262 初始化； - BUSY 和 DIO1
 事件； - Reset； - 电源稳定性； - 无重复 brownout 或 watchdog reset。
 
 配置无效时必须进入 Provisioning Mode，禁止正常无线发送。
 
 ## 4. M2 — HELLO / ACK
 
-短距离、无遮挡、固定 PHY 测试。初始发射功率 10 dBm。
+短距离、无遮挡、固定 PHY 测试。请求功率 22 dBm，发射前核对负载、供电和获准射频条件。
 
 至少记录 200 次 HELLO： - 尝试数量； - Gateway 接收数量； - ACK
 发送数量； - Client 成功确认数量； - Timeout； - Duplicate； -
@@ -45,6 +45,10 @@ wrap； - 重复包识别； - NVS 角色配置验证。
 M4 阶段增加 1、10、70 节点 Bitmap 测试。
 
 ## 6. M3–M8
+
+Iteration 019 在主机执行实际 v2 状态机。Iteration 020 测试实际 v3 Gateway 和 1、2、4、8
+个 Client，并通过 driver 接口验证运行时分派。下列实物验收仍未执行，见
+[定时协议](SCHEDULED_LINK.md)。
 
 - M3：单客户端 Beacon/TDMA、slot timing、radio switching 和 clock
   drift。
@@ -151,3 +155,25 @@ Runtime、应用和显示逻辑，覆盖初始化顺序、分块、变化页、�
 故障隔离。同一 HELLO/ACK 在显示关闭、启用和故障的模拟条件下保持一致。实板要确认
 V3.4 引脚、RF SKU、供电及备份，再做 OLED 开关对照和获准短距采样。验收条件每组至少
 200 次完整 HELLO TX，并留原始串口、两个方向指标、OLED 时序、日志丢失和复位结果。
+
+### Iteration 020.1 v3 显示覆盖
+
+主机执行带屏的实际 v3 Runtime，用模拟无线和 Wire 检查页面、状态过期边界和 I²C
+保护时段。覆盖 Client 提前结束、错过 Beacon、待处理 IRQ 及主循环延迟耗尽剩余预算。
+配置状态及正常 Gateway 的帧尾均注入 屏幕 超时，并检查下一次 Beacon 的时序和名单。
+
+切页回归跳过多个名义周期，并把一次重绘分摊到多个窗口，检查两端的顺序、停留时间和
+标题更新时机。运行时测试在两端使用八个最大时隙和模拟 3 ms I²C 传输，检查重绘位于
+允许的帧尾。协议测试注入位图发送失败和迟到的 TX_DONE，验证未确认的重传时隙保持关闭。
+
+断连测试先完成握手，再模拟 30 秒无 Beacon，检查切页顺序和停留时间、持续接收、过期
+时隙禁止发射、拒绝旧帧重放以及 Gateway 重启后的完整握手。另一用例让 Client 在第 3 页
+丢失 Beacon。其余用例覆盖 Gateway Beacon 发射失败和短暂 I²C 传输故障恢复。
+
+### Iteration 021 时序与开发名单
+
+主机运行时测试注入比捕获时刻晚 30 ms 处理的 Beacon、授权、DATA 和 ACK，检查
+有效包仍按实际完成时间判断。适配器单独测试跨 32 位回绕后读取首次 IRQ。半双工网络
+测试用一个 Gateway 和八个 Client，每个提交 64 字节，核对应用投递与采样日志。
+实板按 1 → 2 → 4 → 8 个 Client 逐步增加，使用 ID 2–9。每步记录两端日志、时钟偏差、
+无线完成至处理时延、启动发送、恢复接收以及时序超限。

@@ -109,15 +109,31 @@ The runbook's existing >=99% short-range target applies to declared transaction 
 Future BEACON/slot/bitmap/ADR event names listed earlier are reserved for later milestones; their absence is not an M0-M2 capture failure.
 
 
-## Iteration 016 OLED diagnostics
+## Iteration 016 display diagnostics
 
-In the OLED build, `OLED_INIT` records the first successful refresh or a
+In the display build, `OLED_INIT` records the first successful refresh or a
 startup failure. A later failure emits `OLED_ERROR` once. Serial `status`
 adds `OLED_STATUS` with `worst_i2c_us` and `worst_refresh_io_us`. The first
 is the longest measured write API span, the second is the sum of write API
 spans for the most expensive completed refresh. They exclude skipped loop
 iterations, CPU-only formatting and bus setup. Zero means no completed
 measurement for that accumulator yet. Neither field measures RF latency.
-Use structured HELLO/ACK records for cohort totals. OLED counters wrap at
+Use structured HELLO/ACK records for cohort totals. display counters wrap at
 2^32 and reset per boot. Frames and existing serial transaction events keep
 their prior format.
+
+## v3 scheduled payloads
+
+`status` identifies `protocol=3` and `profile=multiclient`. The gateway's
+`SCHEDULE_CONFIG` gives the period and roster size. Join `V3_DATA_TX`,
+`V3_DATA_RX` and `V3_PAYLOAD_RESULT` by frame, node and boot identity.
+`APP_PAYLOAD` prints hex from the bench receiver. A duplicate or conflict
+does not invoke that receiver again in the same frame. `V3_BITMAP_RX`
+distinguishes a valid missing bit from an unknown or expired ACK.
+`deadline_miss` records a skipped software launch. The logger's observation
+times include loop service latency. See the [v3 calendar](SCHEDULED_LINK.md).
+
+The v3 display build adds `V3_LINK_STATUS` for live freshness when a quiet
+tail is unavailable. `OLED_STATUS` also reports `worst_step_us` and
+`step_budget_us`. A step includes snapshot formatting and one service call.
+See [display diagnostics](DISPLAY_DIAGNOSTICS.md) for the screen counters.

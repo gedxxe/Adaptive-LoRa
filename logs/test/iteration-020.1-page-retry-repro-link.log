@@ -1,0 +1,14 @@
+Verbosity level can be increased via `-v, -vv, or -vvv` option
+Collected 15 tests
+
+Processing test_multiclient_link in native environment
+--------------------------------------------------------------------------------
+Building...
+[Errno 13] Permission denied: '<PLATFORMIO_HOME>\\platforms.lock'
+----------- native:test_multiclient_link [ERRORED] Took 0.05 seconds -----------
+
+=================================== SUMMARY ===================================
+Environment    Test                   Status    Duration
+-------------  ---------------------  --------  ------------
+native         test_multiclient_link  ERRORED   00:00:00.052
+================== 1 test cases: 0 succeeded in 00:00:00.052 ==================

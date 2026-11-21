@@ -481,3 +481,207 @@ write. Measure it as described in DEPENDENCY_BUDGET_AUDIT.md. ERR-008,
 ERR-021 and ERR-023 are still open. One repository inspection used the
 unsupported Windows rg filename glob README* (OS error 123). The explicit
 README paths corrected that lookup. All required builds and tests exited 0.
+
+## ERR-029 — Iteration 019 native timing and serial fixtures
+
+First `pio test -e native` exited 1. The old schema-1 config fixture treated
+5,000 ms as the default. OLED and runtime fixtures still advanced to 1 s
+ACK deadlines. The new scheduled fixture expected `result` immediately
+after the event field, although the logger inserts identity and PHY fields.
+PlatformIO also printed `Program received signal SIGINT (Interrupt)` for
+the failing config-store suite. Full output is preserved in
+`logs/test/iteration-019-verification-native.log`.
+
+The next run kept the old NVS fixture explicitly, advanced timing to the
+restored boundaries and matched diagnostics by record. It exited 1 with two
+scheduled log assertions still failing because two simulated boards wrote
+partial records to the same UART shim. PlatformIO reported SIGINT for that
+suite. See `logs/test/iteration-019-final-native.log`. Serialize the two
+fake UART drains and keep each complete record. The release run exited 0
+with 333/333 cases, no failures or skips.
+
+## ERR-030 — RadioLib retains low-power OCP after 22 dBm PA setup
+
+Inspect pinned RadioLib 7.8.1 `SX126x.cpp` LoRa initialization and
+`SX126x_config.cpp::setOutputPower`. Common initialization sets 60 mA, and
+the PA change restores the previous OCP register. Semtech's SX1262
+high-power `SetPaConfig` default is 140 mA. The firmware now explicitly
+sets 140 mA after successful `begin()`. An injected OCP error suppresses
+header, CRC and IRQ initialization. The three release builds and adapter
+tests passed. Actual power, current and supply headroom still need a loaded
+board measurement. ERR-021 and ERR-023 remain open.
+
+### Iteration 019 audit tooling notes
+
+PowerShell rejected a brace-expanded filename list; use separate explicit
+paths. Windows `rg` rejected `README*` and a test directory argument ending
+in `*`; use explicit paths or a `-g` filter. The first `Get-ChildItem`
+probe for `.github/workflows` found no directory. A probe for an Iteration
+018 scenario filename also found no file at that name. These lookups had no
+effect on source or validation. The first staged whitespace check found a
+trailing blank line in the Chinese architecture doc. Removing it cleared
+the check. No physical errors were injected on a board.
+
+## ERR-031 — Compiler compatibility in the v3 envelope and mask code
+
+The first `pio run -e heltec_wifi_lora_32_V3_multiclient` exited 1. The
+Arduino header defines `bit(...)` as a macro, which expanded the same-named
+helper when `main.cpp` included the runtime. Renamed the helper to `slotBit`.
+The first targeted native run also exited 1 because the installed GCC 6
+treated `[[fallthrough]]` as an ignored attribute under `-Werror`. Combined
+the REQUEST/DATA cases with an explicit REQUEST length test. Initial logs
+are `logs/build/iteration-020-initial-multiclient.log` and
+`logs/test/iteration-020-probe-link.log`.
+
+## ERR-032 — Native runtime fixture stopped draining serial too early
+
+The first `pio test -e native_multiclient` recorded one failing gateway
+assertion before the pending `APP_PAYLOAD` line had drained through the
+64-byte test UART. PlatformIO also printed `CTRL_BREAK_EVENT` for the
+failed executable. Extend only the fixture's drain budget. The client
+wire test and invalid-configuration test passed in that run. See
+`logs/test/iteration-020-probe2-runtime.log`.
+
+### Iteration 020 timing limits and tooling
+
+The 1 s target cannot contain even one eight-byte client under the complete
+50 ms-guard retry calendar. The firmware rejects a forced 1 s period for
+the shipped roster and computes the documented 6,516 ms period. This is
+an admission result. Radio turnaround, BUSY delays and the guard still need
+physical measurement. ERR-021 and ERR-023 remain open. A Windows `rg` path
+with a wildcard returned error 123; the directory plus `-g` form succeeded.
+
+### Iteration 020.1 OLED timing review
+
+The original display gate only excluded current radio TX and the M2 client
+ACK wait. That condition would allow OLED work during v3 peer phases after
+an early local ACK. The combined build uses the complete v3 calendar and
+checks the available time twice. Native tests inject a 10,001 µs display
+step in provisioning and in a gateway quiet tail. Both latch
+`service_budget_overrun`. The gateway still starts its next beacon with the
+same roster. See `logs/test/iteration-020.1-final-runtime-oled.log`.
+
+All build and test runs for this iteration completed successfully. Physical
+Wire call duration, recovery from SDK locks, and RF IRQ latency remain
+unmeasured. ERR-021 and ERR-023 remain open.
+
+### Iteration 020.1 follow-up — Rebuilt OLED image fingerprint
+
+After removing the redundant target, `pio run -e heltec_wifi_lora_32_V3_multiclient_oled`
+exited 0. The previous image SHA-256 was
+`2645f3ab2b408c47c28e1faf02f84cbd8321c512ae7d87349dd35975b93603af`.
+The rebuilt SHA-256 is
+`bb4e8dcdca24641bb1e915ce5f99b1fdbce5bd30d9733ba5fe84fd6a80df4076`.
+The resolved OLED options, source and reported image sizes match. The
+original binary was not retained for byte comparison, so the cause of the
+digest difference was not established. Native and host regressions passed.
+
+## ERR-033 — v3 Client OLED can stay dark before synchronization
+
+An operator reported that the Gateway display worked while the Client
+display stayed dark. The v3 runtime previously started Client RX before the
+panel could draw, then blocked display service without a beacon anchor.
+The new cold-boot assertion reproduced this in
+`logs/test/iteration-020.1-client-boot-repro-runtime-oled.log`, with
+`pio test -e native_multiclient_oled` exiting 1. The v3 OLED Client now
+has a bounded standby window for its first WAIT screen and starts RX on
+display readiness, display failure or timeout. Physical diagnosis of the
+reported Client board remains pending.
+
+## ERR-034 — v3 OLED page numbers skip when the radio defers a repaint
+
+The operator reported out-of-order pages and uneven dwell on both roles.
+The renderer derived its page from monotonic uptime. A simulated refresh
+pause past two page boundaries showed ACK where DATA should have followed
+LINK. Reproduced with `pio test -e native_multiclient_oled` (exit 1), in
+`logs/test/iteration-020.1-page-retry-baseline-runtime-oled.log`. The
+default full calendar also left too little tail to ensure progress: at
+nominal completion times the Client's quiet-tail gate could close before
+it opened. Page order now follows completed draws. The OLED gateway adds a
+150 ms tail to the derived period. Native tests cover a split repaint and
+the full roster's tail on both roles. Physical duration remains unmeasured.
+
+## ERR-035 — Gateway opened a retry receive slot after a failed bitmap TX
+
+A fake radio discarded the initial DATA, then returned a TX error for the
+bitmap which granted a retry. An injected DATA in the would-be retry slot
+still reached the gateway application. Reproduced with
+`pio test -e native -f test_multiclient_link` (exit 1), in
+`logs/test/iteration-020.1-page-retry-baseline-link.log`. The gateway now
+requires timely TX_DONE for that frame and feedback round. Regressions
+also cover completion after the retry slot has started. This is host evidence.
+
+### Iteration 020.1 v3 OLED reaudit tooling
+
+- The first baseline runs could not create the installed PlatformIO
+  `platforms.lock` under the workspace sandbox (both exit 1). The same
+  commands reached the expected assertions with approved toolchain access.
+  See `logs/test/iteration-020.1-page-retry-repro-runtime-oled.log` and
+  `logs/test/iteration-020.1-page-retry-repro-link.log`.
+- The first focused build applied `[[maybe_unused]]` to the formatter
+  parameter. The native compiler rejected the attribute under `-Werror`
+  (both exit 1). It now uses an explicit unused-parameter cast in the v1
+  build. See `logs/test/iteration-020.1-page-retry-focused-runtime-oled.log`
+  and `logs/test/iteration-020.1-page-retry-focused-link.log`.
+
+## ERR-036 — Client OLED froze after loss of gateway beacons
+
+The operator observed the display stuck at its current page after removing
+Gateway power. The old guard depended on a new calendar even when the
+local receiver was simply searching. The new outage regression withheld
+beacons for 30 simulated seconds and observed zero page changes.
+`pio test -e native_multiclient_oled` exited 1 in
+`logs/test/iteration-020.1-outage-repro-runtime-oled.log`. The Client now
+expires the TX calendar, keeps RX armed and advances pages while searching.
+The regression also covers page 3, rejection of a stale beacon and
+successful DATA/ACK delivery after Gateway restart.
+
+## ERR-037 — Gateway OLED starvation and persistent display fault
+
+The same baseline suite reproduced no Gateway repaint after a failed
+beacon launch and no recovery from a transient I²C failure. The Gateway
+now retains a conservative window for possible peer activity and services
+the remaining tail. The display can retry after two seconds while radio
+work keeps priority. The final host suite verifies both paths.
+
+## ERR-038 — Old title characters could trigger OLED redraws
+
+After the search path was enabled, the outage test detected an extra LINK
+title write without a page change. The first two focused runs also used
+the former first-page expectation for a client that can now rotate before
+its first beacon. The v3 formatter overwrote a longer v1 title and left
+its unused suffix after the NUL byte. The renderer compared and drew
+those bytes. See `logs/test/iteration-020.1-outage-focused-runtime-oled.log`,
+`logs/test/iteration-020.1-outage-focused2-runtime-oled.log` and
+`logs/test/iteration-020.1-outage-focused3-runtime-oled.log` (exit 1).
+Each role now formats its title once, and row comparison and rendering stop
+at the terminator. The final runtime suite checks that title writes show
+the right next page with at least five seconds of dwell.
+
+## ERR-041 — v3 used service time for on-air completion
+
+The gateway and client previously used the clock after radio polling
+to anchor their calendar and validate received packets. Scheduler
+delay, serial work and synchronous radio calls could move that value
+outside a valid slot. DIO1 timestamps now drive v3 receive validation,
+and real processing time still gates transmission. The native runtime
+checks an artificial 30 ms service delay on valid completions.
+Level-only fallback and physical capture error remain measurable risks.
+
+## ERR-042 — Iteration 021 validation setup
+
+- System Python had no PlatformIO module. The first three build
+  and two native commands exited 1 before running PlatformIO.
+  The `iteration-021-timing-*` transcripts remain under
+  `logs/build` and `logs/test`. Rerunning with the installed
+  PlatformIO interpreter reached the toolchain.
+- The current-document fixture attempted to mutate protocol 1 after
+  the default switched to v3. The first checker suite exited 1.
+  The fixture now checks the v3 source definition and tests that the
+  default build includes the display. See
+  `logs/test/iteration-021-check-test_check_consistency.log`
+  and `logs/test/iteration-021-final-test_check_consistency.log`.
+- The installed MiKTeX PDF extractor could not read its registry
+  configuration. The bundled Python reader extracted all four local
+  research papers. It reported incomplete font-encoding support; the
+  cited sections were readable. Extraction output stays under `.pio`.

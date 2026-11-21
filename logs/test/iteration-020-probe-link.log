@@ -1,0 +1,20 @@
+Verbosity level can be increased via `-v, -vv, or -vvv` option
+Collected 14 tests
+
+Processing test_multiclient_link in native environment
+--------------------------------------------------------------------------------
+Building...
+src\common\protocol\multiclient_protocol.cpp: In function 'adaptive_lora::CodecResult adaptive_lora::multiclient::{anonymous}::validate(const adaptive_lora::Frame&)':
+src\common\protocol\multiclient_protocol.cpp:176:13: error: attributes at the beginning of statement are ignored [-Werror=attributes]
+             [[fallthrough]];
+             ^
+cc1plus.exe: all warnings being treated as errors
+*** [.pio\build\native\src\common\protocol\multiclient_protocol.o] Error 1
+Building stage has failed, see errors above. Use `pio test -vvv` option to enable verbose output.
+---------- native:test_multiclient_link [ERRORED] Took 18.00 seconds ----------
+
+=================================== SUMMARY ===================================
+Environment    Test                   Status    Duration
+-------------  ---------------------  --------  ------------
+native         test_multiclient_link  ERRORED   00:00:18.001
+================== 1 test cases: 0 succeeded in 00:00:18.001 ==================

@@ -13,6 +13,14 @@ constexpr int SCL_OLED = 18;
 constexpr int RST_OLED = 21;
 constexpr int Vext = 36;
 
+// The native adapter tests run on one thread and exercise latch ownership.
+struct portMUX_TYPE {};
+#define portMUX_INITIALIZER_UNLOCKED {}
+inline void portENTER_CRITICAL(portMUX_TYPE*) {}
+inline void portEXIT_CRITICAL(portMUX_TYPE*) {}
+inline void portENTER_CRITICAL_ISR(portMUX_TYPE*) {}
+inline void portEXIT_CRITICAL_ISR(portMUX_TYPE*) {}
+
 // Captures the real SerialLogger's output. This models byte capacity/short
 // writes only, not USB, interrupts, locks, a UART or elapsed write latency.
 class HostSerial {

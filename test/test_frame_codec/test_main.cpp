@@ -63,8 +63,18 @@ void test_oversize_payload_rejected() {
 void test_magic() { validBytes(); bytes[0] ^= 1; expect(CodecResult::MAGIC); }
 void test_version() { validBytes(); bytes[2] = 2; expect(CodecResult::VERSION); }
 void test_type_and_future_types() {
-    for (uint8_t type : {uint8_t(0),uint8_t(3),uint8_t(0x10),uint8_t(0x11),uint8_t(0x7F),uint8_t(0xFF)}) {
-        validBytes(); bytes[3] = type; expect(CodecResult::TYPE);
+    // Reserved wire IDs are allocations for future milestones, not v1 traffic.
+    constexpr uint8_t rejected[] = {0x00, 0x03, 0x10, 0x11, 0x12, 0x20,
+                                    0x21, 0x22, 0x30, 0x31, 0x7F, 0xFF};
+    for (uint8_t type : rejected) {
+        validBytes();
+        bytes[3] = type;
+        expect(CodecResult::TYPE);
+
+        Frame frame = hello();
+        frame.type = static_cast<MessageType>(type);
+        TEST_ASSERT_EQUAL(int(CodecResult::TYPE), int(encodeFrame(frame, bytes, sizeof(bytes), length)));
+        TEST_ASSERT_EQUAL_UINT(0, length);
     }
 }
 void test_header_length() { validBytes(); bytes[5] = 27; expect(CodecResult::HEADER); }

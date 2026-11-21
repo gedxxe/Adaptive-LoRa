@@ -34,6 +34,10 @@ public:
         s.sync = sync; s.power = power; s.preamble = preamble; s.tcxo = tcxo; s.ldo = ldo;
         return s.record(host_adapter::BEGIN);
     }
+    int16_t setCurrentLimit(float limit) {
+        auto& s = host_adapter::state(); s.currentLimit = limit;
+        return s.record(host_adapter::CURRENT_LIMIT);
+    }
     int16_t explicitHeader() { return host_adapter::state().record(host_adapter::HEADER); }
     int16_t setCRC(uint8_t length) {
         host_adapter::state().crc = length; return host_adapter::state().record(host_adapter::CRC);

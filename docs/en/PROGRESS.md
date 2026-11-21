@@ -1,7 +1,100 @@
 # Development progress
 
 <!-- current-state:start -->
-## Current state — Iteration 016.1
+## Current state — Iteration 021
+
+Development continues from published Iteration 020
+`75a99dfb0474680f90eb9d9685e5a079595f8e26` with the local display and link fixes.
+
+| Item | Current evidence |
+|---|---|
+| Firmware / protocol | `0.2.0-alpha.1` / `3` |
+| Board | Heltec WiFi LoRa 32 V3.4, ESP32-S3/SX1262, V3.2 electrical reference |
+| ESP32 build | `heltec_wifi_lora_32_V3_multiclient` passed. Both legacy comparison images also passed. |
+| Development roster | Gateway 1, Clients 2–9, each with a 64-byte budget. The advertised period is 6,766 ms. |
+| Timing | Beacon and grant anchors use radio completion timestamps. Slot launches still use current time. |
+| ADR research | The gateway records per-client first delivery, retry or miss. The offline evaluator uses experiment-supplied thresholds. |
+| Host | 356/356 native regressions, 15/15 v3 runtime cases, and 23/23 in the final focused v3 link run |
+| Physical acceptance | IN PROGRESS; NOT RUN |
+
+The PHY, NVS schema, report interval, M2 ACK timeout, v3 wire layout and
+relative radio slots are unchanged. Use the [startup guide](STARTUP_AND_PROVISIONING.md)
+to choose a build and the [display guide](DISPLAY_DIAGNOSTICS.md) to interpret the screen.
+Client boot reserves up to 400 ms for a WAIT screen before beacon RX.
+The operator reported about five metres of additional reach in a separate
+SF9/CR 4/6 experiment, with intermittent stale status. No raw capture was
+supplied for timing or range analysis. The v3 development target uses SF7.
+See [build memory](BUILD_MEMORY.md) for the full regression record.
+<!-- current-state:end -->
+
+## Historical snapshot — Iteration 020
+
+`codex/iteration-020-multiclient-payload-scheduling` stacks on the published
+Iteration 019 commit `979d873fad629aedcdf0e8a565b4ad3681bbea61`. The main
+baseline remains `541e2e8b985f7cd67ca4d1f1af323c46aed4333e`.
+
+| Item | Current evidence |
+|---|---|
+| Firmware / protocol | `0.2.0-alpha.1` / `1` by default, with separate v2 and v3 research profiles |
+| Board | Heltec WiFi LoRa 32 V3.4, ESP32-S3/SX1262, V3.2 electrical reference |
+| Timing | Default report 3,000 ms, M2 ACK 1,000 ms. v3 targets 1,000 ms and admits up to 10,000 ms. The shipped roster derives 6,516 ms using a provisional 50 ms guard. |
+| RF and storage | 915.0 MHz, SF7/BW125/CR4/5, 22 dBm requested, 140 mA PA OCP. Network/gateway/client defaults 1/1/2. Existing NVS schema 1 values persist. |
+| ESP32 builds | `heltec_wifi_lora_32_V3`, `_oled`, `_research`, `_multiclient` all passed |
+| Native | `native` 353/353 and `native_multiclient` 3/3 passed |
+| Host tools | Capture 13/13, legacy model 16/16, v3 model 3/3, documentation checks 9/9 and direct checker passed |
+| Physical acceptance | IN PROGRESS; NOT RUN |
+
+The v3 test network exercises 1, 2, 4 and 8 client state machines. DATA grants
+use the submitted length, and aggregate feedback grants shared retries only
+to missing clients. A ten-client extrapolation fits the ten-second budget
+under the model assumptions. The firmware admits up to eight. No physical
+test or measurement was taken. See the [startup guide](STARTUP_AND_PROVISIONING.md),
+[wire specification](SCHEDULED_LINK.md) and [build memory](BUILD_MEMORY.md).
+
+## Historical snapshot — Iteration 019
+
+Branch `codex/iteration-019-research-implementation` starts at published
+Iteration 018, `0735bb8ef5cb7c1d677c98f2123c4a3f6cb7a1ea`. Canonical `main`
+remains `541e2e8b985f7cd67ca4d1f1af323c46aed4333e`.
+
+| Item | Current evidence |
+|---|---|
+| Firmware / protocol | `0.2.0-alpha.1` / `1` (default M2); opt-in scheduled v2 |
+| Build environment | `heltec_wifi_lora_32_V3`, `_oled`, `_research`; all exit 0 |
+| Board | Two owner-reported Heltec WiFi LoRa 32 V3.4, ESP32-S3/SX1262, stock monopoles, 902–928 MHz procurement; V3.2 electrical reference |
+| Restored baseline | 915.0 MHz, SF7/BW125/CR4/5, 22 dBm request, 140 mA PA OCP, network/gateway/client 1/1/2, 10,000 ms reporting default and M2 ACK timeout, NVS schema 1 |
+| Scheduled software | One client, payload-aware slots, cumulative bitmap feedback and three retries. Host tests run the actual state machines. |
+| Software checks | Native 333/333, capture 13/13, airtime model 16/16 and documentation tests 7/7 PASS. Direct consistency check PASS. |
+| Physical acceptance | IN PROGRESS; NOT RUN |
+
+Follow the [M2 bench runbook](BENCH_RUNBOOK.md) first. M3/M4 acceptance
+needs two boards running v2 and measurements of conducted power, TX/RX
+turnaround, IRQ jitter and drift. See the [v2 specification](SCHEDULED_LINK.md),
+[repository audit](../research/ITERATION_019_AUDIT.md) and [build memory](BUILD_MEMORY.md).
+M5–M8 remain planned. No hardware was accessed this iteration.
+
+## Historical snapshot — Iteration 018
+
+Main includes PR #6 at `541e2e8b985f7cd67ca4d1f1af323c46aed4333e`.
+The research branch is `codex/iteration-018-research-traceability`.
+
+| Item | Current evidence |
+|---|---|
+| Firmware / protocol | `0.2.0-alpha.1` / `1` |
+| Build environment | `heltec_wifi_lora_32_V3` and opt-in `heltec_wifi_lora_32_V3_oled` |
+| Board | Heltec WiFi LoRa 32 V3.4, ESP32-S3/SX1262. V3.2 electrical reference. |
+| Software scope | M2 HELLO/ACK. Reserved-type rejection test expanded. No firmware change. |
+| Research | Four fixed papers. Fifteen figure entries, three attributed crops and six original SVG illustrations. |
+| Software verification | Both S3 builds PASS and binary-identical to 016.1. Native 316/316, capture 13/13, airtime 16/16, docs 7/7 and direct checker PASS. |
+| Physical acceptance | IN PROGRESS; NOT RUN |
+
+[Research references](../references/README.md) and the
+[traceability matrix](../research/ALGORITHM_TRACEABILITY.md) separate paper
+claims, project design, host evidence and physical measurements. No M3–M8
+production feature is active. Next physical step follows the existing
+[BENCH_RUNBOOK.md](BENCH_RUNBOOK.md).
+
+## Historical snapshot — Iteration 016.1
 
 Client date 2026-11-19. PR #5 merged Iteration 015 into main at
 `e34e7296135b47ecd3af479fe0593f4118bc734b`. The review branch is
@@ -28,7 +121,6 @@ The [bench runbook](BENCH_RUNBOOK.md) starts with one-board CP2102 enumeration,
 then same-board backups, OLED checks and separate 15,000 ms provisioning.
 See [HARDWARE.md](HARDWARE.md) for the evidence split and [BUILD_MEMORY.md](BUILD_MEMORY.md)
 for software checks. No physical acceptance result has been recorded.
-<!-- current-state:end -->
 
 ## Iteration 015 historical snapshot
 

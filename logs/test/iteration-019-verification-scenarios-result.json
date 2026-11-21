@@ -1,0 +1,9 @@
+{
+  "command": "<PIO_PYTHON> tools/tdma_feasibility.py --scenarios --out logs/test/iteration-019-tdma-scenarios.json",
+  "exit_code": 0,
+  "runner_seconds": 0.453,
+  "log": "logs/test/iteration-019-verification-scenarios.log",
+  "publication_policy": "Full stdout/stderr with local workspace/PlatformIO/user paths replaced by disclosed placeholders and EOL/trailing-display normalization. Raw retained privately in ignored audit cache.",
+  "client_date": "2026-11-20",
+  "physical_validation": "NOT RUN"
+}

@@ -1,8 +1,9 @@
 # Adaptive-LoRa
 
-Iteration 015 merged through [PR #5](https://github.com/gedxxe/Adaptive-LoRa/pull/5).
-The firmware baseline is main at `e34e7296135b47ecd3af479fe0593f4118bc734b`.
-Iteration 016 prepares the reported V3.4 pair for the first bench link.
+The firmware baseline is main at `541e2e8b985f7cd67ca4d1f1af323c46aed4333e`,
+which includes the V3.4 bench preparation from [PR #6](https://github.com/gedxxe/Adaptive-LoRa/pull/6).
+The [reference review](docs/references/README.md) and [research-to-code matrix](docs/research/ALGORITHM_TRACEABILITY.md)
+trace the four primary papers to the proposed design and current tests.
 
 **Research title:** Reliability-aware TDMA Scheduling and Link Adaptation for Single-Radio LoRa Industrial Energy Monitoring Networks.
 
@@ -10,16 +11,19 @@ Adaptive-LoRa is an independent research and embedded firmware project for priva
 
 ## Research scope and current status
 
-The research direction is reliability-aware gateway scheduling and conservative link adaptation. **Production TDMA, ACK bitmap, selective retransmission scheduling and ADR are planned, not implemented.** Iteration 015 adds host-only feasibility research. The current delivery is the M0–M2 fixed-PHY HELLO/ACK baseline.
+The default `heltec_wifi_lora_32_V3_multiclient` build runs protocol v3 with eight
+clients, exact-length DATA slots, aggregate feedback and deterministic
+retries. The M2 HELLO/ACK and v2 single-client profiles remain available for
+comparison. The gateway records per-client uplink evidence for offline ADR
+analysis. All nodes in the v3 network use the same fixed PHY.
+See the [startup guide](docs/en/STARTUP_AND_PROVISIONING.md) and [wire specification](docs/en/SCHEDULED_LINK.md).
 
 | Evidence | Current baseline |
 |---|---|
-| Firmware / protocol | `0.2.0-alpha.1` / `1` |
-| ESP32 compilation | PASS with OLED off and on |
-| Native tests | 316/316 PASS, including nine OLED and telemetry cases |
-| Implemented | Fixed-PHY HELLO/ACK, NVS role provisioning, RX/TX telemetry and opt-in OLED diagnostics |
-| Capture / analytical model tests | 13/13 / 16/16 PASS, host only |
-| Documentation consistency | 7/7 tests PASS; checker exit 0 |
+| Firmware / protocol | `0.2.0-alpha.1` / `3` |
+| ESP32 compilation and native tests | See the [current verification record](docs/en/PROGRESS.md) |
+| Implemented | v3 TDMA, exact-length grants, aggregate feedback and shared retries |
+| Capture, model and documentation verification | See [build memory](docs/en/BUILD_MEMORY.md) |
 | Physical NVS/reboot/SPI/IRQ/RF/antenna | NOT VERIFIED; M0–M2 acceptance IN PROGRESS |
 
 Host integration tests use the actual client/gateway state machines with bounded fake transport, clock and serial adapters. Simulated loss, delay, object recreation, radio-operation failures and IRQ inputs are not physical measurements. See the [driver audit and coverage](docs/en/RADIO_DRIVER_AUDIT.md). The [progress snapshot](docs/en/PROGRESS.md), [software audit](docs/en/SOFTWARE_AUDIT.md) and [build memory](docs/en/BUILD_MEMORY.md) record exact evidence and limitations.
@@ -37,7 +41,9 @@ RadioLib is pinned to **7.8.1**. The adapter uses the board's GPIO8-14 radio
 interface, a 1.8 V DIO3 TCXO supply and DC-DC regulator selection. Serial
 runs through CP2102 at 115200; native USB CDC is disabled. The fixed research
 profile remains 915.0 MHz, BW125, SF7, CR4/5, preamble 8, explicit header,
-PHY CRC, private sync 0x12, 10 dBm and 1 MHz SPI. SF9 control remains reserved.
+PHY CRC, private sync 0x12, 22 dBm requested TX power and 1 MHz SPI.
+Both profiles use SF7 throughout. SF9 remains reserved. Verify conducted
+power and supply margin in an authorized RF setup before radiated trials.
 
 The 915 MHz Moxon is the design baseline; fabrication, gain and matching have
 not been measured. Read [HARDWARE.md](docs/en/HARDWARE.md) and the
@@ -92,9 +98,9 @@ Adaptive-LoRa/
 Install PlatformIO Core and a native C++17-capable host toolchain, then run from the repository root:
 
 ```sh
-pio run -e heltec_wifi_lora_32_V3
-pio run -e heltec_wifi_lora_32_V3_oled
+pio run -e heltec_wifi_lora_32_V3_multiclient
 pio test -e native
+pio test -e native_multiclient
 ```
 
 The firmware uses `heltec_wifi_lora_32_V3` with Arduino and RadioLib 7.8.1.
@@ -116,27 +122,18 @@ The checker derives current versions and the firmware environment from source fi
 it excludes archived records. The analytical scenario report contains 216 cases
 with unmeasured timing costs left explicit. Neither is a physical test.
 
-## OLED diagnostics
-
-The default environment omits OLED I/O. The opt-in environment uses the V3
-SSD1306 reference at 0x3C, GPIO17/18/21 and active-low Vext GPIO36. Verify
-those details on the V3.4 boards before using the candidate image.
-
-The OLED alternates link and counter pages. WAIT means no qualifying reception.
-ONLINE means a qualifying HELLO at the gateway or an accepted ACK at the client
-within two configured HELLO intervals plus one second. It indicates recent
-receive activity. At the bench setting of 15,000 ms on both boards, STALE
-begins at 31 seconds without a qualifying reception.
-Missing metrics show N/A. Serial `status` reports display state and maximum
-I²C and refresh bus time. Gateway ACK starts and completions are separate.
-
 ## Provisioning and future bench procedure
 
-Serial: 115200 baud. Commands: `help`, `status`, `config show`, `config set role gateway|client`, `config set network-id N`, `config set node-id N`, `config set gateway-id N`, `config save`, `reboot`. Optional `config set hello-interval-ms <1000..3600000>`; default 5000 ms after transaction completion.
+At 115200 baud, use `help`, `status`, `config show`, the `config set`
+commands, `config save` and `reboot`. `hello-interval-ms` defaults to
+3,000 ms. M2 waits it after the transaction completes, so a lost ACK adds
+the ACK wait and transmit time. Legacy v2 uses the saved value as its
+period. v3 uses it for the report source and derives its own feasible
+superframe from the gateway roster. Existing NVS values persist until changed.
 
-For the smoke test, run `config set hello-interval-ms 15000` on **both** boards,
+For the M2 link check, run `config set hello-interval-ms 3000` on **both** boards,
 save, reboot and confirm the loaded value with `status`. The gateway uses its
-interval for OLED freshness. Initial IDs (network/node/gateway) are gateway
+interval for display freshness. Initial IDs (network/node/gateway) are gateway
 `1/1/1` and client `1/2/1`. Set all IDs explicitly; role edits preserve IDs. `config show` is staged state, `status` is loaded state. Network IDs are 1–65535; node/gateway IDs are 1–65534. Start with one-board Windows enumeration and private same-board ROM backups.
 See the [bench runbook](docs/en/BENCH_RUNBOOK.md) and [run-record template](logs/test/RUN_RECORD_TEMPLATE.md). Physical acceptance is pending. Radiated tests require an
 authorized RF setup.
@@ -144,13 +141,13 @@ authorized RF setup.
 ## Development roadmap
 
 1. Finish software verification and resolve dependency timing/allocation assumptions within M0–M2.
-2. Verify each delivered board, then measure NVS/reboot, pins, supply, IRQ, OLED timing and the authorized two-device HELLO/ACK link.
-3. M3: one-client beacon/TDMA after measuring radio transitions and clock drift.
+2. Verify each delivered board, then measure NVS/reboot, pins, supply, IRQ, display timing and the authorized two-device HELLO/ACK link.
+3. Measure radio transitions and clock drift with the v3 research build, then verify the guard, shared retries and loss recovery before expanding the roster.
 4. M4–M6: bitmap/selective retry, versioned conservative ADR and synchronization recovery, with fault tests before physical acceptance.
 5. M7–M8: controlled reference-vs-Moxon evaluation and explicitly labelled logical-node simulations.
 6. Add application payload/event and platform-service interfaces in a separate reviewed task before integrating other embedded applications.
 
-The [milestone plan](docs/en/MILESTONE_TASKS.md) and [test plan](docs/en/TEST_PLAN.md) define acceptance gates. No later MAC behavior is activated. The [TDMA feasibility notes](docs/en/TDMA_FEASIBILITY.md) explain the proposed M3 contract, airtime budgets and remaining timing measurements.
+The [milestone plan](docs/en/MILESTONE_TASKS.md) and [test plan](docs/en/TEST_PLAN.md) define acceptance criteria. The [TDMA feasibility notes](docs/en/TDMA_FEASIBILITY.md) retain the earlier host sizing model and its assumptions.
 
 ## Research and reproducibility
 

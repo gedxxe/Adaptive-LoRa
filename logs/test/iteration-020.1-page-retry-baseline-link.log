@@ -1,0 +1,38 @@
+Verbosity level can be increased via `-v, -vv, or -vvv` option
+Collected 15 tests
+
+Processing test_multiclient_link in native environment
+--------------------------------------------------------------------------------
+Building...
+Testing...
+test\test_multiclient_link\test_main.cpp:462: one_client_zero_payload	[PASSED]
+test\test_multiclient_link\test_main.cpp:463: two_clients_share_the_radio	[PASSED]
+test\test_multiclient_link\test_main.cpp:464: four_clients_with_mixed_payload_lengths	[PASSED]
+test\test_multiclient_link\test_main.cpp:465: eight_clients_with_maximum_size_and_binary_bytes	[PASSED]
+test\test_multiclient_link\test_main.cpp:466: payload_port_validates_and_copies	[PASSED]
+test\test_multiclient_link\test_main.cpp:467: roster_validation_and_period_admission	[PASSED]
+test\test_multiclient_link\test_main.cpp:468: unlisted_and_over_budget_clients_stay_silent	[PASSED]
+test\test_multiclient_link\test_main.cpp:469: missing_client_retries_byte_for_byte	[PASSED]
+test\test_multiclient_link\test_main.cpp:470: partial_retry_pool_and_exhaustion_with_eight_clients	[PASSED]
+test\test_multiclient_link\test_main.cpp:471: lost_feedback_cannot_authorize_retry_and_cumulative_ack_recovers	[PASSED]
+test\test_multiclient_link\test_main.cpp:287: failed_feedback_transmission_does_not_open_gateway_retry_slot: Expected 0 Was 1	[FAILED]
+test\test_multiclient_link\test_main.cpp:473: wrong_feedback_identity_and_late_feedback_remain_unknown	[PASSED]
+test\test_multiclient_link\test_main.cpp:474: refusal_does_not_set_ack_or_redeliver	[PASSED]
+test\test_multiclient_link\test_main.cpp:475: missing_beacon_and_stale_frame_then_recovery	[PASSED]
+test\test_multiclient_link\test_main.cpp:476: dropped_grant_and_client_restart_do_not_transmit	[PASSED]
+test\test_multiclient_link\test_main.cpp:477: gateway_restart_rejoins_after_previous_lease	[PASSED]
+test\test_multiclient_link\test_main.cpp:478: micros_wrap_and_delayed_request	[PASSED]
+test\test_multiclient_link\test_main.cpp:479: codec_group_rules_padding_and_version_isolation	[PASSED]
+test\test_multiclient_link\test_main.cpp:480: guard_edges_are_half_open	[PASSED]
+test\test_multiclient_link\test_main.cpp:481: duplicate_and_conflict_are_not_delivered_again	[PASSED]
+test\test_multiclient_link\test_main.cpp:482: radio_errors_do_not_refresh_v3_link	[PASSED]
+test\test_multiclient_link\test_main.cpp:483: early_late_and_unassigned_data_do_not_reach_application	[PASSED]
+Program received signal CTRL_BREAK_EVENT (None)
+----------- native:test_multiclient_link [ERRORED] Took 3.56 seconds -----------
+
+=================================== SUMMARY ===================================
+Environment    Test                   Status    Duration
+-------------  ---------------------  --------  ------------
+native         test_multiclient_link  ERRORED   00:00:03.558
+
+============ 23 test cases: 1 failed, 21 succeeded in 00:00:03.558 ============

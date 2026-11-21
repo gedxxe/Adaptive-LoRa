@@ -46,36 +46,37 @@ Adaptive-LoRa research title: Reliability-aware TDMA Scheduling and Link Adaptat
 - Perform a short-range two-device RF run.
 - Update all memory files.
 
-## M3 — Beacon and one-client TDMA
+## M3 — Beacon and bounded TDMA
 
-- Add `common/scheduler/` only now.
-- Define beacon payload and relative timing reference.
-- Add frame ID and schedule version.
-- Implement client synchronization and slot state.
-- Measure radio switching, IRQ timing, and clock drift.
-- Add measured guard time.
-- Test missed beacon and stale schedule.
-- Do not generalize to 70 clients in this milestone.
+Iteration 019 implements a v2 single-client link. Iteration 020 adds v3
+exact-length grants and exercises up to eight clients on the host. Verify
+the serialized slot calendar on two boards. Measure IRQ service,
+TX launch and RX re-arm delay, clock drift and late/missed beacon recovery.
+Set guard margins from those measurements before expanding the schedule.
+Iteration 021 anchors v3 to DIO1 completion and keeps launch decisions
+on current time. The development roster is Gateway 1 and Clients 2–9.
 
 ## M4 — ACK bitmap and selective retransmission
 
-- Add schedule-indexed bitmap encoding/decoding.
-- Test 1, 10, and 70 client bitmaps.
-- Add deterministic retry slots.
-- Add `MISSING` and `ACK_UNKNOWN` states.
-- Reuse packet identity on retry.
-- Test dropped DATA, dropped ACK bitmap, and duplicates.
-- Verify no duplicate application delivery.
+The v3 gateway sends an aggregate bitmap and up to four shared retry grants
+after each round. Verify lost DATA, lost feedback, duplicate suppression and
+retry exhaustion on the actual link. A ten-client wire extension requires
+separate review and physical evidence for the guard.
 
 ## M5 — Conservative ADR
 
-- Add gateway-side per-client metric windows.
-- Centralize thresholds and label them experimental.
-- Add hysteresis.
-- Implement CONFIG_PROPOSE / ACCEPT / COMMIT.
-- Apply only at effective frame boundaries.
+- Use the gateway's per-client evidence and offline analysis for initial
+  metric windows, threshold selection and hysteresis.
+- Measure retune, turnaround and oscillator drift with the development roster.
+- Define versioned CONFIG_PROPOSE / ACCEPT / COMMIT and a bounded
+  lease on the common control profile. A client without a matching
+  grant stays silent. The gateway returns to common control for the next beacon.
+- Apply only at announced frame boundaries. Size each serialized PHY block
+  from airtime, retune, RX re-arm, feedback and drift. Reject plans that
+  exceed the roster budget.
 - Keep BW125 and SF7–SF9.
-- Test lost handshake messages and rollback behavior.
+- Test loss of each handshake message, inconsistent versions, resets,
+  rollback, and that all eight clients can still rejoin on the common profile.
 - Do not adjust TX power in this release.
 
 ## M6 — Synchronization recovery and rejoin

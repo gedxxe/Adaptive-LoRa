@@ -24,3 +24,6 @@ Thumbs.db
 *.a
 *.map
 *.exe
+
+# Keep local copies of research papers out of the publication tree.
+/paper-references/*.pdf

@@ -6,7 +6,20 @@ import re
 
 CURRENT_DOCS = ("AGENTS.md", "README.md", "README.zh-CN.md",
                 "docs/en/PROGRESS.md", "docs/zh-CN/PROGRESS.md")
-LINK_DOCS = CURRENT_DOCS + ("docs/en/TDMA_FEASIBILITY.md", "docs/zh-CN/TDMA_FEASIBILITY.md")
+GUIDES = ("docs/en/STARTUP_AND_PROVISIONING.md", "docs/zh-CN/STARTUP_AND_PROVISIONING.md")
+LINK_DOCS = CURRENT_DOCS + GUIDES + ("docs/en/TDMA_FEASIBILITY.md", "docs/zh-CN/TDMA_FEASIBILITY.md")
+APPROVED_SETTINGS = {
+    "include/project_config.h": {"kDefaultHelloIntervalMs": "3000", "kAckTimeoutUs": "1000000", "kConfigSchema": "1"},
+    "include/radio_config.h": {"frequencyMhz": "915.0f", "bandwidthKhz": "125.0f", "dataSf": "7", "controlSf": "9",
+                               "codingRateDenominator": "5", "txPowerDbm": "22", "txCurrentLimitMa": "140.0f",
+                               "preambleSymbols": "8", "privateSyncWord": "0x12"},
+    "src/common/config/device_config.h": {"networkId": "1", "gatewayId": "1", "nodeId": "2",
+                                          "helloIntervalMs": "kDefaultHelloIntervalMs"},
+    "src/common/protocol/multiclient_protocol.h": {"kVersion": "3", "kAttempts": "4", "kRetrySlots": "4",
+                                                  "kTargetPeriodUs": "1000000", "kMaxPeriodUs": "10000000",
+                                                  "kGuardUs": "50000"},
+    "src/common/protocol/scheduled_protocol.h": {"kVersion": "2", "kLegacyFeedbackBudgetUs": "10000000"},
+}
 START = "<!-- current-state:start -->"
 END = "<!-- current-state:end -->"
 
@@ -25,15 +38,34 @@ def check(root):
     config = configparser.ConfigParser()
     config.read(root / "platformio.ini", encoding="utf-8")
     firmware = (root / "VERSION").read_text(encoding="utf-8").strip()
-    protocol = (root / "PROTOCOL_VERSION").read_text(encoding="utf-8").strip()
+    legacy_protocol = (root / "PROTOCOL_VERSION").read_text(encoding="utf-8").strip()
+    protocol = APPROVED_SETTINGS["src/common/protocol/multiclient_protocol.h"]["kVersion"]
     environment = config["platformio"]["default_envs"].strip()
     environments = {name[4:] for name in config.sections() if name.startswith("env:")}
-    if environment not in environments or config[f"env:{environment}"].get("board") != environment:
+    board = "heltec_wifi_lora_32_V3"
+    base = config[f"env:{board}"]
+    if (environment != board + "_multiclient" or environment not in environments
+            or config[f"env:{environment}"].get("extends") != f"env:{board}" or base.get("board") != board):
         errors.append("platformio.ini: default firmware environment/board mismatch")
+    if "jgromes/RadioLib@7.8.1" not in base.get("lib_deps", ""):
+        errors.append("platformio.ini: RadioLib must remain pinned to 7.8.1")
+    if (environment in environments
+            and ("ADAPTIVE_LORA_MULTICLIENT=1" not in config[f"env:{environment}"].get("build_flags", "")
+                 or "ADAPTIVE_LORA_OLED=1" not in base.get("build_flags", ""))):
+        errors.append("platformio.ini: default firmware must include v3 and the board display")
+    for name, settings in APPROVED_SETTINGS.items():
+        contents = (root / name).read_text(encoding="utf-8")
+        for key, value in settings.items():
+            if not re.search(rf"\b{key}\s*=\s*{re.escape(value)}\s*;", contents):
+                errors.append(f"{name}: approved {key} must equal {value}")
+    for name in GUIDES:
+        commands = re.findall(r"^config set hello-interval-ms (\d+)$", (root / name).read_text(encoding="utf-8"), re.M)
+        if commands != ["3000", "3000"]:
+            errors.append(f"{name}: both provisioning examples must use 3000 ms")
     header = (root / "include/project_config.h").read_text(encoding="utf-8")
     if not re.search(r'kFirmwareVersion\[\]\s*=\s*"' + re.escape(firmware) + '"', header):
         errors.append("project_config.h: firmware version differs from VERSION")
-    if not re.search(r"kProtocolVersion\s*=\s*" + re.escape(protocol) + r"\s*;", header):
+    if not re.search(r"kProtocolVersion\s*=\s*" + re.escape(legacy_protocol) + r"\s*;", header):
         errors.append("project_config.h: protocol version differs from PROTOCOL_VERSION")
     adapter = (root / "src/common/radio/sx1262_hardware.h").read_text(encoding="utf-8")
     composition = (root / "src/app/esp32_firmware.h").read_text(encoding="utf-8")
@@ -51,7 +83,7 @@ def check(root):
         if name == "AGENTS.md":
             role_protocol = re.search(r"\bprotocol `([^`]+)`", text)
             if not role_protocol or role_protocol.group(1) != protocol:
-                errors.append(f"{name}: current protocol differs from PROTOCOL_VERSION")
+                errors.append(f"{name}: current protocol differs from the v3 profile")
         if environment not in text or "SX1262" not in text:
             errors.append(f"{name}: current board environment or radio missing")
         for found in re.findall(r"pio run -e ([A-Za-z0-9_]+)", text):

@@ -19,6 +19,9 @@ constexpr uint8_t pixelColumns = 128;
 constexpr uint8_t pixelsPerChunk = 24;
 constexpr uint64_t refreshUs = 1000000;
 constexpr uint64_t pageUs = 5000000;
+#if defined(ADAPTIVE_LORA_MULTICLIENT)
+constexpr uint64_t faultRetryUs = 2000000;
+#endif
 constexpr auto vextPin = static_cast<gpio_num_t>(Vext);
 constexpr auto resetPin = static_cast<gpio_num_t>(RST_OLED);
 static_assert(SDA_OLED == 17 && SCL_OLED == 18 && RST_OLED == 21 && Vext == 36,
@@ -81,12 +84,15 @@ bool output(gpio_num_t pin, uint32_t level) {
 }
 }  // namespace
 
-OledText formatOledStatus(const DisplaySnapshot& s, uint64_t nowUs) {
+OledText formatOledStatus(const DisplaySnapshot& s, uint64_t nowUs, uint8_t v3Page) {
+#if !defined(ADAPTIVE_LORA_MULTICLIENT)
+    (void)v3Page;
+#endif
     OledText screen;
     auto& r = screen.rows;
     const bool counts = (nowUs / pageUs) % 2 != 0;
-    std::snprintf(r[0], sizeof(r[0]), "ADAPTIVE-LORA %s", counts ? "2/2" : "1/2");
     if (s.configError) {
+        std::snprintf(r[0], sizeof(r[0]), "ADAPTIVE-LORA %s", counts ? "2/2" : "1/2");
         std::snprintf(r[1], sizeof(r[1]), "PROVISIONING");
         std::snprintf(r[2], sizeof(r[2]), "CONFIG INVALID");
         std::snprintf(r[3], sizeof(r[3]), "RADIO %s", s.radioState);
@@ -95,6 +101,59 @@ OledText formatOledStatus(const DisplaySnapshot& s, uint64_t nowUs) {
         return screen;
     }
     const bool gateway = s.config.role == DeviceRole::GATEWAY;
+#if defined(ADAPTIVE_LORA_MULTICLIENT)
+    if (s.protocol == multiclient::kVersion) {
+        const auto& v3 = s.multiclient;
+        const auto& peer = v3.peer;
+        const unsigned page = v3Page % 3;
+        std::snprintf(r[0], sizeof(r[0]), "V3 %s %u/3", page == 0 ? "LINK" : page == 1 ? "DATA" : "ACK", page + 1);
+        std::snprintf(r[1], sizeof(r[1]), "%s %u%s", gateway ? "GATEWAY" : "CLIENT", unsigned(s.config.nodeId),
+                      s.searchingForBeacon ? " SEARCH" : "");
+        if (page == 0) {
+            if (peer.seen)
+                std::snprintf(r[2], sizeof(r[2]), "LAST %s P %u", linkName(v3.freshness(nowUs)), unsigned(peer.peer));
+            else
+                std::snprintf(r[2], sizeof(r[2]), "LAST WAIT");
+            metric(r[3], "RSSI", peer.rssi, peer.metrics, "DBM");
+            metric(r[4], "SNR", peer.snr, peer.metrics, "DB");
+            age(r[5], peer, nowUs);
+            if (v3.frame) std::snprintf(r[6], sizeof(r[6]), "FRAME %" PRIu32, v3.frame);
+            else std::snprintf(r[6], sizeof(r[6]), "FRAME N/A");
+            if (v3.periodUs) std::snprintf(r[7], sizeof(r[7]), "PERIOD %" PRIu32 " MS", v3.periodUs / 1000);
+            else std::snprintf(r[7], sizeof(r[7]), "PERIOD N/A");
+        } else if (page == 1) {
+            std::snprintf(r[2], sizeof(r[2]), "%s %" PRIu32, gateway ? "DATA RX" : "DATA TX", v3.data);
+            std::snprintf(r[3], sizeof(r[3]), "RETRY %" PRIu32, v3.retries);
+            std::snprintf(r[4], sizeof(r[4]), "APP OK %" PRIu32, v3.accepted);
+            if (gateway) {
+                std::snprintf(r[5], sizeof(r[5]), "REFUSED %" PRIu32, v3.refused);
+                std::snprintf(r[6], sizeof(r[6]), "DUP %" PRIu32, v3.duplicates);
+            } else {
+                const char* result = "N/A";
+                switch (v3.result) {
+                    case PayloadResult::NONE: break;
+                    case PayloadResult::ACCEPTED: result = "ACCEPTED"; break;
+                    case PayloadResult::MISSING: result = "MISSING"; break;
+                    case PayloadResult::UNKNOWN: result = "UNKNOWN"; break;
+                    case PayloadResult::NOT_ADMITTED: result = "NOT ADMITTED"; break;
+                }
+                std::snprintf(r[5], sizeof(r[5]), "APP %s", result);
+            }
+            std::snprintf(r[7], sizeof(r[7]), "RADIO ERR %" PRIu32, v3.radioErrors);
+        } else {
+            if (v3.bitmap.seen) {
+                std::snprintf(r[2], sizeof(r[2]), "ACK FRAME %" PRIu32, v3.bitmap.frame);
+                std::snprintf(r[3], sizeof(r[3]), "ROUND %u", unsigned(v3.bitmap.round));
+                std::snprintf(r[4], sizeof(r[4]), "ACCEPT MASK %02X", unsigned(v3.bitmap.accepted));
+                std::snprintf(r[5], sizeof(r[5]), "RETRY MASK %02X", unsigned(v3.bitmap.retries));
+            } else std::snprintf(r[2], sizeof(r[2]), "BITMAP N/A");
+            std::snprintf(r[6], sizeof(r[6]), "RADIO %s %s", s.radioReady ? "OK" : "ERR", s.radioState);
+            std::snprintf(r[7], sizeof(r[7]), "LOG DROP %" PRIu32, s.logDropped);
+        }
+        return screen;
+    }
+#endif
+    std::snprintf(r[0], sizeof(r[0]), "ADAPTIVE-LORA %s", counts ? "2/2" : "1/2");
     const auto& last = gateway ? s.gateway.hello : s.client.ack;
     const char* link = linkName(last.freshness(nowUs, s.config.helloIntervalMs));
     if (gateway)
@@ -131,6 +190,19 @@ OledText formatOledStatus(const DisplaySnapshot& s, uint64_t nowUs) {
 }
 
 void OledStatusDisplay::start(uint64_t nowUs) {
+#if defined(ADAPTIVE_LORA_MULTICLIENT)
+    error_ = nullptr;
+    lit_ = false;
+    rotating_ = false;
+    row_ = kOledRows;
+    if (busReady_) {
+        // Reset only the display. Leave the shared Vext rail and Wire alone.
+        if (gpio_set_level(resetPin, 0) != 0) { fail("gpio_reset"); return; }
+        deadlineUs_ = nowUs + 10000;
+        stage_ = Stage::POWER_SETTLE;
+        return;
+    }
+#endif
     if (!output(vextPin, 1) || !output(resetPin, 0) || gpio_set_level(vextPin, 0) != 0) {
         fail("gpio_setup");
         return;
@@ -142,14 +214,30 @@ void OledStatusDisplay::start(uint64_t nowUs) {
 void OledStatusDisplay::fail(const char* reason) {
     error_ = reason;
     stage_ = Stage::FAILED;
+#if defined(ADAPTIVE_LORA_MULTICLIENT)
+    lit_ = false;
+    deadlineUs_ = static_cast<uint64_t>(esp_timer_get_time()) + faultRetryUs;
+#endif
 }
 
 bool OledStatusDisplay::needsSnapshot(uint64_t nowUs) const {
-    return stage_ == Stage::DRAW && row_ == kOledRows && nowUs >= deadlineUs_;
+    if (stage_ != Stage::DRAW || row_ != kOledRows) return false;
+#if defined(ADAPTIVE_LORA_MULTICLIENT)
+    if (rotating_ && nowUs >= nextPageAt_) return true;
+#endif
+    return nowUs >= deadlineUs_;
 }
 
 void OledStatusDisplay::render(const DisplaySnapshot& snapshot, uint64_t nowUs) {
+#if defined(ADAPTIVE_LORA_MULTICLIENT)
+    v3Screen_ = !snapshot.configError && snapshot.protocol == multiclient::kVersion;
+    rotateAfterDraw_ = v3Screen_;
+    nextPage_ = rotateAfterDraw_ && rotating_
+        ? (nowUs >= nextPageAt_ ? (visiblePage_ + 1) % 3 : visiblePage_) : 0;
+    desired_ = formatOledStatus(snapshot, nowUs, nextPage_);
+#else
     desired_ = formatOledStatus(snapshot, nowUs);
+#endif
     deadlineUs_ = nowUs + refreshUs;
     row_ = 0;
     col_ = 0;
@@ -171,36 +259,60 @@ bool OledStatusDisplay::write(const uint8_t* bytes, size_t size) {
     return true;
 }
 
+void OledStatusDisplay::finishDraw() {
+    if (!lit_) {
+        stage_ = Stage::LIGHT;
+        return;
+    }
+    if (refreshIoUs_ > worstRefreshUs_) worstRefreshUs_ = refreshIoUs_;
+#if defined(ADAPTIVE_LORA_MULTICLIENT)
+    if (v3Screen_) {
+        const auto now = static_cast<uint64_t>(esp_timer_get_time());
+        if (rotateAfterDraw_ && (!rotating_ || nextPage_ != visiblePage_))
+            nextPageAt_ = now + pageUs;
+        deadlineUs_ = now + refreshUs;
+    }
+    rotating_ = rotateAfterDraw_;
+    visiblePage_ = nextPage_;
+#endif
+}
+
 void OledStatusDisplay::drawChunk() {
+    const auto physicalRow = [this] {
+#if defined(ADAPTIVE_LORA_MULTICLIENT)
+        // During a split repaint, keep the old title until the new body is drawn.
+        if (v3Screen_) return uint8_t((row_ + 1) % kOledRows);
+#endif
+        return row_;
+    };
     // Unchanged text pages need no bus transfer. The first frame writes all
     // pages while the panel is off, to clear undefined display RAM.
     while (row_ < kOledRows && col_ == 0 && lit_ &&
-           std::memcmp(desired_.rows[row_], shown_.rows[row_], sizeof(desired_.rows[row_])) == 0)
+           std::strcmp(desired_.rows[physicalRow()], shown_.rows[physicalRow()]) == 0)
         ++row_;
     if (row_ == kOledRows) {
-        if (refreshIoUs_ > worstRefreshUs_) worstRefreshUs_ = refreshIoUs_;
+        finishDraw();
         return;
     }
 
+    const auto row = physicalRow();
     // Continuation-tagged commands select page and column, then one data block.
-    uint8_t chunk[7 + pixelsPerChunk]{0x80, uint8_t(0xB0 | row_),
+    uint8_t chunk[7 + pixelsPerChunk]{0x80, uint8_t(0xB0 | row),
         0x80, uint8_t(col_ & 0x0F), 0x80, uint8_t(0x10 | (col_ >> 4)), 0x40};
     const unsigned remaining = pixelColumns - col_;
     const unsigned count = remaining < pixelsPerChunk ? remaining : pixelsPerChunk;
+    const auto textLength = std::strlen(desired_.rows[row]);
     for (unsigned i = 0; i < count; ++i) {
         const unsigned x = col_ + i;
-        if (x / 6 < kOledColumns) chunk[7 + i] = pixel(desired_.rows[row_][x / 6], x % 6);
+        if (x / 6 < textLength) chunk[7 + i] = pixel(desired_.rows[row][x / 6], x % 6);
     }
     if (!write(chunk, 7 + count)) return;
     col_ += count;
     if (col_ == pixelColumns) {
-        std::memcpy(shown_.rows[row_], desired_.rows[row_], sizeof(shown_.rows[row_]));
+        std::memcpy(shown_.rows[row], desired_.rows[row], sizeof(shown_.rows[row]));
         col_ = 0;
         ++row_;
-        if (row_ == kOledRows) {
-            if (!lit_) stage_ = Stage::LIGHT;
-            else if (refreshIoUs_ > worstRefreshUs_) worstRefreshUs_ = refreshIoUs_;
-        }
+        if (row_ == kOledRows) finishDraw();
     }
 }
 
@@ -214,11 +326,18 @@ void OledStatusDisplay::service(uint64_t nowUs) {
             return;
         case Stage::RESET_SETTLE:
             if (nowUs < deadlineUs_) return;
+#if defined(ADAPTIVE_LORA_MULTICLIENT)
+            stage_ = busReady_ ? Stage::INIT : Stage::BUS_BEGIN;
+#else
             stage_ = Stage::BUS_BEGIN;
+#endif
             return;
         case Stage::BUS_BEGIN:
             if (!Wire.begin(SDA_OLED, SCL_OLED, busHz)) { fail("i2c_begin"); return; }
             Wire.setTimeOut(timeoutMs);
+#if defined(ADAPTIVE_LORA_MULTICLIENT)
+            busReady_ = true;
+#endif
             stage_ = Stage::INIT;
             return;
         case Stage::INIT: {
@@ -238,13 +357,17 @@ void OledStatusDisplay::service(uint64_t nowUs) {
             const uint8_t on[] = {0, 0xAF};
             if (write(on, sizeof(on))) {
                 lit_ = true;
-                worstRefreshUs_ = refreshIoUs_;
                 stage_ = Stage::DRAW;
+                finishDraw();
             }
             return;
         }
-        case Stage::OFF:
         case Stage::FAILED:
+#if defined(ADAPTIVE_LORA_MULTICLIENT)
+            if (nowUs >= deadlineUs_) start(nowUs);
+#endif
+            return;
+        case Stage::OFF:
             return;
     }
 }

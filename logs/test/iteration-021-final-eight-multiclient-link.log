@@ -1,0 +1,39 @@
+Verbosity level can be increased via `-v, -vv, or -vvv` option
+Collected 15 tests
+
+Processing test_multiclient_link in native environment
+--------------------------------------------------------------------------------
+Building...
+Testing...
+test\test_multiclient_link\test_main.cpp:480: one_client_zero_payload	[PASSED]
+test\test_multiclient_link\test_main.cpp:481: two_clients_share_the_radio	[PASSED]
+test\test_multiclient_link\test_main.cpp:482: four_clients_with_mixed_payload_lengths	[PASSED]
+test\test_multiclient_link\test_main.cpp:483: eight_clients_with_maximum_size_and_binary_bytes	[PASSED]
+test\test_multiclient_link\test_main.cpp:484: payload_port_validates_and_copies	[PASSED]
+test\test_multiclient_link\test_main.cpp:485: roster_validation_and_period_admission	[PASSED]
+test\test_multiclient_link\test_main.cpp:486: unlisted_and_over_budget_clients_stay_silent	[PASSED]
+test\test_multiclient_link\test_main.cpp:487: missing_client_retries_byte_for_byte	[PASSED]
+test\test_multiclient_link\test_main.cpp:488: partial_retry_pool_and_exhaustion_with_eight_clients	[PASSED]
+test\test_multiclient_link\test_main.cpp:489: lost_feedback_cannot_authorize_retry_and_cumulative_ack_recovers	[PASSED]
+test\test_multiclient_link\test_main.cpp:490: failed_feedback_transmission_does_not_open_gateway_retry_slot	[PASSED]
+test\test_multiclient_link\test_main.cpp:491: late_feedback_completion_does_not_open_gateway_retry_slot	[PASSED]
+test\test_multiclient_link\test_main.cpp:492: wrong_feedback_identity_and_late_feedback_remain_unknown	[PASSED]
+test\test_multiclient_link\test_main.cpp:493: refusal_does_not_set_ack_or_redeliver	[PASSED]
+test\test_multiclient_link\test_main.cpp:494: missing_beacon_and_stale_frame_then_recovery	[PASSED]
+test\test_multiclient_link\test_main.cpp:495: dropped_grant_and_client_restart_do_not_transmit	[PASSED]
+test\test_multiclient_link\test_main.cpp:496: gateway_restart_rejoins_after_previous_lease	[PASSED]
+test\test_multiclient_link\test_main.cpp:497: micros_wrap_and_delayed_request	[PASSED]
+test\test_multiclient_link\test_main.cpp:498: codec_group_rules_padding_and_version_isolation	[PASSED]
+test\test_multiclient_link\test_main.cpp:499: guard_edges_are_half_open	[PASSED]
+test\test_multiclient_link\test_main.cpp:500: duplicate_and_conflict_are_not_delivered_again	[PASSED]
+test\test_multiclient_link\test_main.cpp:501: radio_errors_do_not_refresh_v3_link	[PASSED]
+test\test_multiclient_link\test_main.cpp:502: early_late_and_unassigned_data_do_not_reach_application	[PASSED]
+----------- native:test_multiclient_link [PASSED] Took 18.11 seconds -----------
+
+=================================== SUMMARY ===================================
+Environment    Test                   Status    Duration
+-------------  ---------------------  --------  ------------
+native         test_multiclient_link  PASSED    00:00:18.110
+================= 23 test cases: 23 succeeded in 00:00:18.110 =================
+
+Exit code: 0

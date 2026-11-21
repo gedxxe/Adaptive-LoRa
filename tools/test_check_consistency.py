@@ -3,7 +3,7 @@ import shutil
 import tempfile
 import unittest
 
-from check_consistency import LINK_DOCS, check, current_text
+from check_consistency import APPROVED_SETTINGS, LINK_DOCS, check, current_text
 
 
 class ConsistencyTests(unittest.TestCase):
@@ -19,7 +19,7 @@ class ConsistencyTests(unittest.TestCase):
                     target = self.root / original.relative_to(source)
                     target.parent.mkdir(parents=True, exist_ok=True)
                     target.touch()
-        names = set(LINK_DOCS) | {"CODEX_START_PROMPT.md", "VERSION", "PROTOCOL_VERSION",
+        names = set(LINK_DOCS) | set(APPROVED_SETTINGS) | {"CODEX_START_PROMPT.md", "VERSION", "PROTOCOL_VERSION",
                 "platformio.ini", "THIRD_PARTY.md", "include/project_config.h",
                 "src/common/radio/sx1262_hardware.h", "src/app/esp32_firmware.h",
                 "logs/README.md", "logs/test/RUN_RECORD_TEMPLATE.md"}
@@ -41,13 +41,17 @@ class ConsistencyTests(unittest.TestCase):
         version = (self.root / "VERSION").read_text().strip()
         self.mutate("docs/en/PROGRESS.md", f"`{version}`", "`9.9.9-alpha.9`")
         self.assertTrue(any("current firmware" in e for e in check(self.root)))
-        protocol = (self.root / "PROTOCOL_VERSION").read_text().strip()
+        protocol = APPROVED_SETTINGS["src/common/protocol/multiclient_protocol.h"]["kVersion"]
         self.mutate("AGENTS.md", f"protocol `{protocol}`", "protocol `99`")
         self.assertTrue(any("AGENTS.md: current protocol" in e for e in check(self.root)))
 
     def test_bad_build_environment_is_reported(self):
         self.mutate("README.md", "pio run -e heltec_wifi_lora_32_V3", "pio run -e absent_board")
         self.assertTrue(any("unknown build environment" in e for e in check(self.root)))
+
+    def test_default_build_requires_display(self):
+        self.mutate("platformio.ini", "-D ADAPTIVE_LORA_OLED=1", "")
+        self.assertTrue(any("default firmware must include" in e for e in check(self.root)))
 
     def test_broken_current_link_is_reported(self):
         self.mutate("AGENTS.md", "docs/en/HARDWARE.md)", "docs/en/MISSING.md)")
@@ -69,6 +73,20 @@ class ConsistencyTests(unittest.TestCase):
     def test_bad_current_region_markers_are_rejected(self):
         with self.assertRaises(ValueError):
             current_text("<!-- current-state:start --> no end")
+
+    def test_timing_constants_are_independent(self):
+        self.mutate("include/project_config.h", "kAckTimeoutUs = 1000000", "kAckTimeoutUs = 3000000")
+        self.mutate("src/common/protocol/multiclient_protocol.h", "kTargetPeriodUs = 1000000", "kTargetPeriodUs = 3000000")
+        failures = check(self.root)
+        self.assertTrue(any("approved kAckTimeoutUs" in error for error in failures))
+        self.assertTrue(any("approved kTargetPeriodUs" in error for error in failures))
+
+    def test_phy_and_chinese_provisioning_regressions(self):
+        self.mutate("include/radio_config.h", "dataSf = 7", "dataSf = 9")
+        self.mutate("docs/zh-CN/STARTUP_AND_PROVISIONING.md", "hello-interval-ms 3000", "hello-interval-ms 15000")
+        failures = check(self.root)
+        self.assertTrue(any("approved dataSf" in error for error in failures))
+        self.assertTrue(any("STARTUP_AND_PROVISIONING" in error and "3000 ms" in error for error in failures))
 
 
 if __name__ == "__main__":

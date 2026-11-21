@@ -1,7 +1,93 @@
 # 开发进度
 
 <!-- current-state:start -->
-## 当前状态 — Iteration 016.1
+## 当前状态 — Iteration 021
+
+本地 屏幕 集成分支从已发布的 Iteration 020 提交
+`75a99dfb0474680f90eb9d9685e5a079595f8e26` 开始。
+
+| 项目 | 当前证据 |
+|---|---|
+| 固件 / 协议 | `0.2.0-alpha.1` / `3` |
+| 硬件 | Heltec WiFi LoRa 32 V3.4，ESP32-S3/SX1262，V3.2 电气参考 |
+| ESP32 构建 | `heltec_wifi_lora_32_V3_multiclient` 和两套旧版对照镜像均通过。 |
+| 开发名单 | Gateway 1、Client 2–9，每个 Client 预留 64 字节。超帧周期为 6766 ms。 |
+| 时序 | Beacon 和授权以无线完成时间戳为锚点，发射启动仍使用当前处理时间。 |
+| ADR 研究 | Gateway 记录各 Client 首轮收到、重传收到或未收到；离线工具使用实验提供的阈值。 |
+| Host | 356/356 项 native 回归、15/15 项 v3 运行时测试、23/23 项最终 v3 链路专项测试 |
+| Physical acceptance | IN PROGRESS; NOT RUN |
+
+PHY、NVS schema、上报周期、M2 ACK 超时、v3 线格式和相对无线时隙保持原样。
+镜像选择见 [启动指南](STARTUP_AND_PROVISIONING.md)，
+Client 开始监听前最多预留 400 ms 绘制 WAIT。屏幕含义见 [屏幕 诊断](DISPLAY_DIAGNOSTICS.md)，
+完整回归见 [构建记录](../en/BUILD_MEMORY.md)。
+操作者报告独立 SF9/CR 4/6 实验约增加五米，期间仍偶发 STALE。暂无原始采集日志可分析。
+v3 开发镜像使用 SF7。
+<!-- current-state:end -->
+
+## Iteration 020 历史快照
+
+`codex/iteration-020-multiclient-payload-scheduling` 接续已发布的 Iteration 019
+`979d873fad629aedcdf0e8a565b4ad3681bbea61`。规范 `main` 仍为
+`541e2e8b985f7cd67ca4d1f1af323c46aed4333e`。
+
+| 项目 | 当前证据 |
+|---|---|
+| 固件 / 协议 | `0.2.0-alpha.1` / `1` 为默认，另有 v2 和 v3 研究镜像 |
+| 硬件 | Heltec WiFi LoRa 32 V3.4，ESP32-S3/SX1262，V3.2 电气参考 |
+| 时序 | 默认上报 3000 ms，M2 ACK 1000 ms。v3 目标 1000 ms、上限 10000 ms，按 50 ms 试验保护时间计算当前名单周期 6516 ms。 |
+| 射频与存储 | 915.0 MHz、SF7/BW125/CR4/5、请求功率 22 dBm、PA OCP 140 mA。默认网络/Gateway/Client 为 1/1/2，已有 NVS schema 1 配置保留。 |
+| ESP32 构建 | `heltec_wifi_lora_32_V3`、`_oled`、`_research`、`_multiclient` 均通过 |
+| Native | `native` 353/353，`native_multiclient` 3/3 均通过 |
+| 主机工具 | 采集 13/13、旧模型 16/16、v3 模型 3/3、文档测试 9/9、直接检查均通过 |
+| Physical acceptance | IN PROGRESS; NOT RUN |
+
+主机执行 v3 Gateway 及 1、2、4、8 个 Client 的实际状态机。DATA 按提交长度授权，
+反馈只向欠缺位置分配共享重传。十节点在模型假设下满足十秒预算，固件当前接纳上限
+为八个。未操作或测量实物。见 [启动指南](STARTUP_AND_PROVISIONING.md)、
+[定时协议](SCHEDULED_LINK.md) 和 [构建记录](../en/BUILD_MEMORY.md)。
+
+## Iteration 019 历史快照
+
+审查分支 `codex/iteration-019-research-implementation` 从已发布的 Iteration 018
+`0735bb8ef5cb7c1d677c98f2123c4a3f6cb7a1ea` 开始。规范 `main` 基线仍为
+`541e2e8b985f7cd67ca4d1f1af323c46aed4333e`。
+
+| 项目 | 当前证据 |
+|---|---|
+| 固件 / 协议 | `0.2.0-alpha.1` / `1`（默认 M2）；可选定时 v2 |
+| 构建环境 | `heltec_wifi_lora_32_V3`、`_oled`、`_research` 均退出 0 |
+| 硬件 | 用户报告两块 Heltec WiFi LoRa 32 V3.4，ESP32-S3/SX1262、原装单极天线、采购 902–928 MHz，电气参考为 V3.2 |
+| 恢复配置 | 915.0 MHz、SF7/BW125/CR4/5、请求 22 dBm、PA OCP 140 mA、网络/Gateway/Client 1/1/2、默认上报和 M2 ACK 超时均 10000 ms、NVS schema 1 |
+| 定时软件 | 单 Client、按载荷计算时隙、累计位图反馈和三次重传。主机测试执行真实状态机。 |
+| 软件验证 | Native 333/333、采集 13/13、空口模型 16/16、文档测试 7/7 及直接一致性检查均通过。 |
+| Physical acceptance | IN PROGRESS; NOT RUN |
+
+先按 [M2 台架流程](BENCH_RUNBOOK.md) 操作。M3/M4 验收需两块板运行 v2，并测量传导
+功率、收发切换、IRQ 延迟及漂移。见 [v2 规范](SCHEDULED_LINK.md)、
+[仓库审查](../research/ITERATION_019_AUDIT.md) 与 [构建记录](../en/BUILD_MEMORY.md)。
+M5–M8 仍在计划中。本轮未操作硬件。
+
+## Iteration 018 历史快照
+
+main 已合入 PR #6，提交 `541e2e8b985f7cd67ca4d1f1af323c46aed4333e`。
+研究分支为 `codex/iteration-018-research-traceability`。
+
+| 项目 | 当前证据 |
+|---|---|
+| 固件 / 协议 | `0.2.0-alpha.1` / `1` |
+| 构建环境 | `heltec_wifi_lora_32_V3` 与可选 `heltec_wifi_lora_32_V3_oled` |
+| 硬件 | Heltec WiFi LoRa 32 V3.4，ESP32-S3/SX1262，V3.2 电气参考。 |
+| 软件范围 | M2 HELLO/ACK，扩充拒绝预留 ID 测试，生产固件不变。 |
+| 研究 | 保留四篇论文，登记十五图，三幅授权裁图、六幅原创 SVG。 |
+| 软件验证 | 两种 S3 编译通过，与 016.1 二进制一致。Native 316/316、采集 13/13、空口模型 16/16、文档 7/7 及 checker 通过。 |
+| Physical acceptance | IN PROGRESS; NOT RUN |
+
+[论文与图表](../references/README.md) 和 [追溯矩阵](../research/ALGORITHM_TRACEABILITY.md)
+区分论文结论、项目设计、软件检查与实物测量。M3–M8 生产功能未启动。实物下一步见
+[台架流程](BENCH_RUNBOOK.md)。
+
+## Iteration 016.1 历史快照
 
 客户端日期 2026-11-19。Iteration 015 经 PR #5 合入 main，合并提交为
 `e34e7296135b47ecd3af479fe0593f4118bc734b`。当前审查分支
@@ -24,7 +110,6 @@ CP2102。重建两种镜像均与 Iteration 016 二进制一致。固定 915.0 M
 M3–M8 生产功能未开始。按 [台架流程](BENCH_RUNBOOK.md) 逐块识别 CP2102，再完成同板
 备份、OLED 检查和两板各自 15000 ms 配置。硬件证据见 [HARDWARE](HARDWARE.md)，
 软件结果见 [英文构建记录](../en/BUILD_MEMORY.md)。未取得实物验收结果。
-<!-- current-state:end -->
 
 ## Iteration 015 历史快照
 

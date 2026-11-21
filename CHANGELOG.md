@@ -5,6 +5,53 @@ changes. It is not a substitute for the append-only build memory.
 
 ## Unreleased
 
+### Multiclient timing and link adaptation research
+
+- Make `heltec_wifi_lora_32_V3_multiclient` the default development image.
+- Anchor v3 slots to radio completion and preserve current-time launch deadlines.
+- Record per-client uplink evidence and add a configurable offline ADR evaluator.
+
+### Protocol v3 OLED diagnostics — 2026-11-20
+
+- Keep Client pages turning in beacon search and show `SEARCH` on every page.
+  Preserve continuous RX and resume the handshake on a valid beacon.
+- Give the automatic v3 OLED calendar 250 ms of display margin, and retry
+  display initialization after transient I²C faults. Correct the v3 page title
+  rendering so leftover characters cannot force an unchanged row to redraw.
+- Use a single v3 firmware target with OLED. Show v3 link, payload and
+  aggregate ACK telemetry on three pages.
+- Refresh within the protected quiet tail of an active schedule. Poll for
+  radio IRQs between display steps in beacon search.
+- Give a v3 client a bounded startup window to show `WAIT` before listening
+  for beacons. Begin listening at the deadline or after an OLED fault.
+- Rotate v3 pages in order and start the dwell time after each completed
+  repaint.
+- Open v3 retry slots only after the gateway confirms the corresponding
+  bitmap transmission in time for the retry round.
+
+### Multi-client scheduled research link — 2026-11-20
+
+- Add an opt-in v3 image for up to eight scheduled clients. Gateway grants
+  use actual submitted byte counts. Aggregate feedback assigns shared
+  retry slots and tracks delivery independently per client.
+- Add a bounded 0–64-byte application interface and one bench payload source.
+  Preserve the v1 and v2 wire formats and NVS schema 1.
+- Set the default reporting interval to 3,000 ms and M2 ACK timeout to
+  1,000 ms. Derive v3 superframe timing independently of both values.
+- Add bilingual startup instructions and document the analytical capacity
+  above eight clients. Physical timing and RF acceptance remain open.
+
+### One-client scheduled research profile — 2026-11-20
+
+- Add opt-in v2 beacon synchronization, payload-aware TDMA, bitmap feedback
+  and up to three identity-preserving retries. The default and OLED builds
+  still use v1 HELLO/ACK.
+- Restore the 10,000 ms default reporting interval and M2 ACK timeout. Keep
+  existing NVS values and schema 1. Update OLED freshness to use the ACK window.
+- Request 22 dBm at fixed 915.0 MHz/SF7/BW125 and explicitly configure SX1262
+  high-power protection. Conducted output, supply behavior and RF timing
+  remain unmeasured.
+
 ### V3.4 bench preparation and OLED diagnostics — 2026-11-19
 
 - Document the reported V3.4 pair and supplied monopoles, with the V3.2

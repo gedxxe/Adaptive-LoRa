@@ -1,0 +1,28 @@
+{
+  "evidence": "analytical",
+  "period_us": 10000000,
+  "guard_us": 50000,
+  "rounds": 4,
+  "beacon_us": 77056,
+  "feedback_us": 82176,
+  "cases": [
+    {
+      "grant_bytes": 0,
+      "data_us": 71936,
+      "last_feedback_close_us": 2216448,
+      "reservation_us": 2393504
+    },
+    {
+      "grant_bytes": 8,
+      "data_us": 82176,
+      "last_feedback_close_us": 2257408,
+      "reservation_us": 2434464
+    },
+    {
+      "grant_bytes": 64,
+      "data_us": 164096,
+      "last_feedback_close_us": 2585088,
+      "reservation_us": 2762144
+    }
+  ]
+}

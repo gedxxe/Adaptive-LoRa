@@ -13,6 +13,12 @@ struct RadioEvent {
     float rssi = 0;
     float snr = 0;
     bool metrics = false;
+    bool hasCompletionTime = false;
+    uint64_t completionUs = 0;
+
+    uint64_t completedAt(uint64_t now) const {
+        return hasCompletionTime && completionUs <= now ? completionUs : now;
+    }
 };
 
 // Application boundary only. RadioDriver owns hardware initialization, polling

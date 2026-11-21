@@ -33,6 +33,7 @@ public:
     virtual void enableDio1() = 0;
     virtual void clearIrqSignal() = 0;
     virtual bool irqSignalled() = 0;
+    virtual bool takeIrqTimestampUs(uint64_t& timestamp) = 0;
     virtual int16_t standby() = 0;
     virtual int16_t startReceive() = 0;
     virtual int16_t startTransmit(const uint8_t* bytes, size_t length) = 0;

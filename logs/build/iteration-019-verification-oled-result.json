@@ -1,0 +1,9 @@
+{
+  "command": "pio run -e heltec_wifi_lora_32_V3_oled",
+  "exit_code": 0,
+  "runner_seconds": 212.984,
+  "log": "logs/build/iteration-019-verification-oled.log",
+  "publication_policy": "Full stdout/stderr with local workspace/PlatformIO/user paths replaced by disclosed placeholders and EOL/trailing-display normalization. Raw retained privately in ignored audit cache.",
+  "client_date": "2026-11-20",
+  "physical_validation": "NOT RUN"
+}

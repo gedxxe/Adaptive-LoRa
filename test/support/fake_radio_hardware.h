@@ -18,7 +18,8 @@ class FakeRadioHardware final : public RadioHardware {
 public:
     int16_t beginCode = 0, headerCode = 0, crcCode = 0, standbyCode = 0;
     int16_t startRxCode = 0, startTxCode = 0, finishTxCode = 0, finishRxCode = 0, readCode = 0;
-    bool irqFlag = false, dioHigh = false, violation = false;
+    bool irqFlag = false, dioHigh = false, violation = false, irqTimeValid = false;
+    uint64_t irqTimeUs = 0;
     uint32_t flags = 0, airtime = 12345;
     size_t packetLength = kHeaderSize, txLength = 0, readLength = 0, airtimeLength = 0;
     uint8_t crcLength = 0;
@@ -44,8 +45,14 @@ public:
     int16_t explicitHeader() override { record(HardwareCall::HEADER); return headerCode; }
     int16_t setCRC(uint8_t length) override { record(HardwareCall::CRC); crcLength = length; return crcCode; }
     void enableDio1() override { record(HardwareCall::ENABLE_IRQ); }
-    void clearIrqSignal() override { record(HardwareCall::CLEAR_SIGNAL); irqFlag = false; }
+    void clearIrqSignal() override { record(HardwareCall::CLEAR_SIGNAL); irqFlag = false; irqTimeValid = false; }
     bool irqSignalled() override { record(HardwareCall::SIGNAL); return irqFlag || dioHigh; }
+    bool takeIrqTimestampUs(uint64_t& timestamp) override {
+        const bool valid = irqTimeValid;
+        if (valid) timestamp = irqTimeUs;
+        clearIrqSignal();
+        return valid;
+    }
     int16_t standby() override { record(HardwareCall::STANDBY); return standbyCode; }
     int16_t startReceive() override { record(HardwareCall::START_RX); return startRxCode; }
     int16_t startTransmit(const uint8_t* bytes, size_t length) override {

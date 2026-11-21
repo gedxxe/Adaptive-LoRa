@@ -84,35 +84,34 @@ Stop if the actual layout or safe restore path is uncertain. Keep backups out of
 Git and restore only to the same board. ERR-023 allows the SDK to format NVS
 before the project runtime starts, even if the upload doesn't overlap NVS.
 
-## 3. Check peripherals and flash the OLED candidate
+## 3. Check peripherals and flash the M2 baseline
 
 Compare the V3.2 reference with the delivered board. Record front/back marks,
 physical RF SKU, connector and monopole markings, flash size and supply. Check
-OLED SDA/SCL/reset, Vext polarity and settling, and the expected SSD1306 `0x3C`
-interface. Record any measurements and open questions. Proceed with the OLED
+Display SDA/SCL/reset, Vext polarity and settling, and the expected SSD1306 `0x3C`
+interface. Record any measurements and open questions. Proceed with the display
 image only after these checks and the private backup/layout review. Check the
 actual image hash and retain it in the run record. Use the same image on both
 boards. Keep serial monitors closed during each manual upload.
 
 ```powershell
-pio run -e heltec_wifi_lora_32_V3_oled
-Get-FileHash -Algorithm SHA256 .pio/build/heltec_wifi_lora_32_V3_oled/firmware.bin
-pio run -e heltec_wifi_lora_32_V3_oled -t upload --upload-port COM_BOARD
+pio run -e heltec_wifi_lora_32_V3
+Get-FileHash -Algorithm SHA256 .pio/build/heltec_wifi_lora_32_V3/firmware.bin
+pio run -e heltec_wifi_lora_32_V3 -t upload --upload-port COM_BOARD
 pio device monitor --port COM_BOARD --baud 115200
 ```
 
 Replace `COM_BOARD` separately for each board. After upload, record `BOOT`,
-`status` and the OLED startup result. With missing/invalid config, expect
+`status` and the display startup result. With missing/invalid config, expect
 provisioning and radio disabled. A valid saved role can initialize and transmit.
-Do not erase NVS to force provisioning. The default OLED-off environment
-`heltec_wifi_lora_32_V3` is available for a later matched comparison.
+Use the standard upload to preserve the board's NVS contents.
 
 ## 4. Provision each board separately
 
 At 115200 baud run `status` first and record loaded values. Apply the following
 blocks to their respective ports. Check staged values with `config show`,
 require `CONFIG_SAVED`, then reboot under operator control and use `status` to
-confirm the loaded role, network, node, gateway, schema 1 and `15000` ms interval.
+confirm the loaded role, network, node, gateway, schema 1 and `3000` ms interval.
 A failed save is a stop point. Keep RF terminated while provisioning.
 
 Gateway:
@@ -122,7 +121,7 @@ config set role gateway
 config set network-id 1
 config set node-id 1
 config set gateway-id 1
-config set hello-interval-ms 15000
+config set hello-interval-ms 3000
 config show
 config save
 reboot
@@ -136,20 +135,30 @@ config set role client
 config set network-id 1
 config set node-id 2
 config set gateway-id 1
-config set hello-interval-ms 15000
+config set hello-interval-ms 3000
 config show
 config save
 reboot
 status
 ```
 
-Both intervals are deliberate. The Client waits 15 s after each transaction.
+Both intervals are deliberate. The Client waits 3 s after each transaction.
 The Gateway uses its interval to interpret freshness. With these settings, the
-OLED shows `WAIT` before the first qualifying reception and `ONLINE` for under
-31 s after the latest valid HELLO at Gateway or accepted ACK at Client. It then
+Display shows `WAIT` before the first qualifying reception and `ONLINE` for under
+7 s after the latest valid HELLO at Gateway or accepted ACK at Client. It then
 shows `STALE`. `ONLINE` describes receive recency. It provides no guarantee
 that the peer is still reachable. Check `RADIO_INIT`, `OLED_INIT`, serial status
 and reset boundaries on each board before joining the pair.
+
+For M0–M2, confirm `profile=m2` and `protocol=1`. Before starting the
+22 dBm candidate, follow [HARDWARE.md](HARDWARE.md) to verify the load,
+supply margin and authorized RF conditions. A separate v3 test follows the
+[startup guide](STARTUP_AND_PROVISIONING.md) after the baseline capture
+and uses the multi-client image on both nodes.
+
+For v3, use `heltec_wifi_lora_32_V3_multiclient` and match frame and retry
+outcomes against serial logs. Capture `OLED_STATUS`, SCL, NSS and DIO1 to
+check the display exclusion window. See [display diagnostics](DISPLAY_DIAGNOSTICS.md).
 
 ## 5. Capture the two-board smoke test
 
@@ -164,28 +173,28 @@ python tools/capture_bench.py --gateway COM_GATEWAY --client COM_CLIENT --second
 
 Use PlatformIO Python. Copy the [run-record template](../../logs/test/RUN_RECORD_TEMPLATE.md)
 and record board aliases, image hash, provisioning, supplies, antenna details,
-geometry, OLED screens and `OLED_STATUS` timing. Preserve the raw logs, chunk
+geometry, display screens and `OLED_STATUS` timing. Preserve the raw logs, chunk
 indexes and capture metadata. Require complete capture, stable boot boundaries
 and no log drops for the chosen window. Check a completed Client HELLO,
 Gateway reception, Gateway ACK start and completion, and Client acceptance of
 the echoed identity. Check both RSSI/SNR directions. Save any failure and stop
 before range testing if basic communication or capture is unreliable.
 
-## 6. Compare OLED builds, then extend range
+## 6. Compare display builds, then extend range
 
-Repeat under the same geometry, supply, PHY and interval with OLED on and off.
+Repeat under the same geometry, supply, PHY and interval with display on and off.
 Compare PDR, ACK success, transaction durations, resets and log drops. In the
-OLED run, request `status` at the beginning and end to capture maximum write
+Display run, request `status` at the beginning and end to capture maximum write
 and refresh I/O spans. For direct IRQ timing, use high-impedance probes on DIO1,
 SCL and radio NSS. Compare DIO1-to-first-radio-SPI service and ACK TX turnaround
-for HELLOs overlapping OLED writes. A write API timing counter does not measure
+for HELLOs overlapping display writes. A write API timing counter does not measure
 that latency. Keep a separate run ID for each image and bench condition.
 
 Progress through 10, 25, 50, 100, 200 and 400 m only after the smoke test works.
 Keep antenna type, height, polarization, PHY and duration fixed for comparable
 conditions. Short survey windows are exploratory. Acceptance requires at least
 200 fully observed HELLO TX completions in each selected condition. Plan 3,600 s
-at the 15 s interval, with extra time if needed. Check packet count directly.
+at the 3 s interval, with extra time if needed. Check packet count directly.
 Separate hosts can capture with `--board COM_GATEWAY` and `--board COM_CLIENT`
 and matching run IDs with distinct suffixes. Follow
 [LOGGING_GUIDE.md](LOGGING_GUIDE.md) for cohort joins, PDR and ACK success,
@@ -195,7 +204,7 @@ Missing log lines leave the RF outcome unknown. Screenshots are supplementary.
 M0–M2 acceptance still needs board and electrical results, physical NVS
 save/reload, a closed-cohort normal link and separate controlled negative and
 recovery evidence. ERR-021 remains open. Timing results and M2 evidence precede
-production M3 work.
+closing the scheduled research acceptance checks.
 
 ## Planned ERR-021 fault injection — not executed
 

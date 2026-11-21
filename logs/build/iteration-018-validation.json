@@ -1,0 +1,219 @@
+{
+  "base": "541e2e8b985f7cd67ca4d1f1af323c46aed4333e",
+  "branch": "codex/iteration-018-research-traceability",
+  "client_date": "2026-11-19",
+  "source_pdfs_local_and_preserved": 4,
+  "figure_entries": 15,
+  "assets": [
+    {
+      "path": "docs/references/figures/ats-lora/ats-corona-redrawn.svg",
+      "sha256": "c0329ef16daebc8236317038ca5c7f6699b0a486eedec8e1e383bd459ba77cf5"
+    },
+    {
+      "path": "docs/references/figures/ats-lora/ats-frame-allocation-redrawn.svg",
+      "sha256": "75bf4078d20a0a6221f1bd4f4885073d07ab19ee9928171be1c8eb19a7860cf2"
+    },
+    {
+      "path": "docs/references/figures/blind-adr/blind-adr-frame-redrawn.svg",
+      "sha256": "15fd860eb6f4aa237824e37dba0c400681bf28863173bb9a2a3edf521c06441b"
+    },
+    {
+      "path": "docs/references/figures/blind-adr/blind-adr-sf-selection-redrawn.svg",
+      "sha256": "bda50d4a9a3ab4047ddecdddcc47e798978e96213d49bb7750a9922552ebd965"
+    },
+    {
+      "path": "docs/references/figures/lorahart/lorahart-fig-01-gateway.png",
+      "sha256": "3a9e4b52f1f3ab55f271b8789e48dec0ac885d5d17c81bc38e7ded773b7e309f",
+      "pixels": [
+        3175,
+        1016
+      ],
+      "dpi": 600
+    },
+    {
+      "path": "docs/references/figures/lorahart/lorahart-fig-02-superframe.png",
+      "sha256": "25ff47d6daf92d6c9aeecf26e6abb787ca2e5bade3876e3683e064b0be675433",
+      "pixels": [
+        1934,
+        809
+      ],
+      "dpi": 600
+    },
+    {
+      "path": "docs/references/figures/lorahart/lorahart-fig-03-ack-bitmap.png",
+      "sha256": "9ed89c3d5598f185f513a1ed70d3b08869d21246cfb8ad19f84e9304a3720256",
+      "pixels": [
+        1825,
+        334
+      ],
+      "dpi": 600
+    },
+    {
+      "path": "docs/references/figures/tsvp/tsvp-beacon-redrawn.svg",
+      "sha256": "d4cf4aa0ae53daa5effc0f5121e40a9cc8b6be31d878d4f16aa78bf941025a54"
+    },
+    {
+      "path": "docs/references/figures/tsvp/tsvp-superframe-redrawn.svg",
+      "sha256": "7a79660f26164cd0adf49f69ce6658114d9a0eb81cbdf31572be42d6f9b98765"
+    }
+  ],
+  "verified_relative_links": 62,
+  "verified_traceability_test_names": [
+    "test_ack_echo_layout_and_match",
+    "test_client_only_updates_metrics_on_accepted_ack_and_keeps_accounting",
+    "test_client_rollover_failure_preserves_identity_until_recovery",
+    "test_complete_bitmap_size_and_control_phy",
+    "test_exact_superframe_boundary_and_one_microsecond_over",
+    "test_gateway_counts_hello_and_ack_events_separately",
+    "test_golden_empty_hello_layout",
+    "test_high_gpio_without_latched_irq_is_consumed",
+    "test_latched_irq_with_low_gpio_is_consumed",
+    "test_repeated_rx_tx_transactions_reset_events_and_deadlines",
+    "test_retry_budget_includes_ack_each_round",
+    "test_same_packet_replay_preserves_identity_and_reacks_once",
+    "test_scenario_grid_is_complete_and_deterministic",
+    "test_type_and_future_types",
+    "test_unknown_is_not_zero_or_a_fit_claim"
+  ],
+  "firmware": {
+    "heltec_wifi_lora_32_V3": {
+      "sha256": "51756890f9b54ff5ca5c993954f317b8a21d201a9edac53deb5f58e5259612c8",
+      "same_as_iteration_016": true,
+      "ram_bytes": 32184,
+      "flash_bytes": 342852,
+      "same_as_merged_016_1": true
+    },
+    "heltec_wifi_lora_32_V3_oled": {
+      "sha256": "854640e2532d34dec4d49fb7f36733175f5bc73d66a2f56c45bfc913504c0a59",
+      "same_as_iteration_016": true,
+      "ram_bytes": 33960,
+      "flash_bytes": 377488,
+      "same_as_merged_016_1": true
+    }
+  },
+  "native": {
+    "cases": 316,
+    "skipped": 0,
+    "rejection_case": "test_type_and_future_types, now 12 rejected IDs each checked on encode and decode"
+  },
+  "capture_cases": 13,
+  "model_cases": 16,
+  "consistency_cases": 7,
+  "physical_validation": "NOT RUN",
+  "commands": {
+    "logs/build/iteration-018-verification-esp32-result.json": {
+      "command": "pio run -e heltec_wifi_lora_32_V3",
+      "exit_code": 0,
+      "runner_seconds": 16.094,
+      "log": "logs/build/iteration-018-verification-esp32.log",
+      "publication_policy": "Full stdout/stderr with local workspace/PlatformIO/user paths replaced by disclosed placeholders and EOL/trailing-display normalization. Raw retained privately in ignored audit cache.",
+      "client_date": "2026-11-19",
+      "physical_validation": "NOT RUN"
+    },
+    "logs/build/iteration-018-verification-oled-result.json": {
+      "command": "pio run -e heltec_wifi_lora_32_V3_oled",
+      "exit_code": 0,
+      "runner_seconds": 14.687,
+      "log": "logs/build/iteration-018-verification-oled.log",
+      "publication_policy": "Full stdout/stderr with local workspace/PlatformIO/user paths replaced by disclosed placeholders and EOL/trailing-display normalization. Raw retained privately in ignored audit cache.",
+      "client_date": "2026-11-19",
+      "physical_validation": "NOT RUN"
+    },
+    "logs/test/iteration-018-final-consistency-result.json": {
+      "command": "<PIO_PYTHON> tools/check_consistency.py",
+      "exit_code": 0,
+      "runner_seconds": 0.187,
+      "log": "logs/test/iteration-018-final-consistency.log",
+      "publication_policy": "Full stdout/stderr with local workspace/PlatformIO/user paths replaced by disclosed placeholders and EOL/trailing-display normalization. Raw retained privately in ignored audit cache.",
+      "client_date": "2026-11-19",
+      "physical_validation": "NOT RUN"
+    },
+    "logs/test/iteration-018-final-consistency-tests-result.json": {
+      "command": "<PIO_PYTHON> -m unittest discover -s tools -p test_check_consistency.py -v",
+      "exit_code": 0,
+      "runner_seconds": 0.953,
+      "log": "logs/test/iteration-018-final-consistency-tests.log",
+      "publication_policy": "Full stdout/stderr with local workspace/PlatformIO/user paths replaced by disclosed placeholders and EOL/trailing-display normalization. Raw retained privately in ignored audit cache.",
+      "client_date": "2026-11-19",
+      "physical_validation": "NOT RUN"
+    },
+    "logs/test/iteration-018-final-native-result.json": {
+      "command": "pio test -e native",
+      "exit_code": 0,
+      "runner_seconds": 70.672,
+      "log": "logs/test/iteration-018-final-native.log",
+      "publication_policy": "Full stdout/stderr with local workspace/PlatformIO/user paths replaced by disclosed placeholders and EOL/trailing-display normalization. Raw retained privately in ignored audit cache.",
+      "client_date": "2026-11-19",
+      "physical_validation": "NOT RUN"
+    },
+    "logs/test/iteration-018-verification-capture-result.json": {
+      "command": "<PIO_PYTHON> -m unittest discover -s tools -p test_capture_bench.py -v",
+      "exit_code": 0,
+      "runner_seconds": 0.781,
+      "log": "logs/test/iteration-018-verification-capture.log",
+      "publication_policy": "Full stdout/stderr with local workspace/PlatformIO/user paths replaced by disclosed placeholders and EOL/trailing-display normalization. Raw retained privately in ignored audit cache.",
+      "client_date": "2026-11-19",
+      "physical_validation": "NOT RUN"
+    },
+    "logs/test/iteration-018-verification-model-result.json": {
+      "command": "<PIO_PYTHON> -m unittest discover -s tools -p test_tdma_feasibility.py -v",
+      "exit_code": 0,
+      "runner_seconds": 0.406,
+      "log": "logs/test/iteration-018-verification-model.log",
+      "publication_policy": "Full stdout/stderr with local workspace/PlatformIO/user paths replaced by disclosed placeholders and EOL/trailing-display normalization. Raw retained privately in ignored audit cache.",
+      "client_date": "2026-11-19",
+      "physical_validation": "NOT RUN"
+    },
+    "logs/test/iteration-018-verification-native-result.json": {
+      "command": "pio test -e native",
+      "exit_code": 0,
+      "runner_seconds": 68.204,
+      "log": "logs/test/iteration-018-verification-native.log",
+      "publication_policy": "Full stdout/stderr with local workspace/PlatformIO/user paths replaced by disclosed placeholders and EOL/trailing-display normalization. Raw retained privately in ignored audit cache.",
+      "client_date": "2026-11-19",
+      "physical_validation": "NOT RUN"
+    }
+  },
+  "changed_paths": [
+    ".gitignore",
+    "AGENTS.md",
+    "README.md",
+    "README.zh-CN.md",
+    "docs/en/BUILD_MEMORY.md",
+    "docs/en/PROGRESS.md",
+    "docs/en/PROTOCOL.md",
+    "docs/references/FIGURE_SOURCE_REGISTER.md",
+    "docs/references/README.md",
+    "docs/references/figures/ats-lora/ats-corona-redrawn.svg",
+    "docs/references/figures/ats-lora/ats-frame-allocation-redrawn.svg",
+    "docs/references/figures/blind-adr/blind-adr-frame-redrawn.svg",
+    "docs/references/figures/blind-adr/blind-adr-sf-selection-redrawn.svg",
+    "docs/references/figures/lorahart/lorahart-fig-01-gateway.png",
+    "docs/references/figures/lorahart/lorahart-fig-02-superframe.png",
+    "docs/references/figures/lorahart/lorahart-fig-03-ack-bitmap.png",
+    "docs/references/figures/tsvp/tsvp-beacon-redrawn.svg",
+    "docs/references/figures/tsvp/tsvp-superframe-redrawn.svg",
+    "docs/research/ALGORITHM_TRACEABILITY.md",
+    "docs/zh-CN/PROGRESS.md",
+    "docs/zh-CN/PROTOCOL.md",
+    "logs/build/iteration-018-validation.json",
+    "logs/build/iteration-018-verification-esp32-result.json",
+    "logs/build/iteration-018-verification-esp32.log",
+    "logs/build/iteration-018-verification-oled-result.json",
+    "logs/build/iteration-018-verification-oled.log",
+    "logs/test/iteration-018-final-consistency-result.json",
+    "logs/test/iteration-018-final-consistency-tests-result.json",
+    "logs/test/iteration-018-final-consistency-tests.log",
+    "logs/test/iteration-018-final-consistency.log",
+    "logs/test/iteration-018-final-native-result.json",
+    "logs/test/iteration-018-final-native.log",
+    "logs/test/iteration-018-verification-capture-result.json",
+    "logs/test/iteration-018-verification-capture.log",
+    "logs/test/iteration-018-verification-model-result.json",
+    "logs/test/iteration-018-verification-model.log",
+    "logs/test/iteration-018-verification-native-result.json",
+    "logs/test/iteration-018-verification-native.log",
+    "test/test_frame_codec/test_main.cpp"
+  ],
+  "prior_log_files_preserved": 383
+}

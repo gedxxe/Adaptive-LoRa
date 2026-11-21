@@ -1,0 +1,22 @@
+Verbosity level can be increased via `-v, -vv, or -vvv` option
+Collected 15 tests
+
+Processing test_multiclient_runtime in native_multiclient environment
+--------------------------------------------------------------------------------
+Building...
+Library Manager: Installing throwtheswitch/Unity @ ^2.6.1
+Unpacking 0% 10% 20% 30% 40% 50% 60% 70% 80% 90% 100%
+Library Manager: Unity@2.6.1 has been installed!
+Testing...
+test\test_multiclient_runtime\test_main.cpp:144: runtime_client_submits_arbitrary_bytes_to_actual_driver	[PASSED]
+test\test_multiclient_runtime\test_main.cpp:119: runtime_gateway_delivers_binary_to_its_real_application_boundary: Expected Not-Equal	[FAILED]
+test\test_multiclient_runtime\test_main.cpp:146: runtime_fail_safe_for_missing_config_or_gateway_id_in_roster	[PASSED]
+Program received signal CTRL_BREAK_EVENT (None)
+--- native_multiclient:test_multiclient_runtime [ERRORED] Took 23.57 seconds ---
+
+=================================== SUMMARY ===================================
+Environment         Test                      Status    Duration
+------------------  ------------------------  --------  ------------
+native_multiclient  test_multiclient_runtime  ERRORED   00:00:23.575
+
+============= 4 test cases: 1 failed, 2 succeeded in 00:00:23.575 =============

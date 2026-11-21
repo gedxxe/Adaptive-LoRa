@@ -2,10 +2,14 @@
 
 ## 1. 协议范围
 
-协议第一版先实现固定 PHY 的 HELLO/ACK。后续再逐步加入 Beacon、TDMA、ACK
-Bitmap、选择性重传和 ADR。
+本项目使用自定义 LoRa P2P 协议。默认镜像使用 v3；保留旧版 v1 HELLO/ACK 和单
+Client v2。见 [定时链路规范](SCHEDULED_LINK.md)。各版本编解码器仅接受对应版本与类型。
+`PROTOCOL_VERSION` 记录原有 v1 线格式。各镜像共用固件版本及 NVS schema。
+两种角色由 NVS 选择，共用一个 RadioDriver 与 SX1262。DIO1 捕获时间戳，主循环处理。
 
-本项目是自定义 LoRa P2P 协议，不是 LoRaWAN。
+各镜像均固定 915.0 MHz（暂定）、SF7/BW125、CR4/5、前导 8、显式头、CRC、
+sync 0x12，请求功率 22 dBm。控制 SF9 保留。M2 Client 处理 TX_DONE 后等待匹配 ACK
+一秒，driver TX 时限两秒。M2 在事务结束后等待配置间隔（默认 3000 ms）再发送新的 HELLO。
 
 ## 2. 帧限制
 
@@ -86,24 +90,14 @@ boot_id，重置 Sequence，并重新建立会话。
 
 M2 去重保留 8 个 session key，每个有 64 个 sequence 的窗口；重复 HELLO 再次 ACK，不重复接受。窗口以前的 sequence 视为 stale。旧 session 淘汰和 Gateway 重启后历史丢失；此缓存不提供持久化重放保护或身份认证，M4 须重新评估容量和生命周期。
 
-## 7. ACK Bitmap
+## 7. v2 与 v3 定时协议
 
-ACK Bitmap 使用当前 `schedule_version` 的客户端顺序进行映射，bit
-顺序为每字节最低有效位优先。
+HELLO、ACK 只用于 v1。v2 和 v3 分别定义 BEACON、DATA、ACK_BITMAP。
+v3 另定义 `0x13` PAYLOAD_REQUEST 和 `0x14` SLOT_GRANT。ADR 及 rejoin 类型仍保留。帧布局、身份校验、按载荷计算时隙、位图和重传见
+[定时链路规范](SCHEDULED_LINK.md)。[早期可行性模型](TDMA_FEASIBILITY.md) 的候选
+布局仅供研究比较。
 
-- 1 个客户端：1 字节。
-- 10 个客户端：2 字节。
-- 70 个客户端：9 字节。
-
-Payload 包含 `active_client_count`、`bitmap_length` 和
-bitmap。最后一个字节未使用的高位必须为 0。
-
-客户端状态必须区分： - `ACK_RECEIVED` - `MISSING` - `ACK_UNKNOWN`
-
-重传使用确定性时隙，且复用原始 packet
-identity。初始最多重传两次。Gateway 必须去重。
-
-## 8. 保守 ADR
+## 8. 计划中的保守 ADR
 
 ADR 由 Gateway 控制，初期只允许 BW125 下的 SF7、SF8、SF9。
 

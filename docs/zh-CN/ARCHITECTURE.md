@@ -5,13 +5,18 @@
 两块 Heltec WiFi LoRa 32 V3.4 配 ESP32-S3/SX1262。用户确认沿用 V3.2 布线，
 编译使用 Arduino V3 variant，电气参考为 V3.2 原理图。
 Esp32Firmware先拥有PreferencesConfigStorage和Sx1262Hardware，再构造引用它们的FirmwareRuntime。
-一份镜像读取有效NVS角色后只运行GatewayApp或ClientApp；配置无效保持provisioning且禁应用TX。
+每种镜像通过 NVS 选择角色。默认 v1 镜像运行 GatewayApp 或 ClientApp；研究 v2 镜像由
+FirmwareRuntime 选择 ScheduledLink 的角色路径。配置无效时进入配置模式并禁止发射。
 main.cpp仍为15行构造和setup/loop委托。
 
 RadioDriver保留全部状态/超时/错误策略，Sx1262Hardware独占RadioLib/SPI/GPIO。
 板GPIO8–14、TCXO1.8 V、DIO2开关及DC-DC与CP2102/UART0设置见迁移审查。
 FrameCodec、DeviceConfig、SequenceTracker及NVSschema1/协议1保持。
-OLED 使用可选构建。电池、Wi-Fi、TDMA、bitmap、重传调度和 ADR 仍留待后续。
+默认 3000 ms。M2 从事务结束起计下一次上报，ACK 超时为 1 秒；已有 NVS 周期保留。
+[v2 研究镜像](SCHEDULED_LINK.md) 使用固定 SF7，支持单 Client
+时隙、位图反馈及三次重传。v3 使用 MulticlientLink 与 PayloadPort 支持最多八个
+Client 和有界应用交付，通用事件接口和 ADR 仍待实现。v3 屏幕 使用 `MulticlientLink`
+遥测，在整帧空闲的帧尾或 Client 搜索 Beacon 时更新，搜索中每步之间轮询无线。见 [屏幕 诊断](DISPLAY_DIAGNOSTICS.md)。
 
 Native执行实际生产模块；新增adapter用有界调用记录检查配置和转发，不模拟射频。
 SDK调用仍可能同步等待，ERR-021未因迁移修复。完整平台服务和通用payload/event接口仍缺失。
@@ -191,7 +196,7 @@ AGENTS 为当前合同，CODEX_START_PROMPT 明确归档；主机 TDMA 模型不
 
 ## Iteration 016 显示与遥测
 
-当前以 Heltec V3 参考构建支持 V3.4 候选双板，实物布线另行核实。OLED 候选环境由
+当前以 Heltec V3 参考构建支持 V3.4 候选双板，实物布线另行核实。屏幕 候选环境由
 Esp32Firmware 持有显示，Runtime 在主要工作之后服务，TX、Client 等 ACK 和 reboot
 期间暂停。Gateway/Client 只提供只读计数与最近有效接收。GPIO、电源/复位和 I²C
-独立于 radio、协议和 NVS。OLED 失败单独记录一次并停止显示更新。
+独立于 radio、协议和 NVS。屏幕 故障单独记录；v3 可延时恢复显示。

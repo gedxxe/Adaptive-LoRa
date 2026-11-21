@@ -61,7 +61,7 @@ Acceptance:
 
 - Start at a short, clear line-of-sight distance.
 - Use the same fixed PHY on both ends.
-- Initial TX power: 10 dBm.
+- Requested TX power is 22 dBm. Verify the load, supply and authorized RF conditions before transmitting.
 - Use the 915 MHz Moxon only after confirming its connector and matching
   path.
 - Record antenna orientation and supply voltage.
@@ -124,11 +124,16 @@ Required first-stage tests:
 - duplicate identity detection;
 - role config validation;
 - invalid/partial config rejection;
-- ACK bitmap 1, 10, and 70-client boundaries when M4 is implemented.
+- Scheduled v2 production link tests cover one client end to end and validate bitmap length and padding for 1, 10 and 70 positions.
 
 Tests must not require Arduino or RadioLib for codec logic.
 
 ## 6. M3 — beacon and one-client TDMA
+
+Iteration 019 runs v2 under a fake transport. Iteration 020 exercises the v3
+gateway and 1, 2, 4 or 8 production client instances. It also exercises
+v3 runtime dispatch through the low-level driver seam. The following RF
+acceptance steps remain open. See the [scheduled protocols](SCHEDULED_LINK.md).
 
 Test:
 
@@ -407,3 +412,40 @@ A final selected condition requires at least 200 complete HELLO transmissions.
 Keep original serial bytes, capture metadata, hash, interval and reset bounds.
 Collect directional RSSI/SNR from the corresponding accepted HELLO/ACK records.
 No physical OLED, NVS or RF acceptance result is available yet.
+
+### Iteration 020.1 v3 display coverage
+
+The combined host environment runs the actual runtime with the v3 radio
+hardware and display Wire shims. It checks page contents and the exact
+freshness boundary, then checks that request, DATA and feedback phases
+defer I²C. Cases cover early client completion, a missed beacon, a pending
+RX IRQ, and loop latency consuming the final display time budget. An display
+overrun is injected in both provisioning and a live gateway quiet tail.
+The next gateway beacon is checked against the prior frame's roster.
+
+The page-rotation regression skips multiple nominal page intervals and
+splits a repaint across windows. It checks both roles, the page order and
+dwell, and when the title changes. The runtime tests drive the maximum
+eight-slot grant on both roles with a simulated 3 ms I²C transfer and check
+that repaint work fits inside the guarded tail. The protocol tests inject
+failed bitmap TX and late TX_DONE and verify neither opens a receive slot
+for an unconfirmed retry.
+
+The outage regression completes one handshake, then withholds beacons
+for 30 simulated seconds. It checks page order and dwell, continuous RX,
+no TX on the expired schedule, replay rejection and a complete handshake
+after a rebooted Gateway returns. A separate stress case withholds a
+beacon while the Client displays page 3. Other cases cover a gateway
+beacon launch failure and a recoverable I²C transfer fault.
+
+### Iteration 021 timing and development roster
+
+Native runtime cases deliver beacon, grant, DATA and ACK completion
+events 30 ms after their captured timestamps. They check that valid
+on-air completions keep their slots despite deferred service, with a
+separate adapter case for consuming the first IRQ across 32-bit wrap.
+The half-duplex test network runs one Gateway and eight Clients each
+submitting 64 bytes and checks all application deliveries and evidence
+rows. Run a physical 1 → 2 → 4 → 8 progression with node IDs 2–9. Capture
+Gateway and Client traces, clock offset, radio completion-to-service
+latency, TX launch, RX re-arm and timing misses at each step.

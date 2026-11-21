@@ -5,9 +5,37 @@
 #include <esp_timer.h>
 #include <cstdio>
 #include <cinttypes>
+#if defined(ADAPTIVE_LORA_MULTICLIENT)
+#include "research_roster.h"
+#endif
 
 namespace adaptive_lora {
 namespace {
+#if defined(ADAPTIVE_LORA_MULTICLIENT)
+constexpr auto wireVersion = multiclient::kVersion;
+constexpr const char* profile = "multiclient";
+#if defined(ADAPTIVE_LORA_OLED)
+constexpr uint32_t kClientDisplayStartupUs = 400000;
+constexpr uint32_t kDisplayTailReserveUs = 250000;
+#endif
+multiclient::Roster benchRoster() {
+    auto roster = multiclient::kBenchRoster;
+#if defined(ADAPTIVE_LORA_OLED)
+    if (!roster.periodUs) {
+        const auto minimum = multiclient::requiredPeriodUs(roster);
+        if (minimum && minimum <= multiclient::kMaxPeriodUs - kDisplayTailReserveUs)
+            roster.periodUs = minimum + kDisplayTailReserveUs;
+    }
+#endif
+    return roster;
+}
+#elif defined(ADAPTIVE_LORA_SCHEDULED)
+constexpr auto wireVersion = scheduled::kVersion;
+constexpr const char* profile = "scheduled";
+#else
+constexpr auto wireVersion = kProtocolVersion;
+constexpr const char* profile = "m2";
+#endif
 uint32_t freshBootId(uint32_t previous) {
     // Valid-value bound only; entropy quality depends on ESP32-S3 SDK setup.
     for (unsigned attempt = 0; attempt < kBootIdAttempts; ++attempt) {
@@ -28,18 +56,45 @@ void FirmwareRuntime::status() {
     showConfig(loaded_, loadError_ ? "inactive_defaults" : "loaded", loadError_ ? loadError_ : "valid");
     char line[320];
     std::snprintf(line, sizeof(line),
-        "event=STATUS,mode=%s,radio=%s,chip=%s,fw=%s,protocol=%u,build_id=%s,reset_reason=%d,log_dropped=%" PRIu32,
+        "event=STATUS,mode=%s,radio=%s,chip=%s,fw=%s,protocol=%u,build_id=%s,reset_reason=%d,log_dropped=%" PRIu32 ",profile=%s",
         loadError_ ? "PROVISIONING" : (radio_.healthy() ? roleName(loaded_.role) : "RADIO_FAULT"),
         radio_.initialized() ? (radio_.healthy() ? "ready" : "fault") : "disabled",
-        radio_.initialized() ? radio_.chip() : "N/A", kFirmwareVersion, kProtocolVersion, kBuildId,
-        static_cast<int>(esp_reset_reason()), log_.dropped());
+        radio_.initialized() ? radio_.chip() : "N/A", kFirmwareVersion, wireVersion, kBuildId,
+        static_cast<int>(esp_reset_reason()), log_.dropped(), profile);
     log_.text(line);
+#if defined(ADAPTIVE_LORA_MULTICLIENT)
+    if (!loadError_ && loaded_.role == DeviceRole::GATEWAY) {
+        const auto roster = benchRoster();
+        const uint32_t period = roster.periodUs ? roster.periodUs : multiclient::requiredPeriodUs(roster);
+        std::snprintf(line, sizeof(line), "event=SCHEDULE_CONFIG,period_us=%" PRIu32 ",roster_count=%u",
+                      period, roster.count);
+        log_.text(line);
+    }
+#endif
 #if defined(ADAPTIVE_LORA_OLED)
     if (display_) {
+#if defined(ADAPTIVE_LORA_MULTICLIENT)
+        if (multicli_) {
+            const auto snapshot = multicli_->telemetry();
+            const auto now = static_cast<uint64_t>(esp_timer_get_time());
+            const auto freshness = snapshot.freshness(now);
+            std::snprintf(line, sizeof(line), "event=V3_LINK_STATUS,freshness=%s,frame=%" PRIu32 ",beacon=%s",
+                freshness == LinkFreshness::WAIT ? "WAIT" : freshness == LinkFreshness::ONLINE ? "ONLINE" : "STALE",
+                snapshot.frame, loaded_.role == DeviceRole::CLIENT ?
+                    (multicli_->searchingForBeacon(now) ? "search" : "synced") : "n/a");
+            log_.text(line);
+        }
+        std::snprintf(line, sizeof(line),
+            "event=OLED_STATUS,result=%s,worst_i2c_us=%" PRIu32 ",worst_refresh_io_us=%" PRIu32
+            ",worst_step_us=%" PRIu32 ",step_budget_us=%" PRIu32,
+            display_->error() ? display_->error() : (display_->ready() ? "ready" : "starting"),
+            display_->worstIoUs(), display_->worstRefreshUs(), worstDisplayStepUs_, kOledStepBudgetUs);
+#else
         std::snprintf(line, sizeof(line),
             "event=OLED_STATUS,result=%s,worst_i2c_us=%" PRIu32 ",worst_refresh_io_us=%" PRIu32,
             display_->error() ? display_->error() : (display_->ready() ? "ready" : "starting"),
             display_->worstIoUs(), display_->worstRefreshUs());
+#endif
         log_.text(line);
     }
 #endif
@@ -47,6 +102,12 @@ void FirmwareRuntime::status() {
 void FirmwareRuntime::setup() {
     Serial.begin(kSerialBaud);
     loadError_ = store_.load(loaded_);
+#if defined(ADAPTIVE_LORA_MULTICLIENT)
+    if (!loadError_ && loaded_.role == DeviceRole::GATEWAY && !multiclient::kBenchRoster.valid(loaded_.gatewayId))
+        loadError_ = "invalid_schedule_roster";
+#elif defined(ADAPTIVE_LORA_SCHEDULED)
+    if (!loadError_ && !ScheduledLink::supports(loaded_)) loadError_ = "unsupported_schedule_config";
+#endif
     log_.begin(loaded_);
     console_.begin(loaded_);
 #if defined(ADAPTIVE_LORA_OLED)
@@ -62,6 +123,15 @@ void FirmwareRuntime::setup() {
     const int16_t code = radio_.begin();
     log_.event("RADIO_INIT", code ? "failed" : radio_.chip(), nullptr, nullptr, code);
     if (!code) {
+#if defined(ADAPTIVE_LORA_MULTICLIENT)
+        multicli_.emplace(loaded_, radio_, log_, payload_, freshBootId, benchRoster());
+#if defined(ADAPTIVE_LORA_OLED)
+        if (loaded_.role == DeviceRole::CLIENT && display_ && !display_->error())
+            clientDisplayUntil_ = static_cast<uint64_t>(esp_timer_get_time()) + kClientDisplayStartupUs;
+#endif
+#elif defined(ADAPTIVE_LORA_SCHEDULED)
+        scheduled_.emplace(loaded_, radio_, log_, freshBootId);
+#else
         if (loaded_.role == DeviceRole::GATEWAY) {
             gateway_.emplace(loaded_, radio_, log_, freshBootId);
             gateway_->begin(micros());
@@ -69,6 +139,7 @@ void FirmwareRuntime::setup() {
             client_.emplace(loaded_, radio_, log_, freshBootId);
             client_->begin(micros());
         }
+#endif
     }
     status();
 }
@@ -89,7 +160,15 @@ void FirmwareRuntime::command(ConsoleAction action) {
             break;
         }
         case ConsoleAction::SAVE: {
-            const char* error = store_.save(console_.staging());
+            const char* error = nullptr;
+#if defined(ADAPTIVE_LORA_MULTICLIENT)
+            if (console_.staging().role == DeviceRole::GATEWAY &&
+                !multiclient::kBenchRoster.valid(console_.staging().gatewayId)) error = "invalid_schedule_roster";
+#elif defined(ADAPTIVE_LORA_SCHEDULED)
+            if (!validateConfig(console_.staging()) && !ScheduledLink::supports(console_.staging()))
+                error = "unsupported_schedule_config";
+#endif
+            if (!error) error = store_.save(console_.staging());
             log_.event(error ? "CONFIG_ERROR" : "CONFIG_SAVED", error ? error : "verified_reboot_required");
             break;
         }
@@ -102,13 +181,63 @@ void FirmwareRuntime::command(ConsoleAction action) {
         case ConsoleAction::NONE: break;
     }
 }
+#if defined(ADAPTIVE_LORA_MULTICLIENT)
+SubmitResult FirmwareRuntime::submitPayload(const uint8_t* bytes, size_t length) {
+    if (!multicli_ || loaded_.role != DeviceRole::CLIENT || rebootPending_) return SubmitResult::INACTIVE;
+    return payload_.submit(bytes, length);
+}
+
+bool FirmwareRuntime::receivePayload(void* context, const PayloadDelivery& packet) {
+    auto& log = static_cast<FirmwareRuntime*>(context)->log_;
+    char line[256];
+    const int prefix = std::snprintf(line, sizeof(line),
+        "event=APP_PAYLOAD,source_id=%u,boot_id=%" PRIu32 ",frame_id=%" PRIu32 ",bytes=%u,hex=",
+        packet.source, packet.clientBoot, packet.frame, packet.size);
+    if (prefix < 0 || size_t(prefix) + size_t(packet.size) * 2 >= sizeof(line)) return false;
+    constexpr char digits[] = "0123456789abcdef";
+    size_t end = static_cast<size_t>(prefix);
+    for (uint8_t i = 0; i < packet.size; ++i) {
+        line[end++] = digits[packet.bytes[i] >> 4];
+        line[end++] = digits[packet.bytes[i] & 15];
+    }
+    line[end] = '\0';
+    const auto drops = log.dropped();
+    log.text(line);
+    return log.dropped() == drops;
+}
+#endif
 void FirmwareRuntime::loop() {
-    const uint32_t now = micros();
-    const auto event = radio_.poll(now);
+    const auto event = radio_.poll(static_cast<uint64_t>(esp_timer_get_time()));
     // Radio calls may wait; apps must classify the completed event at fresh time.
+#if defined(ADAPTIVE_LORA_MULTICLIENT)
+    const auto appNow = static_cast<uint64_t>(esp_timer_get_time());
+#if defined(ADAPTIVE_LORA_OLED)
+    if (clientDisplayUntil_) {
+        if (display_->ready() || display_->error()) clientDisplayUntil_ = 0;
+        else if (appNow >= clientDisplayUntil_) {
+            clientDisplayUntil_ = 0;
+            log_.event("OLED_BOOT", "continue_while_searching");
+        }
+    }
+    const bool waitingForBootScreen = clientDisplayUntil_ != 0;
+#else
+    constexpr bool waitingForBootScreen = false;
+#endif
+    if (multicli_ && !waitingForBootScreen) {
+        if (example_ && loaded_.role == DeviceRole::CLIENT && appNow >= nextReport_) {
+            nextReport_ = appNow + uint64_t(loaded_.helloIntervalMs) * 1000;
+            constexpr uint8_t example[] = {0x01, 0x00, 0x16, 0x80, 0x00, 0x05, 0x00, 0x7f};
+            submitPayload(example, sizeof(example));
+        }
+        multicli_->update(appNow, event, !rebootPending_);
+    }
+#elif defined(ADAPTIVE_LORA_SCHEDULED)
+    if (scheduled_) scheduled_->update(static_cast<uint64_t>(esp_timer_get_time()), event, !rebootPending_);
+#else
     const uint32_t appNow = micros();
     if (gateway_) gateway_->update(appNow, event, !rebootPending_);
     if (client_) client_->update(appNow, event, !rebootPending_);
+#endif
     for (unsigned budget = 0; budget < 64 && Serial.available(); ++budget)
         command(console_.feed(static_cast<char>(Serial.read())));
     if (rebootPending_ && !rebootStopped_ && !radio_.transmitting()) {
@@ -123,13 +252,29 @@ void FirmwareRuntime::loop() {
         return;
     }
 #if defined(ADAPTIVE_LORA_OLED)
+#if defined(ADAPTIVE_LORA_MULTICLIENT)
+    const auto displayNow = static_cast<uint64_t>(esp_timer_get_time());
+    if (safeToRefreshDisplay(displayNow)) serviceDisplay(displayNow);
+#else
     if (display_ && !rebootPending_ && !radio_.transmitting() && !(client_ && client_->awaitingAck()))
-        serviceDisplay();
+        serviceDisplay(static_cast<uint64_t>(esp_timer_get_time()));
+#endif
 #endif
 }
 #if defined(ADAPTIVE_LORA_OLED)
-void FirmwareRuntime::serviceDisplay() {
-    const auto now = static_cast<uint64_t>(esp_timer_get_time());
+#if defined(ADAPTIVE_LORA_MULTICLIENT)
+bool FirmwareRuntime::safeToRefreshDisplay(uint64_t now) const {
+    if (!display_ || !display_->canService(now) || rebootPending_) return false;
+    if (clientDisplayUntil_) {
+        // The client role has yet to start; the initialized radio is in standby.
+        return now < clientDisplayUntil_ && clientDisplayUntil_ - now >= kOledStepBudgetUs &&
+               !radio_.receiving() && !radio_.transmitting();
+    }
+    return !radio_.initialized() ||
+        (multicli_ && multicli_->safeToRefreshDisplay(now, kOledStepBudgetUs) && !radio_.irqPending());
+}
+#endif
+void FirmwareRuntime::serviceDisplay(uint64_t now) {
     if (display_->needsSnapshot(now)) {
         DisplaySnapshot snapshot;
         snapshot.config = loaded_;
@@ -137,16 +282,35 @@ void FirmwareRuntime::serviceDisplay() {
         snapshot.radioReady = radio_.healthy();
         snapshot.radioState = radio_.stateName();
         snapshot.logDropped = log_.dropped();
+#if defined(ADAPTIVE_LORA_MULTICLIENT)
+        snapshot.protocol = wireVersion;
+        if (multicli_) {
+            snapshot.multiclient = multicli_->telemetry();
+            snapshot.searchingForBeacon = multicli_->searchingForBeacon(now);
+        }
+        else if (!loadError_) snapshot.multiclient.radioErrors = 1;
+#else
         if (gateway_) snapshot.gateway = gateway_->telemetry();
         if (client_) snapshot.client = client_->telemetry();
+#endif
         display_->render(snapshot, now);
     }
+#if defined(ADAPTIVE_LORA_MULTICLIENT)
+    // Formatting may use part of the window. Check again before any Wire call.
+    const auto serviceAt = static_cast<uint64_t>(esp_timer_get_time());
+    if (safeToRefreshDisplay(serviceAt)) display_->service(serviceAt);
+    const auto elapsed = static_cast<uint32_t>(esp_timer_get_time() - now);
+    if (elapsed > worstDisplayStepUs_) worstDisplayStepUs_ = elapsed;
+    if (elapsed > kOledStepBudgetUs) display_->stopOnOverrun();
+#else
     display_->service(now);
+#endif
     if (display_->error() && !displayErrorLogged_) {
         displayErrorLogged_ = true;
         log_.event(displayReadyLogged_ ? "OLED_ERROR" : "OLED_INIT", display_->error());
-    } else if (display_->ready() && !displayReadyLogged_) {
+    } else if (display_->ready() && (!displayReadyLogged_ || displayErrorLogged_)) {
         displayReadyLogged_ = true;
+        displayErrorLogged_ = false;
         log_.event("OLED_INIT", "ready");
     }
 }

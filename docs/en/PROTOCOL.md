@@ -2,11 +2,20 @@
 
 ## 1. Protocol scope
 
-The first protocol revision is a small, bounded binary protocol for a
-two-device HELLO/ACK link. Later milestones add beacon scheduling,
-bitmap ACK, retries, and ADR.
+Adaptive-LoRa uses a custom LoRa P2P protocol. The default build uses v3.
+The legacy builds use v1 HELLO/ACK and v2 single-client TDMA. The scheduled
+profiles are specified in [SCHEDULED_LINK.md](SCHEDULED_LINK.md). Each
+decoder accepts its own version and types. `PROTOCOL_VERSION` tracks
+the original v1 wire format. Firmware version and NVS schema are shared.
 
-This is a custom LoRa P2P protocol. It is not LoRaWAN.
+The saved role selects Gateway or Client in each image. FirmwareRuntime
+services one RadioDriver; Sx1262Hardware owns the peripheral and latches
+DIO1. All profiles use provisional 915.0 MHz, SF7/BW125, CR4/5, preamble 8,
+explicit header, CRC, sync 0x12 and requested 22 dBm. SF9 stays reserved.
+M2 waits one second from serviced TX_DONE for a matching ACK. The driver
+TX timeout is two seconds. M2 starts a new HELLO after the configured
+reporting interval (3,000 ms by default) and never retries the original
+HELLO. The next interval begins when the transaction finishes.
 
 ## 2. Frame limits and byte order
 
@@ -56,6 +65,8 @@ The magic value is written little-endian. Its on-air bytes are
 | `0x10` | BEACON         | M3          |
 | `0x11` | DATA           | M3+         |
 | `0x12` | ACK_BITMAP     | M4          |
+| `0x13` | PAYLOAD_REQUEST | v3          |
+| `0x14` | SLOT_GRANT      | v3          |
 | `0x20` | CONFIG_PROPOSE | M5          |
 | `0x21` | CONFIG_ACCEPT  | M5          |
 | `0x22` | CONFIG_COMMIT  | M5          |
@@ -63,7 +74,9 @@ The magic value is written little-endian. Its on-air bytes are
 | `0x31` | REJOIN_GRANT   | M6          |
 | `0x7F` | DIAGNOSTIC     | As required |
 
-Do not implement reserved message types before their milestone.
+HELLO and ACK are v1 only. BEACON, DATA and ACK_BITMAP exist in v2 and
+v3 with distinct layouts. PAYLOAD_REQUEST and SLOT_GRANT are v3 only.
+Future ADR and rejoin types remain reserved.
 
 ## 5. M2 HELLO / ACK payload
 
@@ -90,7 +103,7 @@ The client reports success only if all echoed fields match the
 outstanding HELLO. A valid ACK for another boot ID or sequence is not
 success.
 
-M2 implements accepted ACK status 0 only, exactly nine payload bytes. Reject nonzero status, zero echoed boot ID, invalid echoed source, or echoed source different from the ACK destination. All M2 traffic is unicast: source/destination must be 1–65534 and different; network may be 1–65535. Reserved future message types and nonzero frame/config/schedule fields are rejected until their milestones. This clarifies M2 validation without changing the v1 layout.
+M2 implements accepted ACK status 0 only, exactly nine payload bytes. Reject nonzero status, zero echoed boot ID, invalid echoed source, or echoed source different from the ACK destination. All M2 traffic is unicast: source/destination must be 1–65534 and different; network may be 1–65535. Reserved future message types and nonzero frame/config/schedule fields are rejected by v1. This clarifies M2 validation without changing the v1 layout.
 
 ## 6. Boot ID and sequence behavior
 
@@ -108,7 +121,7 @@ M2 implements accepted ACK status 0 only, exactly nine payload bytes. Reject non
 - The deduplication key is
   `network_id + source_id + boot_id + sequence`.
 
-M2 retains eight session keys, each with a 64-sequence replay window. Seen HELLOs are re-ACKed without a second accepted delivery; older sequences in a retained session are rejected as stale. Oldest-session eviction and gateway reboot remove history. This bounded two-unit cache does not implement persistent/authenticated replay protection or later DATA delivery guarantees. Re-evaluate capacity/lifetime at M4.
+M2 retains eight session keys, each with a 64-sequence replay window. Seen HELLOs are re-ACKed without a second accepted delivery; older sequences in a retained session are rejected as stale. Round-robin replacement of an entry and gateway reboot remove history. This bounded two-unit cache does not implement persistent/authenticated replay protection or later DATA delivery guarantees. Re-evaluate capacity/lifetime at M4.
 
 ## 7. Validation rules
 
@@ -129,76 +142,14 @@ The decoder must validate, in this order or an equivalent safe order:
 Do not read a field before confirming the input contains its bytes. Do
 not copy a payload into a destination buffer before confirming capacity.
 
-## 8. M3 beacon and schedule fields
+## 8–10. Scheduled research protocols (v2 and v3)
 
-M3 introduces a common control-PHY beacon. At minimum, it must carry:
+[SCHEDULED_LINK.md](SCHEDULED_LINK.md) defines byte layouts, identity and
+validation, the payload-aware timing equations, feedback, and retries for
+the two scheduled profiles. The older schedule-table candidates in
+[TDMA_FEASIBILITY.md](TDMA_FEASIBILITY.md) are historical design inputs.
 
-- frame ID;
-- schedule version;
-- active client count;
-- the client’s assigned slot information for the one-client test;
-- timing information needed to schedule the uplink relative to beacon
-  reception;
-- validity/lease information so a stale client stops normal uplink.
-
-For the one-client test, a fixed slot may be used. Do not assume that a
-one-client schedule format is automatically sufficient for 70 clients.
-Document and test any later schedule-table encoding before scaling.
-
-The client measures local monotonic time at beacon RX completion and
-schedules its assigned slot using the beacon’s relative timing fields.
-The gateway uses its own TX completion and local monotonic clock. Guard
-time must be based on measured radio switching and clock drift, not an
-arbitrary constant.
-
-## 9. M4 ACK_BITMAP
-
-The ACK bitmap header identifies the superframe using `frame_id` and
-carries the active `schedule_version`.
-
-Payload structure:
-
-| Field                 |     Size | Description                                |
-|-----------------------|---------:|--------------------------------------------|
-| `active_client_count` |        1 | Number of scheduled clients                |
-| `bitmap_length`       |        1 | Must equal `ceil(active_client_count / 8)` |
-| `bitmap`              | variable | One bit per client in schedule order       |
-
-Bit order is least-significant bit first within each byte. Bit index `i`
-maps to schedule entry `i` for the matching schedule version. The
-schedule mapping must be stable and explicit.
-
-Examples:
-
-- 1 client → 1 byte.
-- 10 clients → 2 bytes.
-- 70 clients → 9 bytes.
-
-Unused high bits in the final byte must be zero.
-
-Client states must distinguish:
-
-- `ACK_RECEIVED`: valid bitmap received and this client’s bit is one.
-- `MISSING`: valid bitmap received and this client’s bit is zero.
-- `ACK_UNKNOWN`: no valid bitmap received before the ACK window expires.
-
-`MISSING` and `ACK_UNKNOWN` are not interchangeable.
-
-## 10. Selective retransmission
-
-- Retry slots are deterministic and tied to the active schedule.
-- A client retries only in its assigned retry slot.
-- A `MISSING` client may retry.
-- An `ACK_UNKNOWN` client may retry in its assigned retry slot because
-  the original packet may have reached the gateway while the bitmap was
-  lost.
-- Retry reuses the original logical packet identity and payload.
-- Gateway deduplication prevents duplicate application delivery.
-- Gateway may acknowledge a duplicate packet again.
-- Initial maximum: two retries, configurable.
-- After retry exhaustion, record the failure and sequence identity.
-
-## 11. Conservative ADR
+## 11. Planned conservative ADR
 
 ADR is gateway-controlled and introduced only in M5.
 
@@ -213,7 +164,9 @@ or TX power in the first ADR release.
 
 The gateway evaluates rolling per-client evidence: RSSI, SNR, PDR/PER,
 ACK outcomes, and retries. Thresholds must be centralized and marked
-experimental until measured.
+experimental until measured. No production thresholds or hysteresis
+windows have been selected. A confirmed binary or interpretation change
+requires the version and coexistence review in §12.
 
 Use the versioned handshake:
 
@@ -225,11 +178,14 @@ Use the versioned handshake:
 5.  If the client does not receive a valid commit, it keeps the previous
     committed profile.
 
-Never switch PHY in the middle of a superframe.
+Commit a different profile assignment only at an agreed superframe boundary.
+Future scheduled retunes apply the already active profile at a declared
+phase or slot boundary. The current driver has no such retune path.
 
 ## 12. Protocol versioning
 
-`PROTOCOL_VERSION` describes the wire format. It is independent of
+`PROTOCOL_VERSION` describes the legacy M2 wire format. The scheduled
+builds declare v2 in `scheduled_protocol.h` and v3 in `multiclient_protocol.h`. It is independent of
 firmware SemVer, `config_version`, and `schedule_version`.
 
 Bump the protocol version for incompatible changes to header layout,
