@@ -117,7 +117,9 @@ std::vector<uint8_t> bytes(size_t length) {
 
 void runClients(uint8_t count) {
     Network n(count);
-    const uint8_t lengths[]{0, 3, 8, 34, 64, 9, 46, 62};
+    uint8_t lengths[]{0, 3, 8, 34, 64, 9, 46, 62};
+    if (count == kMaxClients)
+        for (auto& length : lengths) length = kMaxData;
     for (uint8_t i = 0; i < count; ++i) n.submit(i, bytes(lengths[i]));
     n.run(10000000);
     TEST_ASSERT_EQUAL_UINT(count, n.deliveries.size());
@@ -135,6 +137,13 @@ void runClients(uint8_t count) {
     }
     TEST_ASSERT_EQUAL_UINT8(uint8_t((1u << count) - 1), feedback[0].frame.payload[1]);
     TEST_ASSERT_EQUAL_UINT8(0, feedback[0].frame.payload[2]);
+    TEST_ASSERT_TRUE(n.hasLog("event=V3_LINK_SAMPLE"));
+    for (uint8_t i = 0; i < count; ++i) {
+        const auto sample = ",frame_id=1,source_id=" + std::to_string(i + 2) +
+            ",client_boot=" + std::to_string(n.packets(MessageType::DATA, i + 2)[0].frame.bootId) +
+            ",sf=7,outcome=first,app=accepted";
+        TEST_ASSERT_TRUE(n.hasLog(sample.c_str()));
+    }
     if (count > 1) {
         const auto data = n.packets(MessageType::DATA);
         TEST_ASSERT_UINT32_WITHIN(1000, dataAir(lengths[0]) + kGuardUs, data[1].start - data[0].start);
@@ -215,6 +224,25 @@ void missing_client_retries_byte_for_byte() {
     TEST_ASSERT_EQUAL_UINT8(2, ack[0].frame.payload[2]);
     TEST_ASSERT_EQUAL_UINT8(3, ack[1].frame.payload[1]);
     TEST_ASSERT_EQUAL_UINT(2, n.callbacks);
+    const auto gateway = n.gateway.link.telemetry();
+    TEST_ASSERT_EQUAL_UINT32(2, gateway.data);
+    TEST_ASSERT_EQUAL_UINT32(2, gateway.accepted);
+    TEST_ASSERT_EQUAL_UINT32(1, gateway.retries);
+    TEST_ASSERT_EQUAL_UINT16(3, gateway.peer.peer);
+    TEST_ASSERT_EQUAL_UINT32(10000000, gateway.periodUs);
+    TEST_ASSERT_EQUAL_UINT32(1, gateway.frame);
+    TEST_ASSERT_TRUE(gateway.bitmap.seen);
+    TEST_ASSERT_EQUAL_UINT8(3, gateway.bitmap.round);
+    TEST_ASSERT_EQUAL_UINT8(3, gateway.bitmap.accepted);
+    TEST_ASSERT_EQUAL_UINT8(0, gateway.bitmap.retries);
+    TEST_ASSERT_EQUAL_INT(int(LinkFreshness::ONLINE), int(gateway.freshness(gateway.peer.atUs + 19999999)));
+    TEST_ASSERT_EQUAL_INT(int(LinkFreshness::STALE), int(gateway.freshness(gateway.peer.atUs + 20000000)));
+    const auto client = n.clients[1].link.telemetry();
+    TEST_ASSERT_EQUAL_UINT32(2, client.data);
+    TEST_ASSERT_EQUAL_UINT32(1, client.retries);
+    TEST_ASSERT_EQUAL_UINT32(1, client.accepted);
+    TEST_ASSERT_EQUAL_UINT8(1, client.bitmap.round);
+    TEST_ASSERT_EQUAL_INT(int(PayloadResult::ACCEPTED), int(client.result));
 }
 
 void partial_retry_pool_and_exhaustion_with_eight_clients() {
@@ -231,6 +259,7 @@ void partial_retry_pool_and_exhaustion_with_eight_clients() {
         for (const auto& x : sent) TEST_ASSERT_EQUAL_UINT8_ARRAY(sent[0].packet.bytes, x.packet.bytes, x.packet.length);
     }
     TEST_ASSERT_TRUE(n.hasLog("retry_exhausted_missing"));
+    TEST_ASSERT_TRUE(n.hasLog("outcome=missed,app=n/a"));
 }
 
 void lost_feedback_cannot_authorize_retry_and_cumulative_ack_recovers() {
@@ -241,6 +270,39 @@ void lost_feedback_cannot_authorize_retry_and_cumulative_ack_recovers() {
     TEST_ASSERT_EQUAL_UINT(1, n.packets(MessageType::DATA, 2).size());
     TEST_ASSERT_TRUE(n.hasLog("result=unknown"));
     TEST_ASSERT_EQUAL_INT(int(PayloadResult::ACCEPTED), int(n.clients[0].payload.result()));
+}
+
+void feedback_fault_keeps_retry_closed(bool lateCompletion) {
+    Network n(1);
+    n.filter = [](uint8_t receiver, Frame& f) { return receiver || f.type != MessageType::DATA; };
+    n.submit(0, bytes(8));
+    while (n.packets(MessageType::ACK_BITMAP).empty() && n.now < 2000000) n.run(1000);
+    const auto acks = n.packets(MessageType::ACK_BITMAP);
+    TEST_ASSERT_EQUAL_UINT(1, acks.size());
+    TEST_ASSERT_EQUAL_UINT8(1, acks.front().frame.payload[2]);
+    const auto data = n.packets(MessageType::DATA).front();
+    const auto grant = n.packets(MessageType::SLOT_GRANT).front();
+    Plan plan;
+    TEST_ASSERT_TRUE(readPlan(grant.frame, plan));
+
+    const uint64_t dataAt = (grant.end + 999) / 1000 * 1000;
+    const uint64_t retryStart = dataAt + plan.dataStart(1, 0, 1);
+    n.now = lateCompletion ? retryStart + 1 : (acks.front().end + 999) / 1000 * 1000;
+    n.sender = nullptr;
+    auto& radio = n.gateway.radio;
+    n.gateway.link.update(n.now, lateCompletion ? radio.completeTx() : radio.error(RadioEventType::ERROR, -1));
+    TEST_ASSERT_TRUE(radio.receiving());
+    TEST_ASSERT_EQUAL(lateCompletion, n.gateway.link.telemetry().bitmap.seen);
+    n.gateway.link.update(retryStart + dataAir(8), radio.deliver(data.packet));
+    TEST_ASSERT_EQUAL_UINT(0, n.callbacks);
+}
+
+void failed_feedback_transmission_does_not_open_gateway_retry_slot() {
+    feedback_fault_keeps_retry_closed(false);
+}
+
+void late_feedback_completion_does_not_open_gateway_retry_slot() {
+    feedback_fault_keeps_retry_closed(true);
 }
 
 void wrong_feedback_identity_and_late_feedback_remain_unknown() {
@@ -267,6 +329,11 @@ void refusal_does_not_set_ack_or_redeliver() {
     TEST_ASSERT_EQUAL_UINT(1, n.packets(MessageType::DATA).size());
     TEST_ASSERT_EQUAL_INT(int(PayloadResult::MISSING), int(n.clients[0].payload.result()));
     TEST_ASSERT_TRUE(n.hasLog("application_refused"));
+    const auto telemetry = n.gateway.link.telemetry();
+    TEST_ASSERT_EQUAL_UINT32(1, telemetry.data);
+    TEST_ASSERT_EQUAL_UINT32(0, telemetry.accepted);
+    TEST_ASSERT_EQUAL_UINT32(1, telemetry.refused);
+    TEST_ASSERT_TRUE(telemetry.peer.seen);
 }
 
 void missing_beacon_and_stale_frame_then_recovery() {
@@ -370,6 +437,19 @@ void duplicate_and_conflict_are_not_delivered_again() {
     TEST_ASSERT_EQUAL_UINT(1, n.callbacks);
     TEST_ASSERT_TRUE(n.hasLog("result=duplicate"));
     TEST_ASSERT_TRUE(n.hasLog("result=conflict"));
+    TEST_ASSERT_EQUAL_UINT32(1, gateway.link.telemetry().duplicates);
+    TEST_ASSERT_EQUAL_UINT32(1, gateway.link.telemetry().data);
+}
+
+void radio_errors_do_not_refresh_v3_link() {
+    Peer client(2);
+    client.radio.rxFailuresLeft = 1;
+    client.link.update(0, {});
+    client.link.update(1000000, client.radio.error(RadioEventType::CRC_ERROR, -7));
+    const auto snapshot = client.link.telemetry();
+    TEST_ASSERT_EQUAL_UINT32(2, snapshot.radioErrors);
+    TEST_ASSERT_EQUAL_UINT32(0, snapshot.data);
+    TEST_ASSERT_EQUAL_INT(int(LinkFreshness::WAIT), int(snapshot.freshness(1000000)));
 }
 
 void early_late_and_unassigned_data_do_not_reach_application() {
@@ -407,6 +487,8 @@ int main() {
     RUN_TEST(missing_client_retries_byte_for_byte);
     RUN_TEST(partial_retry_pool_and_exhaustion_with_eight_clients);
     RUN_TEST(lost_feedback_cannot_authorize_retry_and_cumulative_ack_recovers);
+    RUN_TEST(failed_feedback_transmission_does_not_open_gateway_retry_slot);
+    RUN_TEST(late_feedback_completion_does_not_open_gateway_retry_slot);
     RUN_TEST(wrong_feedback_identity_and_late_feedback_remain_unknown);
     RUN_TEST(refusal_does_not_set_ack_or_redeliver);
     RUN_TEST(missing_beacon_and_stale_frame_then_recovery);
@@ -416,6 +498,7 @@ int main() {
     RUN_TEST(codec_group_rules_padding_and_version_isolation);
     RUN_TEST(guard_edges_are_half_open);
     RUN_TEST(duplicate_and_conflict_are_not_delivered_again);
+    RUN_TEST(radio_errors_do_not_refresh_v3_link);
     RUN_TEST(early_late_and_unassigned_data_do_not_reach_application);
     return UNITY_END();
 }

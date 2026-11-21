@@ -1,5 +1,6 @@
 #include "sx1262_hardware.h"
 #include <SPI.h>
+#include <esp_timer.h>
 #include "board_pins.h"
 #include "radio_config.h"
 
@@ -23,8 +24,21 @@ static_assert(pins::nss == SS && pins::sck == SCK &&
               pins::miso == MISO && pins::mosi == MOSI,
               "Radio SPI pins must match the Heltec V3 variant");
 
-volatile bool Sx1262Hardware::irq_ = false;
-void IRAM_ATTR Sx1262Hardware::onDio1() { irq_ = true; }
+namespace {
+portMUX_TYPE dioMux = portMUX_INITIALIZER_UNLOCKED;
+}
+
+bool Sx1262Hardware::irq_ = false;
+uint64_t Sx1262Hardware::irqTimeUs_ = 0;
+void IRAM_ATTR Sx1262Hardware::onDio1() {
+    const auto now = static_cast<uint64_t>(esp_timer_get_time());
+    portENTER_CRITICAL_ISR(&dioMux);
+    if (!irq_) {
+        irqTimeUs_ = now;
+        irq_ = true;
+    }
+    portEXIT_CRITICAL_ISR(&dioMux);
+}
 Sx1262Hardware::Sx1262Hardware()
     : module_(pins::nss, pins::dio1, pins::reset, pins::busy, SPI,
               SPISettings(phy::spiClockHz, MSBFIRST, SPI_MODE0)), radio_(&module_) {}
@@ -40,7 +54,24 @@ int16_t Sx1262Hardware::begin() {
     return code ? code : radio_.setCurrentLimit(phy::txCurrentLimitMa);
 }
 void Sx1262Hardware::enableDio1() { radio_.setDio1Action(onDio1); }
-bool Sx1262Hardware::irqSignalled() { return irq_ || digitalRead(pins::dio1); }
+void Sx1262Hardware::clearIrqSignal() {
+    uint64_t unused;
+    takeIrqTimestampUs(unused);
+}
+bool Sx1262Hardware::irqSignalled() {
+    portENTER_CRITICAL(&dioMux);
+    const bool pending = irq_;
+    portEXIT_CRITICAL(&dioMux);
+    return pending || digitalRead(pins::dio1);
+}
+bool Sx1262Hardware::takeIrqTimestampUs(uint64_t& timestamp) {
+    portENTER_CRITICAL(&dioMux);
+    const bool pending = irq_;
+    if (pending) timestamp = irqTimeUs_;
+    irq_ = false;
+    portEXIT_CRITICAL(&dioMux);
+    return pending;
+}
 int16_t Sx1262Hardware::startReceive() {
     // Preserve the full default RX mask, including CRC/header/timeout signals.
     return radio_.startReceive(RADIOLIB_SX126X_RX_TIMEOUT_INF,

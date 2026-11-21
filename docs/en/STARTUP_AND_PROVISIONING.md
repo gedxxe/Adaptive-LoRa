@@ -6,10 +6,16 @@ pioarduino or PlatformIO IDE extension installed.
 
 | Environment | `status` output | Use |
 |---|---|---|
-| `heltec_wifi_lora_32_V3` | `protocol=1`, `profile=m2` | HELLO/ACK |
-| `heltec_wifi_lora_32_V3_oled` | `protocol=1`, `profile=m2` | HELLO/ACK with OLED |
+| `heltec_wifi_lora_32_V3_multiclient` | `protocol=3`, `profile=multiclient` | Default. One gateway, up to eight clients |
+| `heltec_wifi_lora_32_V3` | `protocol=1`, `profile=m2` | Legacy HELLO/ACK |
 | `heltec_wifi_lora_32_V3_research` | `protocol=2`, `profile=scheduled` | Iteration 019 single-client schedule |
-| `heltec_wifi_lora_32_V3_multiclient` | `protocol=3`, `profile=multiclient` | Iteration 020 multi-client payload scheduling |
+
+Check the delivered panel and supply before running the v3 image.
+See [display diagnostics](DISPLAY_DIAGNOSTICS.md).
+
+A configured v3 client can show `LAST WAIT` at startup before it hears a
+gateway. If the screen stays dark, run `status` at 115200 baud and check
+`protocol=3`, `mode=CLIENT` and the `OLED_STATUS` result.
 
 ## Identify the board and upload
 
@@ -87,6 +93,11 @@ succeeded. After reboot, `status` shows the active values and `protocol=3`.
 `CONFIG_ERROR` after save shows why the staged configuration was rejected.
 If the gateway reports `invalid_schedule_roster`, check its ID, table and
 period before retrying. `SCHEDULE_CONFIG` reports roster size and period.
+The gateway reports eight roster entries and
+`period_us=6766000`. Each client learns the period from the beacon.
+For the full development roster, provision Gateway 1 and Client IDs 2–9
+on network 1. Use a different node ID on each Client and keep gateway ID 1
+on all nine units.
 
 The client’s example source offers one eight-byte report every configured
 interval if the queue has room. Look for `APP_PAYLOAD` on the gateway and

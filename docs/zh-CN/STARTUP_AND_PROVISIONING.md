@@ -5,10 +5,14 @@ PlatformIO IDE 扩展的 VS Code 中打开包含 `platformio.ini` 的目录。
 
 | 环境 | `status` 输出 | 用途 |
 |---|---|---|
-| `heltec_wifi_lora_32_V3` | `protocol=1`、`profile=m2` | HELLO/ACK |
-| `heltec_wifi_lora_32_V3_oled` | `protocol=1`、`profile=m2` | 带 OLED 的 HELLO/ACK |
+| `heltec_wifi_lora_32_V3_multiclient` | `protocol=3`、`profile=multiclient` | 默认。一个 Gateway、最多八个 Client |
+| `heltec_wifi_lora_32_V3` | `protocol=1`、`profile=m2` | 旧版 HELLO/ACK |
 | `heltec_wifi_lora_32_V3_research` | `protocol=2`、`profile=scheduled` | Iteration 019 单 Client 调度 |
-| `heltec_wifi_lora_32_V3_multiclient` | `protocol=3`、`profile=multiclient` | Iteration 020 多 Client 载荷调度 |
+
+运行 v3 镜像前核对实板屏幕与供电，详见 [屏幕 诊断](DISPLAY_DIAGNOSTICS.md)。
+
+配置为 Client 的 v3 设备在听到 Gateway 前即可显示 `LAST WAIT`。若屏幕仍黑，请以
+115200 波特率执行 `status`，核对 `protocol=3`、`mode=CLIENT` 和 `OLED_STATUS` 结果。
 
 ## 识别板卡并上传
 
@@ -72,6 +76,9 @@ Gateway ID 均为 1。`config show` 显示暂存值，`CONFIG_SAVED` 表示保�
 重启后 `status` 显示生效值和 `protocol=3`。启动时若出现 `CONFIG_INVALID`，设备进入
 配置模式并禁止发射。保存时 `CONFIG_ERROR` 给出失败原因。Gateway 如报告
 `invalid_schedule_roster`，请核对 ID、名单与周期。`SCHEDULE_CONFIG` 显示名单人数和周期。
+默认带屏 Gateway 报告八个名单位置和 `period_us=6766000`，各 Client 从 Beacon 获取周期。
+完整开发名单为 Gateway 1、Client 2–9，均使用网络 1 和 gateway ID 1。
+每个 Client 使用独立 node ID。
 
 示例程序按配置周期尝试提交八字节样例，队列满时跳过此次提交。Gateway 输出
 `APP_PAYLOAD`，Client 输出 `V3_PAYLOAD_RESULT`。发射须等待当帧授权，设置 3 秒

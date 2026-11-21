@@ -2,11 +2,10 @@
 
 ## 1. 协议范围
 
-本项目使用自定义 LoRa P2P 协议。默认和 OLED 镜像使用 v1 HELLO/ACK；可选研究镜像
-分为单 Client v2 与多 Client v3，见 [定时链路规范](SCHEDULED_LINK.md)。各版本
-编解码器仅接受对应版本与类型。`PROTOCOL_VERSION` 记录默认 v1；两种镜像共用
-固件版本及 NVS schema。两种角色由 NVS 选择，共用一个 RadioDriver 与 SX1262。
-DIO1 只置位，主循环处理。
+本项目使用自定义 LoRa P2P 协议。默认镜像使用 v3；保留旧版 v1 HELLO/ACK 和单
+Client v2。见 [定时链路规范](SCHEDULED_LINK.md)。各版本编解码器仅接受对应版本与类型。
+`PROTOCOL_VERSION` 记录原有 v1 线格式。各镜像共用固件版本及 NVS schema。
+两种角色由 NVS 选择，共用一个 RadioDriver 与 SX1262。DIO1 捕获时间戳，主循环处理。
 
 各镜像均固定 915.0 MHz（暂定）、SF7/BW125、CR4/5、前导 8、显式头、CRC、
 sync 0x12，请求功率 22 dBm。控制 SF9 保留。M2 Client 处理 TX_DONE 后等待匹配 ACK

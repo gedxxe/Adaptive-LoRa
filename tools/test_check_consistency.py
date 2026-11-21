@@ -41,13 +41,17 @@ class ConsistencyTests(unittest.TestCase):
         version = (self.root / "VERSION").read_text().strip()
         self.mutate("docs/en/PROGRESS.md", f"`{version}`", "`9.9.9-alpha.9`")
         self.assertTrue(any("current firmware" in e for e in check(self.root)))
-        protocol = (self.root / "PROTOCOL_VERSION").read_text().strip()
+        protocol = APPROVED_SETTINGS["src/common/protocol/multiclient_protocol.h"]["kVersion"]
         self.mutate("AGENTS.md", f"protocol `{protocol}`", "protocol `99`")
         self.assertTrue(any("AGENTS.md: current protocol" in e for e in check(self.root)))
 
     def test_bad_build_environment_is_reported(self):
         self.mutate("README.md", "pio run -e heltec_wifi_lora_32_V3", "pio run -e absent_board")
         self.assertTrue(any("unknown build environment" in e for e in check(self.root)))
+
+    def test_default_build_requires_display(self):
+        self.mutate("platformio.ini", "-D ADAPTIVE_LORA_OLED=1", "")
+        self.assertTrue(any("default firmware must include" in e for e in check(self.root)))
 
     def test_broken_current_link_is_reported(self):
         self.mutate("AGENTS.md", "docs/en/HARDWARE.md)", "docs/en/MISSING.md)")

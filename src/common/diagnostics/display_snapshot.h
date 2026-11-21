@@ -1,5 +1,6 @@
 #pragma once
 #include <cstdint>
+#include "app/payload_port.h"
 #include "common/config/device_config.h"
 
 namespace adaptive_lora {
@@ -42,6 +43,35 @@ struct ClientTelemetry {
     bool sessionUnavailable = false;
 };
 
+struct BitmapTelemetry {
+    bool seen = false;
+    uint32_t frame = 0;
+    uint8_t round = 0;
+    uint8_t accepted = 0;
+    uint8_t retries = 0;
+};
+
+struct MulticlientTelemetry {
+    LastReception peer;
+    uint32_t peerPeriodUs = 0;
+    uint32_t frame = 0;
+    uint32_t periodUs = 0;
+    uint32_t data = 0;
+    uint32_t retries = 0;
+    uint32_t accepted = 0;
+    uint32_t refused = 0;
+    uint32_t duplicates = 0;
+    uint32_t radioErrors = 0;
+    PayloadResult result = PayloadResult::NONE;
+    BitmapTelemetry bitmap;
+
+    LinkFreshness freshness(uint64_t now) const {
+        if (!peer.seen) return LinkFreshness::WAIT;
+        return now >= peer.atUs && now - peer.atUs < 2 * uint64_t(peerPeriodUs)
+            ? LinkFreshness::ONLINE : LinkFreshness::STALE;
+    }
+};
+
 struct DisplaySnapshot {
     DeviceConfig config;
     const char* configError = nullptr;
@@ -49,6 +79,9 @@ struct DisplaySnapshot {
     bool radioReady = false;
     GatewayTelemetry gateway;
     ClientTelemetry client;
+    MulticlientTelemetry multiclient;
+    bool searchingForBeacon = false;
+    uint8_t protocol = kProtocolVersion;
     uint32_t logDropped = 0;
 };
 }  // namespace adaptive_lora

@@ -5,7 +5,7 @@
 
 namespace adaptive_lora {
 // Exactly one instance in Esp32Firmware composition. RadioLib/SPI/GPIO stays
-// here; the ISR only latches a signal for the cooperative driver poll.
+// here; the ISR only latches a timestamp for the cooperative driver poll.
 class Sx1262Hardware final : public RadioHardware {
 public:
     Sx1262Hardware();
@@ -13,8 +13,9 @@ public:
     int16_t explicitHeader() override { return radio_.explicitHeader(); }
     int16_t setCRC(uint8_t length) override { return radio_.setCRC(length); }
     void enableDio1() override;
-    void clearIrqSignal() override { irq_ = false; }
+    void clearIrqSignal() override;
     bool irqSignalled() override;
+    bool takeIrqTimestampUs(uint64_t& timestamp) override;
     int16_t standby() override { return radio_.standby(); }
     int16_t startReceive() override;
     int16_t startTransmit(const uint8_t* bytes, size_t length) override { return radio_.startTransmit(bytes, length); }
@@ -28,7 +29,8 @@ public:
     uint32_t getTimeOnAir(size_t length) override { return radio_.getTimeOnAir(length); }
 private:
     static void IRAM_ATTR onDio1();
-    static volatile bool irq_;
+    static bool irq_;
+    static uint64_t irqTimeUs_;
     Module module_;
     SX1262 radio_;
 };

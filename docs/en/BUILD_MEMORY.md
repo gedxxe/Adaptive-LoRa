@@ -1361,3 +1361,350 @@ and injected radio events. No board, USB, NVS, RF output, application stack
 watermark, turnaround or oscillator drift was measured. Next, capture
 two-node v3 timing and loss recovery on the authorized bench. Use those
 measurements before designing gateway-controlled ADR activation and fallback.
+
+## Iteration 020.1 — Protocol v3 OLED integration
+
+2026-11-20. Created local branch `codex/iteration-020-1-multiclient-oled`
+from fetched Iteration 020 `75a99dfb0474680f90eb9d9685e5a079595f8e26`.
+Fetched main was `541e2e8b985f7cd67ca4d1f1af323c46aed4333e`.
+
+The pre-edit audit found that the OLED constructor path and status renderer
+were tied to the M2 coordinator. The display gate protected current TX and
+local M2 ACK wait. The v3 role can return to WAIT while peers still have
+DATA and retry windows, so that M2 gate cannot be reused. Existing Wire
+ownership, timeout, single-chunk service and GPIO sequencing were retained.
+
+`Esp32Firmware` owns the same OLED object before the combined runtime.
+`MulticlientLink` publishes validated receive, DATA, retry, payload and
+bitmap telemetry. It reports a quiet tail after the entire active calendar.
+`FirmwareRuntime` checks that tail and the IRQ latch after serial and again
+before the display service call. It latches a display fault above the 10 ms
+step budget. The renderer consumes a v3 `DisplaySnapshot` and the headless
+image uses the same protocol and role logic. See ADR-023 and the bilingual
+OLED diagnostics and startup guides. PHY and pins, v3 codec and calendar,
+reporting interval (3,000 ms), M2 timeout (1,000 ms), firmware version
+`0.2.0-alpha.1`, NVS schema 1 and thin `main.cpp` are preserved.
+
+| Final command | Exit | Result and transcript |
+|---|---:|---|
+| `pio run -e heltec_wifi_lora_32_V3` | 0 | PASS, `logs/build/iteration-020.1-verified-esp32.log` |
+| `pio run -e heltec_wifi_lora_32_V3_oled` | 0 | PASS, `logs/build/iteration-020.1-verified-oled.log` |
+| `pio run -e heltec_wifi_lora_32_V3_research` | 0 | PASS, `logs/build/iteration-020.1-verified-research.log` |
+| `pio run -e heltec_wifi_lora_32_V3_multiclient` | 0 | PASS, `logs/build/iteration-020.1-verified-multiclient.log` |
+| `pio run -e heltec_wifi_lora_32_V3_multiclient_oled` | 0 | PASS, `logs/build/iteration-020.1-final-multiclient-oled.log` |
+| `pio test -e native` | 0 | 354/354, `logs/test/iteration-020.1-verified-native.log` |
+| `pio test -e native_multiclient` | 0 | 3/3, `logs/test/iteration-020.1-verified-runtime.log` |
+| `pio test -e native_multiclient_oled` | 0 | 8/8, `logs/test/iteration-020.1-final-runtime-oled.log` |
+| `<PIO_PYTHON> -m unittest discover -s tools -p test_capture_bench.py -v` | 0 | 13/13, `logs/test/iteration-020.1-verified-capture.log` |
+| `<PIO_PYTHON> -m unittest discover -s tools -p test_tdma_feasibility.py -v` | 0 | 16/16, `logs/test/iteration-020.1-verified-model.log` |
+| `<PIO_PYTHON> -m unittest discover -s tools -p test_model_multiclient.py -v` | 0 | 3/3, `logs/test/iteration-020.1-verified-capacity-tests.log` |
+| `<PIO_PYTHON> -m unittest discover -s tools -p test_check_consistency.py -v` | 0 | 9/9, `logs/test/iteration-020.1-final-consistency-tests.log` |
+| `<PIO_PYTHON> tools/check_consistency.py` | 0 | PASS, `logs/test/iteration-020.1-final-consistency.log` |
+
+All cases selected by each environment passed. The combined suite includes
+the three headless runtime regressions plus five OLED-specific cases.
+No compiler warnings were reported by the final firmware checks.
+Earlier successful builds and host checks are preserved with the `release`,
+`nativecheck` and `verified` run labels. Transcripts normalize line endings
+and replace workspace, PlatformIO and user path prefixes. Raw streams
+remain in the ignored `.pio/iteration-020.1/` directory.
+
+The builds resolved PlatformIO Core 6.1.19, Espressif32 55.3.311, Arduino
+3.3.11, IDF libraries `5.5.5+sha.b774170ff46`, Xtensa `14.2.0+20260121`,
+and RadioLib 7.8.1. Static RAM / flash sizes were 32,592 / 347,124 B for
+v3 headless and 34,376 / 383,212 B for v3 OLED, a difference of 1,784 /
+36,088 B. M2, M2 OLED and v2 measured 32,184 / 342,872 B, 33,960 /
+377,532 B and 31,752 / 342,508 B, respectively.
+
+The host exercises v3 role and display behavior with virtual radio, clock
+and I²C events. No board was flashed, and no physical OLED, NVS, RF or
+timing evidence was collected. Compare v3 builds on the same boards and
+record OLED step time, SCL, NSS, DIO1, and scheduled packet outcomes.
+
+### Iteration 020.1 follow-up — Remove the headless firmware target
+
+2026-11-20. Removed `heltec_wifi_lora_32_V3_multiclient` from PlatformIO and
+the active English and Chinese instructions. `heltec_wifi_lora_32_V3_multiclient_oled`
+now extends the base board with both v3 and OLED flags. The before/after
+resolved options from `pio project config --json-output` match for every
+retained environment apart from the OLED inheritance declaration. The two generated cache trees for the
+retired target contained 44,217,074 and 13,029,370 bytes. Earlier build
+and test records remain intact. The application source and the two v3
+native test environments are unchanged.
+
+The v3 OLED build exited 0. Its linked size remains 34,376 bytes of RAM
+and 383,212 bytes of flash. Its SHA-256 changed on the full rebuild. See
+the hash comparison note in ERROR_LOG.md. Host results follow.
+
+| Command | Exit | Result and transcript |
+|---|---:|---|
+| `pio run -e heltec_wifi_lora_32_V3_multiclient_oled` | 0 | PASS, `logs/build/iteration-020.1-cleanup-multiclient-oled.log` |
+| `pio run -e heltec_wifi_lora_32_V3_research` | 0 | PASS, `logs/build/iteration-020.1-cleanup-research.log` |
+| `pio run -e heltec_wifi_lora_32_V3` | 0 | PASS, `logs/build/iteration-020.1-cleanup-esp32.log` |
+| `pio run -e heltec_wifi_lora_32_V3_oled` | 0 | PASS, `logs/build/iteration-020.1-cleanup-oled.log` |
+| `pio test -e native` | 0 | 354/354, `logs/test/iteration-020.1-cleanup-native.log` |
+| `pio test -e native_multiclient` | 0 | 3/3, `logs/test/iteration-020.1-cleanup-runtime.log` |
+| `pio test -e native_multiclient_oled` | 0 | 8/8, `logs/test/iteration-020.1-cleanup-runtime-oled.log` |
+| `<PIO_PYTHON> -m unittest discover -s tools -p test_capture_bench.py -v` | 0 | 13/13, `logs/test/iteration-020.1-cleanup-capture.log` |
+| `<PIO_PYTHON> -m unittest discover -s tools -p test_tdma_feasibility.py -v` | 0 | 16/16, `logs/test/iteration-020.1-cleanup-model.log` |
+| `<PIO_PYTHON> -m unittest discover -s tools -p test_model_multiclient.py -v` | 0 | 3/3, `logs/test/iteration-020.1-cleanup-capacity-tests.log` |
+| `<PIO_PYTHON> -m unittest discover -s tools -p test_check_consistency.py -v` | 0 | 9/9, `logs/test/iteration-020.1-cleanup-consistency-tests.log` |
+| `<PIO_PYTHON> tools/check_consistency.py` | 0 | PASS, `logs/test/iteration-020.1-cleanup-consistency.log` |
+
+No hardware was flashed or measured.
+
+### Iteration 020.1 follow-up — Show the Client OLED at boot
+
+2026-11-20. Branch `codex/iteration-020-1-multiclient-oled`, base
+`75a99dfb0474680f90eb9d9685e5a079595f8e26`. A host regression reproduced
+the dark Client display when beacon RX started before the first OLED draw.
+`FirmwareRuntime` now gives the configured v3 OLED Client up to 400 ms of
+radio standby at startup. The display draws the LINK page with `LAST WAIT`.
+Beacon RX starts after the display is ready, after a display fault, or at
+the startup deadline. After startup, the existing quiet-tail check still
+controls display writes.
+
+Three runtime cases cover startup without a beacon, timeout and I2C failure.
+The early-ACK case also checks that display writes stay out of radio windows.
+ADR-025 records the startup decision. ERR-033 links the original failure.
+Firmware `0.2.0-alpha.1`, Protocol v3, NVS schema 1 and the RF profile are
+unchanged. The v3 OLED build reports 34,384 bytes of static RAM and 383,476
+bytes of flash. Toolchain: PlatformIO Core 6.1.19, Espressif32 55.3.311,
+RadioLib 7.8.1, Arduino 3.3.11, ESP-IDF 5.5.5 and Xtensa GCC 14.2.0.
+
+| Command | Exit | Result and transcript |
+|---|---:|---|
+| `pio test -e native_multiclient_oled` (before fix) | 1 | New regression reproduced the Client startup failure, `logs/test/iteration-020.1-client-boot-repro-runtime-oled.log` |
+| `pio run -e heltec_wifi_lora_32_V3_multiclient_oled` | 0 | PASS, `logs/build/iteration-020.1-client-boot-multiclient-oled.log` |
+| `pio run -e heltec_wifi_lora_32_V3_research` | 0 | PASS, `logs/build/iteration-020.1-client-boot-research.log` |
+| `pio run -e heltec_wifi_lora_32_V3` | 0 | PASS, `logs/build/iteration-020.1-client-boot-esp32.log` |
+| `pio run -e heltec_wifi_lora_32_V3_oled` | 0 | PASS, `logs/build/iteration-020.1-client-boot-oled.log` |
+| `pio test -e native` | 0 | 354/354, `logs/test/iteration-020.1-client-boot-native.log` |
+| `pio test -e native_multiclient` | 0 | 3/3, `logs/test/iteration-020.1-client-boot-runtime.log` |
+| `pio test -e native_multiclient_oled` | 0 | 11/11, `logs/test/iteration-020.1-client-boot-runtime-oled.log` |
+| `<PIO_PYTHON> -m unittest discover -s tools -p test_capture_bench.py -v` | 0 | 13/13, `logs/test/iteration-020.1-client-boot-capture.log` |
+| `<PIO_PYTHON> -m unittest discover -s tools -p test_tdma_feasibility.py -v` | 0 | 16/16, `logs/test/iteration-020.1-client-boot-model.log` |
+| `<PIO_PYTHON> -m unittest discover -s tools -p test_model_multiclient.py -v` | 0 | 3/3, `logs/test/iteration-020.1-client-boot-capacity-tests.log` |
+| `<PIO_PYTHON> -m unittest discover -s tools -p test_check_consistency.py -v` | 0 | 9/9, `logs/test/iteration-020.1-client-boot-consistency-tests.log` |
+| `<PIO_PYTHON> tools/check_consistency.py` | 0 | PASS, `logs/test/iteration-020.1-client-boot-consistency.log` |
+
+Transcript paths use the existing placeholders for the local workspace,
+user and PlatformIO directories. No physical measurements were taken.
+On the bench, check the Client shows `LAST WAIT` on a cold boot with the
+Gateway off, then confirm beacon reception and the first accepted DATA ACK.
+
+### Iteration 020.1 follow-up — Reaudit OLED rotation and v3 retries
+
+2026-11-20. Branch `codex/iteration-020-1-multiclient-oled`, base
+`75a99dfb0474680f90eb9d9685e5a079595f8e26`. Reviewed OLED initialization,
+snapshot rendering, I²C chunking and the runtime gate. On the radio path,
+reviewed IRQ polling, beacon and grant anchors, session checks, payload
+identity, application delivery and aggregate feedback. Reproduced OLED
+page jumps and premature gateway retry acceptance (ERR-034 and ERR-035).
+
+`OledStatusDisplay` now advances one page after a complete repaint and its
+five-second dwell. It draws the title last and resumes a split repaint.
+`FirmwareRuntime` adds 150 ms to the default OLED gateway's derived
+superframe, giving an advertised period of 6,666 ms for eight 64-byte
+budgets. `MulticlientLink` requires timely TX_DONE before opening the
+corresponding gateway retry slots. ADR-026 and ADR-027 record the decisions.
+`src/main.cpp` remains the Arduino setup/loop delegate. No second v3
+firmware environment was added.
+
+Firmware 0.2.0-alpha.1, protocol v3, NVS schema 1, 915.0 MHz, the requested
+22 dBm TX power, 3,000 ms report default, 1,000 ms M2 ACK timeout and
+relative v3 slots remain as before. PlatformIO Core 6.1.19, Espressif32
+55.3.311, Arduino 3.3.11, ESP-IDF libraries 5.5.5, Xtensa GCC 14.2.0 and
+RadioLib 7.8.1. The v3 OLED build reports 34,400 bytes of static RAM
+and 383,936 bytes of flash. OLED page updates use fixed buffers. Runtime
+heap, stack high-water mark and physical timing were not measured.
+
+The first repro runs could not open the installed PlatformIO lock file
+(exit 1 each, `logs/test/iteration-020.1-page-retry-repro-runtime-oled.log`
+and `logs/test/iteration-020.1-page-retry-repro-link.log`). Approved
+toolchain access reached both expected baseline assertions (exit 1 each,
+`logs/test/iteration-020.1-page-retry-baseline-runtime-oled.log` and
+`logs/test/iteration-020.1-page-retry-baseline-link.log`). The first
+focused compile used a parameter attribute unsupported by the native
+compiler (exit 1 each, `logs/test/iteration-020.1-page-retry-focused-runtime-oled.log`
+and `logs/test/iteration-020.1-page-retry-focused-link.log`). The corrected
+focused checks passed (exit 0, 13/13 and 23/23,
+`logs/test/iteration-020.1-page-retry-focused2-runtime-oled.log` and
+`logs/test/iteration-020.1-page-retry-focused2-link.log`).
+
+| Final command | Exit | Result and transcript |
+|---|---:|---|
+| `pio run -e heltec_wifi_lora_32_V3_multiclient_oled` | 0 | PASS, `logs/build/iteration-020.1-page-retry-final-multiclient-oled.log` |
+| `pio run -e heltec_wifi_lora_32_V3_research` | 0 | PASS, `logs/build/iteration-020.1-page-retry-final-research.log` |
+| `pio run -e heltec_wifi_lora_32_V3` | 0 | PASS, `logs/build/iteration-020.1-page-retry-final-esp32.log` |
+| `pio run -e heltec_wifi_lora_32_V3_oled` | 0 | PASS, `logs/build/iteration-020.1-page-retry-final-oled.log` |
+| `pio test -e native` | 0 | 356/356, `logs/test/iteration-020.1-page-retry-final-native.log` |
+| `pio test -e native_multiclient` | 0 | 3/3, `logs/test/iteration-020.1-page-retry-final-runtime.log` |
+| `pio test -e native_multiclient_oled` | 0 | 13/13, `logs/test/iteration-020.1-page-retry-final-runtime-oled.log` |
+| `<PIO_PYTHON> -m unittest discover -s tools -p test_capture_bench.py -v` | 0 | 13/13, `logs/test/iteration-020.1-page-retry-final-capture.log` |
+| `<PIO_PYTHON> -m unittest discover -s tools -p test_tdma_feasibility.py -v` | 0 | 16/16, `logs/test/iteration-020.1-page-retry-final-model.log` |
+| `<PIO_PYTHON> -m unittest discover -s tools -p test_model_multiclient.py -v` | 0 | 3/3, `logs/test/iteration-020.1-page-retry-final-capacity-tests.log` |
+| `<PIO_PYTHON> -m unittest discover -s tools -p test_check_consistency.py -v` | 0 | 9/9, `logs/test/iteration-020.1-page-retry-final-consistency-tests.log` |
+| `<PIO_PYTHON> tools/check_consistency.py` | 0 | PASS, `logs/test/iteration-020.1-page-retry-final-consistency.log` |
+
+Tested role IDs were Gateway 1 and roster clients 2 through 9. The full
+roster OLED tests used a simulated one-millisecond I²C transfer. The
+runtime tests check all phases against the guard, while the network tests
+exercise beacon, grant, and feedback loss, repeated delivery and reboots.
+Transcript paths sanitize the local workspace, user and PlatformIO
+directories. No flashing, NVS mutation or physical measurement was
+performed. On the bench, boot both roles with the same v3 OLED build
+and compare page order and the `OLED_STATUS`, `V3_LINK_STATUS` and
+`V3_PAYLOAD_RESULT` records over several superframes. Actual airtime,
+transition latency and drift remain to be measured.
+
+### Iteration 020.1 follow-up — Keep the OLED active after loss of Gateway
+
+2026-11-20. Branch `codex/iteration-020-1-multiclient-oled`, base
+`75a99dfb0474680f90eb9d9685e5a079595f8e26`. The operator reported an OLED
+freeze while the Gateway was powered off. The v3 runtime repro preserved
+peer slots after the initial ACK, then observed zero title changes during
+a 30-second simulated outage. It also reproduced stale display gating
+after failed Gateway beacon TX and an I²C error that never recovered.
+The focused tests exposed a second renderer defect in the unused suffix
+of the v3 title. See ERR-036 through ERR-038 and ADR-028.
+
+`MulticlientLink` now expires the Client's TX calendar after the expected
+beacon RX completion plus 25 ms. It retains the accepted session identity
+and unsent queued bytes. The Client stays in RX and accepts a new valid
+beacon. The Gateway keeps possible peer windows protected on control TX
+failure, then permits display work in the available tail. `FirmwareRuntime`
+checks IRQs between chunks and adds 250 ms to the default automatic OLED
+calendar, advertising 6,766 ms. `OledStatusDisplay` rotates offline, marks
+each page SEARCH, draws only the NUL-terminated text, and attempts a
+reset/redraw after a two-second backoff from a display fault. Recovery
+keeps an initialized bus and Vext up. Build and test documentation was
+aligned in both languages. Arduino setup/loop remains in the thin
+`src/main.cpp` delegate.
+
+Versions stay at firmware 0.2.0-alpha.1, v3 wire, NVS schema 1 and RadioLib
+7.8.1. The PHY stays at 915.0 MHz with 22 dBm requested TX power. The
+3,000 ms report default, M2 ACK timeout and relative v3 slots are unchanged.
+PlatformIO Core 6.1.19, Espressif32 55.3.311, Arduino 3.3.11, ESP-IDF
+libraries 5.5.5, Xtensa GCC 14.2.0. The OLED build uses 34,400 bytes of
+static RAM and 384,464 bytes of flash. Runtime heap and physical timing
+were not measured.
+
+The baseline and full repro ran `pio test -e native_multiclient_oled`
+and exited 1 with five failing assertions each
+(`logs/test/iteration-020.1-outage-baseline-runtime-oled.log` and
+`logs/test/iteration-020.1-outage-repro-runtime-oled.log`). The focused
+tests exposed the stale page expectation and the title suffix issue,
+with exit 1 in `logs/test/iteration-020.1-outage-focused-runtime-oled.log`,
+`logs/test/iteration-020.1-outage-focused2-runtime-oled.log` and
+`logs/test/iteration-020.1-outage-focused3-runtime-oled.log`. The separate
+`pio test -e native -f test_multiclient_link` exited 0 with 23/23
+(`logs/test/iteration-020.1-outage-focused-link.log`).
+
+| Final command | Exit | Result and transcript |
+|---|---:|---|
+| `pio run -e heltec_wifi_lora_32_V3_multiclient_oled` | 0 | PASS, `logs/build/iteration-020.1-outage-final-multiclient-oled.log` |
+| `pio run -e heltec_wifi_lora_32_V3_research` | 0 | PASS, `logs/build/iteration-020.1-outage-final-research.log` |
+| `pio run -e heltec_wifi_lora_32_V3` | 0 | PASS, `logs/build/iteration-020.1-outage-final-esp32.log` |
+| `pio run -e heltec_wifi_lora_32_V3_oled` | 0 | PASS, `logs/build/iteration-020.1-outage-final-oled.log` |
+| `pio test -e native` | 0 | 356/356, `logs/test/iteration-020.1-outage-final-native.log` |
+| `pio test -e native_multiclient` | 0 | 3/3, `logs/test/iteration-020.1-outage-final-runtime.log` |
+| `pio test -e native_multiclient_oled` | 0 | 15/15, `logs/test/iteration-020.1-outage-final-runtime-oled.log` |
+| `<PIO_PYTHON> -m unittest discover -s tools -p test_capture_bench.py -v` | 0 | 13/13, `logs/test/iteration-020.1-outage-final-capture.log` |
+| `<PIO_PYTHON> -m unittest discover -s tools -p test_tdma_feasibility.py -v` | 0 | 16/16, `logs/test/iteration-020.1-outage-final-model.log` |
+| `<PIO_PYTHON> -m unittest discover -s tools -p test_model_multiclient.py -v` | 0 | 3/3, `logs/test/iteration-020.1-outage-final-capacity-tests.log` |
+| `<PIO_PYTHON> -m unittest discover -s tools -p test_check_consistency.py -v` | 0 | 9/9, `logs/test/iteration-020.1-outage-final-consistency-tests.log` |
+| `<PIO_PYTHON> tools/check_consistency.py` | 0 | PASS, `logs/test/iteration-020.1-outage-final-consistency.log` |
+
+Gateway ID 1 and Client ID 2 exercised outage and recovery. The full
+roster ran with IDs 2 through 9, 64-byte budgets and simulated 3 ms I²C
+transfers. Wire and radio tests used host adapters. Transcript paths
+replace workspace, user and PlatformIO directories with placeholders.
+No boards were flashed, powered down or measured in this iteration.
+Next bench check: with both boards already exchanging valid DATA and ACK
+and the Client on page 3, turn off the Gateway for 30 seconds. Check that
+the Client continues rotating, shows SEARCH and reaches STALE. Restore
+Gateway power and confirm that the Client resynchronizes and receives
+an ACK without restarting.
+
+### Iteration 021 — Radio timing and one-Gateway, eight-Client research baseline
+
+2026-11-21. Continued `codex/iteration-020-1-multiclient-oled` from
+`75a99dfb0474680f90eb9d9685e5a079595f8e26` with the existing local work.
+Reviewed the four local papers and updated the research traceability matrix.
+The operator reported about 5 m of added reach and intermittent stale
+status in the separate SF9/CR 4/6 trial. Raw capture was unavailable.
+
+`Sx1262Hardware` latches DIO1 time with a short cross-core critical
+section. `RadioDriver` attaches that time or uses poll-entry time.
+`MulticlientLink` uses completion time for receive validation and the
+Beacon/Grant anchors, and still uses current time to authorize TX.
+`FirmwareRuntime` gives the driver a 64-bit timer value.
+`MulticlientLink` also emits per-client samples after final bitmap
+completion. `tools/adr_shadow.py` performs offline, session-separated
+evaluation with experiment-supplied thresholds and hysteresis.
+
+The default build is `heltec_wifi_lora_32_V3_multiclient`, with an
+integrated display. Removed retired target names from the active
+PlatformIO and local VS Code configuration and discarded their generated
+dependency caches. The two legacy comparison profiles remain. The
+main entry point remains a thin delegate. Earlier repository logs and
+the separate benchmark workspace retain their original evidence.
+
+The development roster uses Gateway 1 and Clients 2–9 with a 64-byte
+budget each. The default period is 6,766 ms, including 250 ms display
+margin. Firmware 0.2.0-alpha.1, v3 wire, NVS schema 1, and the active
+915.0 MHz / SF7 / BW125 / CR4/5 profile are unchanged. RadioLib 7.8.1,
+Espressif32 55.3.311, Arduino 3.3.11, ESP-IDF libraries 5.5.5, and
+Xtensa GCC 14.2.0. The v3 image uses 34,536 bytes of static RAM and
+385,460 bytes of flash. No new RTOS task, dynamic PHY or packet type.
+
+| Command | Exit | Result and transcript |
+|---|---:|---|
+| `pio run -e heltec_wifi_lora_32_V3_multiclient` | 0 | PASS, `logs/build/iteration-021-check-heltec_wifi_lora_32_V3_multiclient.log` |
+| `pio run -e heltec_wifi_lora_32_V3` | 0 | PASS, `logs/build/iteration-021-check-heltec_wifi_lora_32_V3.log` |
+| `pio run -e heltec_wifi_lora_32_V3_research` | 0 | PASS, `logs/build/iteration-021-check-heltec_wifi_lora_32_V3_research.log` |
+| `pio test -e native` | 0 | 356/356, `logs/test/iteration-021-check-native.log` |
+| `pio test -e native_multiclient` | 0 | 15/15, `logs/test/iteration-021-check-native_multiclient.log` |
+| `pio test -e native -f test_multiclient_link` | 0 | 23/23, `logs/test/iteration-021-final-eight-multiclient-link.log` |
+| `<PIO_PYTHON> -m unittest discover -s tools -p test_capture_bench.py -v` | 0 | 13/13, `logs/test/iteration-021-check-test_capture_bench.log` |
+| `<PIO_PYTHON> -m unittest discover -s tools -p test_tdma_feasibility.py -v` | 0 | 16/16, `logs/test/iteration-021-check-test_tdma_feasibility.log` |
+| `<PIO_PYTHON> -m unittest discover -s tools -p test_model_multiclient.py -v` | 0 | 3/3, `logs/test/iteration-021-check-test_model_multiclient.log` |
+| `<PIO_PYTHON> -m unittest discover -s tools -p test_adr_shadow.py -v` | 0 | 5/5, `logs/test/iteration-021-delivery-test_adr_shadow.log` |
+| `<PIO_PYTHON> -m unittest discover -s tools -p test_check_consistency.py -v` | 0 | 10/10, `logs/test/iteration-021-delivery-test_check_consistency.log` |
+| `<PIO_PYTHON> tools/check_consistency.py` | 0 | PASS, `logs/test/iteration-021-delivery-consistency.log` |
+
+The runner invokes PlatformIO as `<PIO_PYTHON> -m platformio` and
+substitutes placeholders for local paths in transcripts. In the timing
+cases the fake hardware reports a 30 ms delay between capture and
+handling. The final focused run includes eight clients each submitting
+64 bytes and checks delivery and per-client sample records. The focused
+23 cases overlap the full native suite.
+
+Physical test results for this iteration are NOT RUN. The 50 ms guard
+remains experimental. RadioLib BUSY and flash/serial dependence on
+synchronous SDK calls remain open. Before on-air ADR, measure launch,
+re-arm, IRQ service and oscillator drift with the development roster.
+Use both directions of the logged evidence when selecting the recovery
+and versioned switching procedure.
+
+### Iteration 021 publication review
+
+Earlier workshop and dependency logs retain their original results.
+The publication set includes referenced transcripts and Iteration 021
+build and test records. Seven local transcript copies had absolute
+interpreter or home-directory paths replaced by placeholders. Their
+byte-identical originals are retained privately in the ignored workspace
+cache. Intermediate transcripts outside the publication set, local
+research PDFs, board binaries and benchmark files remain local.
+
+Before publication, fetched GitHub `main` at
+`541e2e8b985f7cd67ca4d1f1af323c46aed4333e` and confirmed it is an ancestor
+of the candidate history. Rechecked the default firmware with
+`pio run -e heltec_wifi_lora_32_V3_multiclient` (exit 0,
+`logs/build/iteration-021-publication-heltec_wifi_lora_32_V3_multiclient.log`).
+The publication checks reran `python -m unittest discover -s tools -p
+test_adr_shadow.py -v` (5/5), `python -m unittest discover -s tools -p
+test_check_consistency.py -v` (10/10) and `python tools/check_consistency.py`
+(PASS). All exited 0. The transcripts share the
+`logs/test/iteration-021-publication-` prefix.

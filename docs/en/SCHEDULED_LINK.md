@@ -2,10 +2,11 @@
 
 ## Multi-client protocol v3
 
-Build `heltec_wifi_lora_32_V3_multiclient` on both roles. It uses SF7 for
+Build `heltec_wifi_lora_32_V3_multiclient` for both roles. It uses SF7 for
 every phase and reports `profile=multiclient, protocol=3` in `status`. The
 [startup guide](STARTUP_AND_PROVISIONING.md) covers role selection and
-gateway admission. Use the v2 environment described below for legacy tests.
+gateway admission. See [display diagnostics](DISPLAY_DIAGNOSTICS.md) for display
+telemetry and refresh scheduling. Use the v2 environment below for legacy tests.
 
 ### Wire format
 
@@ -38,8 +39,9 @@ and v3 decoders each accept their own wire version.
 Each beacon lists eligible clients in fixed order. Clients with pending data
 send length requests in their individual request slots. After receiving the
 requests, the gateway broadcasts an exact-length grant. An empty request
-phase produces no grant. The gateway and clients use serviced Beacon and
-Grant completion timestamps as local phase anchors. They reject stale
+phase produces no grant. The gateway and clients anchor Beacon and Grant
+to the DIO1 completion timestamp, with poll-entry time as a fallback when
+only the pin level is available. They reject stale
 beacons, retire the last gateway session after expiry, and require a current
 grant to send DATA. A valid beacon and grant supply one frame of permission.
 
@@ -53,17 +55,26 @@ the four longest active slots, or all slots if fewer than four are active.
 Before and after every aggregate ACK, the calendar inserts `G`. A launch
 must begin within the first `G/4` of its slot. The receiver checks the
 completion around expected airtime using the half-open `[-G/2, +G/2)` window.
-The gateway abandons a late control completion whose remaining phases would
+Radio launch decisions use current processing time even if an event was
+captured earlier. The gateway abandons a late control completion whose remaining phases would
 extend into the next beacon.
 
 Admission computes the worst-case roster reservation before starting. A zero
 period in `include/research_roster.h` selects the reservation rounded up to
 milliseconds, with a floor of the **1,000 ms** target and a **10,000 ms** cap.
 An explicit period must fit the reservation. The supplied eight-client table
-with 64-byte budgets selects **6,516 ms**. Only requested lengths enter the
-active DATA calendar. Both periods are separate from the **3,000 ms** report
-default and the **1,000 ms** M2 ACK timeout. The example source has one pending
-report per board, so an application may observe a slower on-air cadence.
+with 64-byte budgets requires **6,516 ms** for the radio. The v3 display gateway
+adds **250 ms** to its automatically derived period when this fits under the
+cap. The supplied table therefore advertises **6,766 ms**. Only requested
+lengths enter the active DATA calendar. The superframe is separate from the
+**3,000 ms** report default and the **1,000 ms** M2 ACK timeout. The example
+source has one pending report per board, so an application may observe a
+slower on-air cadence.
+
+If a Client misses the next beacon completion window, it stops using
+the expired slot calendar and keeps RX active. An unsent payload stays
+queued. A sent payload whose acceptance remains unknown completes as UNKNOWN.
+The previous beacon identity is retained for replay and session checks.
 
 ### Payload ownership and outcomes
 
@@ -93,6 +104,28 @@ retries to a client when many peers are missing. A client that misses the ACK
 does not know its next slot and stays silent until a later valid grant. A
 later cumulative ACK can still confirm previously accepted DATA. Four
 feedback rounds are emitted for an active frame to support this recovery.
+On the gateway, the retry mask takes effect only after TX_DONE for that
+frame and feedback round, before the next retry slots start.
+
+### Link adaptation experiments
+
+After the final bitmap completes, the gateway emits `V3_LINK_SAMPLE`
+for each granted client. It records first-slot delivery, retry delivery
+or no valid DATA, plus RSSI, SNR and application acceptance where available.
+Frames with a detected local radio failure or missed feedback deadline
+are excluded. A missed packet can also mean the client never received
+its grant, so this uplink record needs to be compared with the client log.
+
+Run `python tools/adr_shadow.py --help` to supply the observation size,
+first-pass delivery target, two SNR thresholds and hysteresis windows.
+The tool keeps Gateway and Client boot sessions separate, handles exact
+duplicates, and reports mean RSSI alongside candidates based on SNR and
+first-pass delivery. It uses
+explicit observations only. Missing log lines do not become packet loss.
+Suggested SF changes must fit the actual airtime and retry calendar.
+The on-air profile stays at SF7. On-air changes require a versioned,
+acknowledged plan, a common recovery channel/profile and measured retune
+and processing costs for the SX1262.
 
 ### Ten-second analytical capacity
 
@@ -129,7 +162,7 @@ role selects the gateway or client. `status` reports `profile=scheduled` and
 `config set hello-interval-ms 10000` on both boards. Config storage and the
 115200 baud console are shared with M2. An incompatible role/ID or interval
 that cannot fit the schedule leaves the radio disabled. The scheduled build
-has no OLED or protocol negotiation. Two nodes on separate wire profiles may
+has no display or protocol negotiation. Two nodes on separate wire profiles may
 still contend for airtime, so use one profile per bench session.
 
 ## Wire layout

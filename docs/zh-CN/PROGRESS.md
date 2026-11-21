@@ -1,7 +1,31 @@
 # 开发进度
 
 <!-- current-state:start -->
-## 当前状态 — Iteration 020
+## 当前状态 — Iteration 021
+
+本地 屏幕 集成分支从已发布的 Iteration 020 提交
+`75a99dfb0474680f90eb9d9685e5a079595f8e26` 开始。
+
+| 项目 | 当前证据 |
+|---|---|
+| 固件 / 协议 | `0.2.0-alpha.1` / `3` |
+| 硬件 | Heltec WiFi LoRa 32 V3.4，ESP32-S3/SX1262，V3.2 电气参考 |
+| ESP32 构建 | `heltec_wifi_lora_32_V3_multiclient` 和两套旧版对照镜像均通过。 |
+| 开发名单 | Gateway 1、Client 2–9，每个 Client 预留 64 字节。超帧周期为 6766 ms。 |
+| 时序 | Beacon 和授权以无线完成时间戳为锚点，发射启动仍使用当前处理时间。 |
+| ADR 研究 | Gateway 记录各 Client 首轮收到、重传收到或未收到；离线工具使用实验提供的阈值。 |
+| Host | 356/356 项 native 回归、15/15 项 v3 运行时测试、23/23 项最终 v3 链路专项测试 |
+| Physical acceptance | IN PROGRESS; NOT RUN |
+
+PHY、NVS schema、上报周期、M2 ACK 超时、v3 线格式和相对无线时隙保持原样。
+镜像选择见 [启动指南](STARTUP_AND_PROVISIONING.md)，
+Client 开始监听前最多预留 400 ms 绘制 WAIT。屏幕含义见 [屏幕 诊断](DISPLAY_DIAGNOSTICS.md)，
+完整回归见 [构建记录](../en/BUILD_MEMORY.md)。
+操作者报告独立 SF9/CR 4/6 实验约增加五米，期间仍偶发 STALE。暂无原始采集日志可分析。
+v3 开发镜像使用 SF7。
+<!-- current-state:end -->
+
+## Iteration 020 历史快照
 
 `codex/iteration-020-multiclient-payload-scheduling` 接续已发布的 Iteration 019
 `979d873fad629aedcdf0e8a565b4ad3681bbea61`。规范 `main` 仍为
@@ -22,7 +46,6 @@
 反馈只向欠缺位置分配共享重传。十节点在模型假设下满足十秒预算，固件当前接纳上限
 为八个。未操作或测量实物。见 [启动指南](STARTUP_AND_PROVISIONING.md)、
 [定时协议](SCHEDULED_LINK.md) 和 [构建记录](../en/BUILD_MEMORY.md)。
-<!-- current-state:end -->
 
 ## Iteration 019 历史快照
 

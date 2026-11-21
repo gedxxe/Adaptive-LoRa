@@ -11,17 +11,17 @@ Adaptive-LoRa 是独立的单射频 LoRa P2P 网络研究与嵌入式固件项�
 
 ## 研究范围和当前状态
 
-默认镜像运行 M0–M2 HELLO/ACK。可选 `heltec_wifi_lora_32_V3_multiclient` 使用
-协议 v3，支持最多八个 Client、按实际长度授权 DATA、累计位图和定时重传。
-`heltec_wifi_lora_32_V3_research` 保留单 Client v2 链路。所有节点使用同一协议，
-ADR 仍在计划中。见 [启动指南](docs/zh-CN/STARTUP_AND_PROVISIONING.md) 和 [定时链路规范](docs/zh-CN/SCHEDULED_LINK.md)。
+默认 `heltec_wifi_lora_32_V3_multiclient` 使用协议 v3，支持八个 Client、
+按实际长度授权 DATA、累计位图和定时重传。保留 v1 HELLO/ACK 与单 Client v2 供对照。
+Gateway 为离线 ADR 分析记录每个 Client 的上行证据。网络内各节点使用同一固定 PHY。
+见 [启动指南](docs/zh-CN/STARTUP_AND_PROVISIONING.md) 和 [定时链路规范](docs/zh-CN/SCHEDULED_LINK.md)。
 
 | 证据 | 当前基线 |
 |---|---|
-| 固件 / 协议 | `0.2.0-alpha.1` / `1` |
+| 固件 / 协议 | `0.2.0-alpha.1` / `3` |
 | ESP32 编译与 Native 测试 | 见 [当前验证记录](docs/zh-CN/PROGRESS.md) |
 | 采集、模型及文档检查 | 见 [构建记录](docs/en/BUILD_MEMORY.md) |
-| 已实现 | M2 HELLO/ACK、可选 OLED、单 Client v2 与多 Client v3 |
+| 已实现 | v3 TDMA、按长度授权、累计确认和共享重传 |
 | 实物 NVS/重启/SPI/IRQ/RF/天线 | NOT VERIFIED |
 
 Host 执行实际 Client/Gateway 状态机，使用有界 fake transport、时钟及串口适配。丢包、延迟、对象重建、radio 返回码与 IRQ 输入均不等于实测，见 [driver 审查](docs/zh-CN/RADIO_DRIVER_AUDIT.md)。精确证据见 [进度](docs/zh-CN/PROGRESS.md)、[软件审查](docs/zh-CN/SOFTWARE_AUDIT.md) 及英文 [BUILD_MEMORY](docs/en/BUILD_MEMORY.md)。
@@ -51,21 +51,12 @@ RadioTransport 引用分离 app 与 RadioDriver 状态策略；非拥有 RadioHa
 安装 PlatformIO Core 和支持 C++17 的 host 编译器，在根目录执行：
 
 ```sh
-pio run -e heltec_wifi_lora_32_V3
-pio run -e heltec_wifi_lora_32_V3_oled
+pio run -e heltec_wifi_lora_32_V3_multiclient
 pio test -e native
+pio test -e native_multiclient
 ```
 
 目标为 Arduino / heltec_wifi_lora_32_V3，RadioLib7.8.1。已有Core6.1.19、pioarduino/espressif32 55.03.311和Arduino3.3.11/IDF5.5.5保持，使用Xtensa GCC14.2.0；host GCC6.3.0、native1.2.1、Unity2.6.1。platform尚未固定，其他机器须记录实际依赖；hash清单和日志标识各次验证快照。
-
-## OLED 诊断
-
-默认构建关闭显示。OLED 候选使用 V3 参考 SSD1306 0x3C、GPIO17/18/21 与低有效
-Vext GPIO36，实物核对后再使用。显示交替呈现链路和计数。WAIT 为无有效接收，
-ONLINE 为 Gateway 最近有效 HELLO 或 Client 接受 ACK 尚在两倍间隔加 1 秒 ACK 窗口内，
-仅表示近期有有效接收。两板均设 3000 ms 时，距上次有效接收满 7 秒进入 STALE。
-缺失指标显示 N/A。串口 status 提供 OLED 状态
-及 I²C 和刷新总线时间最大值，Gateway ACK 开始与完成分开统计。
 
 ## 配置与后续实物流程
 
@@ -75,7 +66,7 @@ ONLINE 为 Gateway 最近有效 HELLO 或 Client 接受 ACK 尚在两倍间隔�
 计算。已有 NVS 值须明确修改后才会改变。
 
 首轮 M2 联通检查在两板均执行 `config set hello-interval-ms 3000`，保存并重启后用
-`status` 核对。Gateway 使用该间隔判断 OLED 新鲜度。初始 network/node/gateway 为
+`status` 核对。Gateway 使用该间隔判断 屏幕 新鲜度。初始 network/node/gateway 为
 Gateway 1/1/1、Client 1/2/1；角色命令不修改 ID，应全部明确设置。config show 显示暂存值，status 显示启动加载值。Network 1–65535，node/gateway 1–65534。实物流程见 [BENCH_RUNBOOK](docs/zh-CN/BENCH_RUNBOOK.md) 和 [模板](logs/test/RUN_RECORD_TEMPLATE.md)；当前没有烧录或 RF 验证。
 
 ## 开发路线

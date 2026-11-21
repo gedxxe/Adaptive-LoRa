@@ -1,0 +1,31 @@
+Verbosity level can be increased via `-v, -vv, or -vvv` option
+Collected 15 tests
+
+Processing test_multiclient_runtime in native_multiclient_oled environment
+--------------------------------------------------------------------------------
+Building...
+Testing...
+test\test_multiclient_runtime\test_main.cpp:599: runtime_client_submits_arbitrary_bytes_to_actual_driver	[PASSED]
+test\test_multiclient_runtime\test_main.cpp:600: runtime_gateway_delivers_binary_to_its_real_application_boundary	[PASSED]
+test\test_multiclient_runtime\test_main.cpp:601: runtime_fail_safe_for_missing_config_or_gateway_id_in_roster	[PASSED]
+test\test_multiclient_runtime\test_main.cpp:603: v3_oled_rotates_in_order_after_skipped_refresh_windows	[PASSED]
+test\test_multiclient_runtime\test_main.cpp:604: v3_client_draws_boot_screen_before_listening_for_beacons	[PASSED]
+test\test_multiclient_runtime\test_main.cpp:605: v3_client_starts_listening_at_oled_startup_deadline	[PASSED]
+test\test_multiclient_runtime\test_main.cpp:606: v3_client_starts_listening_after_oled_bus_failure	[PASSED]
+test\test_multiclient_runtime\test_main.cpp:607: v3_oled_renders_link_data_and_bitmap	[PASSED]
+test\test_multiclient_runtime\test_main.cpp:608: v3_gateway_defers_all_i2c_until_after_final_feedback_and_protects_beacon	[PASSED]
+test\test_multiclient_runtime\test_main.cpp:609: v3_client_repaints_after_full_roster_calendar	[PASSED]
+test\test_multiclient_runtime\test_main.cpp:475: v3_client_protects_peer_slots_then_refreshes_and_recovers_after_outage: Expected 6 Was 7	[FAILED]
+test\test_multiclient_runtime\test_main.cpp:611: v3_gateway_oled_progresses_when_beacon_launch_fails	[PASSED]
+test\test_multiclient_runtime\test_main.cpp:612: v3_oled_recovers_from_transient_i2c_error_during_beacon_search	[PASSED]
+test\test_multiclient_runtime\test_main.cpp:613: v3_oled_overrun_disables_display_and_preserves_provisioning	[PASSED]
+test\test_multiclient_runtime\test_main.cpp:614: v3_gateway_keeps_next_beacon_after_oled_overrun_in_quiet_tail	[PASSED]
+Program received signal CTRL_BREAK_EVENT (None)
+- native_multiclient_oled:test_multiclient_runtime [ERRORED] Took 2.76 seconds -
+
+=================================== SUMMARY ===================================
+Environment              Test                      Status    Duration
+-----------------------  ------------------------  --------  ------------
+native_multiclient_oled  test_multiclient_runtime  ERRORED   00:00:02.765
+
+============ 16 test cases: 1 failed, 14 succeeded in 00:00:02.765 ============

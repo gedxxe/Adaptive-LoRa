@@ -1,0 +1,19 @@
+Verbosity level can be increased via `-v, -vv, or -vvv` option
+Collected 15 tests
+
+Processing test_multiclient_runtime in native_multiclient_oled environment
+--------------------------------------------------------------------------------
+Building...
+src\common\diagnostics\oled_status_display.cpp:84:94: error: 'maybe_unused' attribute directive ignored [-Werror=attributes]
+ OledText formatOledStatus(const DisplaySnapshot& s, uint64_t nowUs, [[maybe_unused]] uint8_t v3Page) {
+                                                                                              ^~~~~~
+cc1plus.exe: all warnings being treated as errors
+*** [.pio\build\native_multiclient_oled\src\common\diagnostics\oled_status_display.o] Error 1
+Building stage has failed, see errors above. Use `pio test -vvv` option to enable verbose output.
+- native_multiclient_oled:test_multiclient_runtime [ERRORED] Took 2.34 seconds -
+
+=================================== SUMMARY ===================================
+Environment              Test                      Status    Duration
+-----------------------  ------------------------  --------  ------------
+native_multiclient_oled  test_multiclient_runtime  ERRORED   00:00:02.338
+================== 1 test cases: 0 succeeded in 00:00:02.338 ==================

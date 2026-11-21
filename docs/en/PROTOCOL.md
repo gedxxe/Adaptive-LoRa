@@ -2,11 +2,11 @@
 
 ## 1. Protocol scope
 
-Adaptive-LoRa uses a custom LoRa P2P protocol. The default and OLED builds
-use v1 HELLO/ACK. The single-client research build uses v2. The multi-client build uses v3.
-Both are specified in [SCHEDULED_LINK.md](SCHEDULED_LINK.md). Each
-decoder accepts its own version and types only. `PROTOCOL_VERSION` tracks
-the default v1 wire format. Firmware version and NVS schema are shared.
+Adaptive-LoRa uses a custom LoRa P2P protocol. The default build uses v3.
+The legacy builds use v1 HELLO/ACK and v2 single-client TDMA. The scheduled
+profiles are specified in [SCHEDULED_LINK.md](SCHEDULED_LINK.md). Each
+decoder accepts its own version and types. `PROTOCOL_VERSION` tracks
+the original v1 wire format. Firmware version and NVS schema are shared.
 
 The saved role selects Gateway or Client in each image. FirmwareRuntime
 services one RadioDriver; Sx1262Hardware owns the peripheral and latches
@@ -184,7 +184,7 @@ phase or slot boundary. The current driver has no such retune path.
 
 ## 12. Protocol versioning
 
-`PROTOCOL_VERSION` describes the default M2 wire format. The scheduled
+`PROTOCOL_VERSION` describes the legacy M2 wire format. The scheduled
 builds declare v2 in `scheduled_protocol.h` and v3 in `multiclient_protocol.h`. It is independent of
 firmware SemVer, `config_version`, and `schedule_version`.
 

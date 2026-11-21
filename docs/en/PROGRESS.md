@@ -1,7 +1,33 @@
 # Development progress
 
 <!-- current-state:start -->
-## Current state — Iteration 020
+## Current state — Iteration 021
+
+Development continues from published Iteration 020
+`75a99dfb0474680f90eb9d9685e5a079595f8e26` with the local display and link fixes.
+
+| Item | Current evidence |
+|---|---|
+| Firmware / protocol | `0.2.0-alpha.1` / `3` |
+| Board | Heltec WiFi LoRa 32 V3.4, ESP32-S3/SX1262, V3.2 electrical reference |
+| ESP32 build | `heltec_wifi_lora_32_V3_multiclient` passed. Both legacy comparison images also passed. |
+| Development roster | Gateway 1, Clients 2–9, each with a 64-byte budget. The advertised period is 6,766 ms. |
+| Timing | Beacon and grant anchors use radio completion timestamps. Slot launches still use current time. |
+| ADR research | The gateway records per-client first delivery, retry or miss. The offline evaluator uses experiment-supplied thresholds. |
+| Host | 356/356 native regressions, 15/15 v3 runtime cases, and 23/23 in the final focused v3 link run |
+| Physical acceptance | IN PROGRESS; NOT RUN |
+
+The PHY, NVS schema, report interval, M2 ACK timeout, v3 wire layout and
+relative radio slots are unchanged. Use the [startup guide](STARTUP_AND_PROVISIONING.md)
+to choose a build and the [display guide](DISPLAY_DIAGNOSTICS.md) to interpret the screen.
+Client boot reserves up to 400 ms for a WAIT screen before beacon RX.
+The operator reported about five metres of additional reach in a separate
+SF9/CR 4/6 experiment, with intermittent stale status. No raw capture was
+supplied for timing or range analysis. The v3 development target uses SF7.
+See [build memory](BUILD_MEMORY.md) for the full regression record.
+<!-- current-state:end -->
+
+## Historical snapshot — Iteration 020
 
 `codex/iteration-020-multiclient-payload-scheduling` stacks on the published
 Iteration 019 commit `979d873fad629aedcdf0e8a565b4ad3681bbea61`. The main
@@ -24,7 +50,6 @@ to missing clients. A ten-client extrapolation fits the ten-second budget
 under the model assumptions. The firmware admits up to eight. No physical
 test or measurement was taken. See the [startup guide](STARTUP_AND_PROVISIONING.md),
 [wire specification](SCHEDULED_LINK.md) and [build memory](BUILD_MEMORY.md).
-<!-- current-state:end -->
 
 ## Historical snapshot — Iteration 019
 

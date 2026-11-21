@@ -53,8 +53,17 @@ void test_header_and_crc_failures_stop_driver_initialization() {
 }
 void test_dio_callback_only_latches_until_consumed() {
     Sx1262Hardware h; h.clearIrqSignal(); h.enableDio1(); const auto before = state().traceLength;
+    const uint64_t when = uint64_t(UINT32_MAX) + 5;
+    host_clock::set(when);
     state().callback(); TEST_ASSERT_TRUE(h.irqSignalled());
-    TEST_ASSERT_EQUAL_UINT(before, state().traceLength); h.clearIrqSignal(); TEST_ASSERT_FALSE(h.irqSignalled());
+    host_clock::set(when + 20);
+    state().callback();
+    uint64_t timestamp = 0;
+    TEST_ASSERT_TRUE(h.takeIrqTimestampUs(timestamp));
+    TEST_ASSERT_EQUAL_UINT64(when, timestamp);
+    TEST_ASSERT_FALSE(h.takeIrqTimestampUs(timestamp));
+    TEST_ASSERT_EQUAL_UINT(before, state().traceLength);
+    TEST_ASSERT_FALSE(h.irqSignalled());
 }
 void test_dio_level_survives_software_latch_clear() {
     Sx1262Hardware h; h.clearIrqSignal(); state().dioHigh = true;

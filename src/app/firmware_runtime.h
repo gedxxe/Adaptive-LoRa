@@ -1,4 +1,7 @@
 #pragma once
+#if defined(ADAPTIVE_LORA_MULTICLIENT) && !defined(ADAPTIVE_LORA_OLED)
+#error "The v3 firmware requires the board display"
+#endif
 #if __has_include(<optional>)
 #include <optional>
 #else
@@ -28,11 +31,15 @@ class FirmwareRuntime {
 public:
 #if defined(ADAPTIVE_LORA_MULTICLIENT)
     FirmwareRuntime(ConfigStorage& storage, RadioHardware& hardware, bool example = false,
-                    PayloadPort::Receiver receiver = nullptr, void* context = nullptr)
+                    PayloadPort::Receiver receiver = nullptr, void* context = nullptr,
+                    OledStatusDisplay* display = nullptr)
         : store_(storage), radio_(hardware), payload_(receiver ? receiver : receivePayload,
-                                                     receiver ? context : this), example_(example) {}
+                                                     receiver ? context : this), example_(example), display_(display) {}
     SubmitResult submitPayload(const uint8_t* bytes, size_t length);
     PayloadResult payloadResult() const { return payload_.result(); }
+#if defined(ADAPTIVE_LORA_OLED)
+    bool safeToRefreshDisplay(uint64_t now) const;
+#endif
 #else
     FirmwareRuntime(ConfigStorage& storage, RadioHardware& hardware,
                     OledStatusDisplay* display = nullptr)
@@ -65,13 +72,15 @@ private:
     bool rebootPending_ = false;
     bool rebootStopped_ = false;
     uint32_t rebootAt_ = 0;
-#if !defined(ADAPTIVE_LORA_MULTICLIENT)
     OledStatusDisplay* display_;
-#endif
 #if defined(ADAPTIVE_LORA_OLED)
-    void serviceDisplay();
+    void serviceDisplay(uint64_t now);
     bool displayReadyLogged_ = false;
     bool displayErrorLogged_ = false;
+#if defined(ADAPTIVE_LORA_MULTICLIENT)
+    uint32_t worstDisplayStepUs_ = 0;
+    uint64_t clientDisplayUntil_ = 0;
+#endif
 #endif
 };
 }

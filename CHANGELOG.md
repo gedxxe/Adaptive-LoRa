@@ -5,6 +5,30 @@ changes. It is not a substitute for the append-only build memory.
 
 ## Unreleased
 
+### Multiclient timing and link adaptation research
+
+- Make `heltec_wifi_lora_32_V3_multiclient` the default development image.
+- Anchor v3 slots to radio completion and preserve current-time launch deadlines.
+- Record per-client uplink evidence and add a configurable offline ADR evaluator.
+
+### Protocol v3 OLED diagnostics — 2026-11-20
+
+- Keep Client pages turning in beacon search and show `SEARCH` on every page.
+  Preserve continuous RX and resume the handshake on a valid beacon.
+- Give the automatic v3 OLED calendar 250 ms of display margin, and retry
+  display initialization after transient I²C faults. Correct the v3 page title
+  rendering so leftover characters cannot force an unchanged row to redraw.
+- Use a single v3 firmware target with OLED. Show v3 link, payload and
+  aggregate ACK telemetry on three pages.
+- Refresh within the protected quiet tail of an active schedule. Poll for
+  radio IRQs between display steps in beacon search.
+- Give a v3 client a bounded startup window to show `WAIT` before listening
+  for beacons. Begin listening at the deadline or after an OLED fault.
+- Rotate v3 pages in order and start the dwell time after each completed
+  repaint.
+- Open v3 retry slots only after the gateway confirms the corresponding
+  bitmap transmission in time for the retry round.
+
 ### Multi-client scheduled research link — 2026-11-20
 
 - Add an opt-in v3 image for up to eight scheduled clients. Gateway grants

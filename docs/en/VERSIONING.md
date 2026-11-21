@@ -34,7 +34,7 @@ milestone is complete.
 
 ## 3. Protocol version
 
-`PROTOCOL_VERSION` records the default M2 protocol, currently `1`. The
+`PROTOCOL_VERSION` records the legacy M2 protocol, currently `1`. The
 separate `heltec_wifi_lora_32_V3_research` image uses version `2`, declared in
 `scheduled_protocol.h`. `heltec_wifi_lora_32_V3_multiclient` uses version `3`
 from `multiclient_protocol.h`. Each profile rejects other wire versions.

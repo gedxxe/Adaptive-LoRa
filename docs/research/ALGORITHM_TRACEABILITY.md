@@ -1,5 +1,23 @@
 # Research-to-code traceability
 
+## Iteration 021: one Gateway and eight Clients
+
+The selected source sections describe different gateway capabilities.
+The table records the mechanisms carried into this single-SX1262 design
+and the evidence collected for each.
+
+| Reference | Mechanism in the project | Evidence and limit |
+|---|---|---|
+| R1, TS-VP-LoRa §§3.1–3.3 | Beacon and grant completion timestamps anchor serial slots. Request length determines DATA airtime. | The runtime tests introduce a 30 ms service delay after an on-time radio event. Actual timestamp and turnaround error still need measurement. Parallel SF planes and channel hopping require a different receiver/calendar. |
+| R2, Soy §§3–4 | Obtain per-client link evidence and vary candidate SF in an offline evaluation. Our evidence comes from Gateway uplinks and explicitly distinguishes first delivery, retry and no valid DATA. | The analyzer tests independent sessions and configurable hysteresis. This is a different measurement direction from Soy's node-local downlink RSSI decision. Single-radio retuning still needs a versioned agreement, coordinated airtime and a recovery profile. |
+| R3, LoRaHART §§3, 5–6 | Serialize Gateway RX and bitmap TX. Pack four shared retry slots per retry phase. | The test network exercises all eight 64-byte clients and checks that grants, DATA, feedback and retry traffic never overlap. Concentrator packing and LMAC are outside the current MAC. |
+| R4, ATS-LoRa §III | Derive a worst-case period from the roster, then form the active DATA calendar from exact-length grants. | The eight-client reservation model and host cases bound current software admission. The geographical allocation and adaptive frame size of ATS-LoRa remain comparison points. |
+
+The next experiment measures control and data completion, TX preparation,
+RX re-arm and drift with one Gateway and eight Clients. Compare first-pass
+delivery, total delivery after retries, ACK agreement, airtime and timing
+misses before assigning retune costs or choosing ADR thresholds.
+
 ## Iteration 020 multi-client firmware
 
 ![Implementation diagram of the v3 superframe and bitmap](figures/v3-superframe.svg)

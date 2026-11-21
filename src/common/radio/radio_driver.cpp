@@ -47,11 +47,11 @@ int16_t RadioDriver::stop() {
     state_ = code == radio_status::none ? State::IDLE : State::FAULT;
     return code;
 }
-RadioEvent RadioDriver::poll(uint32_t now) {
+RadioEvent RadioDriver::poll(uint64_t nowUs) {
     RadioEvent event;
     if (state_ != State::TX && state_ != State::RX) return event;
     // Deadline must also run when DIO1 is stuck high or IRQ reads return no TX_DONE.
-    if (state_ == State::TX && deadlineReached(now, txDeadline_)) {
+    if (state_ == State::TX && deadlineReached(static_cast<uint32_t>(nowUs), txDeadline_)) {
         const int16_t stopped = stop();
         event.type = RadioEventType::ERROR;
         event.code = stopped ? stopped : radio_status::txTimeout;
@@ -59,8 +59,11 @@ RadioEvent RadioDriver::poll(uint32_t now) {
     }
     // A high DIO1 also catches an edge arriving while the flag is consumed.
     const bool signalled = hardware_.irqSignalled();
-    hardware_.clearIrqSignal();
-    if (!signalled) return event;
+    uint64_t timestamp = nowUs;
+    const bool captured = hardware_.takeIrqTimestampUs(timestamp);
+    if (!signalled && !captured) return event;
+    event.hasCompletionTime = true;
+    event.completionUs = timestamp;
     // This RadioLib getter has no error return; zero/irrelevant flags are ignored.
     const uint32_t flags = hardware_.getIrqFlags();
     if (state_ == State::TX) {

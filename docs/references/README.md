@@ -1,12 +1,12 @@
 # Adaptive-LoRa research references
 
 The four references inform the project’s single-radio schedule and link
-adaptation research. The default firmware exchanges M2 HELLO and unicast ACK.
-The v2 research profile implements one-client TDMA and bitmap retries. The
-v3 profile adds exact-length grants, an application payload boundary and
-aggregate feedback for up to eight clients.
+adaptation research. The default v3 profile provides exact-length grants,
+aggregate feedback and shared retries for one Gateway and up to eight Clients.
+The M2 and v2 images provide HELLO/ACK and one-client TDMA comparators.
 The [traceability matrix](../research/ALGORITHM_TRACEABILITY.md) maps each
-mechanism to its adaptation and software evidence. ADR remains planned.
+mechanism to its adaptation and software evidence. ADR recommendations are
+evaluated offline from captured samples.
 
 The [figure source register](FIGURE_SOURCE_REGISTER.md) gives the exact
 captions, page indices, printed pages, licenses and asset provenance. The
@@ -34,7 +34,7 @@ adopts beacon-referenced scheduling and budgets time for the payload and
 guard. The proposed gateway serializes radio operations on one SX1262.
 Parallel payload/SF planes and channel hopping are excluded from that design.
 R1 evaluates its scheme in simulation and its comparison does not schedule
-data ACKs. Beacon and slot scheduling in Adaptive-LoRa are **Planned**.
+data ACKs. Adaptive-LoRa implements beacon-anchored, exact-length slots.
 
 ## R2 · Blind ADR with distributed TDMA
 
@@ -55,11 +55,10 @@ Figures 5–6 show modeled RSSI and SF variation with distance.
 ![Project illustration comparing beacon RSSI selection with gateway-controlled adaptation](figures/blind-adr/blind-adr-sf-selection-redrawn.svg)
 
 Both SVGs are project illustrations based on R2 §§3–4. Adaptive-LoRa uses
-RSSI as one input to a future gateway decision, alongside SNR and delivery
-evidence. It proposes a versioned profile change with a common control
-PHY and experimental thresholds. Independent node SF selection, published
-distance thresholds and randomized slots are **Not adopted**. Conservative
-ADR is **Planned**. The displayed diagrams contain no paper measurements.
+gateway uplink RSSI, SNR and delivery evidence for offline analysis. A
+versioned on-air change with a common control PHY is planned. The
+node-local SF choice, distance thresholds and randomized slots describe
+the reference system. The diagrams contain no paper measurements.
 
 ## R3 · LoRaHART
 
@@ -91,9 +90,8 @@ TDMA, then transmits the aggregate ACK before an LMAC retransmission phase.
 Figure 3, printed p. 10:10. A bit records the outcome for a node. Adaptive-LoRa
 binds bits to a versioned schedule order, and reserves deterministic retry
 opportunities for missing or unknown outcomes. It has one SX1262, so it uses
-serialized uplinks and profile transitions. LoRaHART’s concentrator packing and
-opportunistic CSMA are **Not adopted**. The bitmap and deterministic selective
-retry are **Planned**.
+serialized uplinks, cumulative feedback and assigned retries. LoRaHART’s
+concentrator packing and opportunistic CSMA are outside this design.
 
 Figures 1–3 are raster crops of the original diagrams, with page margins and
 captions removed. © S. R. Sahoo, A. Gamage, N. Kumar and A. Easwaran, ECRTS

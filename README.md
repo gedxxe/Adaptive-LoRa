@@ -11,18 +11,18 @@ Adaptive-LoRa is an independent research and embedded firmware project for priva
 
 ## Research scope and current status
 
-The default build runs the M0–M2 HELLO/ACK link. The opt-in
-`heltec_wifi_lora_32_V3_multiclient` build runs protocol v3 with up to eight
+The default `heltec_wifi_lora_32_V3_multiclient` build runs protocol v3 with eight
 clients, exact-length DATA slots, aggregate feedback and deterministic
-retries. `heltec_wifi_lora_32_V3_research` retains the v2 single-client link.
-Use one protocol profile across the network. ADR remains planned.
+retries. The M2 HELLO/ACK and v2 single-client profiles remain available for
+comparison. The gateway records per-client uplink evidence for offline ADR
+analysis. All nodes in the v3 network use the same fixed PHY.
 See the [startup guide](docs/en/STARTUP_AND_PROVISIONING.md) and [wire specification](docs/en/SCHEDULED_LINK.md).
 
 | Evidence | Current baseline |
 |---|---|
-| Firmware / protocol | `0.2.0-alpha.1` / `1` |
+| Firmware / protocol | `0.2.0-alpha.1` / `3` |
 | ESP32 compilation and native tests | See the [current verification record](docs/en/PROGRESS.md) |
-| Implemented | M2 HELLO/ACK, optional OLED, legacy v2 schedule and multi-client v3 payload delivery |
+| Implemented | v3 TDMA, exact-length grants, aggregate feedback and shared retries |
 | Capture, model and documentation verification | See [build memory](docs/en/BUILD_MEMORY.md) |
 | Physical NVS/reboot/SPI/IRQ/RF/antenna | NOT VERIFIED; M0–M2 acceptance IN PROGRESS |
 
@@ -98,9 +98,9 @@ Adaptive-LoRa/
 Install PlatformIO Core and a native C++17-capable host toolchain, then run from the repository root:
 
 ```sh
-pio run -e heltec_wifi_lora_32_V3
-pio run -e heltec_wifi_lora_32_V3_oled
+pio run -e heltec_wifi_lora_32_V3_multiclient
 pio test -e native
+pio test -e native_multiclient
 ```
 
 The firmware uses `heltec_wifi_lora_32_V3` with Arduino and RadioLib 7.8.1.
@@ -122,20 +122,6 @@ The checker derives current versions and the firmware environment from source fi
 it excludes archived records. The analytical scenario report contains 216 cases
 with unmeasured timing costs left explicit. Neither is a physical test.
 
-## OLED diagnostics
-
-The default environment omits OLED I/O. The opt-in environment uses the V3
-SSD1306 reference at 0x3C, GPIO17/18/21 and active-low Vext GPIO36. Verify
-those details on the V3.4 boards before using the candidate image.
-
-The OLED alternates link and counter pages. WAIT means no qualifying reception.
-ONLINE means a qualifying HELLO at the gateway or an accepted ACK at the client
-within two configured HELLO intervals plus the 1-second ACK window. It
-indicates recent receive activity. With 3,000 ms on both boards, STALE
-begins at 7 seconds without a qualifying reception.
-Missing metrics show N/A. Serial `status` reports display state and maximum
-I²C and refresh bus time. Gateway ACK starts and completions are separate.
-
 ## Provisioning and future bench procedure
 
 At 115200 baud, use `help`, `status`, `config show`, the `config set`
@@ -147,7 +133,7 @@ superframe from the gateway roster. Existing NVS values persist until changed.
 
 For the M2 link check, run `config set hello-interval-ms 3000` on **both** boards,
 save, reboot and confirm the loaded value with `status`. The gateway uses its
-interval for OLED freshness. Initial IDs (network/node/gateway) are gateway
+interval for display freshness. Initial IDs (network/node/gateway) are gateway
 `1/1/1` and client `1/2/1`. Set all IDs explicitly; role edits preserve IDs. `config show` is staged state, `status` is loaded state. Network IDs are 1–65535; node/gateway IDs are 1–65534. Start with one-board Windows enumeration and private same-board ROM backups.
 See the [bench runbook](docs/en/BENCH_RUNBOOK.md) and [run-record template](logs/test/RUN_RECORD_TEMPLATE.md). Physical acceptance is pending. Radiated tests require an
 authorized RF setup.
@@ -155,7 +141,7 @@ authorized RF setup.
 ## Development roadmap
 
 1. Finish software verification and resolve dependency timing/allocation assumptions within M0–M2.
-2. Verify each delivered board, then measure NVS/reboot, pins, supply, IRQ, OLED timing and the authorized two-device HELLO/ACK link.
+2. Verify each delivered board, then measure NVS/reboot, pins, supply, IRQ, display timing and the authorized two-device HELLO/ACK link.
 3. Measure radio transitions and clock drift with the v3 research build, then verify the guard, shared retries and loss recovery before expanding the roster.
 4. M4–M6: bitmap/selective retry, versioned conservative ADR and synchronization recovery, with fault tests before physical acceptance.
 5. M7–M8: controlled reference-vs-Moxon evaluation and explicitly labelled logical-node simulations.

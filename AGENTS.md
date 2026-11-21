@@ -14,8 +14,8 @@ owner confirms V3.2 wiring and pin mapping and reports SMT and crystal
 improvements. Use the V3.2 schematic and Arduino V3 variant as references.
 Verify each board's physical SKU, antenna and peripheral behavior at the
 bench. Do not assume PSRAM.
-Build environment: `heltec_wifi_lora_32_V3`, Arduino/C++17, with
-`jgromes/RadioLib@7.8.1`. Firmware `0.2.0-alpha.1`, protocol `1`, NVS schema `1`.
+Default environment: `heltec_wifi_lora_32_V3_multiclient`, Arduino/C++17,
+with `jgromes/RadioLib@7.8.1`. Firmware `0.2.0-alpha.1`, protocol `3`, NVS schema `1`.
 Authoritative versions/settings are VERSION, PROTOCOL_VERSION,
 include/project_config.h and platformio.ini; resolved package versions and
 actual test results belong in [PROGRESS.md](docs/en/PROGRESS.md).
@@ -23,9 +23,9 @@ actual test results belong in [PROGRESS.md](docs/en/PROGRESS.md).
 The fixed-PHY M0–M2 HELLO/ACK firmware exists and has host/build evidence.
 **M0–M2 physical acceptance is IN PROGRESS.** Confirm the physical SKU,
 electrical behavior, flash/NVS, supply and timing at the bench. Iteration 020
-adds an opt-in v3 research profile with up to eight clients, variable-length
+adds the v3 research profile with up to eight clients, variable-length
 application payloads, aggregate feedback and shared retry slots. The v2
-single-client image remains available. ADR remains planned. Historical
+single-client image remains available. ADR analysis is offline. Historical
 records retain their original hardware and results.
 
 ## Read before editing
@@ -53,8 +53,7 @@ instructions. Do not update old logs or historical results to match this target.
 Pins and PHY belong in include/board_pins.h and include/radio_config.h.
 The V3 reference uses GPIO 8/9/10/11/12/13/14 for NSS/SCK/MOSI/MISO/RESET/BUSY/DIO1.
 DIO2 controls the RF switch; DIO3 supplies the 1.8 V TCXO. Pass oscillator and
-DC-DC selection explicitly. The OLED candidate uses the Arduino variant’s OLED and Vext aliases in the
-opt-in `heltec_wifi_lora_32_V3_oled` build. Verify GPIO17/18/21/36, Vext
+DC-DC selection explicitly. Verify GPIO17/18/21/36, Vext
 polarity and SSD1306/0x3C before using it on the delivered boards. Preserve
 other pin reservations in HARDWARE.md.
 
@@ -91,11 +90,11 @@ and ARCHITECTURE; do not write per-packet telemetry to NVS.
 | ScheduledLink | Opt-in v2 role state machines and one-client schedule through RadioTransport |
 | MulticlientLink / PayloadPort | v3 roster admission, exact-length grants, shared retries and bounded application delivery |
 | RadioDriver | Sole radio state/deadline/error policy through RadioHardware |
-| Sx1262Hardware | Sole Module/SX1262/SPI/GPIO owner; ISR only sets a minimal flag |
+| Sx1262Hardware | Owns SX1262, SPI and GPIO, and latches radio IRQ timestamps |
 | NvsConfigStore | Load/save/verify policy through non-owning ConfigStorage |
 | PreferencesConfigStorage | Sole Preferences/NVS adapter |
 | DeviceConfig / FrameCodec / SequenceTracker | Pure validation, explicit serialization and bounded session history |
-| OledStatusDisplay | Optional SSD1306 diagnostics using runtime snapshots after radio service |
+| OledStatusDisplay | SSD1306 diagnostics after radio service |
 | ProvisioningConsole / SerialLogger | Bounded command parsing / queued diagnostics; no radio ownership |
 
 Test actual production modules through existing low-level seams; never copy
@@ -111,12 +110,18 @@ error classifications and NVS namespace/key/schema/blob compatibility.
 ACK must match the outstanding client source/boot/sequence and deadline.
 The default reporting interval is 3 s and M2 ACK timeout is 1 s. Persisted
 intervals remain active until changed. The v3 superframe targets 1 s and
-admission derives a feasible period up to 10 s independently. Scheduled
-retries reuse identity and payload in assigned slots. The eight-session,
+admission derives a feasible period up to 10 s independently. The display
+gateway adds 250 ms to its derived period when the radio reservation leaves
+room under that cap. Scheduled retries reuse identity and payload in
+assigned slots. The eight-session,
 64-sequence volatile cache is bounded M2 behavior, not a 70-client or reboot
 replay guarantee. Do not enlarge/change it without milestone justification.
 
 Use monotonic, wrap-safe deadlines within the half-range of their timer type.
+V3 display work uses the runtime's quiet-tail check. Protect peer retry
+slots and the expected beacon window even after the local transaction ends.
+Keep RX armed and poll between display chunks while searching for a beacon. See
+[display diagnostics](docs/en/DISPLAY_DIAGNOSTICS.md).
 Keep application hot paths allocation-free and avoid Arduino String,
 blocking delays, unbounded parsing and ISR SPI/logging/allocation. Check
 return codes and lengths. Dependency calls may still block: ERR-021 BUSY
@@ -129,7 +134,7 @@ third-party libraries or add abstractions speculatively.
 Next: enumerate one terminated board at a time in Windows, make verified
 same-board private backups, and follow the bench runbook. Set
 `config set hello-interval-ms 3000` on both roles for the M2 link check and
-OLED freshness. See the [startup guide](docs/en/STARTUP_AND_PROVISIONING.md).
+Display freshness. See the [startup guide](docs/en/STARTUP_AND_PROVISIONING.md).
 Measure transitions, IRQ latency, processing and drift before closing M3/M4
 acceptance. The [research calendars](docs/en/SCHEDULED_LINK.md) use
 experimental guards. PHY switching and ADR require a versioned agreement
@@ -146,13 +151,13 @@ Before reporting a coding iteration complete, run and check exit codes:
 
 ```sh
 pio run -e heltec_wifi_lora_32_V3
-pio run -e heltec_wifi_lora_32_V3_oled
 pio run -e heltec_wifi_lora_32_V3_research
 pio run -e heltec_wifi_lora_32_V3_multiclient
 pio test -e native
 pio test -e native_multiclient
 python -m unittest discover -s tools -p test_capture_bench.py -v
 python -m unittest discover -s tools -p test_tdma_feasibility.py -v
+python -m unittest discover -s tools -p test_adr_shadow.py -v
 python -m unittest discover -s tools -p test_model_multiclient.py -v
 python -m unittest discover -s tools -p test_check_consistency.py -v
 python tools/check_consistency.py

@@ -55,12 +55,16 @@ tasks rather than separate, drifting codebases.
     serial input and drain diagnostics. Dependency calls can wait synchronously;
     cooperative state machines do not establish a hard loop-time bound.
 
-In the OLED build, Esp32Firmware owns the display before the runtime. The
-runtime starts OLED power/reset sequencing even for invalid configuration.
-It takes snapshots after primary loop work and skips OLED service during TX,
+In the display build, Esp32Firmware owns the display before the runtime. The
+runtime starts display power/reset sequencing even for invalid configuration.
+It takes snapshots after primary loop work and skips display service during TX,
 client ACK wait and reboot. Application snapshots provide counters and the
-last qualifying reception; OLED never changes radio, application or NVS state.
-A failed OLED operation latches a display fault and produces a one-time event.
+last qualifying reception; display never changes radio, application or NVS state.
+A failed display operation produces a display fault event. In the v3 build,
+the display can retry after a delay. The runtime uses `MulticlientLink`
+telemetry, checks for a quiet tail while scheduled, and polls RX between
+display steps while the Client searches for a beacon. See
+[display diagnostics](DISPLAY_DIAGNOSTICS.md) for the runtime guard and fault policy.
 
 A configuration schema mismatch must not be interpreted as a valid role.
 Provide a clear diagnostic and require re-provisioning or a deliberate
@@ -179,7 +183,7 @@ echoed identity.
 
 ## 7. Scheduled MAC flow
 
-The opt-in v3 image uses beacon, length request, exact grant, DATA and
+The default v3 image uses beacon, length request, exact grant, DATA and
 aggregate feedback phases with up to three assigned retries. `PayloadPort`
 copies client bytes and invokes a bounded gateway receiver. The v2 image
 continues to provide its single-client protocol. `FirmwareRuntime` supplies the maintained monotonic
@@ -195,8 +199,8 @@ window. The gateway owns one SX1262, so these phases are time-multiplexed.
 
 The V3 board environment selects ESP32-S3, CP2102/UART0 at115200 and
 CDC_ON_BOOT=0. The sole radio adapter uses GPIO8-14, DIO3 TCXO1.8 V,
-DIO2 RF switching and DC-DC. OLED is optional in the M2 image. Battery
-sensing, Wi-Fi and backhaul are outside the firmware. The driver retains header/CRC reassertions and all
+DIO2 RF switching and DC-DC. Battery sensing, Wi-Fi and backhaul are
+outside the firmware. The driver retains header/CRC reassertions and all
 existing deadlines/error priority. Its dependency calls can still block;
 ERR-021 is not fixed by selecting SX1262.
 

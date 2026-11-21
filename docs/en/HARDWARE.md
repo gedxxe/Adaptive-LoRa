@@ -7,11 +7,11 @@ improvements to SMT implementation and the crystal oscillator. The V3.2
 schematic remains the electrical reference for these boards.
 
 The manufacturer V3 family lists ESP32-S3FN8, SX1262, 8 MB flash, CP2102 and
-a 128 × 64 OLED. The published revision diagrams provide the V3.2 reference
+a 128 × 64 display. The published revision diagrams provide the V3.2 reference
 and the installed Arduino V3 variant supplies the build pin aliases. The
 owner confirmation identifies the research hardware. Physical SKU labels,
 antenna markings/band/matching, board continuity, oscillator behavior,
-USB/flash, supply and OLED behavior remain to be checked directly. No physical
+USB/flash, supply and display behavior remain to be checked directly. No physical
 measurement or board capture is recorded.
 
 Sources: [Heltec V3.2 schematic](https://s.heltec.cn/download/WiFi_LoRa_32_V3/WiFi_LoRa_32_V3.2_Schematic_Diagram.pdf),
@@ -26,13 +26,13 @@ V3.2 schematic and source details in their original context.
 | Identity and PCB | Heltec V3 family | Front/back markings, layout, MCU and radio package markings, SKU and matching network |
 | Radio SPI and interrupt | V3.2 schematic and installed variant. NSS 8, SCK 9, MOSI 10, MISO 11, RESET 12, BUSY 13, DIO1 14 (variant alias DIO0) | Compare nets and observe reset, BUSY and DIO1 with high-impedance probes |
 | Oscillator and PA path | V3.2 reference has DIO3 TCXO at 1.8 V, DC-DC regulator and DIO2 RF switch | Verify oscillator marking/voltage, populated regulator and switch path |
-| OLED | V3 source selects SSD1306 128 × 64 at 7-bit 0x3C. Variant OLED aliases are SDA 17, SCL 18, RESET 21 | Check reset and bus routing, address ACK and working panel. A bus ACK alone identifies an address, not the controller |
-| Vext | V3.2 switched LDO, GPIO36 active low. Radio uses VDD_3V3 and OLED uses Vext | Confirm off/on polarity and rail settling before enabling OLED firmware |
+| display | V3 source selects SSD1306 128 × 64 at 7-bit 0x3C. Variant display aliases are SDA 17, SCL 18, RESET 21 | Check reset and bus routing, address ACK and working panel. A bus ACK alone identifies an address, not the controller |
+| Vext | V3.2 switched LDO, GPIO36 active low. Radio uses VDD_3V3 and display uses Vext | Confirm off/on polarity and rail settling before enabling display firmware |
 | USB and flash | V3 reference CP2102/UART0 TX43/RX44, 8 MB flash | Enumerate one board at a time, verify ROM identity/flash/security/layout |
 | RF connector and antennas | V3 reference IPEX 1.0. Heltec offers several frequency variants | Verify each connector, RF SKU, monopole markings/band and matching |
 
 The installed Arduino-ESP32 3.3.11 `heltec_wifi_lora_32_V3` variant defines
-OLED aliases separately from default `Wire` pins 41/42. The optional OLED
+Display aliases separately from default `Wire` pins 41/42. The display
 build uses the aliases explicitly and asserts their values at compile time.
 No existing radio pin constants were edited. Keep board/peripheral pin and
 power assignments under their current owners. Reserve LED35, battery

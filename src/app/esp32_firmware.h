@@ -19,9 +19,11 @@ private:
     Sx1262Hardware radioHardware_;
 #if defined(ADAPTIVE_LORA_OLED)
     OledStatusDisplay display_;
+#if defined(ADAPTIVE_LORA_MULTICLIENT)
+    FirmwareRuntime runtime_{configStorage_, radioHardware_, true, nullptr, nullptr, &display_};
+#else
     FirmwareRuntime runtime_{configStorage_, radioHardware_, &display_};
-#elif defined(ADAPTIVE_LORA_MULTICLIENT)
-    FirmwareRuntime runtime_{configStorage_, radioHardware_, true};  // Enable the bench example source.
+#endif
 #else
     FirmwareRuntime runtime_{configStorage_, radioHardware_};
 #endif

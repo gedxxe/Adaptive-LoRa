@@ -38,13 +38,21 @@ def check(root):
     config = configparser.ConfigParser()
     config.read(root / "platformio.ini", encoding="utf-8")
     firmware = (root / "VERSION").read_text(encoding="utf-8").strip()
-    protocol = (root / "PROTOCOL_VERSION").read_text(encoding="utf-8").strip()
+    legacy_protocol = (root / "PROTOCOL_VERSION").read_text(encoding="utf-8").strip()
+    protocol = APPROVED_SETTINGS["src/common/protocol/multiclient_protocol.h"]["kVersion"]
     environment = config["platformio"]["default_envs"].strip()
     environments = {name[4:] for name in config.sections() if name.startswith("env:")}
-    if environment not in environments or config[f"env:{environment}"].get("board") != environment:
+    board = "heltec_wifi_lora_32_V3"
+    base = config[f"env:{board}"]
+    if (environment != board + "_multiclient" or environment not in environments
+            or config[f"env:{environment}"].get("extends") != f"env:{board}" or base.get("board") != board):
         errors.append("platformio.ini: default firmware environment/board mismatch")
-    if "jgromes/RadioLib@7.8.1" not in config[f"env:{environment}"].get("lib_deps", ""):
+    if "jgromes/RadioLib@7.8.1" not in base.get("lib_deps", ""):
         errors.append("platformio.ini: RadioLib must remain pinned to 7.8.1")
+    if (environment in environments
+            and ("ADAPTIVE_LORA_MULTICLIENT=1" not in config[f"env:{environment}"].get("build_flags", "")
+                 or "ADAPTIVE_LORA_OLED=1" not in base.get("build_flags", ""))):
+        errors.append("platformio.ini: default firmware must include v3 and the board display")
     for name, settings in APPROVED_SETTINGS.items():
         contents = (root / name).read_text(encoding="utf-8")
         for key, value in settings.items():
@@ -57,7 +65,7 @@ def check(root):
     header = (root / "include/project_config.h").read_text(encoding="utf-8")
     if not re.search(r'kFirmwareVersion\[\]\s*=\s*"' + re.escape(firmware) + '"', header):
         errors.append("project_config.h: firmware version differs from VERSION")
-    if not re.search(r"kProtocolVersion\s*=\s*" + re.escape(protocol) + r"\s*;", header):
+    if not re.search(r"kProtocolVersion\s*=\s*" + re.escape(legacy_protocol) + r"\s*;", header):
         errors.append("project_config.h: protocol version differs from PROTOCOL_VERSION")
     adapter = (root / "src/common/radio/sx1262_hardware.h").read_text(encoding="utf-8")
     composition = (root / "src/app/esp32_firmware.h").read_text(encoding="utf-8")
@@ -75,7 +83,7 @@ def check(root):
         if name == "AGENTS.md":
             role_protocol = re.search(r"\bprotocol `([^`]+)`", text)
             if not role_protocol or role_protocol.group(1) != protocol:
-                errors.append(f"{name}: current protocol differs from PROTOCOL_VERSION")
+                errors.append(f"{name}: current protocol differs from the v3 profile")
         if environment not in text or "SX1262" not in text:
             errors.append(f"{name}: current board environment or radio missing")
         for found in re.findall(r"pio run -e ([A-Za-z0-9_]+)", text):

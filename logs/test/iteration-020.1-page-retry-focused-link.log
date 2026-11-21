@@ -1,0 +1,21 @@
+Verbosity level can be increased via `-v, -vv, or -vvv` option
+Collected 15 tests
+
+Processing test_multiclient_link in native environment
+--------------------------------------------------------------------------------
+Building...
+src\common\diagnostics\oled_status_display.cpp:84:94: error: 'maybe_unused' attribute directive ignored [-Werror=attributes]
+ OledText formatOledStatus(const DisplaySnapshot& s, uint64_t nowUs, [[maybe_unused]] uint8_t v3Page) {
+                                                                                              ^~~~~~
+src\common\diagnostics\oled_status_display.cpp: In function 'adaptive_lora::OledText adaptive_lora::formatOledStatus(const adaptive_lora::DisplaySnapshot&, uint64_t, uint8_t)':
+src\common\diagnostics\oled_status_display.cpp:84:94: error: unused parameter 'v3Page' [-Werror=unused-parameter]
+cc1plus.exe: all warnings being treated as errors
+*** [.pio\build\native\src\common\diagnostics\oled_status_display.o] Error 1
+Building stage has failed, see errors above. Use `pio test -vvv` option to enable verbose output.
+----------- native:test_multiclient_link [ERRORED] Took 2.91 seconds -----------
+
+=================================== SUMMARY ===================================
+Environment    Test                   Status    Duration
+-------------  ---------------------  --------  ------------
+native         test_multiclient_link  ERRORED   00:00:02.912
+================== 1 test cases: 0 succeeded in 00:00:02.912 ==================
