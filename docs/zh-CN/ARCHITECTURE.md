@@ -1,26 +1,24 @@
 # 系统架构
 
-## 当前Heltec目标
+## 当前 Heltec 目标
 
 两块 Heltec WiFi LoRa 32 V3.4 配 ESP32-S3/SX1262。用户确认沿用 V3.2 布线，
 编译使用 Arduino V3 variant，电气参考为 V3.2 原理图。
-Esp32Firmware先拥有PreferencesConfigStorage和Sx1262Hardware，再构造引用它们的FirmwareRuntime。
-每种镜像通过 NVS 选择角色。默认 v1 镜像运行 GatewayApp 或 ClientApp；研究 v2 镜像由
-FirmwareRuntime 选择 ScheduledLink 的角色路径。配置无效时进入配置模式并禁止发射。
-main.cpp仍为15行构造和setup/loop委托。
+`Esp32Firmware` 持有 `PreferencesConfigStorage` 和 `Sx1262Hardware`，并将它们交给
+`FirmwareRuntime`。同一镜像可用于 Gateway 和 Client，运行时根据 NVS schema 1 中的角色
+和节点 ID 选择路径。默认 v3 镜像运行 `MulticlientLink`。v1 目标使用 `GatewayApp` 或
+`ClientApp`，v2 目标使用 `ScheduledLink`。同一场测试中的所有板应运行同一协议版本。
+配置缺失或无效时进入串口配置模式，应用发射保持关闭。`main.cpp` 只负责委托
+Arduino 的 `setup` 和 `loop`。
 
-RadioDriver保留全部状态/超时/错误策略，Sx1262Hardware独占RadioLib/SPI/GPIO。
-板GPIO8–14、TCXO1.8 V、DIO2开关及DC-DC与CP2102/UART0设置见迁移审查。
-FrameCodec、DeviceConfig、SequenceTracker及NVSschema1/协议1保持。
-默认 3000 ms。M2 从事务结束起计下一次上报，ACK 超时为 1 秒；已有 NVS 周期保留。
-[v2 研究镜像](SCHEDULED_LINK.md) 使用固定 SF7，支持单 Client
-时隙、位图反馈及三次重传。v3 使用 MulticlientLink 与 PayloadPort 支持最多八个
-Client 和有界应用交付，通用事件接口和 ADR 仍待实现。v3 屏幕 使用 `MulticlientLink`
-遥测，在整帧空闲的帧尾或 Client 搜索 Beacon 时更新，搜索中每步之间轮询无线。见 [屏幕 诊断](DISPLAY_DIAGNOSTICS.md)。
+`RadioDriver` 负责无线状态、超时和错误处理，`Sx1262Hardware` 独占 RadioLib、SPI 和 GPIO。
+引脚、TCXO、RF 开关和串口参考见[硬件说明](HARDWARE.md)。v3 通过 `PayloadPort` 交付应用数据。
+[README 协议流程图](../../README.zh-CN.md#工作流程)展示请求、授权、DATA 和反馈之间的关系，
+[定时研究链路](SCHEDULED_LINK.md)记录线格式和时序规则。v3 使用 `MulticlientLink` 遥测，
+在空闲帧尾或 Client 搜索 Beacon 时更新显示，搜索期间在操作间轮询无线。详见[显示诊断](DISPLAY_DIAGNOSTICS.md)。
 
-Native执行实际生产模块；新增adapter用有界调用记录检查配置和转发，不模拟射频。
-SDK调用仍可能同步等待，ERR-021未因迁移修复。完整平台服务和通用payload/event接口仍缺失。
-详见英文ARCHITECTURE和双语HARDWARE_MIGRATION_AUDIT。
+Native 测试执行实际生产模块，并通过替身验证配置和事件转发。射频行为需要上板测量。
+SDK 调用仍可能同步等待，ERR-021 尚未关闭。完整的平台服务抽象、通用事件接口和在线 ADR 仍待实现。
 
 ## 截至Iteration013的历史架构说明
 

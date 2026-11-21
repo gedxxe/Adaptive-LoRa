@@ -1,8 +1,8 @@
-# M0–M2 Heltec 台架流程
+# 台架测试
 
-本流程适用于两块 Heltec WiFi LoRa 32 V3.4 与原装单极天线。用户确认采购选项为
-902–928 MHz，V3.4 沿用 V3.2 电气线路及引脚。以 V3.2 原理图为参考，按板分别记录
-实物结果。完整的 Windows 和 ROM 命令见 [英文流程](../en/BENCH_RUNBOOK.md)。
+本流程用于首次上电备份、USB 排查和射频测量。
+[主指南](../../README.zh-CN.md#烧录与配置) 提供上传和角色命令。按板卡别名记录实物
+Heltec WiFi LoRa 32 V3.4 的核对结果，电气参考为 V3.2。见 [硬件说明](HARDWARE.md)。
 
 ## 1. 识别板卡和 Windows COM 口
 
@@ -11,6 +11,8 @@
 采用已知可传数据的 USB-C 线，直连电脑，不经集线器。每次只连接一块，比较插入前后
 的设备管理器和 `pio device list`。首次上电需保留工厂配置时，按板上的 PRG/BOOT 步骤
 进入 ROM 下载模式，避免启动应用。先记录并备份这块板，再操作另一块。
+
+### Windows 设备管理器
 
 1. 在 **端口（COM 和 LPT）** 查找 CP210x USB 转串口桥和新增的 COM 号，拔插比对确认。
    蓝牙虚拟串口与板卡无关，重新连接后 COM 号可能变化。
@@ -31,89 +33,55 @@ flash，检查 8,388,608 字节和 SHA-256 一致。按照实际分区保存 NVS
 布局。ERR-023 说明 SDK 在应用 runtime 之前可能格式化 NVS。备份留在仓库外，只能回到
 原板。遇到限制、布局不明或读失败时停止，不强制、不擦除、不改 eFuse。
 
-## 3. 核对外设并上传 屏幕 候选
+## 3. 验证 v3 双板链路
 
-记录实物 SKU、PCB 标记、RF 接头、天线、供电、flash 和 USB。检查 SDA/SCL/reset、Vext
-极性和稳定时间，以及 SSD1306 0x3C 参考。完成备份、布局和外设核对后，记录镜像哈希，
-对两板使用同一候选镜像。每次关闭其他串口工具，把 `COM_BOARD` 换成实际端口。
+上传前对照[硬件参考](HARDWARE.md)检查板卡标识、射频 SKU、连接器、闪存容量和供电。
+检查显示引脚、Vext 极性和稳定时间，并核对预期的 SSD1306 地址 `0x3C`。确认天线或负载及
+供电能支持固件请求的 `22 dBm`，并在获准的射频条件下测试。在试验记录中列出未确认项。
 
-```powershell
-pio run -e heltec_wifi_lora_32_V3
-Get-FileHash -Algorithm SHA256 .pio/build/heltec_wifi_lora_32_V3/firmware.bin
-pio run -e heltec_wifi_lora_32_V3 -t upload --upload-port COM_BOARD
-pio device monitor --port COM_BOARD --baud 115200
-```
-
-上传后查看 BOOT、status 和 屏幕。有效旧角色可能发射，继续保持 RF 终端。默认
-`heltec_wifi_lora_32_V3` 用于关闭显示的对照。
-
-## 4. 分别配置角色
-
-以 115200 baud 先查看 `status`，按板输入以下命令。核对暂存值并确认 `CONFIG_SAVED`
-后才手动重启。保存失败即停止。重启后以 `status` 核对已加载的角色、ID、schema 1 和
-3000 ms。
-
-Gateway：
-
-```text
-config set role gateway
-config set network-id 1
-config set node-id 1
-config set gateway-id 1
-config set hello-interval-ms 3000
-config show
-config save
-reboot
-status
-```
-
-Client：
-
-```text
-config set role client
-config set network-id 1
-config set node-id 2
-config set gateway-id 1
-config set hello-interval-ms 3000
-config show
-config save
-reboot
-status
-```
-
-两板均为 3 s。Client 每次事务结束后等 3 s。Gateway 使用该间隔判断屏幕新鲜度。
-WAIT 表示尚无有效接收。ONLINE 表示 Gateway 收到有效 HELLO 或 Client 接受 ACK 后
-不足 7 s，不能说明持续连接。达到 7 s 则显示 STALE。联通前查看 RADIO_INIT、
-OLED_INIT、status 和复位边界。
-
-M0–M2 联通前确认 `profile=m2`、`protocol=1`，并按 [硬件说明](HARDWARE.md)
-核对 22 dBm 镜像所需负载、供电余量及获准的射频条件。完成基线捕获后才使用两块
-同配置研究镜像执行独立的 [v3 定时链路测试](STARTUP_AND_PROVISIONING.md)。
-
-v3 使用 `heltec_wifi_lora_32_V3_multiclient`。核对串口中的帧号和重传结果，并采集
-`OLED_STATUS`、SCL、NSS 及 DIO1 检查显示时段。见 [屏幕 诊断](DISPLAY_DIAGNOSTICS.md)。
-
-## 5. 先做双板联通，再扩展距离
-
-915.0 MHz 是固定暂定研究频点。辐射测试须使用获准的射频配置。Gateway 先启动，Client
-随后，约 3 m，原装单极天线竖直。关闭 monitor，使用实际 COM 和新目录采集。
+完成备份和分区检查后，按 [README](../../README.zh-CN.md#烧录与配置) 上传并配置
+Gateway 1 和 Client 2。保存镜像哈希以及每块板的启动和 `status` 输出。
 
 ```powershell
-python tools/capture_bench.py --gateway COM_GATEWAY --client COM_CLIENT --seconds 120 --out logs/test/RUN-YYYYMMDD-HHMMSS-smoke
+Get-FileHash -Algorithm SHA256 .pio/build/heltec_wifi_lora_32_V3_multiclient/firmware.bin
 ```
 
-使用 PlatformIO Python，保存原始串口、chunk 索引、元数据、屏幕 状态及
-[记录模板](../../logs/test/RUN_RECORD_TEMPLATE.md)。确认 HELLO 完成、Gateway 接收、ACK
-开始和完成、Client 接受的回显身份、双向 RSSI/SNR，以及稳定复位边界和无丢日志。联通
-或采集不可靠时保留证据并停止测距。
+在获准的射频条件下先做短距试验，保持天线方向和供电一致。关闭串口监视器后同时采集两端，
+把占位符替换成实际端口，并为每轮使用新目录。打开串口可能导致板卡复位，应在日志中核对启动边界。
+示例将原始日志写入 Git 工作区之外。
 
-在相同几何、供电、PHY 和间隔下比较 屏幕 开关，查看 PDR、ACK 成功、事务时长、复位和
-日志丢失。记录 OLED_STATUS 的单次 I²C 和刷新 I/O 最大时长。可用高阻探头记录 DIO1、
-SCL、radio NSS，比较 DIO1 到首次 SPI 服务与 ACK 启动时延。屏幕 耗时不等于 IRQ 延时。
-联通后才扩展 10/25/50/100/200/400 m。每个选定验收条件至少 200 次完整 HELLO TX，3 s
-间隔建议预留 3600 s 并实际核对包数。独立主机使用 `--board` 和同 run ID 不同后缀。
-用 [日志规范](LOGGING_GUIDE.md) 统计 PDR 与成功率，缺失串口行不能当作 RF 丢包。
-实物 NVS、链路、异常和恢复证据齐备后才完成 M0–M2，M3 还需实测时序。
+```powershell
+$pioPython = Join-Path $env:USERPROFILE '.platformio/penv/Scripts/python.exe'
+$captureDir = Join-Path $env:LOCALAPPDATA 'Adaptive-LoRa/captures/RUN-YYYYMMDD-HHMMSS-smoke'
+& $pioPython tools/capture_bench.py --gateway COM_GATEWAY --client COM_CLIENT --seconds 120 --out $captureDir
+```
+
+按 Client 身份和帧号核对 `V3_DATA_TX`、Gateway 的 `APP_PAYLOAD` 和 Client 的
+`V3_PAYLOAD_RESULT`。检查确认结果、无线错误、错过的发射时隙和串口丢日志。另做一轮
+Gateway 断电再上电，检查 Client 搜索 Beacon、接受新调度并恢复 DATA 交付。
+状态含义见 [屏幕诊断](DISPLAY_DIAGNOSTICS.md)。
+
+## 4. 扩展到八个 Client
+
+按 2、4、8 个 Client 逐步扩展。对比试验保持功率、天线、载荷长度和位置一致，并按声明
+的负载重复采集。对额外 Client 分别用 `--board COMx` 采集到独立目录，记录共享的试验
+编号和不同的板卡别名。提前关闭各端口的监视器。
+
+- 保存 [试验记录](../../logs/test/RUN_RECORD_TEMPLATE.md)、镜像哈希、配置、天线位置、
+  供电和原始日志。
+- 统计实际发送与接收次数，记录首轮交付、重传、ACK 一致性、双向 RSSI/SNR、超时和
+  重新同步时长。串口丢行或缺失标为证据不全。匹配规则见 [日志规范](LOGGING_GUIDE.md)。
+- 使用高阻探头测 DIO1、NSS 和 SCL，采集 DIO1 到首次处理、启动发射和恢复接收的时延。
+  调整 50 ms 保护间隔前，连续多个超帧测量时钟漂移。
+- 在 Gateway 日志上运行 [离线 ADR 工具](SCHEDULED_LINK.md#链路自适应实验)，对照 Client
+  记录后再设计切换实验。
+
+## 旧版 M0–M2 验收
+
+需要对照 v1 HELLO/ACK 时，使用 `heltec_wifi_lora_32_V3`，核对 `profile=m2`
+和 `protocol=1`。M2 仍需板卡和电气检查、同板 NVS 保存及重载、每个选定条件至少
+200 次完整 HELLO 发射，以及独立的受控丢包和恢复试验。与 v3 结果分开记录。
+原 M2 台架条件见[测试计划](TEST_PLAN.md)。
 
 ## ERR-021 计划注入流程，尚未执行
 

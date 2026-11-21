@@ -3,8 +3,10 @@
 ## 多 Client 协议 v3
 
 Gateway 和各 Client 均使用 `heltec_wifi_lora_32_V3_multiclient`，串口 `status`
-显示 `profile=multiclient`、`protocol=3`。所有阶段使用 SF7。名单和配置步骤见
-[启动指南](STARTUP_AND_PROVISIONING.md)，显示与刷新时序见 [屏幕 诊断](DISPLAY_DIAGNOSTICS.md)。
+显示 `profile=multiclient`、`protocol=3`。所有阶段使用 SF7。烧录和角色设置见
+[README](../../README.zh-CN.md#烧录与配置)。修改名单 ID 或每个 Client 的字节预算时，
+需编辑 [research_roster.h](../../include/research_roster.h) 并重新构建。
+遥测和刷新时序见[显示诊断](DISPLAY_DIAGNOSTICS.md)。旧版实验使用下文的 v2 构建环境。
 
 ### 线格式
 

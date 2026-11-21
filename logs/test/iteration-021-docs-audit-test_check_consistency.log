@@ -1,0 +1,19 @@
+test_archived_body_is_preserved_but_notice_is_required (test_check_consistency.ConsistencyTests.test_archived_body_is_preserved_but_notice_is_required) ... ok
+test_bad_build_environment_is_reported (test_check_consistency.ConsistencyTests.test_bad_build_environment_is_reported) ... ok
+test_bad_current_region_markers_are_rejected (test_check_consistency.ConsistencyTests.test_bad_current_region_markers_are_rejected) ... ok
+test_broken_current_link_is_reported (test_check_consistency.ConsistencyTests.test_broken_current_link_is_reported) ... ok
+test_client_example_requires_distinct_node_id (test_check_consistency.ConsistencyTests.test_client_example_requires_distinct_node_id) ... ok
+test_current_repository_passes (test_check_consistency.ConsistencyTests.test_current_repository_passes) ... ok
+test_default_build_requires_display (test_check_consistency.ConsistencyTests.test_default_build_requires_display) ... ok
+test_diagram_translations_must_preserve_edges (test_check_consistency.ConsistencyTests.test_diagram_translations_must_preserve_edges) ... ok
+test_history_cannot_hide_wrong_current_version (test_check_consistency.ConsistencyTests.test_history_cannot_hide_wrong_current_version) ... ok
+test_phy_and_chinese_provisioning_regressions (test_check_consistency.ConsistencyTests.test_phy_and_chinese_provisioning_regressions) ... ok
+test_physical_pass_claim_is_rejected (test_check_consistency.ConsistencyTests.test_physical_pass_claim_is_rejected) ... ok
+test_timing_constants_are_independent (test_check_consistency.ConsistencyTests.test_timing_constants_are_independent) ... ok
+
+----------------------------------------------------------------------
+Ran 12 tests in 8.526s
+
+OK
+
+Exit code: 0

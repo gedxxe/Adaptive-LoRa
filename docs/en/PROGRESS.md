@@ -3,8 +3,8 @@
 <!-- current-state:start -->
 ## Current state — Iteration 021
 
-Development continues from published Iteration 020
-`75a99dfb0474680f90eb9d9685e5a079595f8e26` with the local display and link fixes.
+Iteration 021 is on `main` through [PR #8](https://github.com/gedxxe/Adaptive-LoRa/pull/8).
+The [README](../../README.md) is the operator entry point.
 
 | Item | Current evidence |
 |---|---|
@@ -17,9 +17,14 @@ Development continues from published Iteration 020
 | Host | 356/356 native regressions, 15/15 v3 runtime cases, and 23/23 in the final focused v3 link run |
 | Physical acceptance | IN PROGRESS; NOT RUN |
 
+M3 scheduling and M4 feedback/retries are implemented for the eight-Client
+configuration and verified on the host. M5 has uplink capture and offline
+analysis. On-air negotiation, retuning and recovery remain open. Start the
+physical tests with one pair and expand through eight Clients.
+
 The PHY, NVS schema, report interval, M2 ACK timeout, v3 wire layout and
-relative radio slots are unchanged. Use the [startup guide](STARTUP_AND_PROVISIONING.md)
-to choose a build and the [display guide](DISPLAY_DIAGNOSTICS.md) to interpret the screen.
+relative radio slots are unchanged. See the [display guide](DISPLAY_DIAGNOSTICS.md)
+for freshness and timing counters.
 Client boot reserves up to 400 ms for a WAIT screen before beacon RX.
 The operator reported about five metres of additional reach in a separate
 SF9/CR 4/6 experiment, with intermittent stale status. No raw capture was

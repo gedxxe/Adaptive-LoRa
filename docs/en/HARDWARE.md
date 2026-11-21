@@ -1,4 +1,4 @@
-# Hardware and RF baseline
+# Hardware and radio settings
 
 The bench pair is two **Heltec WiFi LoRa 32 V3.4** boards with ESP32-S3,
 SX1262 and stock monopole antennas. The owner confirms the 902–928 MHz
@@ -26,14 +26,14 @@ V3.2 schematic and source details in their original context.
 | Identity and PCB | Heltec V3 family | Front/back markings, layout, MCU and radio package markings, SKU and matching network |
 | Radio SPI and interrupt | V3.2 schematic and installed variant. NSS 8, SCK 9, MOSI 10, MISO 11, RESET 12, BUSY 13, DIO1 14 (variant alias DIO0) | Compare nets and observe reset, BUSY and DIO1 with high-impedance probes |
 | Oscillator and PA path | V3.2 reference has DIO3 TCXO at 1.8 V, DC-DC regulator and DIO2 RF switch | Verify oscillator marking/voltage, populated regulator and switch path |
-| display | V3 source selects SSD1306 128 × 64 at 7-bit 0x3C. Variant display aliases are SDA 17, SCL 18, RESET 21 | Check reset and bus routing, address ACK and working panel. A bus ACK alone identifies an address, not the controller |
-| Vext | V3.2 switched LDO, GPIO36 active low. Radio uses VDD_3V3 and display uses Vext | Confirm off/on polarity and rail settling before enabling display firmware |
+| Display | V3 source selects SSD1306 128 × 64 at 7-bit 0x3C. Variant aliases are SDA 17, SCL 18, RESET 21 | Check reset, bus routing, address ACK and actual panel response |
+| Vext | V3.2 switched LDO, GPIO36 active low. Radio uses VDD_3V3 and display uses Vext | Confirm polarity and rail settling before the first upload |
 | USB and flash | V3 reference CP2102/UART0 TX43/RX44, 8 MB flash | Enumerate one board at a time, verify ROM identity/flash/security/layout |
 | RF connector and antennas | V3 reference IPEX 1.0. Heltec offers several frequency variants | Verify each connector, RF SKU, monopole markings/band and matching |
 
 The installed Arduino-ESP32 3.3.11 `heltec_wifi_lora_32_V3` variant defines
-Display aliases separately from default `Wire` pins 41/42. The display
-build uses the aliases explicitly and asserts their values at compile time.
+display aliases separately from default `Wire` pins 41/42. The default v3
+image uses the board aliases and asserts their values at compile time.
 No existing radio pin constants were edited. Keep board/peripheral pin and
 power assignments under their current owners. Reserve LED35, battery
 control37, UART43/44, USB19/20, boot straps, crystal and flash/JTAG resources
@@ -62,7 +62,7 @@ with an open RF connector. Measure supply voltage during TX with a suitable
 | Frequency | 915.0 MHz, provisional research setting |
 | Bandwidth | 125 kHz |
 | Data SF | SF7 |
-| Reserved control SF | SF9; unused in both profiles |
+| Reserved control SF | SF9, unused by the active profiles |
 | Coding rate | 4/5 |
 | Preamble | 8 symbols |
 | Header / PHY CRC | Explicit / enabled |

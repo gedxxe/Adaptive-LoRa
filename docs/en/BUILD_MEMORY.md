@@ -1708,3 +1708,45 @@ test_adr_shadow.py -v` (5/5), `python -m unittest discover -s tools -p
 test_check_consistency.py -v` (10/10) and `python tools/check_consistency.py`
 (PASS). All exited 0. The transcripts share the
 `logs/test/iteration-021-publication-` prefix.
+
+## Iteration 021 follow-up — research and operator documentation, 2026-11-21
+
+GitHub `main` was verified at `58d6b576d83b98b02a99edef1e1303d6adf822de`
+via `git ls-remote origin refs/heads/main` (exit 0). The local firmware and
+test sources match that tree. Firmware `0.2.0-alpha.1`, protocol v3, NVS
+schema 1, the default target and the PHY settings are unchanged.
+
+The two READMEs now carry the same protocol flow and flash/role commands.
+The startup pages keep their existing URLs and point to the README. The
+bench and logging references cover backup, measurement, capture and recovery.
+Architecture, hardware, schedule, test and progress pages identify v3 as
+the default and retain the earlier evidence. The research map links the four
+references to implementation, tests and open questions. The consistency
+tests now check the role examples, upload command and diagram parity.
+
+`<PIO_PYTHON>` denotes the installed PlatformIO interpreter. All successful
+commands below exited 0. Transcripts replace machine-specific paths with
+placeholders. See ERR-043 for the initial lock and fixture failures.
+
+| Command | Result | Transcript |
+|---|---|---|
+| `<PIO_PYTHON> -m platformio run -e heltec_wifi_lora_32_V3_multiclient` | PASS, 34,536 B RAM and 385,460 B flash | `logs/build/iteration-021-docs-recheck-heltec_wifi_lora_32_V3_multiclient.log` |
+| `<PIO_PYTHON> -m platformio run -e heltec_wifi_lora_32_V3` | PASS | `logs/build/iteration-021-docs-recheck-heltec_wifi_lora_32_V3.log` |
+| `<PIO_PYTHON> -m platformio run -e heltec_wifi_lora_32_V3_research` | PASS | `logs/build/iteration-021-docs-recheck-heltec_wifi_lora_32_V3_research.log` |
+| `<PIO_PYTHON> -m platformio test -e native` | 356/356 | `logs/test/iteration-021-docs-recheck-native.log` |
+| `<PIO_PYTHON> -m platformio test -e native_multiclient` | 15/15 | `logs/test/iteration-021-docs-recheck-native_multiclient.log` |
+| `<PIO_PYTHON> -m platformio test -e native -f test_multiclient_link` | 23/23, subset of native | `logs/test/iteration-021-docs-recheck-multiclient-link.log` |
+| `<PIO_PYTHON> -m unittest discover -s tools -p test_capture_bench.py -v` | 13/13 | `logs/test/iteration-021-docs-audit-test_capture_bench.log` |
+| `<PIO_PYTHON> -m unittest discover -s tools -p test_tdma_feasibility.py -v` | 16/16 | `logs/test/iteration-021-docs-audit-test_tdma_feasibility.log` |
+| `<PIO_PYTHON> -m unittest discover -s tools -p test_model_multiclient.py -v` | 3/3 | `logs/test/iteration-021-docs-audit-test_model_multiclient.log` |
+| `<PIO_PYTHON> -m unittest discover -s tools -p test_adr_shadow.py -v` | 5/5 | `logs/test/iteration-021-docs-audit-test_adr_shadow.log` |
+| `<PIO_PYTHON> -m unittest discover -s tools -p test_check_consistency.py -v` | 12/12 | `logs/test/iteration-021-docs-final-test_check_consistency.log` |
+| `<PIO_PYTHON> tools/check_consistency.py` | PASS, zero errors | `logs/test/iteration-021-docs-final-consistency.log` |
+| `node .pio/doc-visual/check-diagrams.mjs` | Both README diagrams parsed with Mermaid 11.12.0 | `logs/test/iteration-021-docs-review-mermaid.log` |
+| `python .pio/audit_docs_privacy.py --history --new-logs` | No findings for the selected patterns in tracked files, reachable `main` blobs or new verification transcripts | `logs/test/iteration-021-docs-review-privacy.log` |
+
+Resolved PlatformIO Core 6.1.19, Espressif32 55.3.311, Arduino-ESP32 3.3.11,
+Xtensa 14.2.0+20260121 and RadioLib 7.8.1. No physical measurements or uploads
+were performed. The next physical step is the pair test with Gateway 1 and
+Client 2, followed by a progressively larger roster. M5 remains offline
+until switching and recovery have a protocol and a measured timing budget.

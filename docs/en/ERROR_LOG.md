@@ -685,3 +685,15 @@ Level-only fallback and physical capture error remain measurable risks.
   configuration. The bundled Python reader extracted all four local
   research papers. It reported incomplete font-encoding support; the
   cited sections were readable. Extraction output stays under `.pio`.
+
+## ERR-043 — Documentation audit verification setup
+
+- The first `python -m platformio run -e <environment>` attempts for v3,
+  v1 and v2 exited 1 because the sandbox blocked the PlatformIO package
+  lock. See `logs/build/iteration-021-docs-audit-*.log`. The same commands
+  succeeded with access to the installed toolchain. No source change was
+  needed for the builds.
+- The expanded link check passed on the real tree. Two of the first 12
+  `test_check_consistency.py` cases failed because the temporary tree
+  lacked the two test sources linked from the research map. The fixture
+  now includes those paths. The rerun passed 12/12.

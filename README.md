@@ -1,160 +1,142 @@
 # Adaptive-LoRa
 
-The firmware baseline is main at `541e2e8b985f7cd67ca4d1f1af323c46aed4333e`,
-which includes the V3.4 bench preparation from [PR #6](https://github.com/gedxxe/Adaptive-LoRa/pull/6).
-The [reference review](docs/references/README.md) and [research-to-code matrix](docs/research/ALGORITHM_TRACEABILITY.md)
-trace the four primary papers to the proposed design and current tests.
+[简体中文](README.zh-CN.md)
 
-**Research title:** Reliability-aware TDMA Scheduling and Link Adaptation for Single-Radio LoRa Industrial Energy Monitoring Networks.
+Adaptive-LoRa is a scheduled LoRa P2P network for industrial sensing.
+One Heltec ESP32-S3/SX1262 Gateway serves up to eight Clients on a single
+half-duplex radio. All boards run the same firmware. The saved role and
+node ID determine what each board does.
 
-Adaptive-LoRa is an independent research and embedded firmware project for private, single-radio LoRa peer-to-peer networks. Industrial energy monitoring is a general research use case; the protocol does not require a particular meter, fieldbus, backhaul, database or deployment. This is not LoRaWAN.
+The research question is how to make delivery predictable when beacon,
+DATA, and feedback all share one radio. The Gateway admits payloads by
+their actual length, batches acknowledgements, and assigns retries to
+Clients whose DATA is still missing. The current link uses a fixed PHY and
+collects evidence for adaptive data rate (ADR) experiments.
 
-## Research scope and current status
-
-The default `heltec_wifi_lora_32_V3_multiclient` build runs protocol v3 with eight
-clients, exact-length DATA slots, aggregate feedback and deterministic
-retries. The M2 HELLO/ACK and v2 single-client profiles remain available for
-comparison. The gateway records per-client uplink evidence for offline ADR
-analysis. All nodes in the v3 network use the same fixed PHY.
-See the [startup guide](docs/en/STARTUP_AND_PROVISIONING.md) and [wire specification](docs/en/SCHEDULED_LINK.md).
-
-| Evidence | Current baseline |
+| Setting | Value |
 |---|---|
 | Firmware / protocol | `0.2.0-alpha.1` / `3` |
-| ESP32 compilation and native tests | See the [current verification record](docs/en/PROGRESS.md) |
-| Implemented | v3 TDMA, exact-length grants, aggregate feedback and shared retries |
-| Capture, model and documentation verification | See [build memory](docs/en/BUILD_MEMORY.md) |
-| Physical NVS/reboot/SPI/IRQ/RF/antenna | NOT VERIFIED; M0–M2 acceptance IN PROGRESS |
+| Default PlatformIO target | `heltec_wifi_lora_32_V3_multiclient` |
+| Shipped roster | Gateway **1**, Clients **2–9**, network **1** |
+| Application payload | Up to **64 bytes** per Client |
+| Research PHY | **915.0 MHz** provisional, **SF7**, **BW125**, **CR 4/5** |
+| Shipped superframe | **6.766 s**, sized for the full roster; **50 ms** experimental slot guard |
 
-Host integration tests use the actual client/gateway state machines with bounded fake transport, clock and serial adapters. Simulated loss, delay, object recreation, radio-operation failures and IRQ inputs are not physical measurements. See the [driver audit and coverage](docs/en/RADIO_DRIVER_AUDIT.md). The [progress snapshot](docs/en/PROGRESS.md), [software audit](docs/en/SOFTWARE_AUDIT.md) and [build memory](docs/en/BUILD_MEMORY.md) record exact evidence and limitations.
+## How it works
 
-## Hardware and provisional PHY
+```mermaid
+flowchart TD
+    beacon["Gateway broadcasts BEACON with roster and period"] --> requests["Clients with pending data request bytes in roster order"]
+    requests --> active{"Any valid requests?"}
+    active -->|Yes| grant["Gateway broadcasts exact-length SLOT_GRANT"]
+    active -->|No| next["Wait for next BEACON"]
+    grant --> data["Granted Clients send DATA in serial slots"]
+    data --> bitmap["Gateway sends cumulative ACK_BITMAP"]
+    bitmap --> rounds{"More feedback rounds reserved?"}
+    rounds -->|Yes| retry{"Client has a valid retry grant?"}
+    retry -->|Yes| resend["Client repeats the same DATA identity"]
+    retry -->|No| silent["Client waits for the next bitmap"]
+    resend --> bitmap
+    silent --> bitmap
+    rounds -->|No| next
+    next --> beacon
+```
 
-The bench pair is two Heltec WiFi LoRa 32 V3.4 boards with ESP32-S3, SX1262
-and stock monopoles. The owner confirms the 902–928 MHz procurement option
-and V3.2 wiring, with V3.4 changes to SMT implementation and the crystal.
-Use the V3.2 schematic as the electrical reference. Physical SKU labels,
-antenna characteristics and peripheral behavior still need bench checks.
-See [HARDWARE.md](docs/en/HARDWARE.md).
+Both roles anchor the schedule to radio completion timestamps. The Client
+needs a current grant to transmit. If feedback is lost, it stays silent in
+that retry round and can still be confirmed by a later cumulative bitmap.
+After beacon expiry, the Client listens continuously for a new schedule.
 
-RadioLib is pinned to **7.8.1**. The adapter uses the board's GPIO8-14 radio
-interface, a 1.8 V DIO3 TCXO supply and DC-DC regulator selection. Serial
-runs through CP2102 at 115200; native USB CDC is disabled. The fixed research
-profile remains 915.0 MHz, BW125, SF7, CR4/5, preamble 8, explicit header,
-PHY CRC, private sync 0x12, 22 dBm requested TX power and 1 MHz SPI.
-Both profiles use SF7 throughout. SF9 remains reserved. Verify conducted
-power and supply margin in an authorized RF setup before radiated trials.
+## Research status
 
-The 915 MHz Moxon is the design baseline; fabrication, gain and matching have
-not been measured. Read [HARDWARE.md](docs/en/HARDWARE.md) and the
-[migration audit](docs/en/HARDWARE_MIGRATION_AUDIT.md) before powering a board.
-Earlier hardware descriptions remain in historical records and Git history.
+| Area | Implemented and verified | Open research or bench work |
+|---|---|---|
+| Synchronization and TDMA | DIO1 completion timestamps, exact-length grants, serialized slots. Production state machines tested with 1, 2, 4, and 8 simulated Clients. | Measure IRQ latency, TX launch, RX re-arm and clock drift on the boards. |
+| Delivery and retries | Cumulative ACK bitmap and up to four shared slots per retry round. Host tests cover loss, duplicate suppression and reboot recovery. | Compare first-pass delivery and delivery after retries with a physical eight-Client roster. |
+| Link adaptation | Per-Client reception evidence and an offline ADR evaluator with configurable thresholds and hysteresis. | Agree on versioned PHY changes, measure SX1262 retune time, and verify recovery under lost control messages. |
+| Capacity | The shipped eight-Client roster fits the analytical calendar. | Larger rosters need different control frames and scheduling. |
 
-## Architecture principles
+The four papers inform different parts of the system. TS-VP-LoRa informs
+payload-sized slots, LoRaHART informs aggregate feedback, ATS-LoRa informs
+capacity budgeting, and Soy's work informs link adaptation experiments.
+The [research map](docs/research/ALGORITHM_TRACEABILITY.md) links the
+papers to the source and evidence. The [progress record](docs/en/PROGRESS.md)
+lists the build and host results. A full nine-board RF trial is still pending.
 
-One image loads a validated `GATEWAY` or `CLIENT` role from NVS. Missing, corrupt or unsupported configuration enters provisioning mode with application TX disabled. Role edits apply only after save and controlled reboot; identical hardware is not used to infer roles.
+## Flash and configure
 
-`RadioTransport` separates the application state machines from driver policy.
-`RadioDriver` uses one `RadioHardware` reference, while `Sx1262Hardware`
-owns all RadioLib, SPI and radio GPIO access. `Esp32Firmware` constructs
-hardware/storage adapters before the runtime that references them.
+Use Heltec WiFi LoRa 32 V3.4 boards with a suitable 50-ohm antenna or load
+connected before power. A stored role can start radio traffic on boot.
+For boards with an image or settings to preserve, follow the
+[backup and RF bench procedure](docs/en/BENCH_RUNBOOK.md) before opening
+a monitor or uploading. Use an authorized RF setup.
 
-Native tests execute the actual runtime, driver, configuration store, apps,
-console and logger. Small SDK shims supply simulated time, serial input,
-reset and random values. They test software decisions and error handling,
-while flash durability, physical reset and hardware entropy still require
-board tests. See the [runtime audit](docs/en/RUNTIME_AUDIT.md),
-[storage audit](docs/en/CONFIG_STORE_AUDIT.md) and current migration report.
+### 1. Upload the same build to each board
 
-Session generation permits eight raw calls. If no valid identity is
-available, applications suppress TX, log SESSION_ERROR and retry at
-one-second intervals. The existing timestamp corrections and open SDK
-wait/allocation limits remain. `main.cpp` contains only construction and
-setup/loop delegation in 15 lines.
+Open this repository in VS Code with PlatformIO, or run these commands
+from the project root. Connect one board at a time with a USB-C data cable.
+Use the COM port reported for that board and close any monitor before uploading.
+If your shell cannot find `pio`, open the PlatformIO terminal in VS Code.
 
-Four target boundaries are documented in [ARCHITECTURE.md](docs/en/ARCHITECTURE.md): protocol core, radio adapters, platform services and an application payload/event interface. Platform services are currently ESP32/Arduino-specific; a general application submission/delivery API is still absent. The protocol core contains no Modbus, meter-model, Wi-Fi/MQTT, PostgreSQL or dashboard integration. Do not treat the target architecture as fully implemented.
+```powershell
+pio device list
+$port = 'COMx' # Replace with the observed port
+pio run -e heltec_wifi_lora_32_V3_multiclient -t upload --upload-port $port
+pio device monitor --port $port --baud 115200
+```
 
-## Repository structure
+In the VS Code sidebar, the equivalent is **PlatformIO → Project Tasks →
+heltec_wifi_lora_32_V3_multiclient → General → Upload**, followed by **Monitor**.
+Use a standard upload with the same partition layout to retain NVS. If no
+board-specific COM port appears, follow the [USB checks](docs/en/BENCH_RUNBOOK.md#windows-device-manager).
+
+### 2. Set the Gateway and Client roles
+
+Send one command per line in the serial monitor. Keep the network ID and
+Gateway ID the same across all boards. The first Client's node ID is **2**.
+Use **3–9** for the remaining Clients, one unique ID per board.
+
+**Gateway**
 
 ```text
-Adaptive-LoRa/
-├── include/             # Provisional pins, fixed PHY and project limits
-├── src/app/             # ESP32-S3 runtime, NVS and bounded console
-├── src/common/protocol/ # Frame codec and sequence/session helpers
-├── src/common/radio/    # Transport contract and SX1262 adapter
-├── src/common/config/   # Pure configuration model/encoding
-├── src/common/diagnostics/
-├── src/gateway/         # Production gateway state machine
-├── src/client/          # Production client state machine
-├── test/                # Native unit/integration tests and bounded fakes
-├── docs/en/             # Canonical engineering record
-├── docs/zh-CN/          # Simplified Chinese companion
-├── logs/                # Sanitized build/test history and evidence
-└── tools/               # Bench capture, consistency checks and host-only research
+config set role gateway
+config set network-id 1
+config set node-id 1
+config set gateway-id 1
+config set hello-interval-ms 3000
+config show
+config save
 ```
 
-## Build and tests
+**First Client**
 
-Install PlatformIO Core and a native C++17-capable host toolchain, then run from the repository root:
-
-```sh
-pio run -e heltec_wifi_lora_32_V3_multiclient
-pio test -e native
-pio test -e native_multiclient
+```text
+config set role client
+config set network-id 1
+config set node-id 2
+config set gateway-id 1
+config set hello-interval-ms 3000
+config show
+config save
 ```
 
-The firmware uses `heltec_wifi_lora_32_V3` with Arduino and RadioLib 7.8.1.
-The installed platform 55.03.311 already supports the board; the migration
-keeps Arduino 3.3.11/IDF 5.5.5 and uses Xtensa GCC 14.2.0 rather than changing
-the platform. Core 6.1.19, native 1.2.1, Unity 2.6.1 and host GCC 6.3.0 are
-recorded in the build evidence. The platform remains unpinned, so preserve
-resolved manifests for reproducibility. Separate capture tests use PlatformIO
-Python: `python -m unittest discover -s tools -p test_capture_bench.py -v`.
-Run the additional host checks separately:
+After `CONFIG_SAVED`, send `reboot`. Reconnect the monitor if needed, then
+run `status`. Check the loaded role and IDs and look for `protocol=3` and
+`profile=multiclient`. The Gateway reports `roster_count=8` and
+`period_us=6766000`; the count is the roster size, even with one Client
+present. The 3 s setting feeds the example payload source. The Gateway
+calendar decides when the Client can send it.
 
-```sh
-python -m unittest discover -s tools -p test_tdma_feasibility.py -v
-python -m unittest discover -s tools -p test_check_consistency.py -v
-python tools/check_consistency.py
-```
+### 3. Verify the link
 
-The checker derives current versions and the firmware environment from source files;
-it excludes archived records. The analytical scenario report contains 216 cases
-with unmeasured timing costs left explicit. Neither is a physical test.
+Start with one Gateway and one Client. Look for `APP_PAYLOAD` on the Gateway
+and `V3_PAYLOAD_RESULT` with `result=accepted` on the Client for the same
+frame. Then test loss of Gateway power and recovery. Add Clients in stages
+of 2, 4, and 8 once the pair passes. For packet counts, trace capture and
+timing measurements, use the [bench procedure](docs/en/BENCH_RUNBOOK.md).
 
-## Provisioning and future bench procedure
+## Further reading
 
-At 115200 baud, use `help`, `status`, `config show`, the `config set`
-commands, `config save` and `reboot`. `hello-interval-ms` defaults to
-3,000 ms. M2 waits it after the transaction completes, so a lost ACK adds
-the ACK wait and transmit time. Legacy v2 uses the saved value as its
-period. v3 uses it for the report source and derives its own feasible
-superframe from the gateway roster. Existing NVS values persist until changed.
-
-For the M2 link check, run `config set hello-interval-ms 3000` on **both** boards,
-save, reboot and confirm the loaded value with `status`. The gateway uses its
-interval for display freshness. Initial IDs (network/node/gateway) are gateway
-`1/1/1` and client `1/2/1`. Set all IDs explicitly; role edits preserve IDs. `config show` is staged state, `status` is loaded state. Network IDs are 1–65535; node/gateway IDs are 1–65534. Start with one-board Windows enumeration and private same-board ROM backups.
-See the [bench runbook](docs/en/BENCH_RUNBOOK.md) and [run-record template](logs/test/RUN_RECORD_TEMPLATE.md). Physical acceptance is pending. Radiated tests require an
-authorized RF setup.
-
-## Development roadmap
-
-1. Finish software verification and resolve dependency timing/allocation assumptions within M0–M2.
-2. Verify each delivered board, then measure NVS/reboot, pins, supply, IRQ, display timing and the authorized two-device HELLO/ACK link.
-3. Measure radio transitions and clock drift with the v3 research build, then verify the guard, shared retries and loss recovery before expanding the roster.
-4. M4–M6: bitmap/selective retry, versioned conservative ADR and synchronization recovery, with fault tests before physical acceptance.
-5. M7–M8: controlled reference-vs-Moxon evaluation and explicitly labelled logical-node simulations.
-6. Add application payload/event and platform-service interfaces in a separate reviewed task before integrating other embedded applications.
-
-The [milestone plan](docs/en/MILESTONE_TASKS.md) and [test plan](docs/en/TEST_PLAN.md) define acceptance criteria. The [TDMA feasibility notes](docs/en/TDMA_FEASIBILITY.md) retain the earlier host sizing model and its assumptions.
-
-## Research and reproducibility
-
-Preserve chronology, failed attempts, error resolutions, exact commands, package versions and the distinction between compile, host simulation and physical evidence. Historical records are sanitized publication copies: identity/path labels were redacted, not results reclassified. Old hashes identify original artifacts; see [IDENTITY_AUDIT.md](docs/en/IDENTITY_AUDIT.md) and [logs guidance](logs/README.md).
-
-Use general application payloads; keep integrations outside protocol logic. Publish assumptions, controlled test conditions and limitations. Do not claim link capacity, antenna gain or hardware validation without evidence. Do not redistribute full research papers without permission. Third-party dependencies remain external; [THIRD_PARTY.md](THIRD_PARTY.md) records their licenses. No project-wide redistribution license has been selected in this task.
-
-Read [AGENTS.md](AGENTS.md) before changes. English is canonical; [简体中文](README.zh-CN.md) is the secondary documentation language.
-
-Physical preparation: [M0-M2 readiness](docs/en/PHYSICAL_ACCEPTANCE_READINESS.md) links the integrated-radio board and pair gates, capture/CSV rules and remaining ERR-021/SDK-startup holds. No physical procedure has been executed; use a new evidence directory and preserve private backups before upload/config changes.
+- [Protocol and slot calendar](docs/en/SCHEDULED_LINK.md)
+- [Research references and implementation mapping](docs/research/ALGORITHM_TRACEABILITY.md)
+- [Current evidence and open milestones](docs/en/PROGRESS.md)
