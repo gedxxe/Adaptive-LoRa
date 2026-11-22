@@ -1,0 +1,47 @@
+Verbosity level can be increased via `-v, -vv, or -vvv` option
+Collected 16 tests
+
+Processing test_adaptive_link in native_adaptive environment
+--------------------------------------------------------------------------------
+Building...
+Library Manager: Installing throwtheswitch/Unity @ ^2.6.1
+Unpacking 0% 10% 20% 30% 40% 50% 60% 70% 80% 90% 100%
+Library Manager: Unity@2.6.1 has been installed!
+
+src\app\multiclient_link.cpp: In member function 'void adaptive_lora::MulticlientLink::logLinkSamples()':
+src\app\multiclient_link.cpp:67:12: error: expected '(' before 'constexpr'
+         if constexpr (kAdaptive) {
+            ^~~~~~~~~
+src\app\multiclient_link.cpp:61:21: error: unused variable 'action' [-Werror=unused-variable]
+         const auto* action = kAdaptive ? reviewProfile(i) : "";
+                     ^~~~~~
+src\app\multiclient_link.cpp:62:21: error: unused variable 'adr' [-Werror=unused-variable]
+         const auto& adr = adr_[kAdaptive ? i : 0];
+                     ^~~
+src\app\multiclient_link.cpp: In member function 'void adaptive_lora::MulticlientLink::gatewayRequest(uint64_t, uint64_t, const adaptive_lora::Frame*)':
+src\app\multiclient_link.cpp:302:8: error: expected '(' before 'constexpr'
+     if constexpr (kAdaptive) admitProfiles();
+        ^~~~~~~~~
+src\app\multiclient_link.cpp: In member function 'void adaptive_lora::MulticlientLink::gatewayData(uint64_t, const adaptive_lora::Frame*, const adaptive_lora::RadioEvent&)':
+src\app\multiclient_link.cpp:352:8: error: expected '(' before 'constexpr'
+     if constexpr (kAdaptive) {
+        ^~~~~~~~~
+src\app\multiclient_link.cpp:351:16: error: unused variable 'start' [-Werror=unused-variable]
+     const auto start = dataAt_ + plan_.feedbackStart(round_);
+                ^~~~~
+src\app\multiclient_link.cpp:558:1: error: expected '}' at end of input
+ }
+ ^
+src\app\multiclient_link.cpp: At global scope:
+src\app\multiclient_link.cpp:558:1: error: expected '}' at end of input
+cc1plus.exe: all warnings being treated as errors
+*** [.pio\build\native_adaptive\src\app\multiclient_link.o] Error 1
+Building stage has failed, see errors above. Use `pio test -vvv` option to enable verbose output.
+-------- native_adaptive:test_adaptive_link [ERRORED] Took 8.46 seconds --------
+=================================== SUMMARY ===================================
+Environment      Test                Status    Duration
+---------------  ------------------  --------  ------------
+native_adaptive  test_adaptive_link  ERRORED   00:00:08.461
+================== 1 test cases: 0 succeeded in 00:00:08.461 ==================
+
+Exit code: 1

@@ -1,4 +1,13 @@
-# Adaptive-LoRa Protocol
+# Packet formats
+
+Use the [adaptive wire reference](SCHEDULED_LINK.md#adaptive-protocol-v4)
+for the walk-test image. All frames use a 28-byte header and at most 96 bytes.
+Multi-byte integers are little-endian. Each decoder checks its wire version
+and length before interpreting the message. The original HELLO/ACK fields
+and early design notes are below for comparison.
+
+<details>
+<summary>HELLO/ACK layout and earlier protocol notes</summary>
 
 ## 1. Protocol scope
 
@@ -191,3 +200,5 @@ firmware SemVer, `config_version`, and `schedule_version`.
 Bump the protocol version for incompatible changes to header layout,
 message encoding, or interpretation. Document compatibility behavior
 before supporting multiple versions.
+
+</details>

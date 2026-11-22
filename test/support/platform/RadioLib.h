@@ -46,6 +46,12 @@ public:
         host_adapter::state().callback = callback; host_adapter::state().record(host_adapter::IRQ);
     }
     int16_t standby() { return host_adapter::state().record(host_adapter::STANDBY); }
+    int16_t setSpreadingFactor(uint8_t sf) {
+        auto& s = host_adapter::state();
+        const auto code = s.record(host_adapter::RETUNE);
+        if (!code) s.sf = sf;
+        return code;
+    }
     int16_t startReceive(uint32_t timeout, uint32_t flags, uint32_t mask, size_t length) {
         auto& s = host_adapter::state(); s.rxTimeout = timeout; s.rxFlags = flags; s.rxMask = mask; s.rxLength = length;
         return s.record(host_adapter::RX);

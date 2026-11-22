@@ -1750,3 +1750,107 @@ Xtensa 14.2.0+20260121 and RadioLib 7.8.1. No physical measurements or uploads
 were performed. The next physical step is the pair test with Gateway 1 and
 Client 2, followed by a progressively larger roster. M5 remains offline
 until switching and recovery have a protocol and a measured timing budget.
+
+## Iteration 022 — Adaptive SF walk-test firmware, 2026-11-22
+
+Branch `codex/iteration-022-adaptive-sf` starts at fetched `origin/main`
+`2aaf8f5f9e49aa02cbc7583f5e9d2cf40c361d40`. The bench image is
+`heltec_wifi_lora_32_V3_adaptive`, firmware label `0.2.0-alpha.1`, wire v4,
+NVS schema 1. The default image still uses v3. Role IDs are Gateway 1,
+roaming Client 2 and optional stationary Clients 3–5 on network 1.
+
+- `src/app/multiclient_link.cpp` controls radio preparation, active slot
+  assignment, per-session SF trials, rollback and receipt-gated stability.
+- `src/common/protocol/multiclient_protocol.cpp` serializes Grants and
+  Request receipts and budgets the largest retry slots by airtime.
+- `src/common/radio/radio_driver.cpp` puts SX1262 into standby before
+  forwarding a retune without interrupting TX.
+- `src/app/firmware_runtime.cpp` identifies the wire profile and reports
+  readiness timing. `src/common/diagnostics/serial_logger.cpp` records
+  applied SF and `src/common/diagnostics/oled_status_display.cpp` shows
+  the latest acknowledged DATA SF.
+- `test/test_adaptive_link/test_main.cpp` exercises those production
+  boundaries with a simulated half-duplex link and SDK call recorder.
+  `src/main.cpp` remains a setup/loop delegate.
+
+Radio settings are 915.0 MHz provisional, BW125, CR4/5, control SF9,
+DATA SF7–SF9 and 22 dBm requested TX power. The model reserves eight
+64-byte ceilings. At a 15 s frame with other clients at SF7, two SF9
+reservations take 14.157 s and three take 15.634 s, including the tail.
+The 80 ms guard and 20 ms retune lead are experimental. No on-board
+IRQ, BUSY, retune, range or application-availability measurements were made.
+
+Commands used the installed PlatformIO Python. The log runner replaced
+local path prefixes with placeholders. See ERR-044 for the first two
+adaptive compile failures.
+
+| Command | Exit | Result and transcript |
+|---|---:|---|
+| `python -m platformio run -e heltec_wifi_lora_32_V3_adaptive` | 0 | 34,792 B RAM, 388,468 B flash, `logs/build/iteration-022-final-heltec_wifi_lora_32_V3_adaptive.log` |
+| `python -m platformio run -e heltec_wifi_lora_32_V3_multiclient` | 0 | Fixed-SF v3 build, `logs/build/iteration-022-final-heltec_wifi_lora_32_V3_multiclient.log` |
+| `python -m platformio run -e heltec_wifi_lora_32_V3` | 0 | v1 build, `logs/build/iteration-022-verify-heltec_wifi_lora_32_V3.log` |
+| `python -m platformio run -e heltec_wifi_lora_32_V3_research` | 0 | v2 build, `logs/build/iteration-022-verify-heltec_wifi_lora_32_V3_research.log` |
+| `python -m platformio test -e native_adaptive` | 0 | 8/8, `logs/test/iteration-022-final-native_adaptive.log` |
+| `python -m platformio test -e native_multiclient` | 0 | 15/15, `logs/test/iteration-022-verify-native_multiclient.log` |
+| `python -m platformio test -e native` | 0 | 356/356, `logs/test/iteration-022-verify-native.log` |
+| `python -m unittest discover -s tools -p test_capture_bench.py -v` | 0 | 13/13, `logs/test/iteration-022-final-test_capture_bench.log` |
+| `python -m unittest discover -s tools -p test_tdma_feasibility.py -v` | 0 | 16/16, `logs/test/iteration-022-final-test_tdma_feasibility.log` |
+| `python -m unittest discover -s tools -p test_model_multiclient.py -v` | 0 | 3/3, `logs/test/iteration-022-final-test_model_multiclient.log` |
+| `python -m unittest discover -s tools -p test_adr_shadow.py -v` | 0 | 5/5, `logs/test/iteration-022-final-test_adr_shadow.log` |
+| `python -m unittest discover -s tools -p test_check_consistency.py -v` | 0 | 12/12, `logs/test/iteration-022-final-test_check_consistency.log` |
+| `python tools/check_consistency.py` | 0 | PASS, `logs/test/iteration-022-final-consistency.log` |
+
+The v4 tests cover mixed-SF frame validation and reservation, mobility
+with three stationary peers, loss of control and reacquisition, retune
+error and driver behavior, protected reservations at eight clients,
+ACK-receipt gating and the confirmed-SF display. The final v3 binary
+omits the three v4-specific strings checked for apply, timing and display.
+
+Resolved Core 6.1.19, Espressif32 55.3.311, Arduino-ESP32 3.3.11,
+Xtensa 14.2.0+20260121 and RadioLib 7.8.1. The v4 binary SHA-256 is
+`d94cec628398d1ed93234ef02023cff6dca41946cc14d07240522187b4ba0e9a`.
+No firmware was uploaded. The next test is a one-minute near-pair run,
+followed by a continuous walk with one roaming and three stationary
+Clients when five boards are available.
+
+### Iteration 022 documentation review
+
+The two READMEs lead with adaptive operation, two original vector
+figures, and one upload and setup flow. Both include the same LaTeX
+pseudocode and two airtime equations. Hardware procedure, parsed events,
+protocol fields and test methods have dedicated references. Earlier
+wire formats and engineering records remain available for comparison.
+
+The Markdown inventory checked 127 files, including 68 archived
+snapshots, 19 prior reports, and five engineering records. All active
+relative file links and checked Markdown anchors resolve. Two older
+snapshot README files still point to a missing snapshot-local run
+template. The inventory lists them. The snapshot copies retain their
+original bytes.
+
+- `logs/test/iteration-022-docs-inventory.log` lists the inspected files.
+  SHA-256 comparisons matched all 79 firmware, configuration and native
+  test inputs to the pre-review working tree.
+- `logs/test/iteration-022-docs-render-and-model.log` records three
+  MathJax renders per language, visual checks of the SVGs at desktop
+  and phone widths in Chromium, and 195 matched airtime cases. The
+  model returned 14.156640 s for two SF9 reservations and 15.634272 s
+  for three.
+- The PlatformIO Python ran `python -m unittest discover -s tools -p
+  <suite>.py -v` with the capture (13), airtime (16), multiclient model
+  (3), ADR (5) and documentation (14) suites. All 51 cases passed.
+  `python tools/check_consistency.py` and `git diff --check` exited 0.
+  Use the `logs/test/iteration-022-docs-final-*` transcripts.
+
+The previous firmware and native results apply to unchanged firmware
+inputs. No new physical tests were performed. See ERR-045 for the first
+rendering failures and recovery.
+
+### Iteration 022 publication check
+
+The branch was compared with fetched `origin/main` at
+`2aaf8f5f9e49aa02cbc7583f5e9d2cf40c361d40`. Before publication,
+`python -m platformio test -e native_adaptive` passed 8/8 (exit 0),
+with the result in `logs/test/iteration-022-publication-native_adaptive.log`.
+The documentation checker, MathJax preview and 195 airtime comparisons
+passed again. The adaptive image remains opt-in for field tests.

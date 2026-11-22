@@ -25,6 +25,23 @@ private:
         bool metrics = false;
         bool retried = false;
     };
+    struct AdrState {
+        uint32_t boot = 0;
+        uint32_t lastRequest = 0;
+        uint32_t deliveredFrame = 0;
+        uint8_t desired = multiclient::kBaseSf;
+        uint8_t reservedSf = multiclient::kBaseSf;
+        uint8_t observedSf = 0;
+        uint8_t deliveredSf = 0;
+        uint8_t acknowledgedSf = 0;
+        uint8_t consecutiveFirst = 0;
+        uint8_t consecutiveDegraded = 0;
+        uint8_t probeReturn = 0;
+        uint8_t hold = 0;
+        bool locked = false;
+        bool hasSnr = false;
+        float filteredSnr = 0;
+    };
 
     Frame frame(MessageType type, uint16_t sequence) const;
     bool send(const Frame& frame, uint64_t now, const char* event);
@@ -37,6 +54,9 @@ private:
     void clientFinish(PayloadResult result);
     void observePeer(uint64_t now, uint16_t peer, const RadioEvent& event);
     void logLinkSamples();
+    bool prepareSf(uint8_t sf, uint64_t now);
+    void admitProfiles();
+    const char* reviewProfile(uint8_t index);
 
     DeviceConfig config_;
     RadioTransport& radio_;
@@ -46,6 +66,7 @@ private:
     multiclient::Roster roster_;
     multiclient::Plan plan_;
     Received received_[multiclient::kMaxClients]{};
+    AdrState adr_[multiclient::kAdaptive ? multiclient::kMaxClients : 1]{};
     Frame data_{};
     Phase phase_ = Phase::WAIT;
     uint8_t round_ = 0;
@@ -59,12 +80,17 @@ private:
     uint32_t gatewayBoot_ = 0;
     uint32_t retiredBoot_ = 0;
     uint32_t frameId_ = 0;
+    uint32_t acknowledgedFrame_ = 0;
     uint64_t beaconAt_ = 0;
     uint64_t dataAt_ = 0;
     uint64_t controlStart_ = 0;
     uint64_t nextBeacon_ = 0;
     uint64_t nextRecovery_ = 0;
     uint64_t nextBoot_ = 0;
+    uint64_t nextRetune_ = 0;
+    uint64_t phyRequestedAt_ = 0;
+    bool phyReadinessPending_ = false;
+    uint8_t radioSf_ = multiclient::kBaseSf;
     uint64_t displayQuietAt_ = 0;
     uint64_t displayQuietUntil_ = 0;
     MulticlientTelemetry telemetry_;

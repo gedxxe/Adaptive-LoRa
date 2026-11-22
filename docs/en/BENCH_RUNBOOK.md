@@ -85,27 +85,40 @@ Stop if the actual layout or safe restore path is uncertain. Keep backups out of
 Git and restore only to the same board. ERR-023 allows the SDK to format NVS
 before the project runtime starts, even if the upload doesn't overlap NVS.
 
-## 3. Verify the v3 pair
+## Adaptive v4 walk test
 
-Before upload, compare the board marks, RF SKU, connector, flash size and
-power supply with the [hardware reference](HARDWARE.md). Check the display
-pins, Vext polarity and settling, and the expected SSD1306 address `0x3C`.
-Verify that the antenna or load and supply can support the requested `22 dBm`
-profile in the authorized setup. Record unresolved checks with the run.
-
-After backup and layout checks, use the [main guide](../../README.md#flash-and-configure)
-to upload and configure Gateway 1 and Client 2. Record the image hash,
-startup output and serial `status` for each board.
+Before uploading, check board markings, antenna and connector, flash size
+and supply against the [hardware guide](HARDWARE.md). Verify the display
+wiring and Vext polarity on new boards. Confirm that the supply and antenna
+or load are suitable for the requested 22 dBm profile in the authorized setup.
+Follow the [README](../../README.md#flash-and-configure) to upload and set
+each role. Use Gateway 1, roaming Client 2 and stationary Clients 3–5 on
+network 1. Check the image and serial `status` on every board.
 
 ```powershell
-Get-FileHash -Algorithm SHA256 .pio/build/heltec_wifi_lora_32_V3_multiclient/firmware.bin
+Get-FileHash -Algorithm SHA256 .pio/build/heltec_wifi_lora_32_V3_adaptive/firmware.bin
 ```
 
-With authorized RF settings, run the pair at short range with fixed antenna
-orientation and supply. Close monitors and record both ports together.
-Substitute the observed ports and use a new output directory for each run.
-Opening a serial port can reset the board. Confirm boot boundaries in the logs.
-The example writes raw captures outside the Git workspace.
+1. Run one pair near each other for four complete frames, about a minute.
+   Match `APP_PAYLOAD` to the Client's `V3_PAYLOAD_RESULT,result=accepted`,
+   then check `ACKED DATA SF7` on the Client. Power-cycle the Gateway in
+   a separate test and check that the Client resumes.
+2. Leave the Gateway and Clients 3–5 in place. Capture continuously while
+   Client 2 spends a minute nearby, walks the route, and stops for about
+   two minutes at the destination. Record departure and arrival times.
+   Keep antenna orientation consistent.
+3. Compare delivery before and after retries, SF changes and gaps for
+   **each** Client. Check `deadline_miss`, resets and log drops. Run
+   `status` before and after to record `ADR_TIMING`. Interpret events
+   using the [serial logging guide](LOGGING_GUIDE.md).
+
+## Capture serial logs
+
+Close monitors before recording and use a new directory outside the Git
+workspace. Replace the two ports in this short pair example. For a roaming
+run, use `--board COMx` on the stationary Gateway and capture the roaming
+Client on a second laptop if available. Use the same run ID in both places.
+Opening a serial port can reset a board. Check boot boundaries in the logs.
 
 ```powershell
 $pioPython = Join-Path $env:USERPROFILE '.platformio/penv/Scripts/python.exe'
@@ -113,42 +126,22 @@ $captureDir = Join-Path $env:LOCALAPPDATA 'Adaptive-LoRa/captures/RUN-YYYYMMDD-H
 & $pioPython tools/capture_bench.py --gateway COM_GATEWAY --client COM_CLIENT --seconds 120 --out $captureDir
 ```
 
-Match `V3_DATA_TX`, Gateway `APP_PAYLOAD`, and the Client's
-`V3_PAYLOAD_RESULT` by client identity and frame. Check accepted results,
-radio errors, missed launches and dropped serial lines. Test a Gateway
-power cycle in a separate run. The Client should enter beacon search,
-then accept a new valid schedule and resume DATA exchange.
-Use the [display diagnostics](DISPLAY_DIAGNOSTICS.md) to interpret freshness.
+Use the [run record](../../logs/test/RUN_RECORD_TEMPLATE.md) for the image
+hash, board aliases, supply, antenna geometry and raw capture. If only the
+Gateway log is available, mark the Client's ACK or control losses as unknown.
+Avoid publishing raw logs, device identifiers or private payloads.
+For direct timing measurements, use high-impedance probes on DIO1, NSS,
+BUSY and SCL to observe IRQ service, RX rearm, display access and drift
+before changing the guard.
 
-## 4. Extend the test to eight Clients
+For a fixed-SF comparison, use the same boards and route with the build
+listed in [Versioning](VERSIONING.md). Hold payload, power and antenna
+settings constant and record the different control SF and frame period.
+Earlier HELLO/ACK procedures and the 200-transaction minimum are described
+in the [test plan](TEST_PLAN.md).
 
-Add Clients in stages of 2, 4, and 8 and keep the powers, antennas, payload
-lengths and geometry fixed for comparable runs. Repeat each run at the
-declared load. Use one `--board COMx` capture per extra board into a
-separate output directory and record a common run ID with distinct board
-aliases. Close monitors on those ports before capture.
-
-- Preserve the [run record](../../logs/test/RUN_RECORD_TEMPLATE.md),
-  firmware hash, provisioning, antenna geometry, supply and raw captures.
-- Count the actual attempts and received packets. Record first-pass delivery,
-  retries, ACK agreement, both directions of RSSI/SNR, missed deadlines and
-  resynchronization time. Mark gaps or serial drops as incomplete evidence.
-  The [logging guide](LOGGING_GUIDE.md#protocol-v3-capture) defines the joins.
-- Measure DIO1, NSS and SCL with high-impedance probes. Capture DIO1-to-service
-  delay, TX preparation and RX re-arm. Measure oscillator drift over multiple
-  superframes before changing the 50 ms guard.
-- Run the [offline ADR evaluator](SCHEDULED_LINK.md#link-adaptation-experiments)
-  on Gateway observations and compare them with Client logs before planning
-  adaptive PHY tests.
-
-## Legacy M0–M2 acceptance
-
-Use `heltec_wifi_lora_32_V3` for an explicit v1 HELLO/ACK comparison.
-Confirm `profile=m2` and `protocol=1`. The M2 record needs physical
-board and electrical checks, same-board NVS save/reload, at least 200
-fully observed HELLO transmissions per selected condition and separate
-controlled loss/recovery runs. These measurements are separate from v3.
-For the original M2 bench conditions, see the [test plan](TEST_PLAN.md).
+<details>
+<summary>Controlled BUSY fault procedure</summary>
 
 ## Planned ERR-021 fault injection — not executed
 
@@ -182,3 +175,5 @@ Closure needs the precise fault reproduced and an approved bounded return or
 independently measured recovery, including radio/PA shutdown and initialization.
 A normal link run or source review cannot close ERR-021. No watchdog/library
 modification or physical fault injection was performed in Iteration 015.
+
+</details>

@@ -1,21 +1,25 @@
-# Versioning
+# Build and protocol versions
 
-## 1. Separate version domains
+| Use | PlatformIO environment | Wire version |
+|---|---|---:|
+| Adaptive walk test | `heltec_wifi_lora_32_V3_adaptive` | 4 |
+| Fixed-SF, multi-Client comparison and project default | `heltec_wifi_lora_32_V3_multiclient` | 3 |
+| Single-Client TDMA comparison | `heltec_wifi_lora_32_V3_research` | 2 |
+| HELLO/ACK comparison | `heltec_wifi_lora_32_V3` | 1 |
 
-Do not reuse one version number for unrelated purposes.
+Flash every board in a test with the same environment. These wire
+versions are incompatible. `VERSION` records the firmware release label.
+`PROTOCOL_VERSION` records the HELLO/ACK format. The scheduled builds
+declare their versions in the respective codec headers.
+[Packet formats](SCHEDULED_LINK.md)
 
-| Identifier         | Meaning                                                |
-|--------------------|--------------------------------------------------------|
-| `FW_VERSION`       | Firmware release version (SemVer)                      |
-| `PROTOCOL_VERSION` | On-air frame format compatibility                      |
-| `config_version`   | Committed radio/config profile version                 |
-| `schedule_version` | Gateway schedule-table version                         |
-| `BUILD_ID`         | Short Git commit hash or reproducible build identifier |
-| `boot_id`          | Runtime session identifier generated at boot           |
+Change the wire version when a layout, field encoding or message meaning
+breaks compatibility. The adaptive build binds a DATA SF to the current
+Gateway boot ID and frame. It does not save that SF to NVS.
+Use the build ID or SHA-256 to identify the image used in a test.
 
-## 2. Firmware SemVer
-
-Use `MAJOR.MINOR.PATCH` with pre-release suffixes during development.
+<details>
+<summary>Earlier release plan</summary>
 
 Suggested milestone mapping:
 
@@ -32,39 +36,4 @@ Suggested milestone mapping:
 This table is a proposed release sequence, not a statement that any
 milestone is complete.
 
-## 3. Protocol version
-
-`PROTOCOL_VERSION` records the legacy M2 protocol, currently `1`. The
-separate `heltec_wifi_lora_32_V3_research` image uses version `2`, declared in
-`scheduled_protocol.h`. `heltec_wifi_lora_32_V3_multiclient` uses version `3`
-from `multiclient_protocol.h`. Each profile rejects other wire versions.
-See [the scheduled protocols](SCHEDULED_LINK.md).
-
-Bump the protocol version for an incompatible change to:
-
-- fixed header layout;
-- field width or endianness;
-- message payload encoding;
-- message interpretation that prevents safe mixed-version operation.
-
-A new firmware release does not automatically require a protocol version
-bump.
-
-## 4. Configuration and schedule versions
-
-- `config_version` increments when a gateway-committed PHY/configuration
-  profile changes.
-- `schedule_version` increments when the active client-to-slot mapping
-  changes.
-- Both must be carried where required by the protocol.
-- A client must reject stale or unknown versions rather than guessing.
-
-## 5. Build artifacts
-
-Use role-neutral artifact naming because one firmware image selects its
-role from NVS:
-
-`adaptive-lora-v0.1.0-alpha.1-<build_id>.bin`
-
-If role-specific artifacts are introduced later for a documented reason,
-retain the same source code and record the build flags that differ.
+</details>

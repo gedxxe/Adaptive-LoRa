@@ -19,6 +19,7 @@ public:
     const char* stateName() const;
     const char* chip() const { return "SX1262_driver_id_not_exposed"; }
     uint32_t timeOnAir(size_t length) override { return hardware_.getTimeOnAir(length); }
+    int16_t setSpreadingFactor(uint8_t sf) override;
 private:
     enum class State { OFF, IDLE, RX, TX, FAULT };
     RadioHardware& hardware_;

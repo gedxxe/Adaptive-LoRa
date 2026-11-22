@@ -5,6 +5,15 @@ changes. It is not a substitute for the append-only build memory.
 
 ## Unreleased
 
+### Adaptive SF walk-test image
+
+- Add the opt-in v4 image with SF9 control, per-Client SF7–SF9 DATA
+  grants, bounded trial and rollback, and reservations for peer traffic.
+- Record applied and acknowledged DATA SF, delivery observations and
+  retune-to-RX service timing for a two- or five-board walk test.
+- Put the adaptive setup, original vector figures and airtime equations
+  in both READMEs.
+
 ### Multiclient timing and link adaptation research
 
 - Make `heltec_wifi_lora_32_V3_multiclient` the default development image.

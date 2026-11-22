@@ -32,8 +32,8 @@ V3.2 schematic and source details in their original context.
 | RF connector and antennas | V3 reference IPEX 1.0. Heltec offers several frequency variants | Verify each connector, RF SKU, monopole markings/band and matching |
 
 The installed Arduino-ESP32 3.3.11 `heltec_wifi_lora_32_V3` variant defines
-display aliases separately from default `Wire` pins 41/42. The default v3
-image uses the board aliases and asserts their values at compile time.
+display aliases separately from default `Wire` pins 41/42. The firmware
+uses the board aliases and asserts their values at compile time.
 No existing radio pin constants were edited. Keep board/peripheral pin and
 power assignments under their current owners. Reserve LED35, battery
 control37, UART43/44, USB19/20, boot straps, crystal and flash/JTAG resources
@@ -55,14 +55,14 @@ an unknown factory image or valid saved role may transmit. Never transmit
 with an open RF connector. Measure supply voltage during TX with a suitable
 50-ohm load and check feed and antenna placement before a range test.
 
-## Fixed research PHY
+## Radio settings
 
 | Parameter | Setting |
 |---|---|
 | Frequency | 915.0 MHz, provisional research setting |
 | Bandwidth | 125 kHz |
-| Data SF | SF7 |
-| Reserved control SF | SF9, unused by the active profiles |
+| DATA SF in the adaptive image | SF7–SF9, assigned per Client |
+| Control SF in the adaptive image | SF9 |
 | Coding rate | 4/5 |
 | Preamble | 8 symbols |
 | Header / PHY CRC | Explicit / enabled |
@@ -71,7 +71,7 @@ with an open RF connector. Measure supply voltage during TX with a suitable
 | SPI | 1 MHz, mode0, MSB first |
 | TCXO / radio regulator | DIO3 1.8 V / DC-DC |
 
-The current research PHY is fixed. RadioLib 7.8.1 restores its default 60 mA
+RadioLib 7.8.1 restores its default 60 mA
 OCP after setting PA power. The adapter then applies the SX1262 high-power
 140 mA OCP setting (Semtech datasheet, table 5-2) and checks the return code.
 Neither value is a board measurement. Heltec specifies 21 ± 1 dBm for the V3
@@ -83,7 +83,7 @@ monopoles for the first link after confirming their markings and suitability.
 See the [Semtech SX1262 documentation](https://www.semtech.com/products/wireless-rf/lora-connect/sx1262)
 and [Heltec V3 specifications](https://heltec.org/project/wifi-lora-32-v3/).
 
-## Bring-up evidence still required
+## Checks on the delivered boards
 
 Follow [BENCH_RUNBOOK.md](BENCH_RUNBOOK.md). Confirm received PCB/RF variant,
 flash/security/USB routing, supply, RF termination, TCXO/BUSY/DIO1/reset,

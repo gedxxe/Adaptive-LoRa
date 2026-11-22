@@ -1,6 +1,6 @@
 # Serial logging
 
-## Protocol v3 capture
+## Events to record
 
 Use the capture command in the [bench procedure](BENCH_RUNBOOK.md).
 Keep the original per-board `*.log` files, chunk indexes and `capture.json`.
@@ -16,7 +16,9 @@ paths, identifiers and private payloads. Preserve timestamps and run outcomes.
 | `V3_DATA_RX` and `APP_PAYLOAD` | Gateway validation and delivery to the example application sink. An exact duplicate does not count as another delivery. |
 | `V3_BITMAP_RX` | Client's feedback observation. A received bitmap with a missing bit differs from unknown or expired feedback. |
 | `V3_PAYLOAD_RESULT` | The Client's transaction outcome, including accepted or exhausted with missing or unknown feedback. |
-| `V3_LINK_SAMPLE` | Per-grant observation for offline ADR. Includes first delivery, retry delivery or no valid DATA and any available RSSI/SNR. |
+| `V3_LINK_SAMPLE` | Per-Client first-slot delivery, retry delivery or no valid DATA. The adaptive image also reports applied `sf`, `next_sf`, `locked` and the ADR decision. |
+| `ADR_APPLY` | DATA SF assigned in a Grant accepted by the Client. Match the DATA result to verify confirmation. |
+| `ADR_TIMING` | Number of retunes and the longest observed retune-to-RX service time, printed by `status`. |
 | `V3_LINK_STATUS` and `OLED_STATUS` | Live link freshness and display service timing. `worst_step_us` includes formatting and one service call. |
 
 Correlate Gateway and Client records using network, frame, Gateway session
@@ -30,11 +32,12 @@ Serial timestamps measure when the loop logs an event. Use radio and bus
 traces to measure physical completion and service delays. Missing serial
 events, nonzero `log_dropped` and truncated runs require separate treatment.
 Use the [diagnostic guide](DISPLAY_DIAGNOSTICS.md) for freshness and timing
-counters, and [the scheduled link reference](SCHEDULED_LINK.md#link-adaptation-experiments)
-for offline ADR inputs.
+counters. The [adaptive protocol](SCHEDULED_LINK.md#adaptive-protocol-v4)
+describes how reception and ACK receipts affect SF decisions. Event names
+retain their existing prefix so the analysis tools can read both builds.
 
 <details>
-<summary>Legacy v1 HELLO/ACK capture and record formats (Iterations 013 and 016)</summary>
+<summary>HELLO/ACK record format</summary>
 
 ## Serial format
 

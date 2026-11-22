@@ -1,24 +1,29 @@
-# 系统架构
+# 固件架构
 
-## 当前 Heltec 目标
+两种角色共用同一个 ESP32-S3 镜像。启动时，`FirmwareRuntime` 从 NVS schema 1
+读取角色和 ID。配置缺失或无效时，板卡停留在串口设置模式，并关闭应用发射。
+[烧录与配置](../../README.zh-CN.md#烧录与配置)
 
-两块 Heltec WiFi LoRa 32 V3.4 配 ESP32-S3/SX1262。用户确认沿用 V3.2 布线，
-编译使用 Arduino V3 variant，电气参考为 V3.2 原理图。
-`Esp32Firmware` 持有 `PreferencesConfigStorage` 和 `Sx1262Hardware`，并将它们交给
-`FirmwareRuntime`。同一镜像可用于 Gateway 和 Client，运行时根据 NVS schema 1 中的角色
-和节点 ID 选择路径。默认 v3 镜像运行 `MulticlientLink`。v1 目标使用 `GatewayApp` 或
-`ClientApp`，v2 目标使用 `ScheduledLink`。同一场测试中的所有板应运行同一协议版本。
-配置缺失或无效时进入串口配置模式，应用发射保持关闭。`main.cpp` 只负责委托
-Arduino 的 `setup` 和 `loop`。
+![Gateway 与 Client 架构](../research/figures/adaptive-architecture.svg)
 
-`RadioDriver` 负责无线状态、超时和错误处理，`Sx1262Hardware` 独占 RadioLib、SPI 和 GPIO。
-引脚、TCXO、RF 开关和串口参考见[硬件说明](HARDWARE.md)。v3 通过 `PayloadPort` 交付应用数据。
-[README 协议流程图](../../README.zh-CN.md#工作流程)展示请求、授权、DATA 和反馈之间的关系，
-[定时研究链路](SCHEDULED_LINK.md)记录线格式和时序规则。v3 使用 `MulticlientLink` 遥测，
-在空闲帧尾或 Client 搜索 Beacon 时更新显示，搜索期间在操作间轮询无线。详见[显示诊断](DISPLAY_DIAGNOSTICS.md)。
+| 模块 | 职责 |
+|---|---|
+| `main.cpp` 与 `Esp32Firmware` | 委托 Arduino 的 setup 和 loop，持有 ESP32 存储与无线适配器。 |
+| `FirmwareRuntime` | 读取配置、初始化无线、选择角色，处理无线事件、串口命令和诊断。 |
+| `MulticlientLink` | 运行 Gateway 和 Client 状态机，核对帧号与 boot ID，分配 DATA SF、时隙和重传，并核对 ACK 回执。 |
+| `PayloadPort` | 用固定缓冲区暂存一份待发数据，并通过同步回调交付接收数据。 |
+| `RadioDriver` 与 `Sx1262Hardware` | 管理无线状态、超时和 SF 切换。硬件适配器独占 SPI 与 RadioLib，DIO1 中断记录完成时间。 |
+| `NvsConfigStore` 与 `PreferencesConfigStorage` | 读取配置并校验写入，配置在受控重启后生效。 |
 
-Native 测试执行实际生产模块，并通过替身验证配置和事件转发。射频行为需要上板测量。
-SDK 调用仍可能同步等待，ERR-021 尚未关闭。完整的平台服务抽象、通用事件接口和在线 ADR 仍待实现。
+主循环先轮询无线，再推进状态机。调度以收发完成时间戳为锚点，发射决策用主循环当前
+时间，包括切换配置之后。屏幕在超帧空闲段或 Client 搜索 Beacon 时更新，它不改变无线配置。
+[帧时序与恢复](SCHEDULED_LINK.md#自适应协议-v4)
+
+编解码和时序计算不调用 ESP32 SDK，也不依赖具体应用数据。时钟和日志服务仍依赖 ESP32。
+SDK 和 RadioLib 的同步调用可能等待。待测时序项目见[测试计划](TEST_PLAN.md)。
+
+<details>
+<summary>早期架构与串口命令参考</summary>
 
 ## 截至Iteration013的历史架构说明
 
@@ -198,3 +203,5 @@ AGENTS 为当前合同，CODEX_START_PROMPT 明确归档；主机 TDMA 模型不
 Esp32Firmware 持有显示，Runtime 在主要工作之后服务，TX、Client 等 ACK 和 reboot
 期间暂停。Gateway/Client 只提供只读计数与最近有效接收。GPIO、电源/复位和 I²C
 独立于 radio、协议和 NVS。屏幕 故障单独记录；v3 可延时恢复显示。
+
+</details>

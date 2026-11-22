@@ -15,7 +15,7 @@ void SerialLogger::text(const char* line) {
     ++count_;
 }
 void SerialLogger::event(const char* name, const char* result, const Frame* frame,
-                         const RadioEvent* rx, int16_t code, uint32_t toa) {
+                         const RadioEvent* rx, int16_t code, uint32_t toa, uint8_t sf) {
     char line[512];
     char identity[192];
     if (frame) std::snprintf(identity, sizeof(identity),
@@ -31,7 +31,7 @@ void SerialLogger::event(const char* name, const char* result, const Frame* fram
     const int size = std::snprintf(line, sizeof(line),
         "uptime_us=%" PRId64 ",role=%s,network_id=%u,node_id=%u,event=%s,%s,sf=%u,bw_khz=%.0f,freq_mhz=%.3f,%s,toa_us=%s,code=%d,result=%s",
         esp_timer_get_time(), roleName(config_.role), config_.networkId, config_.nodeId, name, identity,
-        phy::dataSf, phy::bandwidthKhz, phy::frequencyMhz, metrics, airtime, code, result);
+        unsigned(sf ? sf : phy::dataSf), phy::bandwidthKhz, phy::frequencyMhz, metrics, airtime, code, result);
     if (size < 0 || static_cast<size_t>(size) >= sizeof(line)) { ++dropped_; return; }
     text(line);
 }

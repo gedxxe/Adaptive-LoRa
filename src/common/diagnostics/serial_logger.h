@@ -8,7 +8,7 @@ class SerialLogger {
 public:
     void begin(const DeviceConfig& config) { config_ = config; }
     void event(const char* name, const char* result, const Frame* frame = nullptr,
-               const RadioEvent* rx = nullptr, int16_t code = 0, uint32_t toa = 0);
+               const RadioEvent* rx = nullptr, int16_t code = 0, uint32_t toa = 0, uint8_t sf = 0);
     void text(const char* line);
     void drain();
     bool empty() const { return count_ == 0; }

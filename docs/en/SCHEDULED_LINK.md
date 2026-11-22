@@ -1,5 +1,63 @@
 # Scheduled research links
 
+## Adaptive protocol v4
+
+The `heltec_wifi_lora_32_V3_adaptive` experiment runs the same firmware on
+Gateway and Clients. It emits wire version 4 with a 28-byte header and
+a 96-byte frame limit. The [packet reference](PROTOCOL.md) lists the
+common header offsets. Multi-byte fields are little-endian.
+
+| Frame | SF | Payload fields in order |
+|---|---|---|
+| Beacon | 9 | Period (u32), count (u8), then node ID (u16) and byte limit (u8) for each Client |
+| Request | 9 | Gateway boot ID (u32), requested length (u8), latest ACKed frame (u32, zero if unknown) |
+| Grant | 9 | Count (u8), then granted length (u8), Client boot ID (u32) and DATA SF (u8) per entry |
+| DATA | 7–9 | Gateway boot ID (u32) and granted application bytes |
+| ACK bitmap | 9 | Count, accepted mask and retry mask (u8 each), then Client boot IDs (u32) |
+
+An empty Grant entry uses length `0xFF`, boot ID 0 and SF 0. A Client
+uses its granted SF for the current DATA and its retries. The frame and
+boot IDs link the Request, Grant and DATA. Without a valid Grant or retry
+assignment the Client keeps listening on SF9.
+
+The bench roster keeps eight IDs and up to 64 application bytes each. The
+15 s period uses an 80 ms interslot guard, a 20 ms retune lead and launch
+window, and reserves 300 ms at the end for display and loop service. The
+Gateway budgets reserved PHYs at the full roster's payload ceilings and
+keeps room for the four longest eligible retries in each shared round.
+It retains a peer's higher reservation during a lower-SF trial. Slots
+still use the actual submitted bytes. Higher SF is granted only if it fits.
+With the eight 64-byte ceilings and the other Clients at SF7, two SF9
+reservations fit (14.157 s including the tail). Three require 15.634 s.
+Measure radio timing on both roles before changing the guard. The
+[README](../../README.md#airtime-budget) gives the airtime equations.
+
+After two consecutive degraded reports at the applied SF, the Gateway
+tries the next SF if it fits. Degraded means DATA was first seen in a
+retry or no valid DATA arrived despite a Grant. The latter can include
+lost downlink control. Detected local timing failures and application
+refusals are excluded from the policy. Three consecutive first-slot
+deliveries and a Client ACK receipt at that SF mark the profile stable
+at the Gateway. After six first-slot
+deliveries and sufficient smoothed SNR, it may try one lower SF. Initial
+thresholds with margin are −3.5 dB for an SF7 trial and −6 dB for SF8.
+One degraded trial rolls back and holds off the next trial for eight
+first-slot deliveries. The thresholds are experimental, based on
+nominal LoRa demodulator requirements, and remain subject to calibration.
+[Semtech TN1300.05](https://www.semtech.com/uploads/technology/LoRa/predicting-lorawan-capacity.pdf)
+
+Gateway state is volatile and resets on a new Client boot ID or after four
+frames without that Client's Request. Beacon expiry returns the Client to
+SF9 search. The Client's display shows the SF of the last locally acknowledged
+DATA. The Gateway's `locked=1` reports stable delivery observations
+with a matched Client ACK receipt. See the [walk test](BENCH_RUNBOOK.md#adaptive-v4-walk-test)
+for how to join both records. `ADR_TIMING` reports elapsed loop time from
+requesting a PHY change to observing RX ready, which includes scheduling
+jitter. Use DIO1, NSS and BUSY traces for a physical radio timing bound.
+
+<details>
+<summary>Fixed-SF comparison formats</summary>
+
 ## Multi-client protocol v3
 
 Build `heltec_wifi_lora_32_V3_multiclient` for both roles. It uses SF7 for
@@ -229,3 +287,5 @@ latency risks still apply. There is no authenticated replay protection,
 multi-client allocation, general application delivery API, automatic PHY
 retune or gateway-side ADR. See the [research traceability matrix](../research/ALGORITHM_TRACEABILITY.md)
 for the paper assumptions and host evidence.
+
+</details>

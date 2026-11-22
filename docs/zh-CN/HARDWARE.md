@@ -17,14 +17,15 @@ V3 系列厂商资料列出 ESP32-S3FN8、SX1262、8 MB flash、CP2102 和 128 �
 | USB 和 flash | CP2102 UART0 43/44，8 MB flash | 逐块枚举，读 ROM 标识和分区/安全状态 |
 | RF 接头/天线 | 参考 IPEX 1.0，V3 有多个频段 SKU | 识别两板 SKU 和原装天线频段及匹配 |
 
-默认 v3 镜像使用 Arduino 板卡定义中的显示引脚，并在编译时检查引脚值。
+固件使用 Arduino 板卡定义中的显示引脚，并在编译时检查引脚值。
 `Wire` 的默认引脚 41/42 不用于显示。外设来源见[英文参考表](../en/HARDWARE.md)和历史迁移记录。
 首次上传前核对实板的显示接线、Vext 极性和稳定时间。
 
 USB/5 V供电按手册至少500 mA能力，直接3.3 V至少150 mA；用稳定5 V并留余量。测TX电压/电流、reset和温升，检查电池极性，不并联任意电源或从GPIO反向供电。射频在板上不能拆除，未知出厂固件或已保存角色可能发射，第一次上电和单板操作前也须接好 IPEX1.0 对应的 50 欧姆负载或天线，禁止开路发射。
 
-固定 PHY 为 915.0 MHz、BW125、SF7、CR4/5、前导 8、显式头、PHY CRC、sync 0x12、
-请求功率 22 dBm、SPI 1 MHz/mode 0/MSB。当前各镜像均使用 SF7，SF9 保留。RadioLib
+无线设置为 915.0 MHz、BW125、CR4/5、前导 8、显式头、PHY CRC、sync 0x12、
+请求功率 22 dBm、SPI 1 MHz/mode 0/MSB。自适应镜像的控制帧固定 SF9，
+DATA 按 Client 分配 SF7–SF9。RadioLib
 7.8.1 在设定 PA 后恢复其 60 mA 默认过流保护，适配器随后设置 SX1262 高功率
 140 mA OCP 并检查返回值，见 [Semtech 数据手册](https://www.semtech.com/products/wireless-rf/lora-connect/sx1262)
 表 5-2。[Heltec V3 规格](https://heltec.org/project/wifi-lora-32-v3/)为 21 ± 1 dBm，

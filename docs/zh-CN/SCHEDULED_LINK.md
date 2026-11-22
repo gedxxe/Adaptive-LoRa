@@ -1,5 +1,47 @@
 # 定时研究链路
 
+## 自适应协议 v4
+
+实验镜像 `heltec_wifi_lora_32_V3_adaptive` 同时用于 Gateway 和 Client，空口版本为 4。
+帧头为 28 字节，整帧上限 96 字节。[帧格式](PROTOCOL.md)列出公共帧头的偏移，
+多字节字段用小端序。
+
+| 帧 | SF | 载荷字段顺序 |
+|---|---|---|
+| Beacon | 9 | 周期 (u32)、节点数 (u8)，再按 Client 列出节点 ID (u16) 和载荷上限 (u8) |
+| Request | 9 | Gateway boot ID (u32)、请求长度 (u8)、最近确认的帧号 (u32，未知填 0) |
+| Grant | 9 | 节点数 (u8)，每项包含授权长度 (u8)、Client boot ID (u32) 和 DATA SF (u8) |
+| DATA | 7–9 | Gateway boot ID (u32) 和授权的应用载荷 |
+| ACK 位图 | 9 | 节点数、接收位图和重传位图（各 u8），随后是 Client boot ID (u32) |
+
+Grant 空项长度为 `0xFF`，boot ID 和 SF 为 0。Client 用授权 SF 发送当前帧的 DATA
+及重传。帧号与 boot ID 将 Request、Grant 和 DATA 对应起来。缺少有效授权或重传许可时，
+Client 留在 SF9 监听。
+
+实验名单支持八个 Client，每个最多 64 字节。15 秒周期采用 80 ms 时隙间隔，提前 20 ms
+切换，发射启动窗口为 20 ms，帧尾预留 300 ms。Gateway 按整个名单的载荷上限为已保留的 PHY
+计算预算，每轮覆盖空口时间最长的四个共享重传。试用较低 SF 时保留原退回预算。实际时隙仍按
+实际字节数安排，较高 SF 只有在预算内才会授权。按八个 Client 各预留 64 字节、其余节点为
+SF7 计算，两个 SF9 预留共需 14.157 秒（含帧尾），三个需要 15.634 秒。调整保护间隔前，
+先测量两种角色的无线时序。计算公式见 [README](../../README.zh-CN.md#空口时间预算)。
+
+同一 SF 连续两次首轮未收到 DATA 时，在预算内尝试升一级，包括重传收到和完全未收到。
+未收到也可能由下行授权丢失造成。检测到本机时序错误或应用拒绝的数据不用于调节。
+连续三次首轮交付且有同一 SF 的 Client ACK 回执后标记稳定。连续六次首轮交付且平滑 SNR
+有余量时，才试用低一级 SF。
+初始试验阈值为 SF7 的 −3.5 dB 和 SF8 的 −6 dB。低一级的试用失败即退回，至少等待八次
+首轮交付后再考虑试用。这些阈值基于典型解调门限加余量，仍需校准。
+[Semtech TN1300.05](https://www.semtech.com/uploads/technology/LoRa/predicting-lorawan-capacity.pdf)
+
+调整状态只保存在内存。Client boot ID 变化或四帧未收到其请求时清除。信标过期后 Client
+返回 SF9 搜索。屏幕显示上次成功确认的 DATA SF。Gateway 的 `locked=1` 表示稳定交付并收到
+匹配的 Client ACK 回执。双向事件按[走测流程](BENCH_RUNBOOK.md#自适应-v4-走测)对照。
+`ADR_TIMING` 包含从请求切换到主循环观察到 RX 就绪的耗时，含调度抖动。
+实物时序上限仍需用 DIO1、NSS 和 BUSY 波形测量。
+
+<details>
+<summary>固定 SF 对照协议</summary>
+
 ## 多 Client 协议 v3
 
 Gateway 和各 Client 均使用 `heltec_wifi_lora_32_V3_multiclient`，串口 `status`
@@ -141,3 +183,5 @@ SF7/BW125/CR4/5 下，完整帧 `L` 字节的空口时间为
 请求到发射时间。BUSY 和 flash 延迟风险仍存在。当前没有鉴权或持久防重放、多 Client
 分配、通用应用交付接口、自动 PHY 切换或 ADR。论文及主机证据见
 [追溯矩阵](../research/ALGORITHM_TRACEABILITY.md)。
+
+</details>

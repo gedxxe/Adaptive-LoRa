@@ -1,0 +1,134 @@
+Path | classification | lines | older-version mentions | wording flags | local links
+AGENTS.md | current/reference | 202 | 14 | 0 | 17
+CHANGELOG.md | engineering record | 163 | 25 | 0 | 0
+CODEX_START_PROMPT.md | prior report | 162 | 1 | 0 | 2
+docs/en/ARCHITECTURE.md | current/reference | 241 | 7 | 0 | 5
+docs/en/BENCH_RUNBOOK.md | current/reference | 179 | 2 | 0 | 8
+docs/en/BUILD_ITERATION_TEMPLATE.md | current/reference | 121 | 0 | 0 | 0
+docs/en/BUILD_MEMORY.md | engineering record | 1847 | 80 | 1 | 2
+docs/en/CONFIG_STORE_AUDIT.md | prior report | 75 | 1 | 0 | 0
+docs/en/DECISIONS.md | engineering record | 374 | 40 | 0 | 0
+docs/en/DEPENDENCY_BUDGET_AUDIT.md | prior report | 245 | 1 | 0 | 0
+docs/en/DISPLAY_DIAGNOSTICS.md | current/reference | 30 | 0 | 0 | 1
+docs/en/ERROR_LOG.md | engineering record | 730 | 27 | 0 | 0
+docs/en/HARDWARE.md | current/reference | 95 | 22 | 0 | 2
+docs/en/HARDWARE_MIGRATION_AUDIT.md | prior report | 231 | 26 | 0 | 2
+docs/en/IDENTITY_AUDIT.md | prior report | 184 | 0 | 0 | 0
+docs/en/IMPLEMENTATION_REPORT.md | prior report | 192 | 1 | 0 | 1
+docs/en/LOGGING_GUIDE.md | current/reference | 164 | 0 | 0 | 4
+docs/en/MILESTONE_TASKS.md | current/reference | 145 | 6 | 1 | 3
+docs/en/PHYSICAL_ACCEPTANCE_READINESS.md | prior report | 18 | 3 | 0 | 1
+docs/en/PROGRESS.md | current/reference | 363 | 27 | 0 | 18
+docs/en/PROTOCOL.md | current/reference | 204 | 19 | 0 | 4
+docs/en/RADIO_DRIVER_AUDIT.md | prior report | 65 | 1 | 0 | 0
+docs/en/RUNTIME_AUDIT.md | prior report | 80 | 1 | 0 | 0
+docs/en/SCHEDULED_LINK.md | current/reference | 291 | 14 | 1 | 12
+docs/en/SOFTWARE_AUDIT.md | prior report | 130 | 2 | 0 | 0
+docs/en/STARTUP_AND_PROVISIONING.md | current/reference | 5 | 0 | 0 | 2
+docs/en/TDMA_FEASIBILITY.md | current/reference | 214 | 5 | 0 | 7
+docs/en/TEST_PLAN.md | current/reference | 471 | 9 | 0 | 4
+docs/en/VERSIONING.md | current/reference | 39 | 0 | 0 | 1
+docs/references/FIGURE_SOURCE_REGISTER.md | current/reference | 69 | 4 | 0 | 29
+docs/references/README.md | current/reference | 128 | 2 | 0 | 12
+docs/research/ALGORITHM_TRACEABILITY.md | current/reference | 41 | 0 | 0 | 14
+docs/research/ITERATION_019_AUDIT.md | prior report | 23 | 12 | 1 | 1
+docs/zh-CN/ARCHITECTURE.md | current/reference | 207 | 5 | 0 | 4
+docs/zh-CN/BENCH_RUNBOOK.md | current/reference | 100 | 2 | 0 | 8
+docs/zh-CN/CONFIG_STORE_AUDIT.md | prior report | 29 | 1 | 0 | 0
+docs/zh-CN/DECISIONS.md | engineering record | 207 | 38 | 0 | 0
+docs/zh-CN/DEPENDENCY_BUDGET_AUDIT.md | prior report | 135 | 1 | 0 | 0
+docs/zh-CN/DISPLAY_DIAGNOSTICS.md | current/reference | 22 | 0 | 0 | 1
+docs/zh-CN/HARDWARE.md | current/reference | 38 | 10 | 0 | 1
+docs/zh-CN/HARDWARE_MIGRATION_AUDIT.md | prior report | 152 | 10 | 0 | 3
+docs/zh-CN/IDENTITY_AUDIT.md | prior report | 15 | 0 | 0 | 1
+docs/zh-CN/LOGGING_GUIDE.md | current/reference | 67 | 0 | 0 | 4
+docs/zh-CN/PHYSICAL_ACCEPTANCE_READINESS.md | prior report | 13 | 4 | 0 | 1
+docs/zh-CN/PROGRESS.md | current/reference | 308 | 25 | 0 | 18
+docs/zh-CN/PROTOCOL.md | current/reference | 118 | 14 | 0 | 4
+docs/zh-CN/RADIO_DRIVER_AUDIT.md | prior report | 33 | 1 | 0 | 0
+docs/zh-CN/RUNTIME_AUDIT.md | prior report | 43 | 0 | 0 | 0
+docs/zh-CN/SCHEDULED_LINK.md | current/reference | 187 | 11 | 0 | 12
+docs/zh-CN/SOFTWARE_AUDIT.md | prior report | 61 | 1 | 0 | 0
+docs/zh-CN/STARTUP_AND_PROVISIONING.md | current/reference | 4 | 0 | 0 | 2
+docs/zh-CN/TDMA_FEASIBILITY.md | current/reference | 132 | 4 | 0 | 8
+docs/zh-CN/TEST_PLAN.md | current/reference | 197 | 7 | 0 | 3
+logs/build/iteration-006-baseline/AGENTS.md | archived snapshot | 680 | 1 | 0 | 0
+logs/build/iteration-006-baseline/CHANGELOG.md | archived snapshot | 31 | 1 | 0 | 0
+logs/build/iteration-006-baseline/CODEX_START_PROMPT.md | archived snapshot | 153 | 1 | 0 | 0
+logs/build/iteration-006-baseline/docs/en/ARCHITECTURE.md | archived snapshot | 189 | 0 | 0 | 0
+logs/build/iteration-006-baseline/docs/en/BENCH_RUNBOOK.md | archived snapshot | 77 | 0 | 0 | 0
+logs/build/iteration-006-baseline/docs/en/BUILD_ITERATION_TEMPLATE.md | archived snapshot | 121 | 0 | 0 | 0
+logs/build/iteration-006-baseline/docs/en/BUILD_MEMORY.md | archived snapshot | 350 | 5 | 0 | 0
+logs/build/iteration-006-baseline/docs/en/DECISIONS.md | archived snapshot | 104 | 1 | 0 | 0
+logs/build/iteration-006-baseline/docs/en/ERROR_LOG.md | archived snapshot | 166 | 7 | 0 | 0
+logs/build/iteration-006-baseline/docs/en/HARDWARE.md | archived snapshot | 168 | 0 | 0 | 0
+logs/build/iteration-006-baseline/docs/en/IMPLEMENTATION_REPORT.md | archived snapshot | 183 | 1 | 0 | 0
+logs/build/iteration-006-baseline/docs/en/LOGGING_GUIDE.md | archived snapshot | 55 | 0 | 0 | 0
+logs/build/iteration-006-baseline/docs/en/MILESTONE_TASKS.md | archived snapshot | 94 | 1 | 0 | 0
+logs/build/iteration-006-baseline/docs/en/PROGRESS.md | archived snapshot | 77 | 0 | 0 | 0
+logs/build/iteration-006-baseline/docs/en/PROTOCOL.md | archived snapshot | 237 | 4 | 0 | 0
+logs/build/iteration-006-baseline/docs/en/TEST_PLAN.md | archived snapshot | 294 | 0 | 0 | 0
+logs/build/iteration-006-baseline/docs/en/VERSIONING.md | archived snapshot | 66 | 0 | 0 | 0
+logs/build/iteration-006-baseline/docs/zh-CN/ARCHITECTURE.md | archived snapshot | 104 | 0 | 0 | 0
+logs/build/iteration-006-baseline/docs/zh-CN/BENCH_RUNBOOK.md | archived snapshot | 70 | 0 | 0 | 0
+logs/build/iteration-006-baseline/docs/zh-CN/DECISIONS.md | archived snapshot | 13 | 1 | 0 | 0
+logs/build/iteration-006-baseline/docs/zh-CN/HARDWARE.md | archived snapshot | 75 | 0 | 0 | 0
+logs/build/iteration-006-baseline/docs/zh-CN/LOGGING_GUIDE.md | archived snapshot | 7 | 0 | 0 | 0
+logs/build/iteration-006-baseline/docs/zh-CN/PROGRESS.md | archived snapshot | 66 | 0 | 0 | 0
+logs/build/iteration-006-baseline/docs/zh-CN/PROTOCOL.md | archived snapshot | 115 | 4 | 0 | 0
+logs/build/iteration-006-baseline/docs/zh-CN/TEST_PLAN.md | archived snapshot | 70 | 0 | 0 | 0
+logs/build/iteration-006-baseline/PACKAGE_MANIFEST.md | archived snapshot | 36 | 0 | 0 | 0
+logs/build/iteration-006-baseline/README.md | archived snapshot | 129 | 0 | 0 | 2
+logs/build/iteration-006-baseline/README.zh-CN.md | archived snapshot | 97 | 0 | 0 | 1
+logs/build/iteration-007-review-snapshot/AGENTS.md | archived snapshot | 685 | 1 | 0 | 0
+logs/build/iteration-007-review-snapshot/CHANGELOG.md | archived snapshot | 38 | 2 | 0 | 0
+logs/build/iteration-007-review-snapshot/CODEX_START_PROMPT.md | archived snapshot | 153 | 1 | 0 | 0
+logs/build/iteration-007-review-snapshot/docs/en/ARCHITECTURE.md | archived snapshot | 197 | 0 | 0 | 0
+logs/build/iteration-007-review-snapshot/docs/en/BENCH_RUNBOOK.md | archived snapshot | 79 | 0 | 0 | 0
+logs/build/iteration-007-review-snapshot/docs/en/BUILD_ITERATION_TEMPLATE.md | archived snapshot | 121 | 0 | 0 | 0
+logs/build/iteration-007-review-snapshot/docs/en/BUILD_MEMORY.md | archived snapshot | 437 | 6 | 0 | 0
+logs/build/iteration-007-review-snapshot/docs/en/DECISIONS.md | archived snapshot | 114 | 1 | 0 | 0
+logs/build/iteration-007-review-snapshot/docs/en/ERROR_LOG.md | archived snapshot | 207 | 7 | 0 | 0
+logs/build/iteration-007-review-snapshot/docs/en/HARDWARE.md | archived snapshot | 166 | 0 | 0 | 0
+logs/build/iteration-007-review-snapshot/docs/en/IMPLEMENTATION_REPORT.md | archived snapshot | 185 | 1 | 0 | 0
+logs/build/iteration-007-review-snapshot/docs/en/LOGGING_GUIDE.md | archived snapshot | 57 | 0 | 0 | 0
+logs/build/iteration-007-review-snapshot/docs/en/MILESTONE_TASKS.md | archived snapshot | 94 | 1 | 0 | 0
+logs/build/iteration-007-review-snapshot/docs/en/PROGRESS.md | archived snapshot | 79 | 1 | 0 | 0
+logs/build/iteration-007-review-snapshot/docs/en/PROTOCOL.md | archived snapshot | 237 | 4 | 0 | 0
+logs/build/iteration-007-review-snapshot/docs/en/SOFTWARE_AUDIT.md | archived snapshot | 102 | 2 | 0 | 0
+logs/build/iteration-007-review-snapshot/docs/en/TEST_PLAN.md | archived snapshot | 308 | 0 | 0 | 0
+logs/build/iteration-007-review-snapshot/docs/en/VERSIONING.md | archived snapshot | 66 | 0 | 0 | 0
+logs/build/iteration-007-review-snapshot/docs/zh-CN/ARCHITECTURE.md | archived snapshot | 112 | 0 | 0 | 0
+logs/build/iteration-007-review-snapshot/docs/zh-CN/BENCH_RUNBOOK.md | archived snapshot | 72 | 0 | 0 | 0
+logs/build/iteration-007-review-snapshot/docs/zh-CN/DECISIONS.md | archived snapshot | 21 | 1 | 0 | 0
+logs/build/iteration-007-review-snapshot/docs/zh-CN/HARDWARE.md | archived snapshot | 78 | 0 | 0 | 0
+logs/build/iteration-007-review-snapshot/docs/zh-CN/LOGGING_GUIDE.md | archived snapshot | 9 | 0 | 0 | 0
+logs/build/iteration-007-review-snapshot/docs/zh-CN/PROGRESS.md | archived snapshot | 68 | 1 | 0 | 0
+logs/build/iteration-007-review-snapshot/docs/zh-CN/PROTOCOL.md | archived snapshot | 115 | 4 | 0 | 0
+logs/build/iteration-007-review-snapshot/docs/zh-CN/SOFTWARE_AUDIT.md | archived snapshot | 35 | 1 | 0 | 0
+logs/build/iteration-007-review-snapshot/docs/zh-CN/TEST_PLAN.md | archived snapshot | 80 | 0 | 0 | 0
+logs/build/iteration-007-review-snapshot/PACKAGE_MANIFEST.md | archived snapshot | 36 | 0 | 0 | 0
+logs/build/iteration-007-review-snapshot/README.md | archived snapshot | 135 | 0 | 0 | 2
+logs/build/iteration-007-review-snapshot/README.zh-CN.md | archived snapshot | 99 | 0 | 0 | 1
+logs/README.md | current/reference | 26 | 0 | 0 | 0
+logs/test/iteration-007-scenarios.md | archived snapshot | 101 | 0 | 0 | 0
+logs/test/iteration-008-scenarios.md | archived snapshot | 101 | 0 | 0 | 0
+logs/test/iteration-009-scenarios.md | archived snapshot | 175 | 0 | 0 | 0
+logs/test/iteration-010-scenarios.md | archived snapshot | 232 | 0 | 0 | 0
+logs/test/iteration-011-scenarios.md | archived snapshot | 280 | 0 | 0 | 0
+logs/test/iteration-012-scenarios.md | archived snapshot | 294 | 0 | 0 | 0
+logs/test/iteration-013-main-integration-scenarios.md | archived snapshot | 294 | 0 | 0 | 0
+logs/test/iteration-013-scenarios.md | archived snapshot | 294 | 0 | 0 | 0
+logs/test/iteration-014-scenarios.md | archived snapshot | 306 | 0 | 0 | 0
+logs/test/iteration-015-scenarios.md | archived snapshot | 311 | 0 | 0 | 0
+logs/test/RUN_RECORD_TEMPLATE.md | current/reference | 52 | 1 | 0 | 0
+PACKAGE_MANIFEST.md | current/reference | 13 | 1 | 0 | 5
+README.md | current/reference | 148 | 1 | 0 | 10
+README.zh-CN.md | current/reference | 132 | 1 | 0 | 10
+THIRD_PARTY.md | current/reference | 13 | 0 | 0 | 0
+Totals: {'current/reference': 35, 'engineering record': 5, 'prior report': 19, 'archived snapshot': 68} all: 127
+Unresolved local file links: 2
+archived snapshot | logs/build/iteration-006-baseline/README.md | logs/test/RUN_RECORD_TEMPLATE.md
+archived snapshot | logs/build/iteration-007-review-snapshot/README.md | logs/test/RUN_RECORD_TEMPLATE.md
+Unresolved Markdown heading links: 0
+Firmware/config/native test inputs identical to pre-edit working tree: 79

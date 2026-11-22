@@ -2,88 +2,92 @@
 
 [English](README.md)
 
-Adaptive-LoRa 是面向工业传感的定时 LoRa P2P 网络。一个 Heltec ESP32-S3/SX1262
-Gateway 使用单个半双工收发器，最多服务八个 Client。所有板卡运行同一固件，角色和节点
-ID 由已保存的配置决定。
+Adaptive-LoRa 是面向工业遥测的 LoRa 网络。一台 Gateway 用一颗 SX1262 服务最多八个
+Client，为每个 Client 分配发射时隙，并可单独选择其数据扩频因子（SF）。各板使用同一固件，
+启动时从已保存的配置读取角色。
 
-项目研究如何在信标、DATA 和反馈共用一个收发器的条件下提高交付的可预期性。
-Gateway 按实际载荷长度分配时隙，汇总确认，并为仍缺少 DATA 的 Client 分配重传机会。
-目前链路使用固定 PHY，同时采集自适应数据率（ADR）实验所需的链路数据。
-
-| 设置 | 值 |
-|---|---|
-| 固件 / 协议 | `0.2.0-alpha.1` / `3` |
-| 默认 PlatformIO 目标 | `heltec_wifi_lora_32_V3_multiclient` |
-| 默认名单 | Gateway **1**，Client **2–9**，网络 **1** |
-| 应用载荷 | 每个 Client 最多 **64 字节** |
-| 研究 PHY | 暂定 **915.0 MHz**、**SF7**、**BW125**、**CR 4/5** |
-| 默认超帧 | **6.766 s**，按完整名单预留；时隙保护间隔暂定 **50 ms** |
+![单射频 Gateway 与最多八个 Client 的架构，SF9 用于控制，各 Client 在独立时隙发数据](docs/research/figures/adaptive-architecture.svg)
 
 ## 工作流程
 
-```mermaid
-flowchart TD
-    beacon["Gateway 广播名单与周期 BEACON"] --> requests["有待发数据的 Client 按名单顺序申请字节数"]
-    requests --> active{"有有效请求？"}
-    active -->|是| grant["Gateway 广播按长度分配的 SLOT_GRANT"]
-    active -->|否| next["等待下一次 BEACON"]
-    grant --> data["获授权的 Client 依次在时隙中发送 DATA"]
-    data --> bitmap["Gateway 发送累计确认 ACK_BITMAP"]
-    bitmap --> rounds{"还预留了后续反馈轮次？"}
-    rounds -->|是| retry{"Client 有有效的重传授权？"}
-    retry -->|是| resend["Client 重发同一标识的 DATA"]
-    retry -->|否| silent["Client 等待下一轮位图"]
-    resend --> bitmap
-    silent --> bitmap
-    rounds -->|否| next
-    next --> beacon
+Gateway 首先广播 Beacon。有数据待发的 Client 申请时隙，Gateway 通过 Grant 指定
+载荷长度和 DATA SF。Client 依次发送后，Gateway 用一份 ACK 位图公布接收结果和
+重传许可。Beacon、Request、Grant 和 ACK 均使用 SF9。DATA 及其重传使用授权的 SF7–SF9。
+
+![Beacon、时隙请求、Grant、DATA、ACK 位图和选择性重传的顺序](docs/research/figures/adaptive-frame.svg)
+
+某个 Client 的首轮传输反复失败时，Gateway 会在时序允许的情况下提高 SF。交付情况和
+信号质量改善后，可试用较低 SF，失败时回到上一个设置。连续三次首轮交付成功且收到该
+Client 的匹配 ACK 回执后，Gateway 才确认该 SF 稳定。
+
+```math
+\begin{aligned}
+&\textbf{Gateway per superframe}\\
+&\quad\text{Send Beacon and collect Requests on SF9}\\
+&\quad\text{If requested, fit slots and send Grant}\\
+&\quad\textbf{For each DATA or retry round}\\
+&\qquad\text{Receive DATA at each assigned SF}\\
+&\qquad\text{Send ACK bitmap with retry grants on SF9}\\
+&\quad\text{Update SF from delivery, SNR and receipts}\\[3pt]
+&\textbf{Client}\\
+&\quad\text{Request a slot and echo the last ACKed frame}\\
+&\quad\text{Send DATA under a matching Grant}\\
+&\quad\text{Return to SF9 and check the ACK bitmap}
+\end{aligned}
 ```
 
-两端以无线完成事件的时间戳作为时序锚点。Client 要有当帧授权才能发射。若丢失反馈，
-本轮保持静默，后续累计位图仍可确认此前的交付。信标过期后，Client 持续接收以重新获取调度。
+### 空口时间预算
 
-## 研究进展
+设 $b$ 为应用载荷字节数，$s$ 为扩频因子。额外 32 字节用于帧头和 Gateway boot ID。
+公式采用 125 kHz 带宽、CR 4/5、8 个前导符号和 PHY CRC。
 
-| 方向 | 已实现与验证 | 待研究或实测 |
-|---|---|---|
-| 同步与 TDMA | DIO1 完成时间戳、按长度授权和串行时隙；实际状态机已在主机上模拟 1、2、4、8 个 Client。 | 实测 IRQ 时延、启动发送、恢复接收和时钟漂移。 |
-| 交付与重传 | 累计 ACK 位图，每轮重传至多四个共享时隙。主机测试覆盖丢包、去重和重启恢复。 | 比较八个实物 Client 的首轮交付率及重传后交付率。 |
-| 链路自适应 | 按 Client 记录接收结果；离线 ADR 工具支持自定义阈值和滞回。 | 设计带版本的 PHY 切换协商、测量 SX1262 切换耗时，并验证控制帧丢失后的恢复。 |
-| 容量 | 默认八个 Client 的名单通过时序预算计算。 | 更大规模需要新的控制帧和调度设计。 |
+```math
+\begin{aligned}
+n(b,s)&=\left\lceil\frac{8(b+32)+44-4s}{4s}\right\rceil\\
+T_{\mathrm{slot}}(b,s)&=\left(0.080+
+\bigl(20.25+5n(b,s)\bigr)\frac{2^s}{125000}\right)\mathrm{s}.
+\end{aligned}
+```
 
-四篇论文分别为不同机制提供依据。TS-VP-LoRa 对应按载荷分配时隙；LoRaHART 对应
-汇总反馈；ATS-LoRa 对应容量预算；Soy 的研究对应链路自适应实验。
-[研究映射](docs/research/ALGORITHM_TRACEABILITY.md) 关联论文、代码与验证证据。
-[进度记录](docs/zh-CN/PROGRESS.md) 提供构建和主机测试结果。九板射频试验仍待完成。
+Gateway 按完整名单 $R$ 中各节点的载荷上限 $B_i$ 检查新 SF 是否有足够时间。
+每轮重传为最长的四个时隙 $H_4$ 预留时间。$T_{\mathrm{ctrl}}$ 包含控制帧和其余保护间隔。
+
+```math
+\begin{aligned}
+T_{\mathrm{reserved}}={}&T_{\mathrm{ctrl}}+
+\sum_{i\in R}T_{\mathrm{slot}}(B_i,s_i)\\
+&+3\sum_{i\in H_4}T_{\mathrm{slot}}(B_i,s_i)+0.300\,\mathrm{s}
+\ \leq\ 15\ \mathrm{s}.
+\end{aligned}
+```
+
+按八个 Client 各预留 64 字节、其余节点用 SF7 计算，两个 SF9 链路需预留
+14.157 秒，三个需要 15.634 秒。这些数值来自模型计算。
+
+走测镜像采用 **15 秒超帧**、每个 Client **最多 64 字节数据**，无线参数为
+**915.0 MHz / 125 kHz / CR 4/5**。主机测试覆盖不同 SF 的通信、控制帧丢失后的恢复、
+以及一个移动 Client 与三个固定 Client 的模拟。实板覆盖和时序仍需测量。
+[研究参考与测试结果](docs/research/ALGORITHM_TRACEABILITY.md)
 
 ## 烧录与配置
 
-使用 Heltec WiFi LoRa 32 V3.4，上电前接入合适的 50 欧姆天线或负载。已保存角色的
-板卡可能在启动后发射。若需要保留现有镜像或配置，请先按
-[备份与射频台架流程](docs/zh-CN/BENCH_RUNBOOK.md) 操作，再打开串口或上传。使用获准的射频设置。
+使用 **Heltec WiFi LoRa 32 V3.4**。上电前连接合适的 50 欧姆天线或负载，并在获准的
+射频条件下测试。需要保留原固件或配置时，先完成同板备份，再打开串口或上传。
+[首次上电检查与备份](docs/zh-CN/BENCH_RUNBOOK.md)
 
-### 1. 向各板卡上传同一固件
-
-在 VS Code 的 PlatformIO 中打开本仓库，或在项目根目录运行以下命令。
-用可传数据的 USB-C 线每次连接一块板。确认实际 COM 端口，关闭已打开的串口监视器后再上传。
-若终端找不到 `pio`，请使用 VS Code 的 PlatformIO 终端。
+用 USB 数据线逐块连接，在 PlatformIO 终端中将 `COMx` 换成该板的实际端口。
+上传前关闭已打开的串口监视器。两种角色使用同一个镜像。
 
 ```powershell
 pio device list
-$port = 'COMx' # 换成观测到的端口
-pio run -e heltec_wifi_lora_32_V3_multiclient -t upload --upload-port $port
+$port = 'COMx' # 换成实际端口
+pio run -e heltec_wifi_lora_32_V3_adaptive -t upload --upload-port $port
 pio device monitor --port $port --baud 115200
 ```
 
-在 VS Code 侧栏可依次选择 **PlatformIO → Project Tasks →
-heltec_wifi_lora_32_V3_multiclient → General → Upload**，再打开 **Monitor**。
-使用相同分区布局的常规上传以保留 NVS。若没有板卡对应的 COM 端口，按
-[USB 排查步骤](docs/zh-CN/BENCH_RUNBOOK.md#windows-设备管理器) 检查。
-
-### 2. 设置 Gateway 和 Client 角色
-
-在串口监视器中逐行发送命令。所有板卡使用相同的网络 ID 和 Gateway ID。
-第一个 Client 的 node ID 为 **2**，其余 Client 各用一个不同的 **3–9**。
+在 VS Code 中也可选择 **PlatformIO → Project Tasks →
+heltec_wifi_lora_32_V3_adaptive → General → Upload**，再打开 **Monitor**。
+若没有 COM 口，按 [USB 检查步骤](docs/zh-CN/BENCH_RUNBOOK.md#windows-设备管理器)排查。
 
 **Gateway**
 
@@ -97,7 +101,7 @@ config show
 config save
 ```
 
-**第一个 Client**
+**首个 Client**
 
 ```text
 config set role client
@@ -109,20 +113,20 @@ config show
 config save
 ```
 
-收到 `CONFIG_SAVED` 后发送 `reboot`。必要时重连串口，再执行 `status`，核对已加载
-的角色、ID、`protocol=3` 和 `profile=multiclient`。Gateway 报告
-`roster_count=8` 和 `period_us=6766000`。即使只有一块 Client 在线，数量仍是名单
-容量。3 s 设置用于产生示例载荷，实际发送时机由 Gateway 的调度决定。
+后续 Client 使用不同的节点 ID **3–9**。用 `config show` 检查待保存值，
+看到 `CONFIG_SAVED` 后发送 `reboot`，必要时重新打开串口，再执行 `status`。
+核对角色、ID、`protocol=4` 和 `profile=adaptive`。3000 ms 为示例数据生成间隔，
+实际空口发射仍按 Gateway 的 15 秒调度执行。
 
-### 3. 验证链路
+## 验证链路
 
-先用一个 Gateway 和一个 Client。对同一帧，确认 Gateway 输出 `APP_PAYLOAD`，
-Client 输出 `V3_PAYLOAD_RESULT` 且 `result=accepted`。再测试 Gateway 断电与恢复。
-双板通过后，逐步增加至 2、4、8 个 Client。包数、日志采集和时序测量见
-[台架流程](docs/zh-CN/BENCH_RUNBOOK.md)。
+先近距测试一个 Gateway 和一个 Client。核对同一帧的 Gateway `APP_PAYLOAD` 和
+Client `V3_PAYLOAD_RESULT`，后者应包含 `result=accepted`。首个 SF7 载荷确认后，
+Client 的 DATA 页显示 `ACKED DATA SF7`。走测时固定 Client 3–5，只移动 Client 2。
+记录其 SF 变化及固定节点是否持续交付。 [走测和日志采集](docs/zh-CN/BENCH_RUNBOOK.md#自适应-v4-走测)
 
-## 延伸阅读
+## 参考
 
-- [协议与时隙调度](docs/zh-CN/SCHEDULED_LINK.md)
-- [研究文献与代码映射](docs/research/ALGORITHM_TRACEABILITY.md)
-- [当前证据与待完成的里程碑](docs/zh-CN/PROGRESS.md)
+- [固件架构与模块职责](docs/zh-CN/ARCHITECTURE.md)
+- [无线参数、帧格式与时序](docs/zh-CN/SCHEDULED_LINK.md)
+- [软件检查、现场结果与对照镜像](docs/zh-CN/PROGRESS.md)
