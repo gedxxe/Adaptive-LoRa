@@ -1,0 +1,8 @@
+README.md: 1 displayed formula blocks
+README.zh-CN.md: 1 displayed formula blocks
+docs/en/SCHEDULED_LINK.md: 5 displayed formula blocks
+docs/zh-CN/SCHEDULED_LINK.md: 5 displayed formula blocks
+Rendered 45 distinct inline and display expressions using MathJax.
+195 DATA lengths and SF combinations match the airtime model.
+2 higher-SF reservations: 14.156640 s on 15 s budget, fits=True
+3 higher-SF reservations: 15.634272 s on 15 s budget, fits=False

@@ -34,17 +34,14 @@ Historical records retain their original hardware and results.
 Inspect the workspace, Git status and fetched remote refs before changing files.
 Preserve user work. Read README.md and these canonical English documents:
 
-- [ARCHITECTURE.md](docs/en/ARCHITECTURE.md), [HARDWARE.md](docs/en/HARDWARE.md),
-  [PROTOCOL.md](docs/en/PROTOCOL.md), [TEST_PLAN.md](docs/en/TEST_PLAN.md).
+- [Setup and field test](docs/en/BENCH_RUNBOOK.md) and
+  [Protocol and equations](docs/en/SCHEDULED_LINK.md).
 - [PROGRESS.md](docs/en/PROGRESS.md), [BUILD_MEMORY.md](docs/en/BUILD_MEMORY.md),
-  [ERROR_LOG.md](docs/en/ERROR_LOG.md), [DECISIONS.md](docs/en/DECISIONS.md),
-  [VERSIONING.md](docs/en/VERSIONING.md).
+  [ERROR_LOG.md](docs/en/ERROR_LOG.md), [DECISIONS.md](docs/en/DECISIONS.md).
 
-Read source and tests for the affected boundary. For hardware work also read
-[HARDWARE_MIGRATION_AUDIT.md](docs/en/HARDWARE_MIGRATION_AUDIT.md) and
-[BENCH_RUNBOOK.md](docs/en/BENCH_RUNBOOK.md). Future scheduling work starts with
-[MILESTONE_TASKS.md](docs/en/MILESTONE_TASKS.md) and
-[TDMA_FEASIBILITY.md](docs/en/TDMA_FEASIBILITY.md).
+Read source and tests for the affected boundary. Use the
+[pinned documentation snapshot](docs/en/PROGRESS.md#past-work) for
+earlier hardware audits, comparison formats and test plans.
 English is canonical; align the Chinese companion when a decision or operator
 procedure changes. CODEX_START_PROMPT.md is an archived contract, not current
 instructions. Do not update old logs or historical results to match this target.
@@ -71,7 +68,7 @@ actual supply margin/current and check battery polarity. Do not parallel
 regulators or back-power through GPIO. Moxon fabrication, matching and gain
 are unmeasured. Radiated testing requires an authorized RF setup.
 
-## Ownership and compatibility
+## Board roles and compatibility
 
 Use one firmware image. A valid NVS role selects the gateway or client path;
 missing/corrupt/incompatible config enters provisioning with application TX
@@ -122,7 +119,7 @@ Use monotonic, wrap-safe deadlines within the half-range of their timer type.
 V3 display work uses the runtime's quiet-tail check. Protect peer retry
 slots and the expected beacon window even after the local transaction ends.
 Keep RX armed and poll between display chunks while searching for a beacon. See
-[display diagnostics](docs/en/DISPLAY_DIAGNOSTICS.md).
+[field test](docs/en/BENCH_RUNBOOK.md#check-the-pair-and-walk-the-route).
 Keep application hot paths allocation-free and avoid Arduino String,
 blocking delays, unbounded parsing and ISR SPI/logging/allocation. Check
 return codes and lengths. Dependency calls may still block: ERR-021 BUSY
@@ -132,7 +129,7 @@ third-party libraries or add abstractions speculatively.
 
 ## Scope and next work
 
-Use the [README](README.md#flash-and-configure) for the adaptive walk-test setup.
+Use the [setup guide](docs/en/BENCH_RUNBOOK.md#flash-and-set-roles) for the adaptive walk test.
 Keep electrical checks and backups in the [bench procedure](docs/en/BENCH_RUNBOOK.md).
 Start RF testing with one Gateway and one Client, then expand through eight
 Clients. Measure radio turnaround, IRQ latency and drift before closing

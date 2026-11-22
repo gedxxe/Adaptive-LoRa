@@ -728,3 +728,11 @@ README snapshots. The current run-record template resolves, and the
 original snapshots remain available. See
 `logs/test/iteration-022-docs-inventory.log` and
 `logs/test/iteration-022-docs-render-and-model.log`.
+
+## ERR-046 — README pseudocode presentation
+
+The original README put the algorithm inside a MathJax alignment block.
+The GitHub screenshot showed the steps as centered text rather than a
+code listing. The new README uses a fenced listing for the two roles and
+reserves math blocks for equations. Local browser previews and a
+Markdown structure check verified the corrected listing.

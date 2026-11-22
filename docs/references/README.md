@@ -124,5 +124,5 @@ frame-size results as factory sizing evidence are **Not adopted**.
 - [Semtech SX1262 product and datasheet](https://www.semtech.com/products/wireless-rf/lora-connect/sx1262)
   provides the transceiver constraints.
 - [Heltec WiFi LoRa 32 V3](https://heltec.org/project/wifi-lora-32-v3/)
-  and the [project hardware record](../en/HARDWARE.md) provide the board
+  and the [board reference](../en/SCHEDULED_LINK.md#board-reference) provide the board
   reference and separate bench evidence.

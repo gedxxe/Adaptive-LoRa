@@ -5,14 +5,13 @@ from pathlib import Path
 import re
 
 READMES = ("README.md", "README.zh-CN.md")
+GUIDES = ("docs/en/BENCH_RUNBOOK.md", "docs/zh-CN/BENCH_RUNBOOK.md")
+PROTOCOLS = ("docs/en/SCHEDULED_LINK.md", "docs/zh-CN/SCHEDULED_LINK.md")
 CURRENT_DOCS = ("AGENTS.md", "docs/en/PROGRESS.md", "docs/zh-CN/PROGRESS.md")
-README_FIGURES = ("docs/research/figures/adaptive-architecture.svg",
-                  "docs/research/figures/adaptive-frame.svg")
-LINK_DOCS = CURRENT_DOCS + READMES + ("PACKAGE_MANIFEST.md", "docs/research/ALGORITHM_TRACEABILITY.md") + tuple(
-    f"docs/{language}/{document}.md"
-    for language in ("en", "zh-CN")
-    for document in ("ARCHITECTURE", "BENCH_RUNBOOK", "LOGGING_GUIDE", "SCHEDULED_LINK",
-                     "STARTUP_AND_PROVISIONING", "TDMA_FEASIBILITY")
+ARCHITECTURE = "docs/research/figures/adaptive-architecture.svg"
+TIMELINE = "../research/figures/adaptive-frame.svg"
+LINK_DOCS = CURRENT_DOCS + READMES + GUIDES + PROTOCOLS + (
+    "PACKAGE_MANIFEST.md", "docs/research/ALGORITHM_TRACEABILITY.md",
 )
 APPROVED_SETTINGS = {
     "include/project_config.h": {"kDefaultHelloIntervalMs": "3000", "kAckTimeoutUs": "1000000", "kConfigSchema": "1"},
@@ -81,8 +80,7 @@ def check(root):
          f"config set hello-interval-ms {interval}", "config show", "config save"]
         for role, node in (("gateway", ids["gatewayId"]), ("client", ids["nodeId"]))
     ]
-    equations = []
-    for name in READMES:
+    for name in GUIDES:
         text = (root / name).read_text(encoding="utf-8")
         blocks = re.findall(r"^```text\n(config set role [^\n]+\n.*?)^```", text, re.M | re.S)
         if [block.splitlines() for block in blocks] != expected_commands:
@@ -94,12 +92,26 @@ def check(root):
         if adaptive_version and (f"`protocol={adaptive_version.group(1)}`" not in text
                                  or "`profile=adaptive`" not in text):
             errors.append(f"{name}: adaptive serial status must match the firmware")
+
+    algorithms = []
+    for name, guide, protocol_page in zip(READMES, GUIDES, PROTOCOLS):
+        text = (root / name).read_text(encoding="utf-8")
+        if not all(f"]({target})" in text for target in (guide, protocol_page)):
+            errors.append(f"{name}: link directly to setup and protocol")
         images = re.findall(r"!\[[^\]]+\]\(([^\s]+)\)", text)
-        if tuple(images) != README_FIGURES:
-            errors.append(f"{name}: expected the shared architecture and timing figures")
-        equations.append(re.findall(r"^```math\n(.*?)^```$", text, re.M | re.S))
-    if len(equations[0]) != 3 or equations[0] != equations[1] or not all(equations[0]):
-        errors.append("READMEs: use the same pseudocode and two airtime equations")
+        if images != [ARCHITECTURE]:
+            errors.append(f"{name}: expected the shared architecture figure")
+        if f"]({TIMELINE})" not in (root / protocol_page).read_text(encoding="utf-8"):
+            errors.append(f"{protocol_page}: expected the frame timeline")
+        algorithms.append(re.findall(r"^```text\n(gateway\(frame\):\n.*?)^```$", text, re.M | re.S))
+    if (len(algorithms[0]) != 1 or algorithms[0] != algorithms[1]
+            or "\nclient(frame):\n" not in algorithms[0][0]):
+        errors.append("READMEs: use the same gateway and client pseudocode in a text fence")
+    for pair, expected in ((READMES, 1), (PROTOCOLS, 5)):
+        equations = [re.findall(r"^```math\n(.*?)^```$",
+                                (root / name).read_text(encoding="utf-8"), re.M | re.S) for name in pair]
+        if len(equations[0]) != expected or equations[0] != equations[1] or not all(equations[0]):
+            errors.append(f"{pair[0]}: use the same airtime equations in both languages")
     header = (root / "include/project_config.h").read_text(encoding="utf-8")
     if not re.search(r'kFirmwareVersion\[\]\s*=\s*"' + re.escape(firmware) + '"', header):
         errors.append("project_config.h: firmware version differs from VERSION")

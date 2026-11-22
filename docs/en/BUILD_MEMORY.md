@@ -1854,3 +1854,36 @@ The branch was compared with fetched `origin/main` at
 with the result in `logs/test/iteration-022-publication-native_adaptive.log`.
 The documentation checker, MathJax preview and 195 airtime comparisons
 passed again. The adaptive image remains opt-in for field tests.
+
+## Iteration 023 — README rendering and documentation consolidation, 2026-11-22
+
+The documentation branch starts at `4ab3655dc8ca3b7f9ddc382d8ebeeeadceb6d2c7`.
+The READMEs now use a code fence for the two-role algorithm and LaTeX for
+the timing equations. The full derivation defines the symbol-time and
+payload-symbol terms, active and reserved slots, control overhead, retry
+pool and end margin. Configuration values are listed separately.
+
+The live `docs/` tree contains 14 Markdown files, down from 50. Setup,
+protocol and results are parallel pages in both languages. The other
+files cover records, references and figure attribution. The original
+files remain in the pinned Git snapshot. The
+`logs/test/iteration-023-docs-inventory.log` records all 50 prior paths
+and their Git blob IDs. The active link review passed. Two missing
+links remain in frozen Iteration 006 and 007 snapshots.
+
+- The PlatformIO interpreter ran the five tool suites with `python -m
+  unittest discover -s tools -p <suite>.py -v`. Capture 13/13, airtime
+  16/16, multiclient model 3/3, ADR 5/5 and documentation 15/15 passed.
+  `python tools/check_consistency.py` exited 0. See
+  `logs/test/iteration-023-final-*`.
+- Markdown-it, MathJax and local Chromium rendered the corrected pages.
+  Both READMEs produced an indented code block, and both technical pages
+  produced five displayed equations. The desk and phone-width README
+  previews were inspected.
+- All 195 combinations of shipped DATA lengths and SF7–SF9 matched the
+  existing airtime model. The two- and three-SF9 reservations reproduced
+  14.156640 s and 15.634272 s. See
+  `logs/test/iteration-023-render-and-model.log`.
+- The firmware source, headers, PlatformIO settings, native test sources
+  and version files match the previous main tree. `git diff --check`
+  passed. The earlier build results still apply. Hardware was not tested.
