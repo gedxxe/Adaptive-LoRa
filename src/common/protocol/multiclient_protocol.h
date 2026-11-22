@@ -9,7 +9,8 @@ constexpr bool kAdaptive = true;
 #else
 constexpr bool kAdaptive = false;
 #endif
-constexpr uint8_t kWireVersion = kAdaptive ? 4 : kVersion;
+// Earlier adaptive clients discard the entire Grant if it has an SF10 entry.
+constexpr uint8_t kWireVersion = kAdaptive ? 5 : kVersion;
 constexpr uint8_t kBaseSf = phy::dataSf;
 constexpr uint8_t kControlSf = kAdaptive ? phy::controlSf : kBaseSf;
 constexpr uint8_t kMaxClients = 8;
@@ -38,7 +39,10 @@ constexpr uint8_t rosterBytes(uint8_t count) { return 5 + 3 * count; }
 constexpr uint8_t kGrantEntryBytes = kAdaptive ? 6 : 5;
 constexpr uint8_t grantBytes(uint8_t count) { return 1 + kGrantEntryBytes * count; }
 constexpr uint8_t feedbackBytes(uint8_t count) { return 3 + 4 * count; }
-// BW125, CR4/5, preamble 8, explicit header, CRC and SF7–9 without LDRO.
+// Airtime for the scheduled PHY. At BW125 even SF10 is below the LDRO threshold.
+static_assert(phy::bandwidthKhz == 125.0f && phy::codingRateDenominator == 5 &&
+              phy::preambleSymbols == 8 && kBaseSf == 7 && phy::controlSf == 9 &&
+              phy::maxDataSf <= 10, "Update airtime accounting before changing these PHY settings");
 constexpr uint32_t airAtSf(size_t bytes, uint8_t sf) {
     const auto bits = 8 * bytes + 44 - 4 * sf;
     const auto symbolGroups = (bits + 4 * sf - 1) / (4 * sf);
@@ -51,8 +55,10 @@ constexpr uint32_t dataAir(uint8_t length, uint8_t sf = kBaseSf) {
     return kAdaptive ? airAtSf(kHeaderSize + kPayloadPrefix + length, sf) :
         payloadAir(kPayloadPrefix + length);
 }
+static_assert(!kAdaptive || dataAir(kMaxData, phy::maxDataSf) + kSlotGuardUs < kTxTimeoutUs,
+              "The radio TX deadline must cover the longest DATA packet plus guard");
 constexpr bool validDataSf(uint8_t sf) {
-    return kAdaptive ? sf >= 7 && sf <= 9 : sf == kBaseSf;
+    return kAdaptive ? sf >= kBaseSf && sf <= phy::maxDataSf : sf == kBaseSf;
 }
 
 struct Candidate { uint16_t id = 0; uint8_t budget = 0; };

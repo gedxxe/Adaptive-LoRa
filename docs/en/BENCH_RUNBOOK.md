@@ -87,28 +87,63 @@ config save
 
 Give additional Clients unique node IDs 3–9. Check `config show`, wait for
 `CONFIG_SAVED`, send `reboot` and run `status`. Verify the role, IDs,
-`protocol=4` and `profile=adaptive`. The configured interval feeds the
-sample application. The over-the-air period comes from the Beacon.
+`protocol=5` and `profile=adaptive` on every board. Replace earlier
+adaptive images on both roles before the run. The configured interval feeds the
+8-byte sample application. The over-the-air period comes from the Beacon.
+The Gateway must report `period_us=15000000`, `roster_count=8` and
+`bench_payload_ceiling_bytes=16` in `SCHEDULE_CONFIG`.
 
 ## Check the pair and walk the route
 
-1. Run the pair close together for several complete frames. Match
+1. Run Client 2 close to the Gateway for at least five complete frames. Match
    Gateway `APP_PAYLOAD` with Client `V3_PAYLOAD_RESULT,result=accepted`
    for the same frame. Check `ACKED DATA SF` on the Client. In a separate
    run, power-cycle the Gateway and check that the Client reconnects.
-2. Add stationary Clients 3–5. Keep the Gateway and these Clients in place
-   while Client 2 moves. Record departure and stop times, antenna
-   orientation and obstacles. Watch for changes in `ADR_APPLY` and a later
-   `V3_LINK_SAMPLE` with `locked=1` for that Client.
-3. Record first-attempt and final delivery, SF, missed slots, resets and log
+2. Add stationary Clients 3–5 and collect at least five complete frames.
+   Then add Clients 6–9 and collect at least 20 complete frames with all
+   boards stationary. The bring-up gate is that every ID delivers and
+   acknowledges DATA, and there are no duplicate application deliveries,
+   unexpected resets, missing serial streams or unexplained timing faults.
+3. In a separate run, move Client 2 while keeping the Gateway and peers
+   fixed. Record departure and stop times, antenna orientation and obstacles.
+   Wait at least six complete frames after a change in SF to observe lock or
+   rollback. Track peer delivery alongside `ADR_APPLY` and `V3_LINK_SAMPLE`.
+   To check SF10, look for Client `TX SF10`, then `ACKED DATA SF10`, and
+   continuing SF9 control exchanges. If SF10 is never granted, distinguish an
+   over-budget profile (`adr=budget_limited`) from loss of SF9 control (`SEARCH`
+   or missing Request/Grant). Keep this check separate from the acceptance run.
+4. Record first-attempt and final delivery, SF, missed slots, resets and log
    drops per Client. A screen showing `SEARCH` is listening for a Beacon.
    An SF shown under `ACKED DATA SF` belongs to the last confirmed packet.
    Read `ADR_TIMING` with `status` before and after the run.
 
+**Walking without a laptop.** On every Client page, `TX SF8 CR4/5` means
+the last DATA transmission started at SF8. It survives the switch back to
+SF9 for control. On page 2, `ACKED DATA SF` changes only after a matching
+ACK. At a stop, read both values and the AGE on page 1. Client AGE measures
+time since a valid Grant or bitmap. An old TX value can persist through an
+outage. `SEARCH` means the
+Client is listening for a fresh Beacon. The Gateway shows `RX` for the last
+valid DATA and identifies the sender on page 1. A dash means no DATA event
+in this session. The display updates between radio phases.
+
+**Matched SF7 comparison.** For a second run on the same route, change only
+the Gateway image. Replace `COMx` with its observed port. This command uses
+a child shell and a separate output directory:
+
+```powershell
+cmd /d /c 'set PLATFORMIO_BUILD_SRC_FLAGS=-DADAPTIVE_LORA_FIXED_SF_COMPARISON&&set PLATFORMIO_BUILD_DIR=.pio/comparison-build&&pio run -e heltec_wifi_lora_32_V3_adaptive -t upload --upload-port COMx'
+```
+
+Run `status` on the Gateway and record `data_sf_policy=fixed_sf7`. The
+same Clients, SF9 control, 15 s period and retry rules apply. To restore
+ADR, upload the ordinary adaptive image and check `data_sf_policy=adaptive`.
+
 ## Save the results
 
 Close monitors before recording. Use the observed ports and a new
-directory for each run. Use `--board COMx` to record just the Gateway.
+directory for each run. Use repeated `--client` arguments in node-ID order.
+Use `--board COMx` to record just the Gateway.
 Opening a serial session may reset a board. Check boot boundaries before
 joining runs.
 
@@ -119,10 +154,41 @@ Get-FileHash .pio/build/heltec_wifi_lora_32_V3_adaptive/firmware.bin
 & $python tools/capture_bench.py --gateway COM_GATEWAY --client COM_CLIENT --seconds 120 --out $run
 ```
 
+For eight Clients, use a new `$run` and the ports for node IDs 2–9:
+
+```powershell
+$ports = @('--gateway', 'COM_GATEWAY')
+$clients = @('COM_ID2', 'COM_ID3', 'COM_ID4', 'COM_ID5', 'COM_ID6', 'COM_ID7', 'COM_ID8', 'COM_ID9')
+foreach ($client in $clients) { $ports += @('--client', $client) }
+& $python tools/capture_bench.py @ports --seconds 360 --out $run
+```
+
 Use the [run record](../../logs/test/RUN_RECORD_TEMPLATE.md). Save the
 image hash, board aliases, slots and raw files. Keep raw logs, device
 identifiers and private payloads outside Git. Mark Client ACK receipt
-as unknown when only a Gateway log is available. For physical timing,
-measure DIO1, NSS, BUSY and SCL with high-impedance probes and track
-clock drift. Match the test route, load and radio settings before
-comparing runs.
+as unknown when only a Gateway log is available.
+
+Make one CSV row per Client per complete frame. Suggested columns:
+
+```text
+run_id,gateway_boot,frame_id,node_id,client_boot,grant_seen,payload_bytes,data_sf,first_tx,first_received,app_accepted,client_ack,attempts,rssi_dbm,snr_db,rx_us,timing,segment
+```
+
+Join `V3_LINK_SAMPLE`, `APP_PAYLOAD` and the Client `V3_DATA_TX` and
+`V3_PAYLOAD_RESULT` events within one Gateway boot. Start a new segment after
+any boot or intentional outage. Keep absent or ambiguous observations unknown.
+Exclude partial boundary frames. A missing Gateway link-sample row may mean
+the Client never obtained a Grant. `timing=invalid` identifies a local
+schedule fault and is excluded from RF-only comparisons, while any recorded
+application delivery still counts in the end-to-end result. `rx_us` is
+Gateway uptime at reception, so use it for per-Client gaps within a boot.
+For `adr=rx_window_unobserved`, the Gateway could neither establish that
+it was listening at the assigned SF before launch nor verify DATA in that
+slot. Other Clients with valid timing still contribute ADR samples.
+
+Probe DIO1, NSS, BUSY and SCL with high-impedance probes. Measure at least
+30 transitions per SF pair used, including both directions and return to
+control SF. Check the observed tail and worst transition against the 20 ms
+retune lead and 40 ms receive half-window. Record drift over complete
+15 s frames. A missed deadline or unexpected reset merits investigation
+before using the walk test to compare RF performance.

@@ -1,0 +1,31 @@
+Verbosity level can be increased via `-v, -vv, or -vvv` option
+Collected 16 tests
+
+Processing test_adaptive_link in native_adaptive environment
+--------------------------------------------------------------------------------
+Building...
+Testing...
+test\test_adaptive_link\test_main.cpp:420: mixed_profile_codec_and_budget	[PASSED]
+test\test_adaptive_link\test_main.cpp:421: roaming_client_adapts_while_three_peers_deliver	[PASSED]
+test\test_adaptive_link\test_main.cpp:422: missing_grant_ack_and_gateway_outage_leave_peers_safe	[PASSED]
+test\test_adaptive_link\test_main.cpp:423: one_failed_retune_recovers_with_full_roster	[PASSED]
+test\test_adaptive_link\test_main.cpp:424: higher_sf_reservations_protect_two_existing_clients	[PASSED]
+test\test_adaptive_link\test_main.cpp:425: stable_lock_requires_client_ack_receipt	[PASSED]
+test\test_adaptive_link\test_main.cpp:426: accepted_data_remains_observable_when_final_ack_completion_fails	[PASSED]
+test\test_adaptive_link\test_main.cpp:427: sf9_capacity_uses_the_production_calendar	[PASSED]
+test\test_adaptive_link\test_main.cpp:428: eight_clients_can_adapt_to_sf9_at_the_bench_ceiling	[PASSED]
+test\test_adaptive_link\test_main.cpp:429: display_reports_the_last_acknowledged_data_sf	[PASSED]
+test\test_adaptive_link\test_main.cpp:356: oled_tracks_actual_data_on_both_roles_even_without_ack: Expected '1/3 TX -- CR4/5' Was 'V4 LINK 1/3'	[FAILED]
+test\test_adaptive_link\test_main.cpp:384: gateway_stall_cannot_train_rf_loss_for_the_missed_slot: Expected Not-Equal	[FAILED]
+test\test_adaptive_link\test_main.cpp:432: driver_controls_adapter_retune_and_failure	[PASSED]
+
+
+Program received signal SIGINT (Interrupt)
+-------- native_adaptive:test_adaptive_link [ERRORED] Took 3.82 seconds --------
+=================================== SUMMARY ===================================
+Environment      Test                Status    Duration
+---------------  ------------------  --------  ------------
+native_adaptive  test_adaptive_link  ERRORED   00:00:03.819
+============ 14 test cases: 2 failed, 11 succeeded in 00:00:03.819 ============
+
+Exit code: 1

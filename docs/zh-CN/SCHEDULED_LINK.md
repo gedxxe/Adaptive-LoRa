@@ -6,7 +6,7 @@
 
 ![单射频上的控制帧、DATA 与重传顺序](../research/figures/adaptive-frame.svg)
 
-协议 4 使用小端编码，帧头 28 字节，整帧最多 96 字节。帧头包含网络、源地址、目的地址、
+协议 5 使用小端编码，帧头 28 字节，整帧最多 96 字节。帧头包含网络、源地址、目的地址、
 发送方 boot ID、帧号、序号及调度版本。Gateway 广播控制帧，Client 向 Gateway 发送 Request 和 DATA。
 
 | 帧 | 发送方 | 帧头之后的字段 |
@@ -19,7 +19,8 @@
 
 Grant 空项长度为 `0xFF`，boot ID 和 SF 为零。解码器检查长度、版本、网络、目的地址和
 载荷布局。运行时核对当前帧、会话 ID、Grant 和接收窗口。控制帧共用一个 SF，DATA 首传与
-重传使用授权 SF。
+重传使用授权 SF。旧自适应解码器会丢弃包含 SF10 的整个 Grant，因此空口版本 5 要求
+Gateway 和所有 Client 一起升级。
 
 ## 空口时间和时隙预算
 
@@ -56,7 +57,7 @@ $\sigma$ 为扩频因子，$\beta$ 为以 Hz 表示的带宽。
 | $\iota_{\mathrm{CRC}}$、$\iota_{\mathrm{IH}}$、$\iota_{\mathrm{DE}}$ | CRC、隐式头、低速率优化标志 | 当前 SF 范围采用 1、0、0 |
 | $\pi$、$\psi$、$\xi$ | 配置的前导符号、固定同步后缀、基础载荷符号 | 8、4.25、8 |
 | $\gamma$ | 每编码组符号数，即编码率的分母 | CR 4/5 时为 5 |
-| $\beta$、$\sigma_{\mathrm{ctrl}}$、$\sigma_\iota$ | 带宽、共用控制 SF、各 Client 的 DATA SF | 125 kHz、SF9、SF7–SF9 |
+| $\beta$、$\sigma_{\mathrm{ctrl}}$、$\sigma_\iota$ | 带宽、共用控制 SF、各 Client 的 DATA SF | 125 kHz、SF9、SF7–SF10 |
 
 $\Omega$ 为公告名单，$\nu_\Omega=|\Omega|$ 包含有请求窗口的空闲节点。预留时取
 $\Theta=\Omega$，$\lambda_\iota$ 为载荷上限；实际调度时 $\Theta$ 只包含获授权节点，
@@ -99,7 +100,7 @@ Gateway 先核对不等式再预留更高 SF，试用较低 SF 时保留此前�
 | 符号 | 含义 | 当前自适应镜像 |
 |---|---|---|
 | $\eta_{\mathrm{header}}$、$\eta_{\mathrm{session}}$ | DATA 帧头、Gateway boot ID 字节数 | 28 B、4 B |
-| $\nu_\Omega$、$\lambda_\iota$ | 出厂名单数、单节点载荷上限 | 8 个、64 B |
+| $\nu_\Omega$、$\lambda_\iota$ | 测试名单数、单节点载荷上限 | 8 个、16 B。空口格式上限为 64 B。 |
 | $\varrho$、$\varkappa$ | 重传轮数、每轮共享重传槽 | 3 轮、最多 4 槽 |
 | $\delta$、$\tau_{\mathrm{tail}}$、$\tau_{\mathrm{frame}}$ | 时隙保护、帧尾预留、超帧周期 | 80 ms、300 ms、15 s |
 
@@ -107,6 +108,59 @@ Gateway 先核对不等式再预留更高 SF，试用较低 SF 时保留此前�
 间隔。调度以无线完成时间戳为基准，发射时隙过晚则跳过。实际切换时间和时钟漂移仍待测量。
 [无线设置](../../include/radio_config.h) · [空口时间与长度](../../src/common/protocol/multiclient_protocol.h) ·
 [时隙安排](../../src/common/protocol/multiclient_protocol.cpp)
+
+### 15 秒容量
+
+设各 Client 的载荷上限均为 $\lambda_\mathrm{cap}$，其中 $\nu'$ 个使用 SF9，其余使用 SF7。
+可预留的 SF9 节点数为
+
+```math
+\nu_9^{\max}=\max\!\left\{\nu'\in\{0,\ldots,\nu_\Omega\}\;\middle|\;
+\tau_{\mathrm{used}}(\Omega,\lambda_{\mathrm{cap}},\boldsymbol{\sigma}(\nu'))
+\le\tau_{\mathrm{frame}}\right\}.
+```
+
+| Client 数 | 16 B | 24 B | 32 B | 64 B |
+|---:|---:|---:|---:|---:|
+| 4 | 4 | 4 | 4 | 4 |
+| 6 | 6 | 6 | 6 | 3 |
+| 8 | 8 | 8 | 5 | 2 |
+
+八个 Client 均使用 SF9 时，16 B 上限预留 14.083936 秒，含帧尾预留，余量为 0.916064 秒。
+24 B 上限的余量只有 0.096864 秒。测试选用 16 B，能够承载 8 B 示例载荷并留出更多余量。
+八个 Client 全部申请时，Beacon、Grant 和四帧 ACK 占用 Gateway 约 2.361344 秒的发射时间。
+包含 Request 与控制间隔的控制段为 6.019456 秒。以上均为计算值。
+[测试上限](../../include/research_roster.h) · [容量模型](../../tools/model_multiclient.py)
+
+名单固定时，增加单个时隙长度不会缩短 DATA 总时长，也不会缩短最长若干重传时隙的总和。
+Grant 的载荷和 SF 均受各节点预留值限制，因此模型时长受名单预留预算约束。
+真实收发切换和时钟误差仍需落在保护间隔内。
+
+### SF10 容量及更高 SF 选项
+
+按八个 Client、每节点 16 字节建模，保留 SF9 控制交互、四次累计 ACK 和全部重传预留。
+余量列假设只有一个节点使用该 SF，其余七个均用 SF7；最右列给出其他节点维持 SF7 时可同时使用该 SF 的节点上限。
+
+| DATA SF | 单个 48 字节 DATA 的空口时间（秒） | 单节点使用时的帧余量（秒） | 节点上限 |
+|---|---:|---:|---:|
+| SF9 | 0.308 | 4.287 | 8 |
+| SF10 | 0.575 | 3.218 | 2 |
+| SF11 | 1.233 | 0.588 | 1 |
+| SF12 | 2.302 | -3.688 | 0 |
+
+其余六个节点用 SF7 时，两个 SF10 节点在帧尾预留之外还剩 1.306208 秒，第三个会让帧超出
+605.600 毫秒。其余七个节点已用 SF9 时，一个 SF10 节点就会超出 152.992 毫秒。
+Gateway 根据现有的 SF 预留核算预算，拒绝超额升档。
+
+Beacon、Request、Grant 和 ACK 位图均使用 SF9。到 DATA 时隙时双方切换至授权 SF。
+Client 切回 SF9 等反馈，Gateway 逐个切换到下一个 Client 的 SF，再回到 SF9。
+控制链路中断后，Client 等待新的有效 Beacon 和 Grant。提高 DATA SF 只能改善 DATA 链路。
+
+BW125 下 SF10 符号时长为 8.192 毫秒，无需 LDRO。96 字节包在 SF10 的空口时间为
+0.985088 秒，低于驱动的 2 秒发送期限。SF11 和 SF12 只用于建模，需要 LDRO。
+96 字节的 SF11 包及 48 字节的 SF12 包均会超过现有发送期限。
+[RadioLib SF 范围](https://github.com/jgromes/RadioLib/blob/7.8.1/src/modules/SX126x/SX126x_config.cpp) ·
+[RadioLib LDRO 选择](https://github.com/jgromes/RadioLib/blob/7.8.1/src/modules/SX126x/SX126x_commands.cpp)
 
 ## 自适应与恢复
 
@@ -136,12 +190,15 @@ SNR 更新公式如下。
 
 同一 SF 连续两次首传失败后，预算允许时试用高一级 SF，重传成功也算首传失败。
 连续三次首传成功且有同一 SF 的 ACK 回执后锁定。锁定后若连续六次首传成功且平滑 SNR
-达到要求，可试用低一级（SF7 至少 −3.5 dB，SF8 至少 −6 dB）。失败即回退，并等八次
+达到要求，可试用低一级（SF7 至少 −3.5 dB，SF8 至少 −6 dB，SF9 至少 −8.5 dB）。失败即回退，并等八次
 首传成功后再考虑试用。
 
-Client 只有在收到有效位图明确授权时才重传。Gateway 在位图发送完成后打开重传时隙，
-后续累计 ACK 可以补确认。Beacon 过期后 Client 停止按时隙发射，并返回控制 SF 搜索。
-Client boot ID 变化或连续四帧未申请时，Gateway 清除其 SF 状态。同步无线调用仍可能
+Client 只有在收到有效位图授权时才重传。Gateway 只有在下一轮开始前及时处理位图发送完成事件，
+才打开重传时隙。保留四帧累计 ACK，允许补确认。时序异常记入帧样本，并排除在 SF 评估之外。
+对每个获分配的时隙，Gateway 会检查是否在切换提前量内已按指定 SF 就绪，或是否收到了有效
+DATA；两项均无记录时，跳过该 Client 本帧的 SF 评估。
+Beacon 过期后 Client 停止按时隙发射，并返回控制 SF 搜索。Client boot ID 改变或准备 Grant 时距其
+上次 Request 达四个帧编号，Gateway 重置其 SF 状态。同步无线调用仍可能
 超出软件时序窗口。[运行时代码](../../src/app/multiclient_link.cpp) · [已知时序风险](../en/ERROR_LOG.md)
 
 ## 板卡参考

@@ -77,23 +77,52 @@ config save
 ```
 
 后续 Client 使用不同的节点 ID 3–9。用 `config show` 核对设置，看到 `CONFIG_SAVED`
-后发送 `reboot`，再执行 `status`。核对角色、ID、`protocol=4` 和 `profile=adaptive`。
-串口配置中的间隔控制示例应用生成数据，空口周期取自 Beacon。
+后发送 `reboot`，再执行 `status`。在每块板上核对角色、ID、`protocol=5` 和 `profile=adaptive`。
+试验前同时升级 Gateway 和 Client 的旧自适应镜像。
+串口配置中的间隔控制 8 字节示例应用生成数据，空口周期取自 Beacon。
+Gateway 的 `SCHEDULE_CONFIG` 应显示 `period_us=15000000`、`roster_count=8`
+和 `bench_payload_ceiling_bytes=16`。
 
 ## 双板检查与走测
 
-1. 两块板近距运行几个完整帧。核对同一帧的 Gateway `APP_PAYLOAD` 和 Client
+1. Client 2 与 Gateway 近距运行至少五个完整帧。核对同一帧的 Gateway `APP_PAYLOAD` 和 Client
    `V3_PAYLOAD_RESULT,result=accepted`。查看 `ACKED DATA SF`。另做一次 Gateway
    断电上电，确认恢复。
-2. 增加固定 Client 3–5。Gateway 及这些节点保持原位，只移动 Client 2。记录出发和停留
-   时间、天线朝向和障碍物。查看该节点的 `ADR_APPLY` 变化和之后的 `locked=1`。
-3. 按节点记录首传及最终交付、SF、错过时隙、复位和丢日志。`SEARCH` 表示正在监听
+2. 增加固定 Client 3–5 并采集至少五个完整帧，再加入 Client 6–9，全部固定运行至少二十个
+   完整帧。确认各节点都有 DATA 交付和 ACK，且没有应用重复交付、意外复位、串口数据缺失
+   或无法解释的时序错误。
+3. 另开一轮，仅移动 Client 2，其他节点和 Gateway 保持原位。记录出发和停留时间、天线
+   朝向和障碍物。SF 变化后至少等待六个完整帧，查看锁定或回退，并对照其余节点交付情况。
+4. 按节点记录首传及最终交付、SF、错过时隙、复位和丢日志。`SEARCH` 表示正在监听
    Beacon。屏幕 `ACKED DATA SF` 来自上次确认的 DATA。试验前后运行 `status` 保存
    `ADR_TIMING`。
 
+单独检查 SF10 时，先看 Client 是否显示 `TX SF10`，再核对 `ACKED DATA SF10` 和
+SF9 控制交互是否继续。若未获得 SF10，核对是预算不足（`adr=budget_limited`），还是
+控制链路丢失（`SEARCH` 或 Request/Grant 缺失）。这一检查与静态验收分开进行。
+
+**单人走测。** Client 各页顶行的 `TX SF8 CR4/5` 表示最近一次 DATA 已在 SF8
+启动发送。切回 SF9 收控制帧后仍保留该读数。第二页的 `ACKED DATA SF` 只在收到匹配
+ACK 后更新。到达测点后记下这两个值及第一页的 AGE。Client 的 AGE 从最近一次有效
+Grant 或位图算起，断联后仍会保留上一次的 TX 值。`SEARCH` 表示正在等待新 Beacon。
+Gateway 顶行显示最近一次有效 DATA 的接收 SF，第一页显示发送者。短横线表示本会话尚无
+DATA 事件。屏幕在无线收发阶段之间刷新。
+
+**同条件 SF7 对照。** 沿同一路线复测，只需更换 Gateway 镜像。将 `COMx` 换为实测
+端口。以下命令在子进程中构建，输出到独立目录：
+
+```powershell
+cmd /d /c 'set PLATFORMIO_BUILD_SRC_FLAGS=-DADAPTIVE_LORA_FIXED_SF_COMPARISON&&set PLATFORMIO_BUILD_DIR=.pio/comparison-build&&pio run -e heltec_wifi_lora_32_V3_adaptive -t upload --upload-port COMx'
+```
+
+运行 Gateway 的 `status`，记录 `data_sf_policy=fixed_sf7`。Client 镜像、SF9 控制交互、
+15 秒周期及重传规则与自适应试验相同。恢复时重新烧录普通自适应镜像，确认
+`data_sf_policy=adaptive`。
+
 ## 保存结果
 
-采集前关闭监视器。用实测端口，每轮使用新目录。仅采 Gateway 时可用 `--board COMx`。
+采集前关闭监视器。用实测端口，每轮使用新目录。按节点 ID 顺序重复传入 `--client`。
+仅采 Gateway 时可用 `--board COMx`。
 打开串口可能复位板卡，匹配记录前核对启动边界。
 
 ```powershell
@@ -103,7 +132,33 @@ Get-FileHash .pio/build/heltec_wifi_lora_32_V3_adaptive/firmware.bin
 & $python tools/capture_bench.py --gateway COM_GATEWAY --client COM_CLIENT --seconds 120 --out $run
 ```
 
+八个 Client 时使用新的 `$run`，并填入 ID 2–9 的实际端口：
+
+```powershell
+$ports = @('--gateway', 'COM_GATEWAY')
+$clients = @('COM_ID2', 'COM_ID3', 'COM_ID4', 'COM_ID5', 'COM_ID6', 'COM_ID7', 'COM_ID8', 'COM_ID9')
+foreach ($client in $clients) { $ports += @('--client', $client) }
+& $python tools/capture_bench.py @ports --seconds 360 --out $run
+```
+
 使用[试验记录](../../logs/test/RUN_RECORD_TEMPLATE.md)保存镜像哈希、板卡别名、时隙和
 原始采集。原始日志、设备标识与私有载荷保留在 Git 之外。只有 Gateway 日志时，将 Client 的
-ACK 结果标为未知。用高阻探头观察 DIO1、NSS、BUSY 和 SCL，并测量时钟漂移。
-对照试验保持路线、负载和无线设置一致。
+ACK 结果标为未知。
+
+每个完整帧、每个 Client 记录一行 CSV。建议字段如下。
+
+```text
+run_id,gateway_boot,frame_id,node_id,client_boot,grant_seen,payload_bytes,data_sf,first_tx,first_received,app_accepted,client_ack,attempts,rssi_dbm,snr_db,rx_us,timing,segment
+```
+
+仅在同一 Gateway 启动会话内匹配 `V3_LINK_SAMPLE`、`APP_PAYLOAD` 与 Client 侧
+`V3_DATA_TX`、`V3_PAYLOAD_RESULT`。遇到复位或人为中断时另开一段。去掉首尾不完整帧，
+缺失或无法匹配的结果标为未知。缺少 Gateway 样本可能意味着该 Client 未获得 Grant。
+`timing=invalid` 属于本地调度异常，从射频对比中排除，已记录的应用交付仍计入端到端结果。
+`rx_us` 为接收时的 Gateway 启动后时间，可用于统计同一会话内单个 Client 的交付间隔。
+若出现 `adr=rx_window_unobserved`，Gateway 既未在发送前确认已用指定 SF 监听，也未在该时隙
+收到有效 DATA。其他节点时序正常的记录仍用于 ADR。
+
+用高阻探头观察 DIO1、NSS、BUSY 和 SCL。每种测试使用的 SF 切换方向至少记录 30 次，包含
+回到控制 SF 的切换，核对延迟尾部和最大值能否满足 20 毫秒切换提前量及 40 毫秒接收半窗。
+在完整 15 秒帧内测量漂移。先查清错过时隙和意外复位，再用走测比较射频表现。

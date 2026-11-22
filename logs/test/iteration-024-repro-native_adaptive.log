@@ -1,0 +1,16 @@
+Verbosity level can be increased via `-v, -vv, or -vvv` option
+Collected 16 tests
+
+Processing test_adaptive_link in native_adaptive environment
+--------------------------------------------------------------------------------
+Building...
+
+[Errno 13] Permission denied: '<PLATFORMIO_HOME>\\platforms.lock'
+-------- native_adaptive:test_adaptive_link [ERRORED] Took 0.06 seconds --------
+=================================== SUMMARY ===================================
+Environment      Test                Status    Duration
+---------------  ------------------  --------  ------------
+native_adaptive  test_adaptive_link  ERRORED   00:00:00.062
+================== 1 test cases: 0 succeeded in 00:00:00.062 ==================
+
+Exit code: 1

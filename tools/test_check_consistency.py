@@ -20,7 +20,7 @@ class ConsistencyTests(unittest.TestCase):
                     target.parent.mkdir(parents=True, exist_ok=True)
                     target.touch()
         names = set(LINK_DOCS) | set(APPROVED_SETTINGS) | set(ALGORITHM_FIGURES) | {"CODEX_START_PROMPT.md", "VERSION", "PROTOCOL_VERSION",
-                "platformio.ini", "THIRD_PARTY.md", "CHANGELOG.md", "include/project_config.h",
+                "platformio.ini", "THIRD_PARTY.md", "CHANGELOG.md", "include/project_config.h", "include/research_roster.h",
                 "src/common/radio/sx1262_hardware.h", "src/app/esp32_firmware.h",
                 "logs/README.md", "logs/test/RUN_RECORD_TEMPLATE.md"}
         for name in names:
@@ -42,8 +42,9 @@ class ConsistencyTests(unittest.TestCase):
         self.mutate("docs/en/PROGRESS.md", f"`{version}`", "`9.9.9-alpha.9`")
         self.assertTrue(any("current firmware" in e for e in check(self.root)))
         protocol = APPROVED_SETTINGS["src/common/protocol/multiclient_protocol.h"]["kVersion"]
-        self.mutate("AGENTS.md", f"protocol `{protocol}`", "protocol `99`")
-        self.assertTrue(any("AGENTS.md: current protocol" in e for e in check(self.root)))
+        self.mutate("docs/zh-CN/PROGRESS.md", f"`heltec_wifi_lora_32_V3_multiclient` | {protocol} |",
+                    "`heltec_wifi_lora_32_V3_multiclient` | 99 |")
+        self.assertTrue(any("comparison wire versions differ" in e for e in check(self.root)))
 
     def test_bad_build_environment_is_reported(self):
         self.mutate("docs/en/BENCH_RUNBOOK.md", "pio run -e heltec_wifi_lora_32_V3", "pio run -e absent_board")
@@ -109,8 +110,22 @@ class ConsistencyTests(unittest.TestCase):
         self.assertTrue(any("same airtime equations" in e for e in check(self.root)))
 
     def test_walk_test_serial_status_must_match_wire_version(self):
-        self.mutate("docs/zh-CN/BENCH_RUNBOOK.md", "protocol=4", "protocol=3")
+        self.mutate("docs/zh-CN/BENCH_RUNBOOK.md", "protocol=5", "protocol=4")
         self.assertTrue(any("adaptive serial status" in e for e in check(self.root)))
+
+    def test_bench_ceiling_and_capacity_rows_must_match(self):
+        self.mutate("docs/en/BENCH_RUNBOOK.md", "bench_payload_ceiling_bytes=16", "bench_payload_ceiling_bytes=64")
+        self.mutate("docs/zh-CN/SCHEDULED_LINK.md", "| 8 | 8 | 8 | 5 | 2 |", "| 8 | 8 | 7 | 5 | 2 |")
+        failures = check(self.root)
+        self.assertTrue(any("bench payload ceiling" in e for e in failures))
+        self.assertTrue(any("capacity row for 8 Clients" in e for e in failures))
+
+    def test_extended_capacity_and_matched_comparison_in_both_languages(self):
+        self.mutate("docs/zh-CN/SCHEDULED_LINK.md", "2.302 | -3.688", "2.302 | 3.688")
+        self.mutate("docs/en/BENCH_RUNBOOK.md", ".pio/comparison-build", ".pio/build")
+        failures = check(self.root)
+        self.assertTrue(any("SF12 study row" in e for e in failures))
+        self.assertTrue(any("missing matched comparison setting" in e for e in failures))
 
 
 if __name__ == "__main__":

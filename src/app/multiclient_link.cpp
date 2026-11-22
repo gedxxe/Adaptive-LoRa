@@ -13,14 +13,16 @@ constexpr uint8_t kAdrFirstBeforeProbe = 6;
 constexpr uint8_t kAdrRollbackHold = 8;
 constexpr uint8_t kAdrIdleFrames = 4;
 constexpr uint32_t kRetuneRetryUs = 5000;
-// Initial research thresholds include 4 dB over the nominal SF7/SF8 SINR.
-constexpr float kProbeSf7SnrDb = -3.5f;
-constexpr float kProbeSf8SnrDb = -6.0f;
+// Provisional SNR needed to try SF7, SF8, or SF9, including 4 dB margin.
+constexpr float kLowerSfProbeSnrDb[] = {-3.5f, -6.0f, -8.5f};
+static_assert(kBaseSf + sizeof(kLowerSfProbeSnrDb) / sizeof(float) == phy::maxDataSf,
+              "Provide a probe threshold for each lower DATA SF");
 }
 
 MulticlientLink::MulticlientLink(const DeviceConfig& c, RadioTransport& radio, SerialLogger& log,
-                                 PayloadPort& payload, BootIdSource bootId, Roster roster)
-    : config_(c), radio_(radio), log_(log), payload_(payload), bootIdSource_(bootId), roster_(roster) {
+                                 PayloadPort& payload, BootIdSource bootId, Roster roster, bool adaptDataSf)
+    : config_(c), radio_(radio), log_(log), payload_(payload), bootIdSource_(bootId),
+      adaptDataSf_(kAdaptive && adaptDataSf), roster_(roster) {
     validConfig_ = !validateConfig(c) && (c.role == DeviceRole::CLIENT || roster_.valid(c.gatewayId));
     if (validConfig_ && c.role == DeviceRole::GATEWAY && !roster_.periodUs)
         roster_.periodUs = requiredPeriodUs(roster_);
@@ -53,7 +55,7 @@ void MulticlientLink::observePeer(uint64_t now, uint16_t peer, const RadioEvent&
     telemetry_.peerPeriodUs = roster_.periodUs;
 }
 
-void MulticlientLink::logLinkSamples() {
+void MulticlientLink::logLinkSamples(bool timingOk) {
     for (uint8_t i = 0; i < plan_.count; ++i) {
         if (!plan_.slots[i].boot) continue;
         const auto& rx = received_[i];
@@ -63,7 +65,9 @@ void MulticlientLink::logLinkSamples() {
         char metrics[48] = "rssi_dbm=N/A,snr_db=N/A";
         if (rx.metrics) std::snprintf(metrics, sizeof(metrics), "rssi_dbm=%.1f,snr_db=%.1f", rx.rssi, rx.snr);
         char line[304];
-        const auto* action = kAdaptive ? reviewProfile(i) : "";
+        const bool sampleTimingOk = timingOk && !rx.rxWindowUnobserved;
+        const auto* action = !timingOk ? "timing_invalid" : rx.rxWindowUnobserved ? "rx_window_unobserved" :
+            (adaptDataSf_ ? reviewProfile(i) : "fixed_sf");
         const auto& adr = adr_[kAdaptive ? i : 0];
         std::snprintf(line, sizeof(line), "event=V3_LINK_SAMPLE,network_id=%u,gateway_id=%u,gateway_boot=%" PRIu32
             ",frame_id=%" PRIu32 ",source_id=%u,client_boot=%" PRIu32 ",sf=%u,outcome=%s,app=%s,%s",
@@ -74,6 +78,12 @@ void MulticlientLink::logLinkSamples() {
             std::snprintf(line + prefix, sizeof(line) - prefix, ",next_sf=%u,locked=%u,adr=%s",
                 unsigned(adr.desired), unsigned(adr.locked), action);
         }
+        const auto prefix = std::strlen(line);
+        char rxTime[24] = "N/A";
+        if (rx.result != Reception::NONE)
+            std::snprintf(rxTime, sizeof(rxTime), "%" PRIu64, rx.completedAt);
+        std::snprintf(line + prefix, sizeof(line) - prefix, ",timing=%s,payload_bytes=%u,rx_us=%s",
+            sampleTimingOk ? "ok" : "invalid", unsigned(plan_.slots[i].bytes), rxTime);
         log_.text(line);
     }
 }
@@ -136,10 +146,6 @@ const char* MulticlientLink::reviewProfile(uint8_t i) {
     const auto& rx = received_[i];
     if (rx.result == Reception::REFUSED) return "app_refused";
     const auto observedSf = plan_.slots[i].sf;
-    if (rx.result == Reception::ACCEPTED) {
-        state.deliveredFrame = frameId_;
-        state.deliveredSf = observedSf;
-    }
     const bool clientConfirmed = state.acknowledgedSf == observedSf;
     if (state.observedSf != observedSf) {
         state.observedSf = observedSf;
@@ -176,7 +182,7 @@ const char* MulticlientLink::reviewProfile(uint8_t i) {
         if (state.hold) --state.hold;
         else if (state.locked && clientConfirmed && state.desired > kBaseSf &&
                  state.consecutiveFirst >= kAdrFirstBeforeProbe &&
-                 state.hasSnr && state.filteredSnr >= (state.desired == 8 ? kProbeSf7SnrDb : kProbeSf8SnrDb)) {
+                 state.hasSnr && state.filteredSnr >= kLowerSfProbeSnrDb[state.desired - kBaseSf - 1]) {
             state.probeReturn = state.desired--;
             state.consecutiveFirst = 0;
             state.locked = false;
@@ -192,7 +198,7 @@ const char* MulticlientLink::reviewProfile(uint8_t i) {
                 state.probeReturn = 0;
                 state.hold = kAdrRollbackHold;
                 action = "rollback";
-            } else if (state.desired < kControlSf) {
+            } else if (state.desired < phy::maxDataSf) {
                 ++state.desired;
                 action = "step_up";
             } else action = "ceiling";
@@ -241,20 +247,23 @@ void MulticlientLink::update(uint64_t now, const RadioEvent& event, bool allowTx
     }
     const bool isGateway = config_.role == DeviceRole::GATEWAY;
     if (pendingBitmap_.seen && !radio_.transmitting()) {
-        if (event.type == RadioEventType::TX_DONE) {
-            telemetry_.bitmap = pendingBitmap_;
-            // A late completion must not authorize a different round.
-            if (phase_ == Phase::DATA && pendingBitmap_.frame == frameId_ &&
-                pendingBitmap_.round + 1 == round_ && now <= dataAt_ + plan_.roundStart(round_))
-                mask_ = pendingBitmap_.retries;
-            else if (pendingBitmap_.retries) frameTimingOk_ = false;
-            if (pendingBitmap_.round == kAttempts - 1 && frameTimingOk_ &&
-                event.completedAt(now) < nextBeacon_)
-                logLinkSamples();
-        } else {
-            frameTimingOk_ = false;
-        }
+        const auto bitmap = pendingBitmap_;
         pendingBitmap_ = {};
+        const auto completedAt = event.completedAt(now);
+        const bool sent = event.type == RadioEventType::TX_DONE;
+        const bool timely = sent && bitmap.frame == frameId_ &&
+            receiveWindow(completedAt, dataAt_ + plan_.feedbackStart(bitmap.round),
+                          payloadAir(feedbackBytes(plan_.count)));
+        if (sent) telemetry_.bitmap = bitmap;
+        if (!timely) frameTimingOk_ = false;
+        // A late completion cannot authorize a different round or a slot that has started.
+        if (bitmap.retries) {
+            if (timely && phase_ == Phase::DATA && bitmap.round + 1 == round_ &&
+                now <= dataAt_ + plan_.roundStart(round_)) mask_ = bitmap.retries;
+            else frameTimingOk_ = false;
+        }
+        if (bitmap.frame == frameId_ && bitmap.round == kAttempts - 1)
+            logLinkSamples(frameTimingOk_ && completedAt < nextBeacon_);
     }
     const bool renew = isGateway && frameId_ == UINT32_MAX && now >= nextBeacon_ && !radio_.transmitting();
     if ((!boot_ || renew) && now >= nextBoot_) {
@@ -296,6 +305,7 @@ void MulticlientLink::update(uint64_t now, const RadioEvent& event, bool allowTx
 void MulticlientLink::gateway(uint64_t now, const RadioEvent& event, const Frame* incoming) {
     const auto completedAt = event.completedAt(now);
     if (now >= nextBeacon_ && !radio_.transmitting()) {
+        if (phase_ == Phase::DATA) logLinkSamples(false);
         phase_ = Phase::WAIT;
         if (frameId_ == UINT32_MAX) return;
         ++frameId_;
@@ -330,6 +340,7 @@ void MulticlientLink::gateway(uint64_t now, const RadioEvent& event, const Frame
         frameTimingOk_ = true;
         displayQuietAt_ = lastTxEnd;
         round_ = 0;
+        rxReadyMask_ = 0;
         mask_ = plan_.activeMask();
         phase_ = Phase::DATA;
         return;
@@ -363,7 +374,7 @@ void MulticlientLink::gatewayRequest(uint64_t now, uint64_t receivedAt, const Fr
         log_.event("V3_GRANT_TX", "schedule_unavailable");
         return;
     }
-    if (kAdaptive) admitProfiles();
+    if (adaptDataSf_) admitProfiles();
     if (kAdaptive && !plan_.matches(roster_)) {
         log_.event("V3_GRANT_TX", "adaptive_schedule_unavailable");
         return;
@@ -396,17 +407,25 @@ void MulticlientLink::gatewayData(uint64_t now, const Frame* incoming, const Rad
             const char* result;
             if (received.result == Reception::NONE) {
                 observePeer(receivedAt, f.sourceId, event);
+                telemetry_.lastDataSf = radioSf_;
+                rxReadyMask_ |= slotBit(i);
                 ++telemetry_.data;
                 if (round_) ++telemetry_.retries;
                 std::memcpy(received.bytes, bytes, size);
+                received.completedAt = receivedAt;
                 received.rssi = event.rssi;
                 received.snr = event.snr;
                 received.metrics = event.metrics;
                 received.retried = round_ != 0;
                 const bool accepted = payload_.deliver({f.sourceId, f.bootId, boot_, f.frameId, f.sequence, bytes, size});
                 received.result = accepted ? Reception::ACCEPTED : Reception::REFUSED;
-                if (accepted) ++telemetry_.accepted;
-                else ++telemetry_.refused;
+                if (accepted) {
+                    ++telemetry_.accepted;
+                    if (kAdaptive) {
+                        adr_[i].deliveredFrame = frameId_;
+                        adr_[i].deliveredSf = plan_.slots[i].sf;
+                    }
+                } else ++telemetry_.refused;
                 result = accepted ? "accepted" : "application_refused";
             } else {
                 const bool same = std::memcmp(received.bytes, bytes, size) == 0;
@@ -424,6 +443,7 @@ void MulticlientLink::gatewayData(uint64_t now, const Frame* incoming, const Rad
             const auto slot = dataAt_ + plan_.dataStart(round_, i, mask_);
             if (now + kRetuneLeadUs < slot) break;
             nextSf = plan_.slots[i].sf;
+            if (now <= slot && radioSf_ == nextSf && radio_.receiving()) rxReadyMask_ |= slotBit(i);
         }
         if (now + kRetuneLeadUs >= start) nextSf = kControlSf;
         if (nextSf && !prepareSf(nextSf, now) && now < start + kLaunchUs) return;
@@ -434,6 +454,8 @@ void MulticlientLink::gatewayData(uint64_t now, const Frame* incoming, const Rad
     ack.payload[0] = plan_.count;
     uint8_t eligible = 0;
     for (uint8_t i = 0; i < plan_.count; ++i) {
+        if (kAdaptive && (mask_ & slotBit(i)) && !(rxReadyMask_ & slotBit(i)))
+            received_[i].rxWindowUnobserved = true;
         if (received_[i].result == Reception::ACCEPTED) {
             ack.payload[1] |= slotBit(i);
             put32(ack.payload + 3 + 4 * i, plan_.slots[i].boot);
@@ -443,6 +465,7 @@ void MulticlientLink::gatewayData(uint64_t now, const Frame* incoming, const Rad
     }
     if (round_ + 1 < kAttempts) ack.payload[2] = retryMask(eligible, plan_.count, frameId_, round_);
     mask_ = 0;
+    rxReadyMask_ = 0;
     if (launchWindow(now, start) && (!kAdaptive || radioSf_ == kControlSf)) {
         if (send(ack, now, "V3_BITMAP_TX")) {
             pendingBitmap_ = {true, frameId_, round_, ack.payload[1], ack.payload[2]};
@@ -451,7 +474,10 @@ void MulticlientLink::gatewayData(uint64_t now, const Frame* incoming, const Rad
         frameTimingOk_ = false;
         log_.event("V3_BITMAP_TX", "deadline_miss", &ack);
     }
-    if (++round_ == kAttempts) phase_ = Phase::WAIT;
+    if (++round_ == kAttempts) {
+        phase_ = Phase::WAIT;
+        if (!pendingBitmap_.seen) logLinkSamples(false);
+    }
 }
 
 void MulticlientLink::acceptBeacon(uint64_t now, const Frame& beacon) {
@@ -467,6 +493,7 @@ void MulticlientLink::acceptBeacon(uint64_t now, const Frame& beacon) {
         retiredBoot_ = gatewayBoot_;
         telemetry_.peer = {};
         telemetry_.bitmap = {};
+        telemetry_.lastDataSf = 0;
         telemetry_.confirmedDataSf = 0;
         acknowledgedFrame_ = 0;
     }
@@ -621,6 +648,7 @@ void MulticlientLink::client(uint64_t now, const Frame* incoming, const RadioEve
         if (!launchWindow(now, start)) { log_.event("V3_DATA_TX", "deadline_miss", &data_); return; }
         if (send(data_, now, "V3_DATA_TX")) {
             sentData_ = true;
+            telemetry_.lastDataSf = radioSf_;
             ++telemetry_.data;
             if (round_) ++telemetry_.retries;
         }

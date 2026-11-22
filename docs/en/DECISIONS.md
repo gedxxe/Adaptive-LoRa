@@ -372,3 +372,41 @@ it and keep its reservation during a lower-SF probe. Use an experimental
 Measure the retune-to-RX path separately from packet delivery. Nominal
 SNR thresholds and delivery streaks are trial inputs. Evaluate the
 trade-off on one roaming Client while measuring stationary delivery.
+
+## ADR-033 — Eight-Client bench load and timing evidence
+
+Use a 16 B ceiling for the adaptive bench roster. The 8 B example fits
+this traffic profile. At eight SF9 Clients the modeled frame leaves
+0.916064 s after the 300 ms end reserve. The 24 B ceiling leaves 0.096864 s,
+and the 64 B ceiling fits only two SF9 Clients with the rest at SF7.
+Keep the 64 B codec limit, wire versions, NVS schema and PHY. The fixed-SF
+image still advertises 64 B.
+
+Preserve delivery and Rx time even when the Gateway reports a frame timing
+fault. A completed bitmap must fall in its receive window and be serviced
+before the next DATA round to open retries. Samples with timing faults
+remain in captures and do not drive ADR. Keep cumulative feedback in all
+four rounds so a Client can recover an earlier missed ACK. Measure the
+overhead before experimenting with a different termination rule.
+
+## ADR-034 — Observe DATA and separate scheduler faults from RF loss
+
+Keep the adaptive field range at SF7–SF9. Report the last Client DATA
+launch or valid Gateway DATA reception on each display page because the
+radio normally returns to SF9 before the screen can refresh. When the
+Gateway has no observation of RX readiness in the retune lead and receives
+no valid packet in that slot, retain the delivery record and skip that
+Client's ADR update. A Gateway-only comparison build freezes DATA at SF7
+with the same control exchange and retry budget. Measure the matched pair
+before attributing any delivery gain to ADR.
+
+## ADR-035 — SF10 for budgeted DATA slots
+
+Keep the SF9 control exchange and add SF10 to per-Client DATA grants.
+SF10 at BW125 fits the existing airtime equation and TX deadline. The
+Gateway still reserves the full roster and longest retry slots before
+raising an SF. A move from SF10 to SF9 retains the SF10 reservation until
+the trial locks. The provisional filtered SNR threshold for that trial is
+−8.5 dB. Set the adaptive wire version to 5 so a mixed installation fails
+at version validation before a legacy Client can see an incompatible
+Grant. Use the adaptive image as the PlatformIO default for field work.

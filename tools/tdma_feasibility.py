@@ -1,6 +1,6 @@
 """Host-only airtime budget; no radio access or production scheduling policy.
 
-Equations and accounting assumptions: docs/en/TDMA_FEASIBILITY.md.
+Current equations: docs/en/SCHEDULED_LINK.md. The scenario grid below models a cached schedule.
 All durations are integer microseconds. Unknown overheads remain None.
 """
 import argparse

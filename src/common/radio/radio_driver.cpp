@@ -1,4 +1,5 @@
 #include "radio_driver.h"
+#include "radio_config.h"
 
 namespace adaptive_lora {
 const char* RadioDriver::stateName() const {
@@ -48,7 +49,7 @@ int16_t RadioDriver::stop() {
     return code;
 }
 int16_t RadioDriver::setSpreadingFactor(uint8_t sf) {
-    if (!initialized_ || transmitting() || sf < 7 || sf > 9) return radio_status::unknown;
+    if (!initialized_ || transmitting() || sf < phy::dataSf || sf > phy::maxDataSf) return radio_status::unknown;
     int16_t code = stop();
     if (!code) {
         hardware_.clearIrqSignal();
