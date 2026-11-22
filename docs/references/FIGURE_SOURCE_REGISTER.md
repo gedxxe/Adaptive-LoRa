@@ -6,6 +6,19 @@ project drawings based on the adaptive implementation. The example SFs
 and packet positions illustrate how the code works. They are not
 measurements. The antenna symbol is also original.
 
+The [Gateway](../research/figures/adaptive-algorithm-gateway.png) and
+[Client](../research/figures/adaptive-algorithm-client.png) listings describe
+the [adaptive runtime](../../src/app/multiclient_link.cpp). Both come from
+one [LaTeX source](../research/figures/adaptive-algorithm.tex). To rebuild
+them from the repository root, use pdfLaTeX with `standalone` and AMS packages,
+and Poppler. This assumes `.pio` exists.
+
+```sh
+pdflatex -interaction=nonstopmode -halt-on-error -output-directory=.pio docs/research/figures/adaptive-algorithm.tex
+pdftoppm -r 288 -png -gray -f 1 -l 1 -singlefile .pio/adaptive-algorithm.pdf docs/research/figures/adaptive-algorithm-gateway
+pdftoppm -r 288 -png -gray -f 2 -l 2 -singlefile .pio/adaptive-algorithm.pdf docs/research/figures/adaptive-algorithm-client
+```
+
 The [v3 implementation diagram](../research/figures/v3-superframe.svg) was
 drawn for Iteration 020 from the production calendar and bitmap layout. The
 paper figures and the earlier explanatory drawings below remain available

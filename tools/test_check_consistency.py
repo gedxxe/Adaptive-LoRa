@@ -3,7 +3,7 @@ import shutil
 import tempfile
 import unittest
 
-from check_consistency import APPROVED_SETTINGS, LINK_DOCS, check, current_text
+from check_consistency import ALGORITHM_FIGURES, APPROVED_SETTINGS, LINK_DOCS, check, current_text
 
 
 class ConsistencyTests(unittest.TestCase):
@@ -15,11 +15,11 @@ class ConsistencyTests(unittest.TestCase):
         # Empty targets suffice for link existence checks; copy only inspected inputs.
         for folder in ("docs", "tools", "src", "include", "test"):
             for original in (source / folder).rglob("*"):
-                if original.is_file() and original.suffix in (".md", ".py", ".svg", ".png", ".cpp", ".h"):
+                if original.is_file() and original.suffix in (".md", ".py", ".svg", ".png", ".cpp", ".h", ".tex"):
                     target = self.root / original.relative_to(source)
                     target.parent.mkdir(parents=True, exist_ok=True)
                     target.touch()
-        names = set(LINK_DOCS) | set(APPROVED_SETTINGS) | {"CODEX_START_PROMPT.md", "VERSION", "PROTOCOL_VERSION",
+        names = set(LINK_DOCS) | set(APPROVED_SETTINGS) | set(ALGORITHM_FIGURES) | {"CODEX_START_PROMPT.md", "VERSION", "PROTOCOL_VERSION",
                 "platformio.ini", "THIRD_PARTY.md", "CHANGELOG.md", "include/project_config.h",
                 "src/common/radio/sx1262_hardware.h", "src/app/esp32_firmware.h",
                 "logs/README.md", "logs/test/RUN_RECORD_TEMPLATE.md"}
@@ -97,8 +97,12 @@ class ConsistencyTests(unittest.TestCase):
         self.assertTrue(any("shared architecture figure" in e for e in check(self.root)))
 
     def test_readmes_share_the_two_role_algorithm(self):
-        self.mutate("README.zh-CN.md", "retry_granted(ack)", "any_ack(ack)")
-        self.assertTrue(any("same gateway and client pseudocode" in e for e in check(self.root)))
+        self.mutate("README.zh-CN.md", "adaptive-algorithm-client.png", "missing-client.png")
+        self.assertTrue(any("embed both algorithm figures" in e for e in check(self.root)))
+
+    def test_algorithm_requires_a_png(self):
+        (self.root / ALGORITHM_FIGURES[0]).write_text("", encoding="utf-8")
+        self.assertTrue(any("missing or invalid algorithm PNG" in e for e in check(self.root)))
 
     def test_protocol_pages_share_the_symbolic_reservation(self):
         self.mutate("docs/zh-CN/SCHEDULED_LINK.md", r"\le \tau_{\mathrm{frame}}", r"\le 15")

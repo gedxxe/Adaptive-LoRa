@@ -16,33 +16,17 @@ and groups acknowledgements in a bitmap so only missing packets can retry.
 
 ## How it works
 
-The same image runs on every board. A Beacon starts the frame. The Grant
-assigns a slot, byte count and DATA SF. Control packets share one SF, so
-Clients can recover synchronization after missing a frame.
+Control uses $\sigma_{\mathrm{ctrl}}$ and each Client $\iota$ sends DATA at
+$\sigma_\iota$. The Gateway fits the full roster $\Omega$ into the frame
+budget, then uses $\Xi$ for accepted DATA and $\Pi_\jmath$ for retry slots
+announced in round $\jmath$. A retry reuses the same packet $\Delta_\iota$.
 
-```text
-gateway(frame):
-    requests <- beacon_and_collect()
-    plan <- fit_grants(requests)
-    if not plan: return
-    broadcast_grant(plan)
-    for round in plan:
-        receive_data_at_granted_sfs(round)
-        bitmap <- send_ack_at_control_sf()
-        if tx_done(bitmap): open_retries()
-    update_sf(delivery, snr, ack_receipts)
+<img src="docs/research/figures/adaptive-algorithm-gateway.png" alt="Gateway algorithm. Collect requests, fit the schedule, receive DATA, send the ACK bitmap and review the per-Client SF." width="480">
 
-client(frame):
-    listen_on_control_sf()
-    if no fresh Beacon or no DATA: return
-    request_slot(frame, last_ack)
-    grant <- matching_grant(frame)
-    if not grant: return
-    send_in_slot(grant)
-    for ack in valid_bitmaps_on_control_sf():
-        if accepted(ack): return save_ack(ack)
-        if retry_granted(ack): retry_in_slot(ack)
-```
+<img src="docs/research/figures/adaptive-algorithm-client.png" alt="Client algorithm. Synchronize to a Beacon, request a slot, transmit with the granted SF, then accept the ACK or use an assigned retry slot." width="480">
+
+[Algorithm notation and SF decisions](docs/en/SCHEDULED_LINK.md#adaptation-and-recovery) ·
+[LaTeX source](docs/research/figures/adaptive-algorithm.tex)
 
 ## Airtime budget
 

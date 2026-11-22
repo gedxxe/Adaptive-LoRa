@@ -1,0 +1,84 @@
+\documentclass[11pt,multi=algorithm,border=6pt]{standalone}
+\usepackage{amsmath,amssymb}
+
+\newenvironment{algorithm}[2]{%
+  \begin{minipage}{252pt}
+  \raggedright
+  \setlength{\parindent}{0pt}%
+  \setlength{\parskip}{2pt}%
+  \hrule height .8pt\vspace{4pt}%
+  {\large\textbf{Algorithm #1} \enspace #2\par}%
+  \vspace{3pt}\hrule height .45pt\vspace{5pt}%
+}{\par\vspace{5pt}\hrule height .8pt\end{minipage}}
+
+\newcommand{\Step}[1]{\noindent #1\par}
+\DeclareMathOperator{\Requests}{Requests}
+\DeclareMathOperator{\Reserve}{Reserve}
+\DeclareMathOperator{\Deliver}{DeliverOnce}
+\DeclareMathOperator{\Missing}{Missing}
+\DeclareMathOperator{\Pick}{Pick}
+\DeclareMathOperator{\OnTime}{OnTime}
+\DeclareMathOperator{\Review}{ReviewSF}
+\DeclareMathOperator{\ValidGrant}{ValidGrant}
+\DeclareMathOperator{\ValidACK}{ValidACK}
+\newcommand{\ctrl}{\sigma_{\mathrm{ctrl}}}
+\newcommand{\Tx}[2]{\mathsf{TX}_{#1}(#2)}
+\newcommand{\Rx}[2]{\mathsf{RX}_{#1}(#2)}
+\newcommand{\Block}[2]{%
+  \Step{#1}%
+  \noindent\hspace{.75em}\vrule width .45pt\hspace{.65em}%
+  \begin{minipage}[t]{\dimexpr\linewidth-1.4em-.45pt\relax}%
+    \raggedright\setlength{\parskip}{2pt}#2%
+  \end{minipage}\par%
+}
+
+\begin{document}
+\begin{algorithm}{1}{Gateway scheduling}
+  \Step{$\Tx{\ctrl}{\mathrm{Beacon}(\phi,\Omega)}$}
+  \Step{$\Theta_0 \gets \Requests(\phi,\Omega)$}
+  \Step{\textbf{if} $\Theta_0=\varnothing$ \textbf{then return}}
+  \Step{$\boldsymbol{\sigma}^{\mathrm{res}}\gets
+    \Reserve(\Omega,\boldsymbol{\sigma}^{\mathrm{want}})$}
+  \Step{\hspace{1em}subject to $\tau_{\mathrm{used}}(\Omega,\boldsymbol{\sigma}^{\mathrm{res}})\le\tau_{\mathrm{frame}}$}
+  \Step{$\sigma_\iota\gets\min(\sigma_\iota^{\mathrm{want}},\sigma_\iota^{\mathrm{res}}),\quad \iota\in\Theta_0$}
+  \Step{$\Tx{\ctrl}{\mathrm{Grant}(\phi,\Theta_0,\boldsymbol{\lambda},\boldsymbol{\sigma})}$}
+  \Step{\textbf{if} $\neg\OnTime(\mathrm{Grant})$ \textbf{then return}}
+  \Step{$\Xi\gets\varnothing$}
+  \Block{\textbf{for} $\jmath=0,\ldots,\varrho$ \textbf{do}}{%
+    \Block{\textbf{for} $\iota\in\Theta_\jmath$ in slot order \textbf{do}}{%
+      \Step{$\Delta_\iota\gets\Rx{\sigma_\iota}{\phi,\jmath,\iota}$}
+      \Step{$\Xi\gets\Xi\cup\Deliver(\Delta_\iota)$}%
+    }
+    \Step{$\Pi_\jmath\gets\begin{cases}
+      \Pick_{\varkappa}(\Missing(\Theta_0),\phi,\jmath), & \jmath<\varrho\\
+      \varnothing, & \jmath=\varrho
+    \end{cases}$}
+    \Step{$\Tx{\ctrl}{\mathrm{ACK}(\phi,\jmath,\Xi,\Pi_\jmath)}$}
+    \Step{$\Theta_{\jmath+1}\gets\begin{cases}
+      \Pi_\jmath, & \OnTime(\mathrm{ACK})\\
+      \varnothing, & \text{otherwise}
+    \end{cases}$}%
+  }
+  \Step{\textbf{if} $\OnTime(\phi)$ \textbf{then} $\Review(\phi)$}
+\end{algorithm}
+
+\begin{algorithm}{2}{Client delivery}
+  \Step{$(\phi,\Omega)\gets\Rx{\ctrl}{\mathrm{Beacon}}$}
+  \Step{\textbf{if} $\neg\mathrm{Fresh}(\phi)\lor\Delta_\iota=\bot$ \textbf{then return}}
+  \Step{$\Tx{\ctrl}{\mathrm{Request}(\phi,\lambda_\iota,\phi_{\mathrm{ack}})}$}
+  \Step{$\Gamma\gets\ValidGrant_\iota(\phi,\lambda_\iota)$}
+  \Step{\textbf{if} $\Gamma=\bot$ \textbf{then return}}
+  \Step{$\sigma_\iota\gets\Gamma.\sigma_\iota,\quad \epsilon_0\gets\mathrm{true}$}
+  \Block{\textbf{for} $\jmath=0,\ldots,\varrho$ \textbf{while} $\mathrm{Fresh}(\phi)$}{%
+    \Block{\textbf{if} $\epsilon_\jmath\land(0\le\tau-\tau_{\iota,\jmath}<\delta_{\mathrm{tx}})$ \textbf{then}}{%
+      \Step{$\Tx{\sigma_\iota}{\Delta_\iota}$}%
+    }
+    \Step{$(\Xi_\jmath,\Pi_\jmath)\gets\ValidACK_{\ctrl}(\phi,\jmath)$}
+    \Block{\textbf{if} $\mathrm{Sent}(\Delta_\iota)\land\iota\in\Xi_\jmath$ \textbf{then}}{%
+      \Step{$\phi_{\mathrm{ack}}\gets\phi$ \enspace\textbf{return} \textsc{accepted}}%
+    }
+    \Step{$\epsilon_{\jmath+1}\gets(\iota\in\Pi_\jmath)$}%
+  }
+  \Step{$\Rx{\ctrl}{\text{next Beacon}}$}
+\end{algorithm}
+\end{document}
