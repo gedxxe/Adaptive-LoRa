@@ -125,6 +125,33 @@ Physical retune time and drift still need measurement.
 
 ## Adaptation and recovery
 
+In the README algorithms, $\phi$ is the frame ID, $\phi_{\mathrm{ack}}$ is
+the last ACKed frame in the same Gateway session, and $\Gamma$ is a valid
+Grant. Round $\jmath=0$ is the first DATA attempt. $\Theta_\jmath$ is the set
+of authorized Clients, $\Xi$ accumulates accepted Clients, and $\Pi_\jmath$
+selects up to $\varkappa$ granted Clients whose DATA has yet to arrive.
+$\epsilon_\jmath$ records the local Client's permission to send. An invalid
+or absent bitmap provides empty sets. The Gateway checks frame and session
+identity, declared payload length, and timing before accepting DATA.
+
+For current time $\tau$, scheduled TX start $\tau_{\iota,\jmath}$, expected
+packet completion $\widehat{\tau}$ and observed completion $\tau_{\mathrm{rx}}$,
+the windows and the SNR update are
+
+```math
+\begin{aligned}
+0 &\le \tau-\tau_{\iota,\jmath}<\delta_{\mathrm{tx}},\\
+-\delta_{\mathrm{rx}} &\le \tau_{\mathrm{rx}}-\widehat{\tau}<\delta_{\mathrm{rx}},\\
+\overline{\upsilon}_\iota^{\mathrm{next}}
+   &=(1-\omega)\overline{\upsilon}_\iota+\omega\upsilon_\iota.
+\end{aligned}
+```
+
+This profile uses $\delta_{\mathrm{tx}}=\delta/4$, $\delta_{\mathrm{rx}}=\delta/2$
+and $\omega=1/4$. The first finite first-attempt SNR sample $\upsilon_\iota$
+at the current SF initializes the filter. The reserved SF can stay above
+the requested SF during a lower-SF trial, preserving room to roll back.
+
 After two consecutive degraded reports, the Gateway may try the next
 higher SF if the reservation fits. Degraded means the first attempt
 failed, even if a retry arrived. A lock requires three first-slot

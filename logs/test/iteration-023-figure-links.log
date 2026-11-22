@@ -1,0 +1,4 @@
+Markdown files inspected: 91
+logs/build/iteration-006-baseline/README.md: logs/test/RUN_RECORD_TEMPLATE.md
+logs/build/iteration-007-review-snapshot/README.md: logs/test/RUN_RECORD_TEMPLATE.md
+Active broken local links or anchors: 0. Pre-existing broken links in frozen snapshots: 2.

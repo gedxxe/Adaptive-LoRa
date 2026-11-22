@@ -52,8 +52,8 @@ Pins and PHY belong in include/board_pins.h and include/radio_config.h.
 The V3 reference uses GPIO 8/9/10/11/12/13/14 for NSS/SCK/MOSI/MISO/RESET/BUSY/DIO1.
 DIO2 controls the RF switch; DIO3 supplies the 1.8 V TCXO. Pass oscillator and
 DC-DC selection explicitly. Verify GPIO17/18/21/36, Vext
-polarity and SSD1306/0x3C before using it on the delivered boards. Preserve
-other pin reservations in HARDWARE.md.
+polarity and SSD1306/0x3C before using it on the delivered boards. See the
+[board reference](docs/en/SCHEDULED_LINK.md#board-reference) for pin details.
 
 Retain 915.0 MHz provisional, BW125, default v3 SF7, v4 control SF9, CR4/5,
 preamble 8, explicit header, CRC, sync 0x12, 22 dBm requested TX power,
@@ -76,10 +76,11 @@ disabled. Never infer role from identical hardware. Config edits are staged,
 validated, saved with readback, then activated only after controlled reboot.
 Gateway node ID equals gateway ID; client node ID differs. Network is
 1–65535; node/gateway IDs are 1–65534. Defaults are network 1, gateway 1,
-client 2. Keep the bounded serial commands and status semantics in README
-and ARCHITECTURE; do not write per-packet telemetry to NVS.
+client 2. Keep the bounded serial commands and status semantics in the
+[setup guide](docs/en/BENCH_RUNBOOK.md#flash-and-set-roles). Do not write
+per-packet telemetry to NVS.
 
-| Owner | Responsibility |
+| Module | Responsibility |
 |---|---|
 | src/main.cpp | Thin Arduino setup/loop delegate; approximately 15–40 lines, no protocol/radio/state policy |
 | Esp32Firmware | Own concrete storage/radio adapters before and beyond the coordinator lifetime |
@@ -93,7 +94,7 @@ and ARCHITECTURE; do not write per-packet telemetry to NVS.
 | PreferencesConfigStorage | Sole Preferences/NVS adapter |
 | DeviceConfig / FrameCodec / SequenceTracker | Pure validation, explicit serialization and bounded session history |
 | OledStatusDisplay | SSD1306 diagnostics after radio service |
-| ProvisioningConsole / SerialLogger | Bounded command parsing / queued diagnostics; no radio ownership |
+| ProvisioningConsole / SerialLogger | Bounded command parsing and queued diagnostics |
 
 Test actual production modules through existing low-level seams; never copy
 state machines into fakes. Keep protocol logic free of MCU/radio dependencies
@@ -188,12 +189,10 @@ branches and records. Commit/push/create PR only when authorized by the user.
 Integrate reviewed work through normal merge commits. Never force-push,
 rebase, squash or delete historical branches during synchronization.
 PR #6 merged the V3.4 bench baseline at `541e2e8b985f7cd67ca4d1f1af323c46aed4333e`.
-Iteration 020 stacks on published Iteration 019 at
-`979d873fad629aedcdf0e8a565b4ad3681bbea61`. Review the 020 branch against
-`codex/iteration-019-research-implementation` while it remains unmerged.
+PR #11 consolidated the manuals at `5ec1e7e6bf9839320cdd0ea6474b2b29d6d4980d`.
 
 Publish sanitized project files only. Exclude caches, binaries, credentials,
 local configuration, private backups and unlicensed research PDFs. Preserve
-third-party license references. Final report lists changed files/ownership,
+third-party license references. Final report lists changed files and their roles,
 actual build/test evidence, behavior/compatibility, unresolved risks, physical
 checks performed, milestone state, next task and publication state.

@@ -1887,3 +1887,38 @@ links remain in frozen Iteration 006 and 007 snapshots.
 - The firmware source, headers, PlatformIO settings, native test sources
   and version files match the previous main tree. `git diff --check`
   passed. The earlier build results still apply. Hardware was not tested.
+
+### Iteration 023 follow-up — LaTeX algorithm figures, 2026-11-22
+
+- Base: GitHub `main` at `5ec1e7e` after PR #11. Branch:
+  `codex/iteration-023-algorithm-figure`. Both READMEs now embed the two
+  PNGs under `docs/research/figures/`. The shared `adaptive-algorithm.tex`
+  specifies the SF reservation, accepted and retry sets, and Client
+  launch window. Both protocol pages define the symbols and give the RX
+  window and SNR filter. The figure register records the export commands.
+- pdfLaTeX 1.40.26 from TeX Live 2024 and Poppler 26.07.0 generated both
+  panels at 288 DPI. Two pages compiled without box warnings, and both
+  READMEs showed both images at 376 px and 480 px. MathJax rendered 65
+  distinct expressions. `logs/test/iteration-023-figure-render.log` keeps
+  the commands, output and checks. The local TeX installation prefix was
+  replaced with `<TEX_ROOT>` and trailing whitespace was trimmed.
+- Rechecked 91 Markdown files. No broken links or anchors in the active
+  docs. Two pre-existing missing links are in frozen snapshots. See
+  `logs/test/iteration-023-figure-links.log`. The folder `docs/` still has
+  14 Markdown files.
+- `pio run -e` for `heltec_wifi_lora_32_V3`, `heltec_wifi_lora_32_V3_research`,
+  `heltec_wifi_lora_32_V3_multiclient` and `heltec_wifi_lora_32_V3_adaptive`
+  each exited 0. See `logs/build/iteration-023-figure-heltec_wifi_lora_32_V3*.log`.
+  Resolved Espressif32 55.3.311, Arduino ESP32 3.3.11, Xtensa toolchain
+  14.2.0+20260121 and RadioLib 7.8.1 for the adaptive build.
+- `pio test -e native`, `-e native_multiclient` and `-e native_adaptive`
+  exited 0 with 356/356, 15/15 and 8/8 cases. See
+  `logs/test/iteration-023-figure-native*.log`. The five `python -m unittest
+  discover -s tools -p <file> -v` suites passed 13 capture, 16 airtime,
+  3 multiclient model, 5 ADR and 16 documentation cases. The consistency
+  command exited 0. See `logs/test/iteration-023-figure-final-*.log`.
+  Build and test logs replace local workspace and account paths when present.
+- Source, firmware version `0.2.0-alpha.1`, protocol 4 for the adaptive
+  image, NVS schema 1 and PHY settings match the base. `main.cpp` still
+  delegates Arduino setup and loop to `Esp32Firmware`. No board was
+  flashed or tested. Walk-test and radio-timing measurements remain open.

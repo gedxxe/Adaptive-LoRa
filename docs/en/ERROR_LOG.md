@@ -736,3 +736,23 @@ The GitHub screenshot showed the steps as centered text rather than a
 code listing. The new README uses a fenced listing for the two roles and
 reserves math blocks for equations. Local browser previews and a
 Markdown structure check verified the corrected listing.
+
+Follow-up: The fenced listing remained unsuitable for the research README.
+The Gateway and Client algorithms were typeset from one LaTeX source with
+symbolic SF, timing and bitmap operations. Both READMEs embed the PNG exports.
+
+## ERR-047 — Figure verification tools on Windows
+
+- Running the default `kpsewhich` and `pdftotext` resolved to MiKTeX and
+  failed while it attempted to open its per-user registry or setup directory.
+  The inventory query exited 1 and `pdftotext` terminated. The first PDF
+  render also reported an underfull line. Using TinyTeX explicitly, removing
+  paragraph justification in the figure, and rasterizing through bundled
+  Poppler produced two clean pages, inspected as PNGs.
+- In the escalated `cmd.exe` session, direct and `call` invocations of
+  the quoted `%USERPROFILE%` PlatformIO Python path exited 1 before the
+  runner started. Launching that interpreter with Python `subprocess.run`
+  passed its arguments intact. All four ESP32 builds and all three native
+  suites subsequently exited 0.
+- `git diff --cached --check` flagged a trailing space from the TeX log.
+  The new log was normalized to LF and its trailing whitespace trimmed.

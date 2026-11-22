@@ -18,6 +18,11 @@ peers, the eight-Client reservation, ACK receipt and radio recovery.
 The host results do not establish range or timing on the boards.
 [Build and test records](BUILD_MEMORY.md)
 
+The Iteration 023 figure update rebuilt all four ESP32 images and reran
+the three native suites (356/356, 15/15 and 8/8) and 53 Python checks.
+The [Gateway and Client listings](../../README.md#how-it-works) use the
+same PHY and protocol as the previous build.
+
 The airtime calculation for eight 64-byte limits and the other Clients
 at SF7 gives **14.156640 s** with two SF9 reservations and **15.634272 s**
 with three. Compare these model results against the configured period,

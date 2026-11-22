@@ -9,9 +9,12 @@ GUIDES = ("docs/en/BENCH_RUNBOOK.md", "docs/zh-CN/BENCH_RUNBOOK.md")
 PROTOCOLS = ("docs/en/SCHEDULED_LINK.md", "docs/zh-CN/SCHEDULED_LINK.md")
 CURRENT_DOCS = ("AGENTS.md", "docs/en/PROGRESS.md", "docs/zh-CN/PROGRESS.md")
 ARCHITECTURE = "docs/research/figures/adaptive-architecture.svg"
+ALGORITHM_FIGURES = tuple(f"docs/research/figures/adaptive-algorithm-{role}.png"
+                          for role in ("gateway", "client"))
+ALGORITHM_SOURCE = "docs/research/figures/adaptive-algorithm.tex"
 TIMELINE = "../research/figures/adaptive-frame.svg"
 LINK_DOCS = CURRENT_DOCS + READMES + GUIDES + PROTOCOLS + (
-    "PACKAGE_MANIFEST.md", "docs/research/ALGORITHM_TRACEABILITY.md",
+    "PACKAGE_MANIFEST.md", "docs/research/ALGORITHM_TRACEABILITY.md", "docs/references/FIGURE_SOURCE_REGISTER.md",
 )
 APPROVED_SETTINGS = {
     "include/project_config.h": {"kDefaultHelloIntervalMs": "3000", "kAckTimeoutUs": "1000000", "kConfigSchema": "1"},
@@ -93,7 +96,10 @@ def check(root):
                                  or "`profile=adaptive`" not in text):
             errors.append(f"{name}: adaptive serial status must match the firmware")
 
-    algorithms = []
+    for figure in ALGORITHM_FIGURES:
+        path = root / figure
+        if not path.is_file() or not path.read_bytes().startswith(b"\x89PNG\r\n\x1a\n"):
+            errors.append(f"{figure}: missing or invalid algorithm PNG")
     for name, guide, protocol_page in zip(READMES, GUIDES, PROTOCOLS):
         text = (root / name).read_text(encoding="utf-8")
         if not all(f"]({target})" in text for target in (guide, protocol_page)):
@@ -103,11 +109,10 @@ def check(root):
             errors.append(f"{name}: expected the shared architecture figure")
         if f"]({TIMELINE})" not in (root / protocol_page).read_text(encoding="utf-8"):
             errors.append(f"{protocol_page}: expected the frame timeline")
-        algorithms.append(re.findall(r"^```text\n(gateway\(frame\):\n.*?)^```$", text, re.M | re.S))
-    if (len(algorithms[0]) != 1 or algorithms[0] != algorithms[1]
-            or "\nclient(frame):\n" not in algorithms[0][0]):
-        errors.append("READMEs: use the same gateway and client pseudocode in a text fence")
-    for pair, expected in ((READMES, 1), (PROTOCOLS, 5)):
+        algorithms = re.findall(r'<img\s+src="([^"]+)"\s+alt="[^"]+"[^>]*>', text)
+        if tuple(algorithms) != ALGORITHM_FIGURES or f"]({ALGORITHM_SOURCE})" not in text:
+            errors.append(f"{name}: embed both algorithm figures with alt text and link the LaTeX source")
+    for pair, expected in ((READMES, 1), (PROTOCOLS, 6)):
         equations = [re.findall(r"^```math\n(.*?)^```$",
                                 (root / name).read_text(encoding="utf-8"), re.M | re.S) for name in pair]
         if len(equations[0]) != expected or equations[0] != equations[1] or not all(equations[0]):

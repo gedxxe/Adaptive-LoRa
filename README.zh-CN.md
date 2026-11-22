@@ -15,32 +15,16 @@
 
 ## 工作流程
 
-所有板使用同一个镜像。Beacon 启动一帧，Grant 指定时隙、字节数和 DATA SF。
-控制帧采用同一个 SF，Client 丢帧后可在该 SF 上恢复同步。
+控制帧使用 $\sigma_{\mathrm{ctrl}}$，Client $\iota$ 使用 $\sigma_\iota$ 发送 DATA。
+Gateway 先为整组节点 $\Omega$ 预留时间，再用 $\Xi$ 表示已接收的 DATA，
+用 $\Pi_\jmath$ 表示第 $\jmath$ 轮宣布的重传时隙。重传沿用同一个包 $\Delta_\iota$。
 
-```text
-gateway(frame):
-    requests <- beacon_and_collect()
-    plan <- fit_grants(requests)
-    if not plan: return
-    broadcast_grant(plan)
-    for round in plan:
-        receive_data_at_granted_sfs(round)
-        bitmap <- send_ack_at_control_sf()
-        if tx_done(bitmap): open_retries()
-    update_sf(delivery, snr, ack_receipts)
+<img src="docs/research/figures/adaptive-algorithm-gateway.png" alt="Gateway 算法。收集请求、分配时隙、接收 DATA、发送 ACK 位图，并评估各 Client 的 SF。" width="480">
 
-client(frame):
-    listen_on_control_sf()
-    if no fresh Beacon or no DATA: return
-    request_slot(frame, last_ack)
-    grant <- matching_grant(frame)
-    if not grant: return
-    send_in_slot(grant)
-    for ack in valid_bitmaps_on_control_sf():
-        if accepted(ack): return save_ack(ack)
-        if retry_granted(ack): retry_in_slot(ack)
-```
+<img src="docs/research/figures/adaptive-algorithm-client.png" alt="Client 算法。根据 Beacon 同步并申请时隙，按分配的 SF 发送 DATA，再处理 ACK 或重传。" width="480">
+
+[算法符号与 SF 调整](docs/zh-CN/SCHEDULED_LINK.md#自适应与恢复) ·
+[LaTeX 源文件](docs/research/figures/adaptive-algorithm.tex)
 
 ## 空口时间预算
 

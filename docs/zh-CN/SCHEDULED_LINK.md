@@ -110,6 +110,30 @@ Gateway 先核对不等式再预留更高 SF，试用较低 SF 时保留此前�
 
 ## 自适应与恢复
 
+README 算法中的 $\phi$ 为帧 ID，$\phi_{\mathrm{ack}}$ 是同一 Gateway 会话中
+最后收到 ACK 的帧，$\Gamma$ 为有效 Grant。第 $\jmath=0$ 轮为首传。
+$\Theta_\jmath$ 是本轮有权发送的 Client 集合，$\Xi$ 累计记录已接受的 Client，
+$\Pi_\jmath$ 从已获授权但 DATA 仍未到达的 Client 中选出最多 $\varkappa$ 个。
+$\epsilon_\jmath$ 表示本地 Client 有权发送。位图缺失或无效时，两集合为空。
+Gateway 接收 DATA 时检查帧、会话、载荷长度和时序。
+
+设当前时刻为 $\tau$，计划发射时刻为 $\tau_{\iota,\jmath}$，预计完成时刻为
+$\widehat{\tau}$，实际接收完成时刻为 $\tau_{\mathrm{rx}}$。发送和接收窗口以及
+SNR 更新公式如下。
+
+```math
+\begin{aligned}
+0 &\le \tau-\tau_{\iota,\jmath}<\delta_{\mathrm{tx}},\\
+-\delta_{\mathrm{rx}} &\le \tau_{\mathrm{rx}}-\widehat{\tau}<\delta_{\mathrm{rx}},\\
+\overline{\upsilon}_\iota^{\mathrm{next}}
+   &=(1-\omega)\overline{\upsilon}_\iota+\omega\upsilon_\iota.
+\end{aligned}
+```
+
+当前配置使用 $\delta_{\mathrm{tx}}=\delta/4$、$\delta_{\mathrm{rx}}=\delta/2$
+和 $\omega=1/4$。当前 SF 首次有效的首传 SNR 样本 $\upsilon_\iota$ 用于初始化滤波。
+尝试降低 SF 时，可以保留较高 SF 所需的时隙，以便回退。
+
 同一 SF 连续两次首传失败后，预算允许时试用高一级 SF，重传成功也算首传失败。
 连续三次首传成功且有同一 SF 的 ACK 回执后锁定。锁定后若连续六次首传成功且平滑 SNR
 达到要求，可试用低一级（SF7 至少 −3.5 dB，SF8 至少 −6 dB）。失败即回退，并等八次
