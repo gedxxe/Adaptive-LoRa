@@ -191,6 +191,8 @@ SF12 are model-only rows. They need LDRO, and the 96 B SF11 packet and the
 
 ## Adaptation and recovery
 
+<img src="../research/figures/adaptive-algorithm-adr.png" alt="Gateway SF policy showing session recovery, the recent loss window, lower-SF trial rollback and confirmation." width="480">
+
 In the README algorithms, $\phi$ is the frame ID, $\phi_{\mathrm{ack}}$ is
 the last ACKed frame in the same Gateway session, and $\Gamma$ is a valid
 Grant. Round $\jmath=0$ is the first DATA attempt. $\Theta_\jmath$ is the set
@@ -218,13 +220,51 @@ and $\omega=1/4$. The first finite first-attempt SNR sample $\upsilon_\iota$
 at the current SF initializes the filter. The reserved SF can stay above
 the requested SF during a lower-SF trial, preserving room to roll back.
 
-After two consecutive degraded reports, the Gateway may try the next
-higher SF if the reservation fits. Degraded means the first attempt
-failed, even if a retry arrived. A lock requires three first-slot
-deliveries and an ACK receipt at the same SF. Once locked, six
-first-slot deliveries and enough filtered SNR can open a lower-SF trial
-(at least −3.5 dB for SF7, −6 dB for SF8 or −8.5 dB for SF9). A degraded trial rolls back
-and holds off another trial for eight first-slot deliveries.
+The SF policy uses the following quantities. Frame IDs and ACK receipts
+refer to the active Gateway session.
+
+| Symbol | Meaning | Current value |
+|---|---|---:|
+| $\nu_{\mathrm{obs}}$, $\nu_{\mathrm{up}}$ | Size of the eligible-report window and misses needed to request an increase | 3, 2 |
+| $\nu_{\mathrm{idle}}$ | Frame-ID gap that frees a higher-SF reservation | 4 |
+| $\nu_{\mathrm{lock}}$, $\nu_{\mathrm{probe}}$ | First-attempt deliveries required to lock or consider a lower SF | 3, 6 |
+| $\nu_{\mathrm{ack}}$, $\nu_{\mathrm{hold}}$ | Lower trial's receipt limit and first-attempt deliveries in the rollback hold | 6, 8 |
+
+$\epsilon_\iota^{\mathrm{fail}}$ marks a missed first attempt, including a
+retry that eventually delivered. $\alpha_\iota$ means the latest Request
+echoes the stored delivery's frame and confirms its SF.
+$\nu_\iota^{\mathrm{first}}$ counts the current run of first-attempt
+deliveries, including the current eligible report. $\phi_\iota^{\mathrm{req}}$
+and $\phi_\iota^{\mathrm{del}}$ are the last Request and delivery.
+$\sigma_\iota^{\mathrm{del}}$ is the SF used for that delivery. The SF
+state carries desired, reserved, remembered and rollback values
+$\sigma_\iota^{\mathrm{want}}$, $\sigma_\iota^{\mathrm{res}}$,
+$\sigma_\iota^{\mathrm{mem}}$ and $\sigma_\iota^{\mathrm{back}}$.
+$h_\iota$ counts the remaining hold after rollback. $\theta_{\sigma_\iota-1}$
+is the SNR threshold for trying the next lower SF.
+
+```math
+\boldsymbol{\xi}^{\mathrm{loss}}_\iota\gets
+  \operatorname{Tail}_{\nu_{\mathrm{obs}}}
+  \bigl(\boldsymbol{\xi}^{\mathrm{loss}}_\iota\mathbin{\|}\epsilon_\iota^{\mathrm{fail}}\bigr),
+\qquad
+\sum_{j}\xi^{\mathrm{loss}}_{\iota,j}\ge\nu_{\mathrm{up}}.
+```
+
+The Gateway evaluates the loss test after a miss. The window contains
+only eligible reports at the current SF and excludes timing faults and
+application refusals. When the count reaches two, the Gateway clears the
+window and checks the higher reservation at the next Grant.
+
+A lock requires three first-slot deliveries and an ACK receipt at the same
+SF, including when the budget limits a Grant to a lower SF. It stores the
+confirmed SF and releases any higher reservation held for rollback. After
+lock and hold expiry, six first-slot deliveries and enough filtered SNR
+can open a lower-SF trial
+(at least −3.5 dB for SF7, −6 dB for SF8 or −8.5 dB for SF9). A degraded
+trial rolls back. It also rolls back after six eligible first-slot
+deliveries without a matching Client ACK receipt for that SF. Either
+rollback delays the next lower-SF trial for eight first-slot deliveries.
 
 A Client retries only when a valid bitmap grants a retry. The Gateway
 opens those slots after an in-window TX completion serviced before the
@@ -235,10 +275,15 @@ each assigned slot, the Gateway checks for RX armed at the assigned SF
 during the retune lead or a valid DATA reception. Without either observation
 it skips SF review for that Client in this frame. If the Beacon expires,
 the Client stops scheduled TX and searches on the control SF. The
-Gateway resets its per-Client SF state on a new Client boot ID or when a
-Grant is prepared at least four frame IDs after its previous Request.
+Gateway releases the inactive Client's higher-SF reservation at a Grant
+prepared at least four frame IDs after its previous Request. When the
+same Client boot returns, the Gateway proposes the SF it remembered from
+a matching ACK receipt or later lock. The Gateway checks the new Grant
+against the current budget, so a returning Client may receive a lower SF. A lower-SF
+trial only lowers the remembered SF once it locks. A new Client boot ID
+or Gateway session clears the hint.
 Synchronous radio dependencies can still overrun
-software windows. [Runtime](../../src/app/multiclient_link.cpp) · [Known timing risks](ERROR_LOG.md)
+software windows. [LaTeX source](../research/figures/adaptive-algorithm.tex) · [Runtime](../../src/app/multiclient_link.cpp) · [Known timing risks](ERROR_LOG.md)
 
 ## Board reference
 

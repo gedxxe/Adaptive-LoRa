@@ -14,6 +14,7 @@ ARCHITECTURE = "docs/research/figures/adaptive-architecture.svg"
 ALGORITHM_FIGURES = tuple(f"docs/research/figures/adaptive-algorithm-{role}.png"
                           for role in ("gateway", "client"))
 ALGORITHM_SOURCE = "docs/research/figures/adaptive-algorithm.tex"
+ADR_FIGURE = "docs/research/figures/adaptive-algorithm-adr.png"
 TIMELINE = "../research/figures/adaptive-frame.svg"
 LINK_DOCS = CURRENT_DOCS + READMES + GUIDES + PROTOCOLS + (
     "docs/research/ALGORITHM_TRACEABILITY.md", "docs/references/FIGURE_SOURCE_REGISTER.md",
@@ -111,7 +112,7 @@ def check(root):
             if token not in text:
                 errors.append(f"{name}: missing matched comparison setting {token}")
 
-    for figure in ALGORITHM_FIGURES:
+    for figure in (*ALGORITHM_FIGURES, ADR_FIGURE):
         path = root / figure
         if not path.is_file() or not path.read_bytes().startswith(b"\x89PNG\r\n\x1a\n"):
             errors.append(f"{figure}: missing or invalid algorithm PNG")
@@ -122,8 +123,12 @@ def check(root):
         images = re.findall(r"!\[[^\]]+\]\(([^\s]+)\)", text)
         if images != [ARCHITECTURE]:
             errors.append(f"{name}: expected the shared architecture figure")
-        if f"]({TIMELINE})" not in (root / protocol_page).read_text(encoding="utf-8"):
+        protocol_text = (root / protocol_page).read_text(encoding="utf-8")
+        if f"]({TIMELINE})" not in protocol_text:
             errors.append(f"{protocol_page}: expected the frame timeline")
+        if not re.search(r'<img\s+src="../research/figures/' + re.escape(Path(ADR_FIGURE).name) +
+                         r'"\s+alt="[^"]+"', protocol_text):
+            errors.append(f"{protocol_page}: expected the SF recovery figure with alt text")
         algorithms = re.findall(r'<img\s+src="([^"]+)"\s+alt="[^"]+"[^>]*>', text)
         if tuple(algorithms) != ALGORITHM_FIGURES or f"]({ALGORITHM_SOURCE})" not in text:
             errors.append(f"{name}: embed both algorithm figures with alt text and link the LaTeX source")
@@ -142,7 +147,7 @@ def check(root):
                         f"{row['max_at_sf_with_others_at_sf7']} |")
             if row["sf"] >= 9 and expected not in text.splitlines():
                 errors.append(f"{page}: SF{row['sf']} study row differs from the airtime model")
-    for pair, expected in ((READMES, 1), (PROTOCOLS, 7)):
+    for pair, expected in ((READMES, 1), (PROTOCOLS, 8)):
         equations = [re.findall(r"^```math\n(.*?)^```$",
                                 (root / name).read_text(encoding="utf-8"), re.M | re.S) for name in pair]
         if len(equations[0]) != expected or equations[0] != equations[1] or not all(equations[0]):

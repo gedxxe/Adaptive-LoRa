@@ -12,6 +12,10 @@ Client ID 为 2–9。超帧为 15 秒，每个 Client 预留最多 16 字节载
 Gateway 显示最近一次收到的 DATA 的 SF。Gateway 为各 Client 调整 DATA SF7–SF10，按申请的字节数
 分配时隙，并通过 ACK 位图分配重传机会。控制帧固定用 SF9，编码率、带宽、发射功率和帧周期均固定。
 
+同一 SF 最近三条有效记录中有两次首传失败时，Gateway 可升档。断联后同一会话的 Client 返回时，
+若预算允许，Gateway 可恢复上次确认的 SF。`SEARCH` 表示在等新的 SF9 Beacon。
+`NO GRANT` 表示已启动 Request，但未收到匹配的 Grant。
+
 <a name="烧录与配置"></a>
 
 **[烧录、设置角色并进行八节点测试](docs/zh-CN/BENCH_RUNBOOK.md)** ·
@@ -26,11 +30,11 @@ Gateway 显示最近一次收到的 DATA 的 SF。Gateway 为各 Client 调整 D
 Gateway 先为整组节点 $\Omega$ 预留时间，再用 $\Xi$ 表示已接收的 DATA，
 用 $\Pi_\jmath$ 表示第 $\jmath$ 轮宣布的重传时隙。重传沿用同一个包 $\Delta_\iota$。
 
-<img src="docs/research/figures/adaptive-algorithm-gateway.png" alt="Gateway 算法。收集请求、分配时隙、接收 DATA、发送 ACK 位图，并评估各 Client 的 SF。" width="480">
+<img src="docs/research/figures/adaptive-algorithm-gateway.png" alt="Gateway 算法。恢复各节点的 SF、核算空口预算、收发 DATA 与 ACK，并用有效记录评估链路。" width="480">
 
-<img src="docs/research/figures/adaptive-algorithm-client.png" alt="Client 算法。根据 Beacon 同步并申请时隙，按分配的 SF 发送 DATA，再处理 ACK 或重传。" width="480">
+<img src="docs/research/figures/adaptive-algorithm-client.png" alt="Client 算法。等待 SF9 控制帧，在匹配的 Grant 下按指定 SF 发送 DATA，区分未确认和结果未知。" width="480">
 
-[算法符号与 SF 调整](docs/zh-CN/SCHEDULED_LINK.md#自适应与恢复) ·
+[SF 恢复和评估伪代码](docs/zh-CN/SCHEDULED_LINK.md#自适应与恢复) ·
 [LaTeX 源文件](docs/research/figures/adaptive-algorithm.tex)
 
 ## 空口时间预算

@@ -116,7 +116,16 @@ OledText formatOledStatus(const DisplaySnapshot& s, uint64_t nowUs, uint8_t v3Pa
                 std::snprintf(r[0], sizeof(r[0]), "%u/3 %s -- CR4/%u", page + 1, direction,
                               unsigned(phy::codingRateDenominator));
         } else std::snprintf(r[0], sizeof(r[0]), "V%u %s %u/3", unsigned(s.protocol), title, page + 1);
-        const char* suffix = s.searchingForBeacon ? "SEARCH" : multiclient::kAdaptive ? title : "";
+        const char* suffix = multiclient::kAdaptive ? title : "";
+        if (!gateway && multiclient::kAdaptive) {
+            switch (v3.clientIssue) {
+                case ClientScheduleIssue::REQUEST_TX: suffix = "REQ FAIL"; break;
+                case ClientScheduleIssue::NO_GRANT: suffix = "NO GRANT"; break;
+                case ClientScheduleIssue::NO_DATA_TX: suffix = "NO TX"; break;
+                case ClientScheduleIssue::NONE: break;
+            }
+        }
+        if (s.searchingForBeacon) suffix = "SEARCH";
         std::snprintf(r[1], sizeof(r[1]), "%s %u%s%s", gateway ? "GATEWAY" : "CLIENT",
                       unsigned(s.config.nodeId), *suffix ? " " : "", suffix);
         if (page == 0) {

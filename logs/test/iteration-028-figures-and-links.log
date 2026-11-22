@@ -1,0 +1,16 @@
+README.md: 1 MathJax display blocks
+README.zh-CN.md: 1 MathJax display blocks
+docs/en/SCHEDULED_LINK.md: 8 MathJax display blocks
+docs/zh-CN/SCHEDULED_LINK.md: 8 MathJax display blocks
+docs/en/PROGRESS.md: 1 MathJax display blocks
+docs/zh-CN/PROGRESS.md: 1 MathJax display blocks
+MathJax: 92 distinct expressions rendered; exit 0
+Three pdfLaTeX pages rendered via pdftoppm at 288 dpi; no LaTeX layout warnings
+docs/research/figures/adaptive-algorithm-gateway.png SHA-256 e9a99a8a0138d9aba95aa5b8aa48a1a5b42cdb2d0295101cc7353f47432f309b
+docs/research/figures/adaptive-algorithm-client.png SHA-256 fa667d5c2736226e3382428def285c84673b7d3029f9d62e024efb50fa1ae05b
+docs/research/figures/adaptive-algorithm-adr.png SHA-256 685556329325fa4c0398865b0af1382fbefe25c3da8dafd77d76097864946402
+Markdown files inspected: 90
+logs/build/iteration-006-baseline/README.md: logs/test/RUN_RECORD_TEMPLATE.md
+logs/build/iteration-007-review-snapshot/README.md: logs/test/RUN_RECORD_TEMPLATE.md
+Active broken local links or anchors: 0. Pre-existing broken links in frozen snapshots: 2.
+Exit code: 0

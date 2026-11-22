@@ -62,6 +62,8 @@ preamble 8, explicit header, CRC, sync 0x12, 22 dBm requested TX power,
 140 mA SX1262 PA OCP and 1 MHz SPI. The adaptive DATA range is SF7–SF10/BW125.
 The matched comparison freezes Gateway DATA grants at SF7 on the same wire format.
 SF11–SF12 remain scenarios in the host capacity tool.
+Keep the published LaTeX algorithms aligned with the production loss window,
+recovery hint, airtime admission and rollback rules when ADR changes.
 One radio time-shares control and data; it cannot receive multiple SFs at once.
 
 Before power, identify the board, RF variant and antenna connector and connect a suitable

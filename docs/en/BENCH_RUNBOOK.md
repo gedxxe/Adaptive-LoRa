@@ -122,10 +122,19 @@ the last DATA transmission started at SF8. It survives the switch back to
 SF9 for control. On page 2, `ACKED DATA SF` changes only after a matching
 ACK. At a stop, read both values and the AGE on page 1. Client AGE measures
 time since a valid Grant or bitmap. An old TX value can persist through an
-outage. `SEARCH` means the
-Client is listening for a fresh Beacon. The Gateway shows `RX` for the last
+outage. `SEARCH` means the Client is listening for a fresh Beacon.
+`NO GRANT` means its Request started but no matching Grant arrived.
+`REQ FAIL` or `NO TX` reports a local send failure before DATA or a
+granted frame with no DATA launch. On page 2, `APP MISSING` means that
+feedback omitted the attempted DATA. `APP UNKNOWN` means its delivery
+could not be confirmed. The Gateway shows `RX` for the last
 valid DATA and identifies the sender on page 1. A dash means no DATA event
 in this session. The display updates between radio phases.
+
+To check a walk outage, hold position for six frames and record the
+Client screen before moving again. Step back into SF9 coverage and check
+the first new DATA attempt. The Gateway can restore the previous confirmed
+SF in the same session if its retry and peer reservations still fit.
 
 **Matched SF7 comparison.** For a second run on the same route, change only
 the Gateway image. Replace `COMx` with its observed port. This command uses

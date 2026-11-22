@@ -1,0 +1,13 @@
+test_adaptive_matrix_and_bench_headroom (test_model_multiclient.MulticlientBudgetTests.test_adaptive_matrix_and_bench_headroom) ... ok
+test_adaptive_no_extrapolation_past_wire_limit (test_model_multiclient.MulticlientBudgetTests.test_adaptive_no_extrapolation_past_wire_limit) ... ok
+test_bench_roster_matches_firmware_reservation (test_model_multiclient.MulticlientBudgetTests.test_bench_roster_matches_firmware_reservation) ... ok
+test_extended_sf_includes_ldro_and_shared_retries (test_model_multiclient.MulticlientBudgetTests.test_extended_sf_includes_ldro_and_shared_retries) ... ok
+test_extrapolation_does_not_admit_large_rosters (test_model_multiclient.MulticlientBudgetTests.test_extrapolation_does_not_admit_large_rosters) ... ok
+test_guard_and_payload_sweep (test_model_multiclient.MulticlientBudgetTests.test_guard_and_payload_sweep) ... ok
+
+----------------------------------------------------------------------
+Ran 6 tests in 0.072s
+
+OK
+
+Exit code: 0
