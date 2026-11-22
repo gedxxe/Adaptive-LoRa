@@ -19,6 +19,12 @@
 \DeclareMathOperator{\Pick}{Pick}
 \DeclareMathOperator{\OnTime}{OnTime}
 \DeclareMathOperator{\Review}{ReviewSF}
+\DeclareMathOperator{\Recover}{RecoverSF}
+\DeclareMathOperator{\Eligible}{Eligible}
+\DeclareMathOperator{\Lock}{Lock}
+\DeclareMathOperator{\Rollback}{Rollback}
+\DeclareMathOperator{\Probe}{Probe}
+\DeclareMathOperator{\Tail}{Tail}
 \DeclareMathOperator{\ValidGrant}{ValidGrant}
 \DeclareMathOperator{\ValidACK}{ValidACK}
 \newcommand{\ctrl}{\sigma_{\mathrm{ctrl}}}
@@ -35,10 +41,12 @@
 \begin{document}
 \begin{algorithm}{1}{Gateway scheduling}
   \Step{$\Tx{\ctrl}{\mathrm{Beacon}(\phi,\Omega)}$}
-  \Step{$\Theta_0 \gets \Requests(\phi,\Omega)$}
+  \Step{$(\Theta_0,\boldsymbol{\phi}_{\mathrm{ack}}) \gets \Requests(\phi,\Omega)$}
   \Step{\textbf{if} $\Theta_0=\varnothing$ \textbf{then return}}
+  \Step{$(\boldsymbol{\sigma}^{\mathrm{want}},\boldsymbol{\sigma}^{\mathrm{res}})
+    \gets \Recover(\phi,\Omega,\Theta_0,\boldsymbol{\phi}_{\mathrm{ack}})$}
   \Step{$\boldsymbol{\sigma}^{\mathrm{res}}\gets
-    \Reserve(\Omega,\boldsymbol{\sigma}^{\mathrm{want}})$}
+    \Reserve(\Omega,\boldsymbol{\sigma}^{\mathrm{want}},\boldsymbol{\sigma}^{\mathrm{res}})$}
   \Step{\hspace{1em}subject to $\tau_{\mathrm{used}}(\Omega,\boldsymbol{\sigma}^{\mathrm{res}})\le\tau_{\mathrm{frame}}$}
   \Step{$\sigma_\iota\gets\min(\sigma_\iota^{\mathrm{want}},\sigma_\iota^{\mathrm{res}}),\quad \iota\in\Theta_0$}
   \Step{$\Tx{\ctrl}{\mathrm{Grant}(\phi,\Theta_0,\boldsymbol{\lambda},\boldsymbol{\sigma})}$}
@@ -59,15 +67,17 @@
       \varnothing, & \text{otherwise}
     \end{cases}$}%
   }
-  \Step{\textbf{if} $\OnTime(\phi)$ \textbf{then} $\Review(\phi)$}
+  \Step{$\Review_\iota(\phi)$ for each $\iota\in\Theta_0$ satisfying $\Eligible_\iota(\phi)$}
 \end{algorithm}
 
 \begin{algorithm}{2}{Client delivery}
   \Step{$(\phi,\Omega)\gets\Rx{\ctrl}{\mathrm{Beacon}}$}
-  \Step{\textbf{if} $\neg\mathrm{Fresh}(\phi)\lor\Delta_\iota=\bot$ \textbf{then return}}
+  \Step{\textbf{if} $\neg\mathrm{Fresh}(\phi)$ \textbf{then return} \textsc{search}}
+  \Step{\textbf{if} $\Delta_\iota=\bot$ \textbf{then return}}
   \Step{$\Tx{\ctrl}{\mathrm{Request}(\phi,\lambda_\iota,\phi_{\mathrm{ack}})}$}
+  \Step{\textbf{if} Request TX did not start \textbf{then return} \textsc{req fail}}
   \Step{$\Gamma\gets\ValidGrant_\iota(\phi,\lambda_\iota)$}
-  \Step{\textbf{if} $\Gamma=\bot$ \textbf{then return}}
+  \Step{\textbf{if} $\Gamma=\bot$ \textbf{then return} \textsc{no grant}}
   \Step{$\sigma_\iota\gets\Gamma.\sigma_\iota,\quad \epsilon_0\gets\mathrm{true}$}
   \Block{\textbf{for} $\jmath=0,\ldots,\varrho$ \textbf{while} $\mathrm{Fresh}(\phi)$}{%
     \Block{\textbf{if} $\epsilon_\jmath\land(0\le\tau-\tau_{\iota,\jmath}<\delta_{\mathrm{tx}})$ \textbf{then}}{%
@@ -79,6 +89,51 @@
     }
     \Step{$\epsilon_{\jmath+1}\gets(\iota\in\Pi_\jmath)$}%
   }
-  \Step{$\Rx{\ctrl}{\text{next Beacon}}$}
+  \Step{\textbf{if} $\neg\mathrm{Sent}(\Delta_\iota)$ \textbf{then return} \textsc{no tx}}
+  \Step{\textbf{if} final feedback is valid \textbf{then return} \textsc{missing}}
+  \Step{\textbf{return} \textsc{unknown}}
+\end{algorithm}
+
+\begin{algorithm}{3}{Gateway SF recovery and review}
+  \Step{\textbf{Before the Grant:} $\Recover_\iota$}
+  \Step{\textbf{if} session changed \textbf{then} reset state to $\sigma_{\min}$}
+  \Block{\textbf{if} $\phi_{\mathrm{ack}}=\phi^{\mathrm{del}}_\iota\ne 0$ in this session \textbf{then}}{%
+    \Step{$\sigma^{\mathrm{mem}}_\iota\gets
+      \max(\sigma^{\mathrm{mem}}_\iota,\sigma^{\mathrm{del}}_\iota)$}%
+  }
+  \Block{\textbf{if} $\phi^{\mathrm{req}}_\iota\ne0$ and $\phi-\phi^{\mathrm{req}}_\iota\ge\nu_{\mathrm{idle}}$ \textbf{then}}{%
+    \Step{$\sigma^{\mathrm{res}}_\iota\gets\sigma_{\min}$ and clear the sample history}%
+  }
+  \Step{\textbf{if} rejoining after expiry \textbf{then}
+    $\sigma^{\mathrm{want}}_\iota\gets\sigma^{\mathrm{mem}}_\iota$}
+  \vspace{3pt}
+  \Step{\textbf{After feedback:} $\Review_\iota$ for an eligible report}
+  \Step{Reset sample history on observed SF change}
+  \Block{\textbf{if} $\sigma_\iota<\sigma^{\mathrm{want}}_\iota$ \textbf{then}}{%
+    \Step{\textbf{if} $\nu^{\mathrm{first}}_\iota\ge\nu_{\mathrm{lock}}\land\alpha_\iota$
+      \textbf{then} $\Lock(\sigma_\iota)$}
+    \Step{\textbf{return}}%
+  }
+  \Block{\textbf{if} probing and $(\epsilon_\iota^{\mathrm{fail}}
+      \lor (\nu^{\mathrm{first}}_\iota\ge\nu_{\mathrm{ack}}\land\neg\alpha_\iota))$ \textbf{then}}{%
+    \Step{$\Rollback(\sigma^{\mathrm{back}}_\iota,\nu_{\mathrm{hold}})$}
+    \Step{\textbf{return}}%
+  }
+  \Step{$\boldsymbol{\xi}^{\mathrm{loss}}_\iota\gets
+      \Tail_{\nu_{\mathrm{obs}}}(\boldsymbol{\xi}^{\mathrm{loss}}_\iota,\epsilon_\iota^{\mathrm{fail}})$}
+  \Block{\textbf{if} $\epsilon_\iota^{\mathrm{fail}}$ \textbf{then}}{%
+    \Block{\textbf{if} $\sum_j\xi^{\mathrm{loss}}_{\iota,j}\ge\nu_{\mathrm{up}}$ \textbf{then}}{%
+      \Step{$\sigma^{\mathrm{want}}_\iota\gets\min(\sigma_\iota+1,\sigma_{\max})$}
+      \Step{Unlock and clear the loss history}%
+    }
+    \Step{\textbf{return}}%
+  }
+  \Step{\textbf{if} unlocked and $\nu^{\mathrm{first}}_\iota\ge\nu_{\mathrm{lock}}\land\alpha_\iota$
+    \textbf{then} $\Lock(\sigma_\iota)$}
+  \Step{\textbf{if} $h_\iota>0$ \textbf{then} $h_\iota\gets h_\iota-1$ \enspace\textbf{return}}
+  \Step{$\chi_\iota\gets\alpha_\iota\land(\sigma_\iota>\sigma_{\min})
+    \land(\nu^{\mathrm{first}}_\iota\ge\nu_{\mathrm{probe}})$}
+  \Step{\textbf{if} locked and $\chi_\iota$ and
+    $\overline{\upsilon}_\iota\ge\theta_{\sigma_\iota-1}$ \textbf{then} $\Probe(\sigma_\iota-1)$}
 \end{algorithm}
 \end{document}

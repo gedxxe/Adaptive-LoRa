@@ -164,6 +164,8 @@ BW125 下 SF10 符号时长为 8.192 毫秒，无需 LDRO。96 字节包在 SF10
 
 ## 自适应与恢复
 
+<img src="../research/figures/adaptive-algorithm-adr.png" alt="Gateway SF 策略，包括会话恢复、近期丢包窗口、降档失败回退和确认。" width="480">
+
 README 算法中的 $\phi$ 为帧 ID，$\phi_{\mathrm{ack}}$ 是同一 Gateway 会话中
 最后收到 ACK 的帧，$\Gamma$ 为有效 Grant。第 $\jmath=0$ 轮为首传。
 $\Theta_\jmath$ 是本轮有权发送的 Client 集合，$\Xi$ 累计记录已接受的 Client，
@@ -188,18 +190,51 @@ SNR 更新公式如下。
 和 $\omega=1/4$。当前 SF 首次有效的首传 SNR 样本 $\upsilon_\iota$ 用于初始化滤波。
 尝试降低 SF 时，可以保留较高 SF 所需的时隙，以便回退。
 
-同一 SF 连续两次首传失败后，预算允许时试用高一级 SF，重传成功也算首传失败。
-连续三次首传成功且有同一 SF 的 ACK 回执后锁定。锁定后若连续六次首传成功且平滑 SNR
-达到要求，可试用低一级（SF7 至少 −3.5 dB，SF8 至少 −6 dB，SF9 至少 −8.5 dB）。失败即回退，并等八次
-首传成功后再考虑试用。
+下表列出 SF 策略的计数参数。帧编号和 ACK 回执都归属于当前 Gateway 会话。
+
+| 符号 | 含义 | 当前值 |
+|---|---|---:|
+| $\nu_{\mathrm{obs}}$、$\nu_{\mathrm{up}}$ | 有效记录窗口长度和申请升档所需的首传失败次数 | 3、2 |
+| $\nu_{\mathrm{idle}}$ | 释放较高 SF 额度的帧编号差 | 4 |
+| $\nu_{\mathrm{lock}}$、$\nu_{\mathrm{probe}}$ | 锁定或尝试降档所需的连续首传成功次数 | 3、6 |
+| $\nu_{\mathrm{ack}}$、$\nu_{\mathrm{hold}}$ | 降档试用等待回执的上限及回退等待期间的首传成功次数 | 6、8 |
+
+$\epsilon_\iota^{\mathrm{fail}}$ 表示首传失败，即使重传后来成功也计入。
+$\alpha_\iota$ 表示最新 Request 回报了已记录交付的帧，并确认对应 SF。
+$\nu_\iota^{\mathrm{first}}$ 为连续首传成功次数，包含当前有效记录。
+$\phi_\iota^{\mathrm{req}}$ 和 $\phi_\iota^{\mathrm{del}}$ 是上次 Request 和交付帧，
+$\sigma_\iota^{\mathrm{del}}$ 是该次交付所用 SF。
+$\sigma_\iota^{\mathrm{want}}$、$\sigma_\iota^{\mathrm{res}}$、
+$\sigma_\iota^{\mathrm{mem}}$ 和 $\sigma_\iota^{\mathrm{back}}$ 依次表示目标、预留、记忆及回退 SF。
+$h_\iota$ 是回退后剩余等待次数，$\theta_{\sigma_\iota-1}$ 是试用低一级 SF 的 SNR 门限。
+
+```math
+\boldsymbol{\xi}^{\mathrm{loss}}_\iota\gets
+  \operatorname{Tail}_{\nu_{\mathrm{obs}}}
+  \bigl(\boldsymbol{\xi}^{\mathrm{loss}}_\iota\mathbin{\|}\epsilon_\iota^{\mathrm{fail}}\bigr),
+\qquad
+\sum_{j}\xi^{\mathrm{loss}}_{\iota,j}\ge\nu_{\mathrm{up}}.
+```
+
+首传失败后，Gateway 检查当前 SF 的丢包窗口，时序异常和应用拒收不计入。累计两次失败后
+清空窗口，并在下一次 Grant 前核算较高 SF 的额度。
+
+连续三次首传成功且有同一 SF 的 ACK 回执后锁定，预算受限而分配较低 SF 时也适用。
+锁定后记录已确认的 SF，并释放为回退保留的较高额度。锁定且等待期结束后，若连续六次首传成功且平滑 SNR
+达到要求，可试用低一级（SF7 至少 −3.5 dB，SF8 至少 −6 dB，SF9 至少 −8.5 dB）。
+试用期间首传失败即回退，连续六次有效首传仍无该 SF 的匹配 ACK 回执也回退。回退后需八次
+首传成功才再次考虑降档。
 
 Client 只有在收到有效位图授权时才重传。Gateway 只有在下一轮开始前及时处理位图发送完成事件，
 才打开重传时隙。保留四帧累计 ACK，允许补确认。时序异常记入帧样本，并排除在 SF 评估之外。
 对每个获分配的时隙，Gateway 会检查是否在切换提前量内已按指定 SF 就绪，或是否收到了有效
 DATA；两项均无记录时，跳过该 Client 本帧的 SF 评估。
-Beacon 过期后 Client 停止按时隙发射，并返回控制 SF 搜索。Client boot ID 改变或准备 Grant 时距其
-上次 Request 达四个帧编号，Gateway 重置其 SF 状态。同步无线调用仍可能
-超出软件时序窗口。[运行时代码](../../src/app/multiclient_link.cpp) · [已知时序风险](../en/ERROR_LOG.md)
+Beacon 过期后 Client 停止按时隙发射，并返回控制 SF 搜索。准备 Grant 时距某个 Client
+上次 Request 达四个帧编号，Gateway 释放其较高 SF 的预留。相同 boot ID 的 Client 返回时，
+Gateway 按当前预算重新申请由 ACK 回执或后续锁定记住的 SF。预算不足时可能分配较低 SF。
+降档试用锁定前，保留此前的恢复 SF。Client boot ID 改变或 Gateway 启动新会话时清除该记录。
+同步无线调用仍可能
+超出软件时序窗口。[LaTeX 源文件](../research/figures/adaptive-algorithm.tex) · [运行时代码](../../src/app/multiclient_link.cpp) · [已知时序风险](../en/ERROR_LOG.md)
 
 ## 板卡参考
 

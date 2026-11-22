@@ -34,11 +34,12 @@ private:
         uint32_t deliveredFrame = 0;
         uint8_t desired = multiclient::kBaseSf;
         uint8_t reservedSf = multiclient::kBaseSf;
+        uint8_t recoverySf = multiclient::kBaseSf;
         uint8_t observedSf = 0;
         uint8_t deliveredSf = 0;
         uint8_t acknowledgedSf = 0;
         uint8_t consecutiveFirst = 0;
-        uint8_t consecutiveDegraded = 0;
+        uint8_t degradedHistory = 0;
         uint8_t probeReturn = 0;
         uint8_t hold = 0;
         bool locked = false;

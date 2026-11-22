@@ -5,6 +5,13 @@ changes. It is not a substitute for the append-only build memory.
 
 ## Unreleased
 
+### Adaptive recovery during a walk
+
+- Keep the last confirmed recovery SF after releasing an idle Client's airtime reservation.
+- Raise the requested SF after two degraded results in three eligible reports. Roll back a lower-SF trial if the Client never confirms its receipt.
+- Show missing Grants and locally missed transmissions on the Client screen.
+- Update both READMEs and the LaTeX algorithms for SF recovery, rollback and airtime checks.
+
 ### SF10 DATA grants
 
 - The adaptive image uses wire version 5 and permits SF7–SF10 DATA grants when the full roster fits. Control stays at SF9.

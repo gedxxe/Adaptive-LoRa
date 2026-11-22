@@ -8,8 +8,9 @@ namespace adaptive_lora {
 using namespace multiclient;
 namespace {
 constexpr uint8_t kAdrConfirmations = 3;
-constexpr uint8_t kAdrDegradedReports = 2;
+constexpr uint8_t kAdrRecentReportsMask = 0b111;
 constexpr uint8_t kAdrFirstBeforeProbe = 6;
+constexpr uint8_t kAdrProbeReceiptLimit = 6;
 constexpr uint8_t kAdrRollbackHold = 8;
 constexpr uint8_t kAdrIdleFrames = 4;
 constexpr uint32_t kRetuneRetryUs = 5000;
@@ -115,9 +116,20 @@ void MulticlientLink::admitProfiles() {
     for (uint8_t i = 0; i < plan_.count; ++i) {
         const auto& slot = plan_.slots[i];
         auto& state = adr_[i];
-        if ((slot.boot && state.boot != slot.boot) || frameId_ - state.lastRequest >= kAdrIdleFrames)
+        if (slot.boot && state.boot != slot.boot) {
             state = {};
+        } else if (state.lastRequest && frameId_ - state.lastRequest >= kAdrIdleFrames) {
+            // Free airtime and discard old samples. Preserve the session and
+            // last delivery so the next Request can still report its receipt.
+            AdrState inactive;
+            inactive.boot = state.boot;
+            inactive.deliveredFrame = state.deliveredFrame;
+            inactive.deliveredSf = state.deliveredSf;
+            inactive.recoverySf = state.recoverySf;
+            state = inactive;
+        }
         if (slot.boot) {
+            if (!state.lastRequest) state.desired = state.recoverySf;
             state.boot = slot.boot;
             state.lastRequest = frameId_;
         }
@@ -149,7 +161,7 @@ const char* MulticlientLink::reviewProfile(uint8_t i) {
     const bool clientConfirmed = state.acknowledgedSf == observedSf;
     if (state.observedSf != observedSf) {
         state.observedSf = observedSf;
-        state.consecutiveFirst = state.consecutiveDegraded = 0;
+        state.consecutiveFirst = state.degradedHistory = 0;
         state.hasSnr = false;
     }
     const bool first = rx.result == Reception::ACCEPTED && !rx.retried;
@@ -159,23 +171,33 @@ const char* MulticlientLink::reviewProfile(uint8_t i) {
             if (state.consecutiveFirst < kAdrConfirmations) ++state.consecutiveFirst;
             if (state.consecutiveFirst >= kAdrConfirmations && clientConfirmed) {
                 state.desired = observedSf;
+                state.recoverySf = observedSf;
                 state.locked = true;
                 return "locked_within_budget";
             }
         }
         return "budget_limited";
     }
+    if (state.probeReturn && (!first ||
+        (!clientConfirmed && state.consecutiveFirst + 1 >= kAdrProbeReceiptLimit))) {
+        state.desired = state.probeReturn;
+        state.probeReturn = 0;
+        state.consecutiveFirst = state.degradedHistory = 0;
+        state.hold = kAdrRollbackHold;
+        return first ? "probe_no_receipt" : "rollback";
+    }
+    state.degradedHistory = uint8_t(((state.degradedHistory << 1) | !first) & kAdrRecentReportsMask);
     const char* action = "observe";
     if (first) {
         if (rx.metrics && std::isfinite(rx.snr)) {
             state.filteredSnr = state.hasSnr ? 0.75f * state.filteredSnr + 0.25f * rx.snr : rx.snr;
             state.hasSnr = true;
         }
-        state.consecutiveDegraded = 0;
         if (state.consecutiveFirst < kAdrFirstBeforeProbe) ++state.consecutiveFirst;
         if (state.consecutiveFirst >= kAdrConfirmations && !state.locked && clientConfirmed) {
             state.probeReturn = 0;
             state.reservedSf = state.desired;
+            state.recoverySf = observedSf;
             state.locked = true;
             action = "locked";
         }
@@ -190,15 +212,11 @@ const char* MulticlientLink::reviewProfile(uint8_t i) {
         }
     } else {
         state.consecutiveFirst = 0;
-        if (state.probeReturn || ++state.consecutiveDegraded >= kAdrDegradedReports) {
+        // A mask has at least two misses if clearing its lowest bit leaves another bit.
+        if (state.degradedHistory & (state.degradedHistory - 1)) {
             state.locked = false;
-            state.consecutiveDegraded = 0;
-            if (state.probeReturn) {
-                state.desired = state.probeReturn;
-                state.probeReturn = 0;
-                state.hold = kAdrRollbackHold;
-                action = "rollback";
-            } else if (state.desired < phy::maxDataSf) {
+            state.degradedHistory = 0;
+            if (state.desired < phy::maxDataSf) {
                 ++state.desired;
                 action = "step_up";
             } else action = "ceiling";
@@ -269,7 +287,11 @@ void MulticlientLink::update(uint64_t now, const RadioEvent& event, bool allowTx
     if ((!boot_ || renew) && now >= nextBoot_) {
         nextBoot_ = now + kSessionRecoveryUs;
         const auto fresh = bootIdSource_(boot_);
-        if (fresh && fresh != boot_) { boot_ = fresh; frameId_ = 0; }
+        if (fresh && fresh != boot_) {
+            if (renew) for (auto& peer : adr_) peer = {};
+            boot_ = fresh;
+            frameId_ = 0;
+        }
         else log_.event("V3_SESSION", "unavailable");
     }
     Frame f;
@@ -362,6 +384,10 @@ void MulticlientLink::gatewayRequest(uint64_t now, uint64_t receivedAt, const Fr
                 const auto receipt = get32(f.payload + 5);
                 state.acknowledgedSf = state.boot == f.bootId && receipt && receipt == state.deliveredFrame ?
                     state.deliveredSf : 0;
+                // One verified receipt can teach a more robust recovery SF.
+                // Lowering the hint requires a confirmed lower-SF lock.
+                if (state.acknowledgedSf > state.recoverySf)
+                    state.recoverySf = state.acknowledgedSf;
             }
         } else log_.event("V3_DROP", "request_identity_size_or_slot", &f);
     }
@@ -495,6 +521,7 @@ void MulticlientLink::acceptBeacon(uint64_t now, const Frame& beacon) {
         telemetry_.bitmap = {};
         telemetry_.lastDataSf = 0;
         telemetry_.confirmedDataSf = 0;
+        telemetry_.clientIssue = ClientScheduleIssue::NONE;
         acknowledgedFrame_ = 0;
     }
     gatewayBoot_ = beacon.bootId;
@@ -550,7 +577,10 @@ void MulticlientLink::acceptFeedback(uint64_t now, const Frame& ack, const Radio
     launched_ = false;
     if (++round_ == kAttempts) {
         if (sentData_) clientFinish(PayloadResult::MISSING);
-        else phase_ = Phase::WAIT;
+        else {
+            telemetry_.clientIssue = ClientScheduleIssue::NO_DATA_TX;
+            phase_ = Phase::WAIT;
+        }
     }
 }
 
@@ -582,13 +612,18 @@ void MulticlientLink::client(uint64_t now, const Frame* incoming, const RadioEve
         const auto start = beaconAt_ + requestStart(index_);
         if (now < start) return;
         phase_ = Phase::WAIT;
-        if (!launchWindow(now, start)) { log_.event("V3_REQUEST_TX", "deadline_miss"); return; }
+        if (!launchWindow(now, start)) {
+            telemetry_.clientIssue = ClientScheduleIssue::REQUEST_TX;
+            log_.event("V3_REQUEST_TX", "deadline_miss");
+            return;
+        }
         auto req = frame(MessageType::PAYLOAD_REQUEST, uint16_t(frameId_));
         req.payloadLength = kRequestSize;
         put32(req.payload, gatewayBoot_);
         req.payload[4] = payload_.size_;
         if (kAdaptive) put32(req.payload + 5, acknowledgedFrame_);
         if (send(req, now, "V3_REQUEST_TX")) phase_ = Phase::GRANT_TX;
+        else telemetry_.clientIssue = ClientScheduleIssue::REQUEST_TX;
         return;
     }
     if (phase_ == Phase::GRANT_TX) {
@@ -596,10 +631,15 @@ void MulticlientLink::client(uint64_t now, const Frame* incoming, const RadioEve
         const auto air = payloadAir(grantBytes(roster_.count));
         if (!control || control->type != MessageType::SLOT_GRANT || grant.slots[index_].boot != boot_ ||
             grant.slots[index_].bytes != payload_.size_) {
-            if (now >= start + air + kSlotGuardUs / 2) phase_ = Phase::WAIT;
+            if (now >= start + air + kSlotGuardUs / 2) {
+                telemetry_.clientIssue = ClientScheduleIssue::NO_GRANT;
+                log_.event("V3_GRANT_RX", "no_matching_grant");
+                phase_ = Phase::WAIT;
+            }
             return;
         }
         plan_ = grant;
+        telemetry_.clientIssue = ClientScheduleIssue::NONE;
         if (kAdaptive) {
             char line[104];
             std::snprintf(line, sizeof(line), "event=ADR_APPLY,frame_id=%" PRIu32 ",node_id=%u,sf=%u",
@@ -627,7 +667,10 @@ void MulticlientLink::client(uint64_t now, const Frame* incoming, const RadioEve
         launched_ = false;
         if (++round_ == kAttempts) {
             if (sentData_) clientFinish(PayloadResult::UNKNOWN);
-            else phase_ = Phase::WAIT;
+            else {
+                telemetry_.clientIssue = ClientScheduleIssue::NO_DATA_TX;
+                phase_ = Phase::WAIT;
+            }
             return;
         }
     }

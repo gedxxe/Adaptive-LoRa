@@ -18,6 +18,12 @@ The Gateway adjusts DATA SF7–SF10 per Client, sizes slots to the requested
 bytes and grants retries from the ACK bitmap. Control stays at SF9. Coding
 rate, bandwidth, TX power and frame period stay fixed.
 
+During a fade, two missed first attempts in the latest three eligible
+reports can raise DATA SF. After a gap, the Gateway can offer the last
+confirmed SF to the same Client session if it still fits the schedule.
+`SEARCH` means the Client is waiting for a fresh SF9 Beacon. `NO GRANT`
+means its Request started but a matching Grant did not arrive.
+
 <a name="flash-and-configure"></a>
 
 **[Flash, set roles and run the eight-Client test](docs/en/BENCH_RUNBOOK.md)** ·
@@ -33,11 +39,11 @@ $\sigma_\iota$. The Gateway fits the full roster $\Omega$ into the frame
 budget, then uses $\Xi$ for accepted DATA and $\Pi_\jmath$ for retry slots
 announced in round $\jmath$. A retry reuses the same packet $\Delta_\iota$.
 
-<img src="docs/research/figures/adaptive-algorithm-gateway.png" alt="Gateway algorithm. Collect requests, fit the schedule, receive DATA, send the ACK bitmap and review the per-Client SF." width="480">
+<img src="docs/research/figures/adaptive-algorithm-gateway.png" alt="Gateway algorithm. Recover each Client's SF, check the airtime budget, exchange DATA and ACKs, then review eligible link reports." width="480">
 
-<img src="docs/research/figures/adaptive-algorithm-client.png" alt="Client algorithm. Synchronize to a Beacon, request a slot, transmit with the granted SF, then accept the ACK or use an assigned retry slot." width="480">
+<img src="docs/research/figures/adaptive-algorithm-client.png" alt="Client algorithm. Wait for SF9 control, require a matching Grant, send DATA at its assigned SF, and distinguish missing or unknown delivery." width="480">
 
-[Algorithm notation and SF decisions](docs/en/SCHEDULED_LINK.md#adaptation-and-recovery) ·
+[SF recovery and review pseudocode](docs/en/SCHEDULED_LINK.md#adaptation-and-recovery) ·
 [LaTeX source](docs/research/figures/adaptive-algorithm.tex)
 
 ## Airtime budget

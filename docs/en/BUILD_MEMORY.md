@@ -2089,3 +2089,87 @@ display, field directions and the model against the eight-Client roster.
   runbook. This is a supervised test build. The RF profile still requires
   an authorized setup. Physical timing and production duty, security
   and device recovery remain open.
+
+## Iteration 027 — Recovery after intermittent walk-test loss, 2026-11-22
+
+Branch `codex/iteration-027-adr-reacquisition` from
+`bbb7fb2a9f023a901826592fcb59b86613cdeeaa`. The owner observed SF changes
+and stalls around 125–150 m. The cause of the physical stall was not
+measured. Reproduced five distinct old-code failures using the shipped
+state machines, plus one recovery case that exposed an incomplete first
+patch. See ERR-053 and the `iteration-027-*repro-native_adaptive.log`
+files under `logs/test/`.
+
+- `multiclient_link.cpp` and its header retain a same-session recovery SF
+  and the last usable delivery identity after freeing the old reservation.
+  Admission rechecks full roster airtime on return. The review uses two
+  degraded results in three eligible reports and bounds a lower trial
+  without an ACK receipt. PHY, frame layout, protocol 5, NVS schema 1,
+  the 15 s period, retry windows and radio guard values are unchanged.
+- `display_snapshot.h` and `oled_status_display.cpp` mark local request
+  failure, Grant timeout and no DATA TX. `test_adaptive_link/test_main.cpp`
+  covers prolonged SF9 loss, returning SF10 with and without spare
+  capacity, loss during a downshift, a receipt after idle expiry,
+  alternating first-attempt loss, missing ACKs and local launch failures.
+- `pio test -e native`, `-e native_multiclient` and `-e native_adaptive`
+  exited 0 with 356/356, 15/15 and 24/24 cases (395/395). See
+  `logs/test/iteration-027-verified-native*.log`. The five Python
+  discovery suites exited 0 with 61/61 cases (15 capture, 16 airtime,
+  6 multiclient model, 6 offline ADR and 18 documentation).
+  `python tools/check_consistency.py` exited 0. See
+  `logs/test/iteration-027-final-test_*.log` and
+  `logs/test/iteration-027-final-consistency.log`.
+- `pio run -e` for `heltec_wifi_lora_32_V3_adaptive`,
+  `heltec_wifi_lora_32_V3_multiclient`, `heltec_wifi_lora_32_V3_research`
+  and `heltec_wifi_lora_32_V3` exited 0. The same adaptive environment
+  with `PLATFORMIO_BUILD_SRC_FLAGS=-DADAPTIVE_LORA_FIXED_SF_COMPARISON` and
+  `PLATFORMIO_BUILD_DIR=.pio/comparison-build` also exited 0. See
+  `logs/build/iteration-027-verified-heltec_wifi_lora_32_V3*.log` and
+  `logs/build/iteration-027-comparison-heltec_wifi_lora_32_V3_adaptive.log`.
+  Espressif32 55.3.311, Arduino ESP32 3.3.11, Xtensa 14.2.0+20260121 and
+  RadioLib 7.8.1. The adaptive build uses 389,696 B program storage,
+  34,864 B static RAM and produces a 401,616 B image.
+- `esptool image-info` exited 0 and validated both ESP32-S3 images. The
+  adaptive image SHA-256 is
+  `b096045427fd9072de6ba1addc05b243fde9f8101ec2e9a0f9b22d5151644b2c`.
+  See `logs/test/iteration-027-firmware-images.log`. Build/test outputs
+  use the established placeholders for workspace and toolchain paths.
+- The local candidate is ready for the same-route retest, starting with
+  one Gateway and one Client. No new flash, configuration write, RF
+  measurement or range claim was made. SF9 coverage is still required
+  for Beacon, Request, Grant and ACK. No logs from the physical walk
+  were available for correlation.
+
+## Iteration 028 — Walk recovery integration and documentation, 2026-11-22
+
+- Prepared the Iteration 027 integration on
+  `codex/iteration-027-adr-reacquisition` from
+  `bbb7fb2a9f023a901826592fcb59b86613cdeeaa`. Firmware matches the verified
+  Iteration 027 patch. Both READMEs, protocol guides, the research map and
+  the run record now describe the loss window, same-session recovery,
+  reservation check, rollback and screen messages.
+- `docs/research/figures/adaptive-algorithm.tex` generates three figures
+  for Gateway scheduling, Client delivery and Gateway SF review.
+  pdfLaTeX and Poppler rendered all three at 288 dpi without layout
+  warnings. MathJax rendered 92 distinct expressions. The link and
+  anchor scan found zero active breaks in 90 Markdown files, with two
+  pre-existing breaks in preserved archives. See
+  `logs/test/iteration-028-figures-and-links.log` and ERR-054.
+- `pio run -e heltec_wifi_lora_32_V3_adaptive`,
+  `-e heltec_wifi_lora_32_V3_multiclient`, `-e heltec_wifi_lora_32_V3_research`
+  and `-e heltec_wifi_lora_32_V3` all exited 0. See
+  `logs/build/iteration-028-merge-heltec_wifi_lora_32_V3*.log`.
+  The separate matched SF7 build also exited 0 using the Iteration 027
+  comparison flags. See `logs/build/iteration-028-comparison-heltec_wifi_lora_32_V3_adaptive.log`.
+  The rebuilt adaptive image has the same SHA-256 as Iteration 027.
+  `pio test -e native`, `-e native_multiclient`, and `-e native_adaptive`
+  exited 0 with 356/356, 15/15 and 24/24 cases respectively.
+  See `logs/test/iteration-028-merge-native*.log`.
+- The five Python discovery suites ran 15 capture, 16 airtime,
+  6 multiclient, 6 offline ADR and 19 documentation tests. All 62 cases
+  passed. `python tools/check_consistency.py` exited 0.
+  See `logs/test/iteration-028-merge-test_*.log` and
+  `logs/test/iteration-028-merge-consistency.log`.
+- The local radio and display checks remain host simulations. No board
+  was flashed or taken on a new walk. Earlier records and results remain
+  in their original entries.

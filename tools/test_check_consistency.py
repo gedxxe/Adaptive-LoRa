@@ -3,7 +3,7 @@ import shutil
 import tempfile
 import unittest
 
-from check_consistency import ALGORITHM_FIGURES, APPROVED_SETTINGS, LINK_DOCS, check, current_text
+from check_consistency import ADR_FIGURE, ALGORITHM_FIGURES, APPROVED_SETTINGS, LINK_DOCS, check, current_text
 
 
 class ConsistencyTests(unittest.TestCase):
@@ -19,7 +19,7 @@ class ConsistencyTests(unittest.TestCase):
                     target = self.root / original.relative_to(source)
                     target.parent.mkdir(parents=True, exist_ok=True)
                     target.touch()
-        names = set(LINK_DOCS) | set(APPROVED_SETTINGS) | set(ALGORITHM_FIGURES) | {"CODEX_START_PROMPT.md", "VERSION", "PROTOCOL_VERSION",
+        names = set(LINK_DOCS) | set(APPROVED_SETTINGS) | set(ALGORITHM_FIGURES) | {ADR_FIGURE, "CODEX_START_PROMPT.md", "VERSION", "PROTOCOL_VERSION",
                 "platformio.ini", "THIRD_PARTY.md", "CHANGELOG.md", "include/project_config.h", "include/research_roster.h",
                 "src/common/radio/sx1262_hardware.h", "src/app/esp32_firmware.h",
                 "logs/README.md", "logs/test/RUN_RECORD_TEMPLATE.md"}
@@ -104,6 +104,10 @@ class ConsistencyTests(unittest.TestCase):
     def test_algorithm_requires_a_png(self):
         (self.root / ALGORITHM_FIGURES[0]).write_text("", encoding="utf-8")
         self.assertTrue(any("missing or invalid algorithm PNG" in e for e in check(self.root)))
+
+    def test_both_protocol_guides_show_the_sf_recovery_algorithm(self):
+        self.mutate("docs/zh-CN/SCHEDULED_LINK.md", Path(ADR_FIGURE).name, "adaptive-algorithm-gateway.png")
+        self.assertTrue(any("expected the SF recovery figure" in e for e in check(self.root)))
 
     def test_protocol_pages_share_the_symbolic_reservation(self):
         self.mutate("docs/zh-CN/SCHEDULED_LINK.md", r"\le \tau_{\mathrm{frame}}", r"\le 15")

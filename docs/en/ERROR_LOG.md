@@ -827,3 +827,35 @@ copies use one final newline and retain the command output and exit codes.
 A command-runner quote handling error also split the initial Git commit
 message into path arguments (exit 1). Pass the message through a local
 file with `git commit -F` to preserve the exact text.
+
+## ERR-053 — ADR can restart too low after intermittent loss
+
+Field report: SF7 switched to SF8 near 125 m, stalled near 150 m, and
+showed SF7 again after returning and walking out a second time. The
+report supplies observations but no paired serial capture.
+
+Host reproduction: suppress the first Client's SF9 control for five
+frames while a peer remains active. In the previous code, the returning
+Client fell back to SF7 after its higher-SF reservation expired. Two
+first-attempt misses separated by one delivery also failed to trigger
+an increase. A lower-SF trial could continue while every ACK was lost,
+and the display did not distinguish a Grant timeout. See
+`logs/test/iteration-027-repro-native_adaptive.log` and
+`logs/test/iteration-027-intermittent-repro-native_adaptive.log`.
+
+A further test stopped control immediately after the first SF8 ACK.
+The reservation release initially discarded the delivery identity
+needed to verify that receipt on the returning Request. See
+`logs/test/iteration-027-idle-receipt-repro-native_adaptive.log`.
+All three reproductions exited 1. The recovery hint and receipt evidence
+now survive reservation expiry in the same session. See ADR-036 and the
+final adaptive test log. Physical reproduction and retest are pending.
+
+## ERR-054 — Optional Markdown preview dependency missing
+
+The previous local Markdown preview imports `markdown_it`, which the
+available document Python does not provide. Re-running that preview
+exited 1 after validating the three PNG files. The replacement check
+rendered the Markdown math with the existing MathJax runner and checked
+the local links and rendered PNGs separately. See
+`logs/test/iteration-028-figures-and-links.log`.

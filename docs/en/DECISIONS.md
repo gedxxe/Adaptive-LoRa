@@ -410,3 +410,18 @@ the trial locks. The provisional filtered SNR threshold for that trial is
 −8.5 dB. Set the adaptive wire version to 5 so a mixed installation fails
 at version validation before a legacy Client can see an incompatible
 Grant. Use the adaptive image as the PlatformIO default for field work.
+
+## ADR-036 — Recover the last verified SF after a walk outage
+
+Release an inactive Client's higher-SF airtime after four frame IDs and
+keep the Client session, last delivery identity and recovery SF in RAM.
+The next valid Request can echo its last ACK, and the Gateway fits the
+returning SF into the current reservations. A lower trial may lower that
+recovery SF only after a lock. Gateway or Client session changes clear
+the candidate.
+
+Use two misses among the last three eligible reports at the same SF.
+Successful retries count as first-attempt misses. A failed lower trial,
+or six first attempts without a matching receipt, restores the prior SF.
+Use the Client display to distinguish missing Beacon, missing Grant and
+local TX failures during a walk. DATA still requires an SF9 Grant.

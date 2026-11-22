@@ -7,9 +7,9 @@
 |---|---|
 | Firmware / protocol | `0.2.0-alpha.1` / `5` |
 | Board | Heltec WiFi LoRa 32 V3.4, ESP32-S3/SX1262 |
-| Adaptive image | `heltec_wifi_lora_32_V3_adaptive`, ESP32 build passed, 17/17 native cases |
+| Adaptive image | `heltec_wifi_lora_32_V3_adaptive`, ESP32 build passed, 24/24 native cases with the walk recovery patch |
 | Fixed-SF image | `heltec_wifi_lora_32_V3_multiclient`, ESP32 build passed, 15/15 runtime cases |
-| Shared tests | 356/356 native cases and 61/61 Python tests in Iteration 026 |
+| Shared tests | 356/356 native cases and 62/62 Python tests in the merge check |
 | Field test | Walk test and radio timing measurements pending |
 <!-- current-state:end -->
 
@@ -19,6 +19,8 @@
 | The 15 s frame has 0.916064 s beyond its end reserve at that load | Analytical model checked against the production calendar. |
 | Two SF10 Clients can deliver alongside six SF7 peers | Fake-radio tests cover SF9 control, an SF10 retry, a refused third SF10 upgrade, and reuse of the reservation after a successful drop to SF9. |
 | A Client waits on SF9 when control is lost | Fake-radio outage after SF10 delivery. The next valid Beacon and Grant restored delivery. |
+| A returning Client can reuse its confirmed SF without taking a peer's reservation | Hosts drive the real Gateway and Client state machines through idle expiry, a late ACK receipt and limited SF10 airtime. |
+| An unsuccessful downshift cannot leave a Client at an unconfirmed lower SF | Fake-radio tests cover a failed trial, missing ACK receipts and a control outage during a trial. |
 | A local final ACK timing fault preserves the recorded delivery without training ADR | Native fault injection. |
 | A Gateway stall across one Client's primary RX slot leaves the other Client's ADR active | Fake radio and delayed Gateway loop. Both Clients delivered, one by retry. |
 | The capture tool records nine streams with separate timestamps and hashes | Simulated serial ports. |

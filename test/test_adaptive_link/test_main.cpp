@@ -69,6 +69,7 @@ struct Network {
     bool dropAllAck = false;
     bool dropControl = false;
     bool dropFirstData = false;
+    bool failDataLaunch = false;
     bool loseFinalTxDone = false;
     bool stallFirstRx = false;
     uint64_t resumeGateway = 0;
@@ -117,6 +118,10 @@ struct Network {
             sender = -1;
         }
         host_clock::set(now);
+        if (failDataLaunch && events[1].type == RadioEventType::RX_DONE &&
+            (frame.type == MessageType::SLOT_GRANT ||
+             (frame.type == MessageType::ACK_BITMAP && frame.sequence + 1 < kAttempts)))
+            clients[0].radio.failNextTx = true;
         for (uint8_t i = 0; i <= count; ++i) {
             if (i == 0 && now < resumeGateway) continue;
             peer(i).link.update(now, events[i]);
@@ -459,14 +464,159 @@ void sf10_client_stops_data_when_control_is_lost() {
     TEST_ASSERT_EQUAL_UINT8(10, n.clients[0].link.telemetry().confirmedDataSf);
     const auto delivered = n.delivered[0];
     n.dropControl = true;
-    n.rounds(2, 16);
+    n.rounds(5, 16);  // Longer than the inactive airtime reservation.
     TEST_ASSERT_EQUAL_UINT(delivered, n.delivered[0]);
     TEST_ASSERT_TRUE(n.clients[0].link.searchingForBeacon(n.now));
     TEST_ASSERT_EQUAL_UINT8(kControlSf, n.clients[0].radio.sf);
     n.dropControl = false;
     n.rounds(1, 16);
     TEST_ASSERT_EQUAL_UINT(delivered + 1, n.delivered[0]);
-    TEST_ASSERT_EQUAL_UINT(12, n.delivered[1]);
+    TEST_ASSERT_EQUAL_UINT(15, n.delivered[1]);
+}
+
+void returning_client_does_not_displace_other_sf10_reservations() {
+    Network n(8, 8, 16);
+    n.minDataSf[0] = n.minDataSf[1] = 10;
+    n.snr[0] = n.snr[1] = n.snr[2] = -12;
+    n.rounds(10, 16);
+    TEST_ASSERT_EQUAL_UINT8(10, n.clients[0].link.telemetry().confirmedDataSf);
+
+    n.dropControl = true;
+    n.minDataSf[2] = 10;
+    n.rounds(9, 16);
+    TEST_ASSERT_EQUAL_UINT8(10, n.clients[2].link.telemetry().confirmedDataSf);
+
+    n.dropControl = false;
+    const auto start = n.tx.size();
+    const auto previouslyDelivered = n.delivered[0];
+    n.rounds(1, 16);
+    TEST_ASSERT_EQUAL_UINT(previouslyDelivered, n.delivered[0]);
+    bool attempted = false;
+    for (size_t i = start; i < n.tx.size(); ++i) {
+        const auto& tx = n.tx[i];
+        if (tx.type != MessageType::DATA || tx.sender != 1) continue;
+        TEST_ASSERT_EQUAL_UINT8(9, tx.sf);
+        attempted = true;
+    }
+    TEST_ASSERT_TRUE(attempted);
+    TEST_ASSERT_EQUAL_UINT8(10, n.clients[1].link.telemetry().confirmedDataSf);
+    TEST_ASSERT_EQUAL_UINT8(10, n.clients[2].link.telemetry().confirmedDataSf);
+    for (uint8_t i = 3; i < n.count; ++i) TEST_ASSERT_EQUAL_UINT(20, n.delivered[i]);
+}
+
+void lower_sf_probe_expires_without_a_matching_ack_receipt() {
+    Network n(1);
+    n.minDataSf[0] = 8;
+    n.snr[0] = -6;
+    n.rounds(8);
+    TEST_ASSERT_EQUAL_UINT8(8, n.clients[0].link.telemetry().confirmedDataSf);
+    n.minDataSf[0] = 7;
+    n.snr[0] = 5;
+    for (unsigned i = 0; i < 12 && Serial.output.find("adr=probe_lower") == std::string::npos; ++i)
+        n.rounds(1);
+    TEST_ASSERT_NOT_EQUAL(std::string::npos, Serial.output.find("adr=probe_lower"));
+    n.dropAllAck = true;
+    n.rounds(7);
+    TEST_ASSERT_NOT_EQUAL(std::string::npos, Serial.output.find("adr=probe_no_receipt"));
+    TEST_ASSERT_EQUAL_UINT8(8, n.clients[0].link.telemetry().lastDataSf);
+    n.dropAllAck = false;
+    n.rounds(1);
+    TEST_ASSERT_EQUAL_UINT8(8, n.clients[0].link.telemetry().confirmedDataSf);
+}
+
+void intermittent_first_attempt_loss_still_requests_a_higher_sf() {
+    Network n(1);
+    n.snr[0] = -9;
+    n.rounds(4);
+    n.dropFirstData = true;
+    n.rounds(2);  // Retry success followed by a clean first attempt.
+    TEST_ASSERT_FALSE(n.sent(1, 8));
+    n.dropFirstData = true;
+    n.rounds(2);
+    TEST_ASSERT_TRUE(n.sent(1, 8));
+    TEST_ASSERT_EQUAL_UINT(8, n.delivered[0]);
+}
+
+void outage_during_a_downshift_trial_recovers_the_previous_sf() {
+    Network n(1);
+    n.minDataSf[0] = 8;
+    n.snr[0] = -6;
+    n.rounds(8);
+    TEST_ASSERT_EQUAL_UINT8(8, n.clients[0].link.telemetry().confirmedDataSf);
+    n.minDataSf[0] = 7;
+    n.snr[0] = 5;
+    for (unsigned i = 0; i < 12 && Serial.output.find("adr=probe_lower") == std::string::npos; ++i)
+        n.rounds(1);
+    TEST_ASSERT_NOT_EQUAL(std::string::npos, Serial.output.find("adr=probe_lower"));
+    n.rounds(1);
+    TEST_ASSERT_EQUAL_UINT8(7, n.clients[0].link.telemetry().confirmedDataSf);
+    n.dropControl = true;
+    n.minDataSf[0] = 8;
+    const auto delivered = n.delivered[0];
+    n.rounds(5);
+    n.dropControl = false;
+    n.rounds(1);
+    TEST_ASSERT_EQUAL_UINT(delivered + 1, n.delivered[0]);
+    TEST_ASSERT_EQUAL_UINT8(8, n.clients[0].link.telemetry().confirmedDataSf);
+}
+
+void first_request_after_outage_can_confirm_the_last_delivery() {
+    Network n(2);
+    n.minDataSf[0] = 8;
+    n.rounds(3);  // The first SF8 DATA is ACKed just before the control outage.
+    TEST_ASSERT_EQUAL_UINT(1, n.delivered[0]);
+    TEST_ASSERT_EQUAL_UINT8(8, n.clients[0].link.telemetry().confirmedDataSf);
+    n.dropControl = true;
+    n.rounds(5);  // The other Client stays active while the Gateway frees the reservation.
+    n.dropControl = false;
+    n.rounds(1);
+    TEST_ASSERT_EQUAL_UINT(2, n.delivered[0]);
+    TEST_ASSERT_EQUAL_UINT8(8, n.clients[0].link.telemetry().confirmedDataSf);
+    TEST_ASSERT_EQUAL_UINT(9, n.delivered[1]);
+}
+
+void display_distinguishes_grant_timeout_from_beacon_loss_and_ack_loss() {
+    Network n(1);
+    DisplaySnapshot snapshot;
+    snapshot.config = config(2);
+    snapshot.protocol = kWireVersion;
+    n.rounds(1);
+    n.dropGrant = true;
+    n.rounds(1);
+    snapshot.multiclient = n.clients[0].link.telemetry();
+    TEST_ASSERT_EQUAL_STRING("CLIENT 2 NO GRANT", formatOledStatus(snapshot, n.now, 1).rows[1]);
+    n.dropGrant = false;
+    n.dropAllAck = true;
+    n.rounds(1);
+    snapshot.multiclient = n.clients[0].link.telemetry();
+    TEST_ASSERT_EQUAL_STRING("CLIENT 2 DATA", formatOledStatus(snapshot, n.now, 1).rows[1]);
+    TEST_ASSERT_EQUAL_STRING("APP UNKNOWN", formatOledStatus(snapshot, n.now, 1).rows[5]);
+    n.dropControl = true;
+    n.rounds(1);
+    snapshot.searchingForBeacon = n.clients[0].link.searchingForBeacon(n.now);
+    TEST_ASSERT_EQUAL_STRING("CLIENT 2 SEARCH", formatOledStatus(snapshot, n.now, 1).rows[1]);
+}
+
+void display_identifies_local_failures_before_request_and_data() {
+    Network n(1);
+    DisplaySnapshot snapshot;
+    snapshot.config = config(2);
+    snapshot.protocol = kWireVersion;
+    n.rounds(1);
+    n.clients[0].radio.failNextTx = true;
+    n.rounds(1);
+    snapshot.multiclient = n.clients[0].link.telemetry();
+    TEST_ASSERT_EQUAL_STRING("CLIENT 2 REQ FAIL", formatOledStatus(snapshot, n.now, 1).rows[1]);
+    n.failDataLaunch = true;
+    n.rounds(1);
+    snapshot.multiclient = n.clients[0].link.telemetry();
+    TEST_ASSERT_EQUAL_STRING("CLIENT 2 NO TX", formatOledStatus(snapshot, n.now, 1).rows[1]);
+    TEST_ASSERT_EQUAL_UINT(1, n.delivered[0]);
+    n.failDataLaunch = false;
+    n.rounds(1);
+    snapshot.multiclient = n.clients[0].link.telemetry();
+    TEST_ASSERT_EQUAL_STRING("CLIENT 2 DATA", formatOledStatus(snapshot, n.now, 1).rows[1]);
+    TEST_ASSERT_EQUAL_UINT(2, n.delivered[0]);
 }
 
 void sf10_airtime_fits_driver_tx_deadline() {
@@ -525,6 +675,13 @@ int main() {
     RUN_TEST(fixed_comparison_keeps_peers_and_feedback_on_the_same_calendar);
     RUN_TEST(two_clients_use_sf10_with_sf9_control_and_retry);
     RUN_TEST(sf10_client_stops_data_when_control_is_lost);
+    RUN_TEST(returning_client_does_not_displace_other_sf10_reservations);
+    RUN_TEST(lower_sf_probe_expires_without_a_matching_ack_receipt);
+    RUN_TEST(intermittent_first_attempt_loss_still_requests_a_higher_sf);
+    RUN_TEST(outage_during_a_downshift_trial_recovers_the_previous_sf);
+    RUN_TEST(first_request_after_outage_can_confirm_the_last_delivery);
+    RUN_TEST(display_distinguishes_grant_timeout_from_beacon_loss_and_ack_loss);
+    RUN_TEST(display_identifies_local_failures_before_request_and_data);
     RUN_TEST(sf10_airtime_fits_driver_tx_deadline);
     RUN_TEST(driver_controls_adapter_retune_and_failure);
     return UNITY_END();

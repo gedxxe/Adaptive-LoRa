@@ -1,0 +1,38 @@
+Verbosity level can be increased via `-v, -vv, or -vvv` option
+Collected 16 tests
+
+Processing test_adaptive_link in native_adaptive environment
+--------------------------------------------------------------------------------
+Building...
+Testing...
+test\test_adaptive_link\test_main.cpp:585: mixed_profile_codec_and_budget	[PASSED]
+test\test_adaptive_link\test_main.cpp:586: roaming_client_adapts_while_three_peers_deliver	[PASSED]
+test\test_adaptive_link\test_main.cpp:587: missing_grant_ack_and_gateway_outage_leave_peers_safe	[PASSED]
+test\test_adaptive_link\test_main.cpp:588: one_failed_retune_recovers_with_full_roster	[PASSED]
+test\test_adaptive_link\test_main.cpp:589: higher_sf_reservations_protect_two_existing_clients	[PASSED]
+test\test_adaptive_link\test_main.cpp:590: stable_lock_requires_client_ack_receipt	[PASSED]
+test\test_adaptive_link\test_main.cpp:591: accepted_data_remains_observable_when_final_ack_completion_fails	[PASSED]
+test\test_adaptive_link\test_main.cpp:592: sf9_capacity_uses_the_production_calendar	[PASSED]
+test\test_adaptive_link\test_main.cpp:593: eight_clients_can_adapt_to_sf9_at_the_bench_ceiling	[PASSED]
+test\test_adaptive_link\test_main.cpp:594: display_reports_the_last_acknowledged_data_sf	[PASSED]
+test\test_adaptive_link\test_main.cpp:595: oled_tracks_actual_data_on_both_roles_even_without_ack	[PASSED]
+test\test_adaptive_link\test_main.cpp:596: gateway_stall_cannot_train_rf_loss_for_the_missed_slot	[PASSED]
+test\test_adaptive_link\test_main.cpp:597: fixed_comparison_keeps_peers_and_feedback_on_the_same_calendar	[PASSED]
+test\test_adaptive_link\test_main.cpp:598: two_clients_use_sf10_with_sf9_control_and_retry	[PASSED]
+test\test_adaptive_link\test_main.cpp:468: sf10_client_stops_data_when_control_is_lost: Expected 4 Was 3	[FAILED]
+test\test_adaptive_link\test_main.cpp:493: returning_client_does_not_displace_other_sf10_reservations: Expected 9 Was 7	[FAILED]
+test\test_adaptive_link\test_main.cpp:515: lower_sf_probe_expires_without_a_matching_ack_receipt: Expected Not-Equal	[FAILED]
+test\test_adaptive_link\test_main.cpp:531: display_distinguishes_grant_timeout_from_beacon_loss_and_ack_loss: Expected 'CLIENT 2 NO GRANT' Was 'CLIENT 2 DATA'	[FAILED]
+test\test_adaptive_link\test_main.cpp:603: sf10_airtime_fits_driver_tx_deadline	[PASSED]
+test\test_adaptive_link\test_main.cpp:604: driver_controls_adapter_retune_and_failure	[PASSED]
+
+
+Program received signal SIGILL (Illegal instruction)
+------- native_adaptive:test_adaptive_link [ERRORED] Took 17.14 seconds -------
+=================================== SUMMARY ===================================
+Environment      Test                Status    Duration
+---------------  ------------------  --------  ------------
+native_adaptive  test_adaptive_link  ERRORED   00:00:17.140
+============ 21 test cases: 4 failed, 16 succeeded in 00:00:17.140 ============
+
+Exit code: 1

@@ -20,10 +20,13 @@ for testing that policy.
 - [Runtime tests](../../test/test_multiclient_runtime/test_main.cpp) cover the
   actual driver, delayed completion handling, and resume after an outage.
 - [Adaptive link tests](../../test/test_adaptive_link/test_main.cpp) cover
-  mixed-SF traffic, ACK receipts, rollback and peer delivery in simulation.
+  mixed-SF traffic, interleaved first-attempt loss, same-session recovery,
+  ACK receipts across an idle gap, rollback and peer delivery in simulation.
 - [Progress](../en/PROGRESS.md) lists build, host and physical test status.
 - [Protocol reference](../en/SCHEDULED_LINK.md) contains the wire layout,
-  slot calculation, retries and inputs for the offline evaluator.
+  slot calculation, retries and the live [SF review](../en/SCHEDULED_LINK.md#adaptation-and-recovery).
+  The [offline evaluator](../../tools/adr_shadow.py) uses its own window
+  parameters for capture analysis.
 
 ## Close the research gaps
 

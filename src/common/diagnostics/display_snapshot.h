@@ -51,6 +51,8 @@ struct BitmapTelemetry {
     uint8_t retries = 0;
 };
 
+enum class ClientScheduleIssue : uint8_t { NONE, REQUEST_TX, NO_GRANT, NO_DATA_TX };
+
 struct MulticlientTelemetry {
     LastReception peer;
     uint32_t peerPeriodUs = 0;
@@ -63,6 +65,7 @@ struct MulticlientTelemetry {
     uint32_t duplicates = 0;
     uint32_t radioErrors = 0;
     PayloadResult result = PayloadResult::NONE;
+    ClientScheduleIssue clientIssue = ClientScheduleIssue::NONE;
     uint8_t lastDataSf = 0;  // Client TX launch or Gateway's first valid DATA RX for a packet.
     uint8_t confirmedDataSf = 0;
     uint32_t retunes = 0;

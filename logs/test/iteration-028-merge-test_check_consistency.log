@@ -1,0 +1,26 @@
+test_algorithm_requires_a_png (test_check_consistency.ConsistencyTests.test_algorithm_requires_a_png) ... ok
+test_archived_body_is_preserved_but_notice_is_required (test_check_consistency.ConsistencyTests.test_archived_body_is_preserved_but_notice_is_required) ... ok
+test_bad_build_environment_is_reported (test_check_consistency.ConsistencyTests.test_bad_build_environment_is_reported) ... ok
+test_bad_current_region_markers_are_rejected (test_check_consistency.ConsistencyTests.test_bad_current_region_markers_are_rejected) ... ok
+test_bench_ceiling_and_capacity_rows_must_match (test_check_consistency.ConsistencyTests.test_bench_ceiling_and_capacity_rows_must_match) ... ok
+test_both_protocol_guides_show_the_sf_recovery_algorithm (test_check_consistency.ConsistencyTests.test_both_protocol_guides_show_the_sf_recovery_algorithm) ... ok
+test_broken_current_link_is_reported (test_check_consistency.ConsistencyTests.test_broken_current_link_is_reported) ... ok
+test_client_example_requires_distinct_node_id (test_check_consistency.ConsistencyTests.test_client_example_requires_distinct_node_id) ... ok
+test_current_repository_passes (test_check_consistency.ConsistencyTests.test_current_repository_passes) ... ok
+test_default_build_requires_display (test_check_consistency.ConsistencyTests.test_default_build_requires_display) ... ok
+test_extended_capacity_and_matched_comparison_in_both_languages (test_check_consistency.ConsistencyTests.test_extended_capacity_and_matched_comparison_in_both_languages) ... ok
+test_history_cannot_hide_wrong_current_version (test_check_consistency.ConsistencyTests.test_history_cannot_hide_wrong_current_version) ... ok
+test_phy_and_chinese_provisioning_regressions (test_check_consistency.ConsistencyTests.test_phy_and_chinese_provisioning_regressions) ... ok
+test_physical_pass_claim_is_rejected (test_check_consistency.ConsistencyTests.test_physical_pass_claim_is_rejected) ... ok
+test_protocol_pages_share_the_symbolic_reservation (test_check_consistency.ConsistencyTests.test_protocol_pages_share_the_symbolic_reservation) ... ok
+test_readmes_share_the_same_figures (test_check_consistency.ConsistencyTests.test_readmes_share_the_same_figures) ... ok
+test_readmes_share_the_two_role_algorithm (test_check_consistency.ConsistencyTests.test_readmes_share_the_two_role_algorithm) ... ok
+test_timing_constants_are_independent (test_check_consistency.ConsistencyTests.test_timing_constants_are_independent) ... ok
+test_walk_test_serial_status_must_match_wire_version (test_check_consistency.ConsistencyTests.test_walk_test_serial_status_must_match_wire_version) ... ok
+
+----------------------------------------------------------------------
+Ran 19 tests in 12.476s
+
+OK
+
+Exit code: 0
