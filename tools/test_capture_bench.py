@@ -135,6 +135,29 @@ class CaptureTests(unittest.TestCase):
         self.assertEqual({"board"}, set(self.record()["streams"]))
         self.assertEqual([], self.backend.opened[0].writes)
 
+    def test_gateway_and_eight_clients_keep_independent_streams(self):
+        args = ["--gateway", "COM10", "--no-status"]
+        for index in range(8):
+            args += ["--client", f"COM{index + 11}"]
+        self.assertEqual(0, self.run_capture(args))
+        streams = self.record()["streams"]
+        self.assertEqual("COM11", streams["client"]["port"])
+        self.assertEqual("COM18", streams["client-8"]["port"])
+        self.assertEqual(9, len(streams))
+        for state in streams.values():
+            self.assertEqual(self.backend.data, (self.out / state["raw_file"]).read_bytes())
+        self.assertTrue(all(not port.writes for port in self.backend.opened))
+
+    def test_group_rejects_duplicate_clients_and_more_than_eight(self):
+        base = ["--gateway", "COM10"]
+        with self.assertRaises(SystemExit) as duplicate:
+            self.run_capture(base + ["--client", "COM11", "--client", "com11"])
+        self.assertEqual(2, duplicate.exception.code)
+        with self.assertRaises(SystemExit) as overflow:
+            self.run_capture(base + [item for n in range(9) for item in ("--client", f"COM{n + 11}")])
+        self.assertEqual(2, overflow.exception.code)
+        self.assertEqual([], self.backend.opened)
+
     def test_interrupt_is_incomplete_exit130(self):
         self.interrupt = True
         self.assertEqual(130, self.run_capture())

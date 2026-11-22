@@ -5,6 +5,28 @@ changes. It is not a substitute for the append-only build memory.
 
 ## Unreleased
 
+### SF10 DATA grants
+
+- The adaptive image uses wire version 5 and permits SF7–SF10 DATA grants when the full roster fits. Control stays at SF9.
+- The Gateway can probe back down from SF10 after sustained delivery and sufficient SNR. SF11 and SF12 remain model inputs.
+- PlatformIO defaults to the adaptive image. Upgrade all boards in the roster together.
+
+### Field display and matched SF comparison
+
+- Every adaptive display page shows the last DATA TX or RX SF and configured CR.
+- The Gateway excludes a Client's unobserved receive slot from ADR training.
+- A build-time Gateway comparison holds DATA at SF7 using the same handshake and retry rules.
+
+### Eight-Client adaptive test profile
+
+- Reserve 16 payload bytes per Client in the adaptive test roster. The
+  protocol still encodes up to 64 B, and the fixed-SF roster keeps its ceiling.
+- Require on-time ACK completion for retry authorization and preserve
+  Gateway delivery samples when local frame timing fails. Exclude those
+  samples from ADR review.
+- Capture a Gateway and up to eight Client serial ports in a single run.
+  Document the modeled SF9 capacity and the 70-Client research target.
+
 ### Adaptive SF walk-test image
 
 - Add the opt-in v4 image with SF9 control, per-Client SF7–SF9 DATA

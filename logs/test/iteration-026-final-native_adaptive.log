@@ -1,0 +1,33 @@
+Verbosity level can be increased via `-v, -vv, or -vvv` option
+Collected 16 tests
+
+Processing test_adaptive_link in native_adaptive environment
+--------------------------------------------------------------------------------
+Building...
+Testing...
+test\test_adaptive_link\test_main.cpp:502: mixed_profile_codec_and_budget	[PASSED]
+test\test_adaptive_link\test_main.cpp:503: roaming_client_adapts_while_three_peers_deliver	[PASSED]
+test\test_adaptive_link\test_main.cpp:504: missing_grant_ack_and_gateway_outage_leave_peers_safe	[PASSED]
+test\test_adaptive_link\test_main.cpp:505: one_failed_retune_recovers_with_full_roster	[PASSED]
+test\test_adaptive_link\test_main.cpp:506: higher_sf_reservations_protect_two_existing_clients	[PASSED]
+test\test_adaptive_link\test_main.cpp:507: stable_lock_requires_client_ack_receipt	[PASSED]
+test\test_adaptive_link\test_main.cpp:508: accepted_data_remains_observable_when_final_ack_completion_fails	[PASSED]
+test\test_adaptive_link\test_main.cpp:509: sf9_capacity_uses_the_production_calendar	[PASSED]
+test\test_adaptive_link\test_main.cpp:510: eight_clients_can_adapt_to_sf9_at_the_bench_ceiling	[PASSED]
+test\test_adaptive_link\test_main.cpp:511: display_reports_the_last_acknowledged_data_sf	[PASSED]
+test\test_adaptive_link\test_main.cpp:512: oled_tracks_actual_data_on_both_roles_even_without_ack	[PASSED]
+test\test_adaptive_link\test_main.cpp:513: gateway_stall_cannot_train_rf_loss_for_the_missed_slot	[PASSED]
+test\test_adaptive_link\test_main.cpp:514: fixed_comparison_keeps_peers_and_feedback_on_the_same_calendar	[PASSED]
+test\test_adaptive_link\test_main.cpp:515: two_clients_use_sf10_with_sf9_control_and_retry	[PASSED]
+test\test_adaptive_link\test_main.cpp:516: sf10_client_stops_data_when_control_is_lost	[PASSED]
+test\test_adaptive_link\test_main.cpp:517: sf10_airtime_fits_driver_tx_deadline	[PASSED]
+test\test_adaptive_link\test_main.cpp:518: driver_controls_adapter_retune_and_failure	[PASSED]
+-------- native_adaptive:test_adaptive_link [PASSED] Took 9.34 seconds --------
+
+=================================== SUMMARY ===================================
+Environment      Test                Status    Duration
+---------------  ------------------  --------  ------------
+native_adaptive  test_adaptive_link  PASSED    00:00:09.339
+================= 17 test cases: 17 succeeded in 00:00:09.339 =================
+
+Exit code: 0

@@ -65,6 +65,6 @@
   <path d="M49 457h56" class="control"/>
   <text x="120" y="462" class="tiny">Control, SF9</text>
   <path d="M351 457h-56" class="data"/>
-  <text x="366" y="462" class="tiny">DATA, assigned SF7–SF9</text>
+  <text x="366" y="462" class="tiny">DATA, assigned SF7–SF10</text>
   <text x="660" y="462" class="tiny">Clients transmit in separate time slots.</text>
 </svg>

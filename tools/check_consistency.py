@@ -4,6 +4,8 @@ import configparser
 from pathlib import Path
 import re
 
+from model_multiclient import adaptive_report, extended_sf_rows
+
 READMES = ("README.md", "README.zh-CN.md")
 GUIDES = ("docs/en/BENCH_RUNBOOK.md", "docs/zh-CN/BENCH_RUNBOOK.md")
 PROTOCOLS = ("docs/en/SCHEDULED_LINK.md", "docs/zh-CN/SCHEDULED_LINK.md")
@@ -14,18 +16,20 @@ ALGORITHM_FIGURES = tuple(f"docs/research/figures/adaptive-algorithm-{role}.png"
 ALGORITHM_SOURCE = "docs/research/figures/adaptive-algorithm.tex"
 TIMELINE = "../research/figures/adaptive-frame.svg"
 LINK_DOCS = CURRENT_DOCS + READMES + GUIDES + PROTOCOLS + (
-    "PACKAGE_MANIFEST.md", "docs/research/ALGORITHM_TRACEABILITY.md", "docs/references/FIGURE_SOURCE_REGISTER.md",
+    "docs/research/ALGORITHM_TRACEABILITY.md", "docs/references/FIGURE_SOURCE_REGISTER.md",
+    "logs/README.md",
 )
 APPROVED_SETTINGS = {
     "include/project_config.h": {"kDefaultHelloIntervalMs": "3000", "kAckTimeoutUs": "1000000", "kConfigSchema": "1"},
     "include/radio_config.h": {"frequencyMhz": "915.0f", "bandwidthKhz": "125.0f", "dataSf": "7", "controlSf": "9",
-                               "codingRateDenominator": "5", "txPowerDbm": "22", "txCurrentLimitMa": "140.0f",
+                               "maxDataSf": "10", "codingRateDenominator": "5", "txPowerDbm": "22", "txCurrentLimitMa": "140.0f",
                                "preambleSymbols": "8", "privateSyncWord": "0x12"},
     "src/common/config/device_config.h": {"networkId": "1", "gatewayId": "1", "nodeId": "2",
                                           "helloIntervalMs": "kDefaultHelloIntervalMs"},
     "src/common/protocol/multiclient_protocol.h": {"kVersion": "3", "kAttempts": "4", "kRetrySlots": "4",
                                                   "kTargetPeriodUs": "1000000", "kMaxPeriodUs": "10000000",
-                                                  "kGuardUs": "50000"},
+                                                  "kGuardUs": "50000", "kAdaptivePeriodUs": "15000000",
+                                                  "kAdaptiveTailUs": "300000"},
     "src/common/protocol/scheduled_protocol.h": {"kVersion": "2", "kLegacyFeedbackBudgetUs": "10000000"},
 }
 START = "<!-- current-state:start -->"
@@ -52,24 +56,29 @@ def check(root):
     environments = {name[4:] for name in config.sections() if name.startswith("env:")}
     board = "heltec_wifi_lora_32_V3"
     base = config[f"env:{board}"]
+    multiclient = board + "_multiclient"
     adaptive = board + "_adaptive"
-    if (environment != board + "_multiclient" or environment not in environments
-            or config[f"env:{environment}"].get("extends") != f"env:{board}" or base.get("board") != board):
+    comparison = config[f"env:{multiclient}"] if multiclient in environments else {}
+    if (environment != adaptive or environment not in environments
+            or comparison.get("extends") != f"env:{board}" or base.get("board") != board):
         errors.append("platformio.ini: default firmware environment/board mismatch")
     if "jgromes/RadioLib@7.8.1" not in base.get("lib_deps", ""):
         errors.append("platformio.ini: RadioLib must remain pinned to 7.8.1")
-    if (environment in environments
-            and ("ADAPTIVE_LORA_MULTICLIENT=1" not in config[f"env:{environment}"].get("build_flags", "")
-                 or "ADAPTIVE_LORA_OLED=1" not in base.get("build_flags", ""))):
-        errors.append("platformio.ini: default firmware must include v3 and the board display")
+    if ("ADAPTIVE_LORA_MULTICLIENT=1" not in comparison.get("build_flags", "")
+            or "ADAPTIVE_LORA_OLED=1" not in base.get("build_flags", "")):
+        errors.append("platformio.ini: default firmware must include the scheduled link and board display")
     candidate = config[f"env:{adaptive}"] if adaptive in environments else {}
-    if (candidate.get("extends") != f"env:{environment}"
+    if (candidate.get("extends") != f"env:{multiclient}"
             or "ADAPTIVE_LORA_LINK_ADAPTATION=1" not in candidate.get("build_flags", "")):
         errors.append("platformio.ini: expected the adaptive walk-test environment")
     protocol_source = (root / "src/common/protocol/multiclient_protocol.h").read_text(encoding="utf-8")
     adaptive_version = re.search(r"kWireVersion\s*=\s*kAdaptive\s*\?\s*(\d+)\s*:", protocol_source)
     if not adaptive_version:
         errors.append("multiclient_protocol.h: adaptive wire version missing")
+    roster = (root / "include/research_roster.h").read_text(encoding="utf-8")
+    ceiling = re.search(r"kBenchPayloadBytes\s*=\s*kAdaptive\s*\?\s*(\d+)\s*:\s*kMaxData", roster)
+    if not ceiling:
+        errors.append("research_roster.h: adaptive bench payload ceiling missing")
     for name, settings in APPROVED_SETTINGS.items():
         contents = (root / name).read_text(encoding="utf-8")
         for key, value in settings.items():
@@ -95,6 +104,12 @@ def check(root):
         if adaptive_version and (f"`protocol={adaptive_version.group(1)}`" not in text
                                  or "`profile=adaptive`" not in text):
             errors.append(f"{name}: adaptive serial status must match the firmware")
+        if ceiling and f"`bench_payload_ceiling_bytes={ceiling.group(1)}`" not in text:
+            errors.append(f"{name}: bench payload ceiling must match the firmware")
+        for token in ("PLATFORMIO_BUILD_SRC_FLAGS=-DADAPTIVE_LORA_FIXED_SF_COMPARISON",
+                      "PLATFORMIO_BUILD_DIR=.pio/comparison-build", "data_sf_policy=fixed_sf7", "data_sf_policy=adaptive"):
+            if token not in text:
+                errors.append(f"{name}: missing matched comparison setting {token}")
 
     for figure in ALGORITHM_FIGURES:
         path = root / figure
@@ -112,7 +127,22 @@ def check(root):
         algorithms = re.findall(r'<img\s+src="([^"]+)"\s+alt="[^"]+"[^>]*>', text)
         if tuple(algorithms) != ALGORITHM_FIGURES or f"]({ALGORITHM_SOURCE})" not in text:
             errors.append(f"{name}: embed both algorithm figures with alt text and link the LaTeX source")
-    for pair, expected in ((READMES, 1), (PROTOCOLS, 6)):
+    expected_capacity_rows = {}
+    for case in adaptive_report()["cases"]:
+        capacity = case["most_sf9_that_fit"]
+        expected_capacity_rows.setdefault(capacity["clients"], []).append(capacity["sf9_clients"])
+    for page in PROTOCOLS:
+        text = (root / page).read_text(encoding="utf-8")
+        for clients, caps in expected_capacity_rows.items():
+            row = "| " + " | ".join(map(str, (clients, *caps))) + " |"
+            if row not in text.splitlines():
+                errors.append(f"{page}: capacity row for {clients} Clients differs from the model")
+        for row in extended_sf_rows():
+            expected = (f"| SF{row['sf']} | {row['data_air_us'] / 1e6:.3f} | {row['headroom_one_us'] / 1e6:.3f} | "
+                        f"{row['max_at_sf_with_others_at_sf7']} |")
+            if row["sf"] >= 9 and expected not in text.splitlines():
+                errors.append(f"{page}: SF{row['sf']} study row differs from the airtime model")
+    for pair, expected in ((READMES, 1), (PROTOCOLS, 7)):
         equations = [re.findall(r"^```math\n(.*?)^```$",
                                 (root / name).read_text(encoding="utf-8"), re.M | re.S) for name in pair]
         if len(equations[0]) != expected or equations[0] != equations[1] or not all(equations[0]):
@@ -135,19 +165,24 @@ def check(root):
         versions = set(re.findall(r"(?:\bFirmware|固件)(?: / (?:protocol|协议) \|)?\s*`([^`]+)`", text))
         if versions != {firmware}:
             errors.append(f"{name}: current firmware references differ from VERSION")
-        if name == "AGENTS.md":
-            role_protocol = re.search(r"\bprotocol `([^`]+)`", text)
-            if not role_protocol or role_protocol.group(1) != protocol:
-                errors.append(f"{name}: current protocol differs from the v3 profile")
         if environment not in text or "SX1262" not in text:
             errors.append(f"{name}: current board environment or radio missing")
         for found in re.findall(r"pio run -e ([A-Za-z0-9_]+)", text):
             if found not in environments:
                 errors.append(f"{name}: unknown build environment {found}")
         if name.endswith("PROGRESS.md"):
+            body = (root / name).read_text(encoding="utf-8")
             row = re.search(r"\| (?:Firmware / protocol|固件 / 协议) \| `([^`]+)` / `([^`]+)`", text)
             if adaptive_version and (not row or row.groups() != (firmware, adaptive_version.group(1))):
                 errors.append(f"{name}: current firmware/protocol row mismatch")
+            wire_versions = dict(re.findall(r"\| `([A-Za-z0-9_]+)` \| (\d+) \|", body))
+            if adaptive_version and wire_versions != {
+                board: legacy_protocol,
+                board + "_research": APPROVED_SETTINGS["src/common/protocol/scheduled_protocol.h"]["kVersion"],
+                multiclient: protocol,
+                adaptive: adaptive_version.group(1),
+            }:
+                errors.append(f"{name}: comparison wire versions differ from firmware")
             field_status = ("| 现场试验 | 走测和无线时序仍待实测 |" if "/zh-CN/" in name
                             else "| Field test | Walk test and radio timing measurements pending |")
             if field_status not in text:

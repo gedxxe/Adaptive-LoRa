@@ -6,7 +6,7 @@
 
 ![Order of control, DATA and retry slots on the single radio](../research/figures/adaptive-frame.svg)
 
-Protocol 4 uses little-endian fields in a 28-byte header and a 96-byte
+Protocol 5 uses little-endian fields in a 28-byte header and a 96-byte
 maximum frame. The header carries the network, source, destination,
 sender boot ID, frame ID, sequence and schedule version. The Gateway
 sends control frames to the group. Requests and DATA go to the Gateway.
@@ -23,7 +23,10 @@ Empty Grant entries carry length `0xFF` and zero boot ID and SF. The
 codec checks length, wire version, network, destination, and payload
 shape. The runtime also checks the current frame, the expected session
 IDs, the Grant and the receive window. Control uses a shared SF. DATA
-uses the granted SF for both its first transmission and retries.
+uses the granted SF for both its first transmission and retries. Upgrade
+the Gateway and every Client together. An older adaptive decoder rejects
+an entire Grant containing SF10, so the version byte prevents mixed
+deployments from joining the same schedule.
 
 ## Airtime and slot budget
 
@@ -61,7 +64,7 @@ overhead and coding groups. [Semtech LoRa Calculator](https://www.semtech.com/de
 | $\iota_{\mathrm{CRC}}$, $\iota_{\mathrm{IH}}$, $\iota_{\mathrm{DE}}$ | Flags for PHY CRC, implicit header and low-data-rate optimization | 1, 0, 0 for this SF range |
 | $\pi$, $\psi$, $\xi$ | Programmed preamble symbols, fixed synchronization suffix, baseline payload symbols | 8, 4.25, 8 |
 | $\gamma$ | Symbols per coding group, the denominator of the LoRa coding rate | 5 for CR 4/5 |
-| $\beta$, $\sigma_{\mathrm{ctrl}}$, $\sigma_\iota$ | Bandwidth, common control SF, per-Client DATA SF | 125 kHz, SF9, SF7–SF9 |
+| $\beta$, $\sigma_{\mathrm{ctrl}}$, $\sigma_\iota$ | Bandwidth, common control SF, per-Client DATA SF | 125 kHz, SF9, SF7–SF10 |
 
 $\Omega$ is the advertised roster and $\nu_\Omega=|\Omega|$ includes idle
 Clients with Request windows. Use $\Theta=\Omega$ and each payload ceiling
@@ -110,7 +113,7 @@ reservation. Lower-SF trials retain the previous reservation.
 | Symbol | Meaning | Current adaptive image |
 |---|---|---|
 | $\eta_{\mathrm{header}}$, $\eta_{\mathrm{session}}$ | Frame header and Gateway boot ID in DATA | 28 B, 4 B |
-| $\nu_\Omega$, $\lambda_\iota$ | Shipped roster and per-Client payload ceiling | 8 Clients, 64 B |
+| $\nu_\Omega$, $\lambda_\iota$ | Bench roster and per-Client payload ceiling | 8 Clients, 16 B. The wire format allows 64 B. |
 | $\varrho$, $\varkappa$ | Retry rounds and shared retry slots per round | 3 rounds, up to 4 slots |
 | $\delta$, $\tau_{\mathrm{tail}}$, $\tau_{\mathrm{frame}}$ | Slot guard, end reserve, superframe period | 80 ms, 300 ms, 15 s |
 
@@ -122,6 +125,69 @@ Physical retune time and drift still need measurement.
 [Radio settings](../../include/radio_config.h) ·
 [Airtime and sizes](../../src/common/protocol/multiclient_protocol.h) ·
 [Slot scheduling](../../src/common/protocol/multiclient_protocol.cpp)
+
+### Capacity at 15 seconds
+
+For equal payload ceilings $\lambda_\mathrm{cap}$, place $\nu'$ Clients at
+SF9 and the rest at SF7. The maximum number of SF9 reservations is
+
+```math
+\nu_9^{\max}=\max\!\left\{\nu'\in\{0,\ldots,\nu_\Omega\}\;\middle|\;
+\tau_{\mathrm{used}}(\Omega,\lambda_{\mathrm{cap}},\boldsymbol{\sigma}(\nu'))
+\le\tau_{\mathrm{frame}}\right\}.
+```
+
+| Clients | 16 B | 24 B | 32 B | 64 B |
+|---:|---:|---:|---:|---:|
+| 4 | 4 | 4 | 4 | 4 |
+| 6 | 6 | 6 | 6 | 3 |
+| 8 | 8 | 8 | 5 | 2 |
+
+At eight Clients, 16 B with all SF9 reserves 14.083936 s, leaving 0.916064 s
+after the end reserve. At 24 B the same SF mix leaves 0.096864 s. The bench
+uses 16 B to leave more margin while carrying the 8 B sample. With all
+eight requesting, Beacon, Grant and four ACKs account for 2.361344 s of
+modeled Gateway transmission in 15 s. Requests and control gaps bring
+the control portion to 6.019456 s. These are computed durations.
+[Bench ceiling](../../include/research_roster.h) · [Capacity model](../../tools/model_multiclient.py)
+
+For a fixed roster, both the sum of DATA slots and the sum of the longest
+retry slots are nondecreasing in each slot length. A Grant uses at most
+the reserved payload and SF per Client, so its modeled time is bounded by
+the checked roster reservation. Physical turnaround and clock error still
+have to fit the guards.
+
+### SF10 capacity and higher SF options
+
+Eight Clients, 16 B each, the same SF9 control exchange, four cumulative ACKs
+and the full retry reservation. The second numeric column puts one Client at
+the listed SF with seven at SF7. The last column gives the maximum number at
+that SF when every other Client uses SF7. Times are modeled seconds.
+
+| DATA SF | One 48 B DATA packet (s) | Frame headroom with one (s) | Maximum at this SF |
+|---|---:|---:|---:|
+| SF9 | 0.308 | 4.287 | 8 |
+| SF10 | 0.575 | 3.218 | 2 |
+| SF11 | 1.233 | 0.588 | 1 |
+| SF12 | 2.302 | -3.688 | 0 |
+
+With six peers at SF7, two SF10 reservations leave 1.306208 s beyond the
+end reserve. A third SF10 exceeds the frame by 605.600 ms. With seven
+peers at SF9, even one SF10 exceeds the frame by 152.992 ms. The Gateway
+checks the current SF reservations and rejects increases that exceed the budget.
+
+The radio sends Beacon, Request, Grant and ACK bitmaps at SF9. Both ends
+retune to the granted SF for a DATA slot. The Client returns to SF9 for
+feedback and the Gateway uses each next Client's SF before returning to
+SF9. If control reception is lost, the Client waits for a new valid Beacon
+and Grant. A higher DATA SF extends only the DATA link.
+
+SF10 gives 8.192 ms per symbol at BW125 and uses no LDRO. Even a 96 B
+packet at SF10 takes 0.985088 s, within the 2 s driver deadline. SF11 and
+SF12 are model-only rows. They need LDRO, and the 96 B SF11 packet and the
+48 B SF12 packet each exceed the current TX deadline.
+[RadioLib SF limits](https://github.com/jgromes/RadioLib/blob/7.8.1/src/modules/SX126x/SX126x_config.cpp) ·
+[RadioLib LDRO selection](https://github.com/jgromes/RadioLib/blob/7.8.1/src/modules/SX126x/SX126x_commands.cpp)
 
 ## Adaptation and recovery
 
@@ -157,15 +223,21 @@ higher SF if the reservation fits. Degraded means the first attempt
 failed, even if a retry arrived. A lock requires three first-slot
 deliveries and an ACK receipt at the same SF. Once locked, six
 first-slot deliveries and enough filtered SNR can open a lower-SF trial
-(at least −3.5 dB for SF7 or −6 dB for SF8). A degraded trial rolls back
+(at least −3.5 dB for SF7, −6 dB for SF8 or −8.5 dB for SF9). A degraded trial rolls back
 and holds off another trial for eight first-slot deliveries.
 
 A Client retries only when a valid bitmap grants a retry. The Gateway
-opens those slots after that bitmap completes TX. Later cumulative
-feedback can acknowledge an earlier delivery. If the Beacon expires,
+opens those slots after an in-window TX completion serviced before the
+next DATA round. Later cumulative feedback can acknowledge an earlier
+delivery after an ACK loss. All four bitmaps are retained. A local timing
+fault is reported in the frame sample and excluded from SF review. For
+each assigned slot, the Gateway checks for RX armed at the assigned SF
+during the retune lead or a valid DATA reception. Without either observation
+it skips SF review for that Client in this frame. If the Beacon expires,
 the Client stops scheduled TX and searches on the control SF. The
-Gateway clears its per-Client SF state on a new Client boot ID or four frames
-without its Request. Synchronous radio dependencies can still overrun
+Gateway resets its per-Client SF state on a new Client boot ID or when a
+Grant is prepared at least four frame IDs after its previous Request.
+Synchronous radio dependencies can still overrun
 software windows. [Runtime](../../src/app/multiclient_link.cpp) · [Known timing risks](ERROR_LOG.md)
 
 ## Board reference

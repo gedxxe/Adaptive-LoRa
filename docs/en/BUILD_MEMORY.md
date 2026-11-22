@@ -1922,3 +1922,170 @@ links remain in frozen Iteration 006 and 007 snapshots.
   image, NVS schema 1 and PHY settings match the base. `main.cpp` still
   delegates Arduino setup and loop to `Esp32Firmware`. No board was
   flashed or tested. Walk-test and radio-timing measurements remain open.
+
+## Iteration 024 — Eight-Client field-test candidate, 2026-11-22
+
+- Base `origin/main` at `72db5dc74bf0e9e6374274b3a361f93e48973271`.
+  Local branch `codex/iteration-024-eight-client-field-check`. Audited the
+  14-page private review and checked its points against the firmware and
+  primary research references. The review document stays outside Git.
+- `include/research_roster.h` selects the 16 B adaptive test ceiling.
+  `firmware_runtime.cpp` reports it in `SCHEDULE_CONFIG`. `multiclient_link`
+  records accepted delivery independently of final ACK timing, rejects
+  late retry authorization, and reports timing quality and RX time. The
+  adaptive tests drive the production state machines, including all eight
+  Clients at SF9 and an ACK completion fault after accepted DATA.
+- The capture utility supports nine streams. The offline ADR tool ignores
+  timing-invalid and application-refused samples. The capacity model and
+  the bilingual checker cross-check the table, version mapping, capture
+  instructions and LaTeX. The setup and results pages now distinguish bench
+  observations, model results and the 70-Client research plan. Prior
+  iteration records were retained. See ADR-033 and ERR-048/049.
+- First adaptive native attempt exited 1 on the PlatformIO lock. The
+  approved reproduction exited 1 with two targeted failures. The final
+  `pio test -e native`, `-e native_multiclient`, and `-e native_adaptive`
+  each exited 0 with 356/356, 15/15, and 11/11 cases respectively.
+  Logs: `logs/test/iteration-024-repro-native_adaptive.log`,
+  `logs/test/iteration-024-adr-repro-native_adaptive.log`, and
+  `logs/test/iteration-024-final-native*.log`.
+- `pio run -e heltec_wifi_lora_32_V3`, `-e heltec_wifi_lora_32_V3_research`,
+  `-e heltec_wifi_lora_32_V3_multiclient`, and `-e heltec_wifi_lora_32_V3_adaptive`
+  each exited 0. See `logs/build/iteration-024-final-heltec_wifi_lora_32_V3*.log`.
+  Adaptive build used Espressif32 55.3.311, Arduino ESP32 3.3.11,
+  Xtensa 14.2.0+20260121 and RadioLib 7.8.1. It used 34,864 B RAM and
+  388,984 B program flash. Its `firmware.bin` is 400,912 B with SHA-256
+  `d7c855663c69edbf3f494e290d935a5248776e60e40a7101b2ded4117116d70d`.
+- `python -m unittest discover -s tools -p <file> -v` passed 15 capture,
+  16 airtime, 5 capacity, 6 ADR and 17 documentation tests. The
+  `python tools/check_consistency.py` command exited 0. See
+  `logs/test/iteration-024-final-docs-*.log`. The adaptive capacity model
+  checked 12 rows, Markdown link audit inspected 91 files, and MathJax
+  rendered 72 expressions. See `logs/test/iteration-024-model-and-doc-audit.log`.
+  Runner output replaces workspace and account paths when present.
+- `main.cpp` still only delegates setup and loop. Version `0.2.0-alpha.1`,
+  wire versions 1–4, NVS schema 1 and the provisional PHY stay the same.
+  No physical flash, NVS mutation, RF test or timing measurement was
+  performed. Use authorized RF conditions and the 1 → 4 → 8 Client
+  sequence in the field guide. The 70-Client rotation is a research model.
+
+## Iteration 025 — DATA visibility, missed receive windows and the high-SF budget, 2026-11-22
+
+Continued on `codex/iteration-024-eight-client-field-check` with the local
+Iteration 024 work. Fetched `origin/main` at `72db5dc74bf0e9e6374274b3a361f93e48973271`.
+Reviewed the private 14-page critique against the current wire decoder,
+SF policy, radio driver, display, field guidance and comparison tools.
+
+- The Gateway tracks which assigned slots it observed ready for reception.
+  A missed preparation window can no longer train SF on a local stall.
+  Client TX and Gateway RX history feed the display from DATA events.
+  CR comes from the configured radio profile. The matched comparison
+  runs the same Client code and controls with Gateway DATA grants held at SF7.
+  See ADR-034, ERR-050 and the bilingual field guide.
+- `pio test -e native_adaptive` first exited 1 with both added regressions
+  failing, then passed 13/13 and finally 14/14 including the matched
+  comparison. `pio test -e native_multiclient` passed 15/15 and
+  `pio test -e native` passed 356/356. Final exits 0, no skips.
+  See `logs/test/iteration-025-repro-native_adaptive.log`,
+  `logs/test/iteration-025-check-native_adaptive.log` and
+  `logs/test/iteration-025-final-native*.log`.
+- Ran `pio run -e` for `heltec_wifi_lora_32_V3`, `heltec_wifi_lora_32_V3_research`,
+  `heltec_wifi_lora_32_V3_multiclient` and `heltec_wifi_lora_32_V3_adaptive`.
+  Rebuilt the adaptive environment separately with
+  `PLATFORMIO_BUILD_SRC_FLAGS=-DADAPTIVE_LORA_FIXED_SF_COMPARISON` and
+  `PLATFORMIO_BUILD_DIR=.pio/comparison-build`. All five exited 0.
+  Logs are `logs/build/iteration-025-final-heltec_wifi_lora_32_V3*.log`
+  and `logs/build/iteration-025-comparison-heltec_wifi_lora_32_V3_adaptive.log`.
+  Espressif32 55.3.311, Arduino ESP32 3.3.11, Xtensa 14.2.0+20260121,
+  RadioLib 7.8.1. Adaptive program storage 389,288 B, static RAM 34,864 B.
+  Adaptive firmware.bin SHA-256 `0b2a92defefdc61d1eef8ca00a24da89a5243d8c1c99b8853ad7a2de272d3d1f`;
+  matched SF7 `e68635cf9f61af7022c029df0616695c260ac711dc77640d7131e1bdb7df909b`.
+- With the installed PlatformIO Python, ran
+  `python -m unittest discover -s tools -p NAME.py -v` for
+  `test_capture_bench` (15), `test_tdma_feasibility` (16),
+  `test_model_multiclient` (6), `test_adr_shadow` (6) and
+  `test_check_consistency` (18). All 61 passed without skips.
+  `python tools/check_consistency.py` exited 0.
+  Logs in `logs/test/iteration-025-final-test_*.log` and
+  `logs/test/iteration-025-final-consistency.log`. Runner output
+  substitutes workspace, PlatformIO and account path placeholders.
+- `python tools/model_multiclient.py --adaptive` computes the full retry
+  budget with LDRO for the host-only SF10–SF12 study. With 8 × 16 B and
+  remaining Clients at SF7 the counts that fit are 2, 1 and 0 respectively.
+  Seven SF9 plus one SF10 exceed the frame by 152,992 µs. The firmware
+  still rejects SF above 9. The 2 s TX deadline also precedes the end of
+  a 48 B SF12 packet. No changes to the wire format, NVS schema or operating PHY.
+- Consolidated the current package manifest into the log index and removed
+  an obsolete, ignored dependency cache only after matching all 371 files
+  (13,029,370 B) to the active cache by SHA-256. Prior records remain in place.
+  Link and anchor scan covered 90 Markdown files. Two broken links in frozen
+  review snapshots predate this work. The active documents passed.
+- No board was flashed. Physical timing, display legibility, RF coverage,
+  power and delivery intervals remain unmeasured in this iteration. Use the
+  1, 4 and 8 Client procedure before attempting a field comparison. Keep
+  application authentication, watchdog recovery and outage buffering open
+  for a separate unattended pilot.
+
+## Iteration 026 — SF10 DATA with SF9 control, 2026-11-22
+
+Branch `codex/iteration-024-eight-client-field-check`, based on
+`72db5dc74bf0e9e6374274b3a361f93e48973271`. Publication includes the
+verified Iterations 024 and 025. Re-audited PHY, schedule, recovery, driver,
+display, field directions and the model against the eight-Client roster.
+
+- `radio_config.h` extends the DATA SF ceiling to 10. The shared
+  multiclient protocol gates SF10 under wire version 5 and checks the
+  assumptions of the airtime equation and the longest-packet TX deadline
+  at compile time. Different wire versions reject each other's frames.
+- `MulticlientLink` keeps a separate SF9 control profile. Higher-SF grants
+  must fit the full-roster reservation. The SF10-to-SF9 trial uses a
+  provisional −8.5 dB filtered SNR threshold and keeps the higher
+  reservation until confirmed. OLED continues to report DATA TX/RX and
+  ACK history. PlatformIO now defaults to the adaptive environment.
+- The 15 s period, 80 ms guard, 300 ms reserve, CR4/5, BW125, provisional
+  915 MHz and NVS schema 1 are unchanged. For an eight-Client, 16 B
+  ceiling schedule, two SF10 plus six SF7 reserve 13.693792 s. A third
+  SF10 exceeds 15 s by 0.605600 s. One SF10 plus seven SF9 exceeds
+  15 s by 0.152992 s. A 96 B DATA packet at SF10 takes 0.985088 s.
+- Native commands `pio test -e native_adaptive`, `-e native_multiclient`
+  and `-e native` exited 0 (17/17, 15/15, 356/356). The final adaptive
+  pass adds the SF10 display and radio adapter checks. See
+  `logs/test/iteration-026-display-retune-native_adaptive.log` and
+  `logs/test/iteration-026-final-native*.log`. Synthetic loss cases
+  cover SF10 retry, a control outage and reacquisition on SF9, and a
+  blocked third SF10 that becomes admissible after a peer downshifts.
+  See ERR-051 for three earlier failing runs.
+- The five existing Python discovery suites ran 61 cases without skips
+  (15 capture, 16 airtime, 6 multiclient model, 6 offline ADR and 18
+  documentation). `python tools/check_consistency.py` exited 0.
+  Logs in `logs/test/iteration-026-final-test_*.log` and
+  `logs/test/iteration-026-final-consistency.log`.
+- `python tools/model_multiclient.py --adaptive` and `esptool image-info`
+  exited 0 for the capacity sweep and both adaptive-family images.
+  Esptool 5.3.0 identified ESP32-S3 and validated both image checksums
+  and embedded hashes. Adaptive image SHA-256
+  `92c731d8a4cdbc6ad97581bb618bde08672624b5805197741c363d4ae1ab3aa0`.
+  The separate matched Gateway build contains the fixed-SF policy.
+  A link and anchor scan inspected 90 Markdown files, with no broken
+  current links and two pre-existing broken links in frozen snapshots.
+  Results are in `logs/test/iteration-026-model-and-publication-audit.log`.
+- `pio run -e` passed all four targets with exit 0:
+  `heltec_wifi_lora_32_V3_adaptive`, `heltec_wifi_lora_32_V3_multiclient`,
+  `heltec_wifi_lora_32_V3_research`, and `heltec_wifi_lora_32_V3`.
+  The separate adaptive build with
+  `PLATFORMIO_BUILD_SRC_FLAGS=-DADAPTIVE_LORA_FIXED_SF_COMPARISON` and
+  `PLATFORMIO_BUILD_DIR=.pio/comparison-build` also exited 0.
+  See `logs/build/iteration-026-final-heltec_wifi_lora_32_V3*.log` and
+  `logs/build/iteration-026-comparison-heltec_wifi_lora_32_V3_adaptive.log`.
+  Espressif32 55.3.311, Arduino ESP32 3.3.11, Xtensa 14.2.0+20260121,
+  RadioLib 7.8.1. Adaptive image uses 389,288 B program storage and
+  34,864 B static RAM.
+- Moved 96 untracked runner receipts or preliminary outputs to ignored
+  local storage, verified matching hashes and kept the tracked evidence
+  in place. Reviewed release files and scanned the selected additions
+  and logs for workstation paths, private URLs, credentials and identity
+  markers. Build and test logs use the established path placeholders.
+- No physical flash, provision, RF run or display test took place. Use
+  the coordinated upgrade and staged field procedure in the bilingual
+  runbook. This is a supervised test build. The RF profile still requires
+  an authorized setup. Physical timing and production duty, security
+  and device recovery remain open.

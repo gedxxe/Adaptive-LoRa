@@ -63,6 +63,7 @@ struct MulticlientTelemetry {
     uint32_t duplicates = 0;
     uint32_t radioErrors = 0;
     PayloadResult result = PayloadResult::NONE;
+    uint8_t lastDataSf = 0;  // Client TX launch or Gateway's first valid DATA RX for a packet.
     uint8_t confirmedDataSf = 0;
     uint32_t retunes = 0;
     uint32_t worstPhyReadyUs = 0;

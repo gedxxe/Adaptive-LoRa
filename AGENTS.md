@@ -14,8 +14,10 @@ owner confirms V3.2 wiring and pin mapping and reports SMT and crystal
 improvements. Use the V3.2 schematic and Arduino V3 variant as references.
 Verify each board's physical SKU, antenna and peripheral behavior at the
 bench. Do not assume PSRAM.
-Default environment: `heltec_wifi_lora_32_V3_multiclient`, Arduino/C++17,
-with `jgromes/RadioLib@7.8.1`. Firmware `0.2.0-alpha.1`, protocol `3`, NVS schema `1`.
+PlatformIO defaults to `heltec_wifi_lora_32_V3_adaptive` for the eight-Client
+field test. `heltec_wifi_lora_32_V3_multiclient` is the earlier fixed-SF comparison.
+Both use Arduino/C++17, `jgromes/RadioLib@7.8.1`, Firmware `0.2.0-alpha.1`
+and NVS schema `1`. See the [wire version table](docs/en/PROGRESS.md#papers-and-comparison-runs).
 Authoritative versions/settings are VERSION, PROTOCOL_VERSION,
 include/project_config.h and platformio.ini; resolved package versions and
 actual test results belong in [PROGRESS.md](docs/en/PROGRESS.md).
@@ -25,8 +27,8 @@ The fixed-PHY M0–M2 HELLO/ACK firmware exists and has host/build evidence.
 electrical behavior, flash/NVS, supply and timing at the bench. Iteration 020
 adds the v3 research profile with up to eight clients, variable-length
 application payloads, aggregate feedback and shared retry slots. The v2
-single-client image remains available. The opt-in v4 adaptive bench
-candidate uses frame-scoped DATA SF7–SF9 grants and fixed SF9 control.
+single-client image remains available. The adaptive image uses wire version
+5 with frame-scoped DATA SF7–SF10 grants and fixed SF9 control.
 Historical records retain their original hardware and results.
 
 ## Read before editing
@@ -55,10 +57,11 @@ DC-DC selection explicitly. Verify GPIO17/18/21/36, Vext
 polarity and SSD1306/0x3C before using it on the delivered boards. See the
 [board reference](docs/en/SCHEDULED_LINK.md#board-reference) for pin details.
 
-Retain 915.0 MHz provisional, BW125, default v3 SF7, v4 control SF9, CR4/5,
+Retain 915.0 MHz provisional, BW125, v3 DATA SF7, adaptive control SF9, CR4/5,
 preamble 8, explicit header, CRC, sync 0x12, 22 dBm requested TX power,
-140 mA SX1262 PA OCP and 1 MHz SPI. The v4 bench ADR
-range is SF7–SF9/BW125; no automatic bandwidth/power changes.
+140 mA SX1262 PA OCP and 1 MHz SPI. The adaptive DATA range is SF7–SF10/BW125.
+The matched comparison freezes Gateway DATA grants at SF7 on the same wire format.
+SF11–SF12 remain scenarios in the host capacity tool.
 One radio time-shares control and data; it cannot receive multiple SFs at once.
 
 Before power, identify the board, RF variant and antenna connector and connect a suitable
@@ -130,7 +133,8 @@ third-party libraries or add abstractions speculatively.
 
 ## Scope and next work
 
-Use the [setup guide](docs/en/BENCH_RUNBOOK.md#flash-and-set-roles) for the adaptive walk test.
+Use the [setup guide](docs/en/BENCH_RUNBOOK.md#flash-and-set-roles) for the adaptive field test.
+Keep the 16 B adaptive test ceiling separate from the 64 B wire limit.
 Keep electrical checks and backups in the [bench procedure](docs/en/BENCH_RUNBOOK.md).
 Start RF testing with one Gateway and one Client, then expand through eight
 Clients. Measure radio turnaround, IRQ latency and drift before closing

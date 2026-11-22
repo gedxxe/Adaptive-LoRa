@@ -50,3 +50,14 @@ Copy into a new run directory as `RUN_RECORD.md`. Never overwrite an earlier run
 - Result, issue IDs, unresolved assumptions, next action: TBD
 
 Bench pair: Heltec WiFi LoRa 32 V3.4, owner-confirmed 902–928 MHz procurement variant and stock monopoles. Record the observed SKU, antenna and USB bridge for each board. The integrated radio remains present in a single-board run; connect a suitable antenna/load before power and follow the current runbook. No cross-chip full-flash restore.
+
+## Adaptive eight-Client run
+
+Use the [current field procedure](../../docs/en/BENCH_RUNBOOK.md). Record
+the Gateway ID, Client IDs, COM mapping, channel authorization, firmware
+hash, `SCHEDULE_CONFIG` including `data_sf_policy`, start/end `status`, and segment boundaries.
+List which streams are present (`gateway`, `client`, `client-2` through
+`client-8`). Record completed frames per node, deliveries, ACK receipts,
+retries, consecutive delivery gaps, and `timing=invalid` rows. Exclude
+partial frames and note any reset that prevents matching sessions. The
+single-board HELLO/ACK checks above are optional when using this section.

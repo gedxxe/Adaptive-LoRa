@@ -20,9 +20,11 @@ class AdrShadowTests(unittest.TestCase):
 
     def test_low_snr_counts_even_when_all_data_arrive(self):
         rows = list(evaluate([sample(i, snr="-8", sf=9) for i in range(1, 5)], self.policy))
-        self.assertEqual([9, 9], [row["candidate_sf"] for row in rows])
+        self.assertEqual([9, 10], [row["candidate_sf"] for row in rows])
         self.assertEqual(-8, rows[-1]["mean_snr_db"])
         self.assertEqual(-90, rows[-1]["mean_rssi_dbm"])
+        at_ceiling = list(evaluate([sample(i, snr="-12", sf=10) for i in range(1, 5)], self.policy))
+        self.assertEqual([10, 10], [row["candidate_sf"] for row in at_ceiling])
 
     def test_clients_and_reboot_sessions_keep_separate_windows(self):
         lines = [sample(1), sample(1, session=2), sample(2, client=3), sample(2)]
@@ -32,6 +34,13 @@ class AdrShadowTests(unittest.TestCase):
         rows = list(evaluate([sample(1), sample(1), sample(20)], self.policy))
         self.assertEqual(1, rows[0]["first_pass"])
         self.assertEqual(20, rows[0]["last_frame"])
+
+    def test_local_timing_faults_and_application_refusals_do_not_train_adr(self):
+        lines = [sample(1), sample(2, "missed", "N/A") + ",timing=invalid",
+                 sample(3, snr="-12").replace("app=accepted", "app=refused"),
+                 sample(4) + ",timing=ok"]
+        rows = list(evaluate(lines, self.policy))
+        self.assertEqual([(1, 4, 1.0)], [(r["first_frame"], r["last_frame"], r["first_pass"]) for r in rows])
 
     def test_invalid_metrics_and_conflicting_observations_are_rejected(self):
         for lines in ([sample(1, snr="nan")], [sample(1), sample(1, snr="0")]):

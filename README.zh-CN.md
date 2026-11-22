@@ -2,12 +2,19 @@
 
 [English](README.md)
 
-一台 Heltec Gateway 用一颗 SX1262 调度最多八个遥测 Client。Gateway 为各 Client
-分配 DATA 扩频因子（SF），并用 ACK 位图公布收包结果，只有缺失包可以重传。
+Adaptive-LoRa 是使用单颗半双工 SX1262 的遥测调度原型。当前测试配置最多支持八个 Client。
+Gateway 为各 Client 指定 DATA 扩频因子（SF），并按整组节点的空口时间预算限制 SF 调整。
+
+**八节点测试。** 九块板都烧录默认镜像 `heltec_wifi_lora_32_V3_adaptive`，并确认空口版本为 5。Gateway ID 为 1，
+Client ID 为 2–9。超帧为 15 秒，每个 Client 预留最多 16 字节载荷，示例发送 8 字节。
+
+走测时可直接查看任一页顶行。Client 显示的 `TX SF8 CR4/5` 表示最近一次 DATA 发送尝试，
+Gateway 显示最近一次收到的 DATA 的 SF。Gateway 为各 Client 调整 DATA SF7–SF10，按申请的字节数
+分配时隙，并通过 ACK 位图分配重传机会。控制帧固定用 SF9，编码率、带宽、发射功率和帧周期均固定。
 
 <a name="烧录与配置"></a>
 
-**[烧录、设置角色并走测](docs/zh-CN/BENCH_RUNBOOK.md)** ·
+**[烧录、设置角色并进行八节点测试](docs/zh-CN/BENCH_RUNBOOK.md)** ·
 [协议与公式](docs/zh-CN/SCHEDULED_LINK.md) ·
 [测试结果与研究参考](docs/zh-CN/PROGRESS.md)
 
@@ -44,5 +51,7 @@ $\delta$ 为保护间隔。重传项为 $\varrho$ 轮中耗时最长的可用时
 [推导过程](docs/zh-CN/SCHEDULED_LINK.md#空口时间和时隙预算)解释各符号、展开控制开销，
 并列出现有固件参数。
 
-主机测试覆盖不同 SF、控制帧丢失及恢复。无线时序与覆盖距离仍需上板测量。
-[查看测试结果](docs/zh-CN/PROGRESS.md)
+模型中，八个 Client 均以 SF9 发送测试载荷上限时，共预留 14.084 秒，含帧末保护时间
+300 毫秒，额外余量为 0.916 秒。覆盖距离和无线时序仍需实测。
+其余 Client 均用 SF7 时，至多两个可预留 SF10。若其他节点已使用较高 SF，可获得 SF10 的节点会减少。
+[容量与 SF10](docs/zh-CN/SCHEDULED_LINK.md#sf10-容量及更高-sf-选项) · [实验结果与 70 节点研究计划](docs/zh-CN/PROGRESS.md)

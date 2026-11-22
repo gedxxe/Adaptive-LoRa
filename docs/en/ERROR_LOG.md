@@ -756,3 +756,74 @@ symbolic SF, timing and bitmap operations. Both READMEs embed the PNG exports.
   suites subsequently exited 0.
 - `git diff --cached --check` flagged a trailing space from the TeX log.
   The new log was normalized to LF and its trailing whitespace trimmed.
+
+## ERR-048 — Final ACK fault masked a successful DATA reception
+
+The Gateway emitted link samples only after a timely final bitmap. Its
+receipt state was also written from that sampling path, so a late fault
+could hide an earlier accepted delivery and invalidate a receipt from the
+next Request. The adaptive fake transport reproduces this by accepting
+DATA in the first round and returning an error when the final ACK completes.
+The test and the new 16 B roster test failed in
+`logs/test/iteration-024-adr-repro-native_adaptive.log`.
+
+The Gateway now records delivery when the application accepts DATA and
+emits a final sample even on local timing failure. `timing=invalid` stays
+in the delivery record but does not advance ADR. ACK completions outside
+the receive window do not open retry slots. The native tests pass in
+`logs/test/iteration-024-final-native_adaptive.log`. Physical timing has
+not been measured.
+
+## ERR-049 — Host verification environment
+
+The first sandboxed `pio test -e native_adaptive` could not write the
+PlatformIO package lock and exited 1. See
+`logs/test/iteration-024-repro-native_adaptive.log`. Running the installed
+PlatformIO Python with the approved cache access started the tests. The
+initial compiler-version probe required the same environment. PDF text
+extraction for the local research papers warned about missing fontTools
+for some embedded font encodings. Related-work descriptions were checked
+against the readable primary text and the existing paper references.
+
+## ERR-050 — Gateway missed its receive slot and trained ADR on the retry
+
+Suspend the Gateway loop after Grant TX completion, across the first SF7
+Client's retune and primary DATA. Resume before the second Client's slot.
+Both Clients can deliver, but the first delivery by retry used to count
+as RF degradation. The regression and the missing walk-test display
+fields both failed in `logs/test/iteration-025-repro-native_adaptive.log`
+(exit 1). The Gateway now marks the affected sample
+`adr=rx_window_unobserved,timing=invalid`; a timely peer can still lock.
+The corresponding display test checks TX, RX and ACK history independently.
+Both pass in `logs/test/iteration-025-final-native_adaptive.log`. Actual
+IRQ service and display timing on the boards remain unmeasured.
+
+## ERR-051 — SF10 DATA range and separation from control in the host test
+
+The new cases initially failed because the decoder and the ADR policy
+capped DATA at SF9. See `logs/test/iteration-026-repro-native_adaptive.log`,
+exit 1. After extending the range, the host fixture still applied the
+Client's synthetic DATA loss threshold to SF9 Requests. Applying DATA
+loss only to DATA and injecting a separate control outage made the two
+conditions independently testable. The retry assertion was also corrected
+to compare the counter delta. The original failures are in
+`logs/test/iteration-026-focused-native_adaptive.log` and
+`logs/test/iteration-026-recheck-native_adaptive.log`, both exit 1.
+
+## ERR-052 — Nested Windows command failed to launch the comparison build
+
+The initial comparison command wrapped `cmd /d /c` inside the command
+runner's own command shell. It exited 1 before PlatformIO because the
+embedded quote was passed literally. The retry supplied
+`PLATFORMIO_BUILD_SRC_FLAGS` and `PLATFORMIO_BUILD_DIR` directly to
+the build subprocess. The runbook uses PowerShell as its parent shell.
+A non-flashing check from PowerShell confirmed both variables reached
+the child shell.
+
+The first staged whitespace check also rejected an extra blank line at
+the end of the newly generated model and image audit log. The release
+copies use one final newline and retain the command output and exit codes.
+
+A command-runner quote handling error also split the initial Git commit
+message into path arguments (exit 1). Pass the message through a local
+file with `git commit -F` to preserve the exact text.

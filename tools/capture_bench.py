@@ -1,4 +1,4 @@
-"""Stream one MCU or a radio pair to a new evidence directory (no flashing).
+"""Stream one board or a Gateway with up to eight Clients to a new directory.
 
 Only status commands are sent unless --no-status is used. Opening a port can
 reset some boards despite preconfigured DTR/RTS; finish backup/RF gates first.
@@ -17,6 +17,7 @@ import serial
 
 FINAL_STATUS_SECONDS = 1.0
 JOIN_SECONDS = 3.0
+MAX_CLIENT_PORTS = 8
 
 
 def utc_now():
@@ -32,8 +33,8 @@ def port_key(port):
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--gateway", help="Gateway COM/device port (requires --client)")
-    parser.add_argument("--client", help="Client COM/device port (requires --gateway)")
-    parser.add_argument("--board", help="Single MCU port; mutually exclusive with pair")
+    parser.add_argument("--client", action="append", help="Client port, repeatable (requires --gateway)")
+    parser.add_argument("--board", help="Single MCU port; mutually exclusive with group capture")
     parser.add_argument("--seconds", type=int, default=1200)
     parser.add_argument("--out", type=Path, required=True, help="New run directory")
     parser.add_argument("--metadata", type=Path, help="Operator JSON object, at most 64 KiB")
@@ -44,11 +45,15 @@ def main(argv=None):
     if args.board and not (args.gateway or args.client):
         ports = {"board": args.board}
     elif not args.board and args.gateway and args.client:
-        if port_key(args.gateway) == port_key(args.client):
+        if len(args.client) > MAX_CLIENT_PORTS:
+            parser.error(f"Use at most {MAX_CLIENT_PORTS} client ports")
+        ports = {"gateway": args.gateway}
+        for index, port in enumerate(args.client, 1):
+            ports["client" if index == 1 else f"client-{index}"] = port
+        if len({port_key(port) for port in ports.values()}) != len(ports):
             parser.error("Use distinct ports")
-        ports = {"gateway": args.gateway, "client": args.client}
     else:
-        parser.error("Select --board OR both --gateway and --client")
+        parser.error("Select --board or --gateway with at least one --client")
     operator = {}
     if args.metadata:
         try:

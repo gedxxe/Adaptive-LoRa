@@ -1,4 +1,4 @@
-"""Evaluate candidate spreading factors offline from v3 gateway logs."""
+"""Evaluate candidate DATA spreading factors offline from Gateway logs."""
 
 import argparse
 from collections import defaultdict
@@ -11,6 +11,8 @@ from statistics import mean
 
 EVENT = "event=V3_LINK_SAMPLE,"
 IDENTITY = ("network_id", "gateway_id", "gateway_boot", "source_id", "client_boot", "sf")
+MIN_DATA_SF = 7
+MAX_DATA_SF = 10
 
 
 @dataclass(frozen=True)
@@ -37,11 +39,16 @@ def read_samples(lines):
         if EVENT not in line:
             continue
         fields = dict(item.split("=", 1) for item in line.strip().split(EVENT, 1)[1].split(","))
+        timing = fields.get("timing", "ok")  # Older captures only emitted timely frames.
+        if timing not in ("ok", "invalid"):
+            raise ValueError("invalid timing flag in link sample")
+        if timing == "invalid" or fields.get("app") == "refused":
+            continue
         key = tuple(int(fields[name]) for name in IDENTITY)
         frame = int(fields["frame_id"])
         outcome = fields["outcome"]
-        if min(*key, frame) < 1 or key[-1] not in (7, 8, 9) or outcome not in ("first", "retry", "missed"):
-            raise ValueError("invalid v3 link sample")
+        if min(*key, frame) < 1 or not MIN_DATA_SF <= key[-1] <= MAX_DATA_SF or outcome not in ("first", "retry", "missed"):
+            raise ValueError("invalid link sample")
         metrics = tuple(None if fields[name] == "N/A" else float(fields[name]) for name in ("snr_db", "rssi_dbm"))
         if any(value is not None and (not math.isfinite(value) or outcome == "missed") for value in metrics):
             raise ValueError("invalid radio metrics in v3 link sample")
@@ -68,7 +75,7 @@ def evaluate(lines, policy):
             weak = weak + 1 if poor else 0
             healthy = healthy + 1 if sound else 0
             if weak >= policy.weak_windows:
-                candidate = min(active + 1, 9)
+                candidate = min(active + 1, MAX_DATA_SF)
             elif healthy >= policy.healthy_windows:
                 candidate = active
             yield dict(zip(IDENTITY, key), first_frame=block[0][0], last_frame=block[-1][0],

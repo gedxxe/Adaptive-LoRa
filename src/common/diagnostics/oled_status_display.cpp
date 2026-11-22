@@ -106,10 +106,19 @@ OledText formatOledStatus(const DisplaySnapshot& s, uint64_t nowUs, uint8_t v3Pa
         const auto& v3 = s.multiclient;
         const auto& peer = v3.peer;
         const unsigned page = v3Page % 3;
-        std::snprintf(r[0], sizeof(r[0]), "V%u %s %u/3", unsigned(s.protocol),
-                      page == 0 ? "LINK" : page == 1 ? "DATA" : "ACK", page + 1);
-        std::snprintf(r[1], sizeof(r[1]), "%s %u%s", gateway ? "GATEWAY" : "CLIENT", unsigned(s.config.nodeId),
-                      s.searchingForBeacon ? " SEARCH" : "");
+        const char* title = page == 0 ? "LINK" : page == 1 ? "DATA" : "ACK";
+        if (multiclient::kAdaptive) {
+            const char* direction = gateway ? "RX" : "TX";
+            if (v3.lastDataSf)
+                std::snprintf(r[0], sizeof(r[0]), "%u/3 %s SF%u CR4/%u", page + 1, direction,
+                              unsigned(v3.lastDataSf), unsigned(phy::codingRateDenominator));
+            else
+                std::snprintf(r[0], sizeof(r[0]), "%u/3 %s -- CR4/%u", page + 1, direction,
+                              unsigned(phy::codingRateDenominator));
+        } else std::snprintf(r[0], sizeof(r[0]), "V%u %s %u/3", unsigned(s.protocol), title, page + 1);
+        const char* suffix = s.searchingForBeacon ? "SEARCH" : multiclient::kAdaptive ? title : "";
+        std::snprintf(r[1], sizeof(r[1]), "%s %u%s%s", gateway ? "GATEWAY" : "CLIENT",
+                      unsigned(s.config.nodeId), *suffix ? " " : "", suffix);
         if (page == 0) {
             if (peer.seen)
                 std::snprintf(r[2], sizeof(r[2]), "LAST %s P %u", linkName(v3.freshness(nowUs)), unsigned(peer.peer));

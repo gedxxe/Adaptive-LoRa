@@ -8,7 +8,8 @@ class MulticlientLink {
 public:
     using BootIdSource = uint32_t (*)(uint32_t);
     MulticlientLink(const DeviceConfig& config, RadioTransport& radio, SerialLogger& log,
-                    PayloadPort& payload, BootIdSource bootId, multiclient::Roster roster = {});
+                    PayloadPort& payload, BootIdSource bootId, multiclient::Roster roster = {},
+                    bool adaptDataSf = multiclient::kAdaptive);
     void update(uint64_t now, const RadioEvent& event, bool allowTx = true);
     MulticlientTelemetry telemetry() const;
     bool safeToRefreshDisplay(uint64_t now, uint32_t stepBudgetUs) const;
@@ -18,12 +19,14 @@ private:
     enum class Phase { WAIT, BEACON_TX, REQUEST, GRANT_TX, DATA };
     enum class Reception : uint8_t { NONE, ACCEPTED, REFUSED };
     struct Received {
+        uint64_t completedAt = 0;
         Reception result = Reception::NONE;
         uint8_t bytes[multiclient::kMaxData]{};
         float rssi = 0;
         float snr = 0;
         bool metrics = false;
         bool retried = false;
+        bool rxWindowUnobserved = false;
     };
     struct AdrState {
         uint32_t boot = 0;
@@ -53,7 +56,7 @@ private:
     void acceptFeedback(uint64_t now, const Frame& ack, const RadioEvent& event);
     void clientFinish(PayloadResult result);
     void observePeer(uint64_t now, uint16_t peer, const RadioEvent& event);
-    void logLinkSamples();
+    void logLinkSamples(bool timingOk);
     bool prepareSf(uint8_t sf, uint64_t now);
     void admitProfiles();
     const char* reviewProfile(uint8_t index);
@@ -63,6 +66,7 @@ private:
     SerialLogger& log_;
     PayloadPort& payload_;
     BootIdSource bootIdSource_;
+    const bool adaptDataSf_;
     multiclient::Roster roster_;
     multiclient::Plan plan_;
     Received received_[multiclient::kMaxClients]{};
@@ -71,6 +75,7 @@ private:
     Phase phase_ = Phase::WAIT;
     uint8_t round_ = 0;
     uint8_t mask_ = 0;
+    uint8_t rxReadyMask_ = 0;  // Gateway saw RX armed at the slot SF before launch, or received DATA.
     bool launched_ = false;
     bool sentData_ = false;
     bool validConfig_ = false;

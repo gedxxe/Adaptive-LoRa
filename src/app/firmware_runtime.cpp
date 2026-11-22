@@ -13,6 +13,12 @@ namespace adaptive_lora {
 namespace {
 #if defined(ADAPTIVE_LORA_MULTICLIENT)
 constexpr auto wireVersion = multiclient::kWireVersion;
+#if defined(ADAPTIVE_LORA_FIXED_SF_COMPARISON)
+static_assert(multiclient::kAdaptive, "Use the adaptive environment for matched SF7 comparison");
+constexpr bool adaptDataSf = false;
+#else
+constexpr bool adaptDataSf = multiclient::kAdaptive;
+#endif
 constexpr const char* profile = multiclient::kAdaptive ? "adaptive" : "multiclient";
 #if defined(ADAPTIVE_LORA_OLED)
 constexpr uint32_t kClientDisplayStartupUs = 400000;
@@ -66,8 +72,9 @@ void FirmwareRuntime::status() {
     if (!loadError_ && loaded_.role == DeviceRole::GATEWAY) {
         const auto roster = benchRoster();
         const uint32_t period = roster.periodUs ? roster.periodUs : multiclient::requiredPeriodUs(roster);
-        std::snprintf(line, sizeof(line), "event=SCHEDULE_CONFIG,period_us=%" PRIu32 ",roster_count=%u",
-                      period, roster.count);
+        std::snprintf(line, sizeof(line), "event=SCHEDULE_CONFIG,period_us=%" PRIu32
+                      ",roster_count=%u,bench_payload_ceiling_bytes=%u,data_sf_policy=%s", period, roster.count,
+                      unsigned(multiclient::kBenchPayloadBytes), adaptDataSf ? "adaptive" : "fixed_sf7");
         log_.text(line);
     }
 #endif
@@ -131,7 +138,7 @@ void FirmwareRuntime::setup() {
     log_.event("RADIO_INIT", code ? "failed" : radio_.chip(), nullptr, nullptr, code);
     if (!code) {
 #if defined(ADAPTIVE_LORA_MULTICLIENT)
-        multicli_.emplace(loaded_, radio_, log_, payload_, freshBootId, benchRoster());
+        multicli_.emplace(loaded_, radio_, log_, payload_, freshBootId, benchRoster(), adaptDataSf);
 #if defined(ADAPTIVE_LORA_OLED)
         if (loaded_.role == DeviceRole::CLIENT && display_ && !display_->error())
             clientDisplayUntil_ = static_cast<uint64_t>(esp_timer_get_time()) + kClientDisplayStartupUs;

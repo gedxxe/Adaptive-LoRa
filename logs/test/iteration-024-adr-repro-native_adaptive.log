@@ -1,0 +1,29 @@
+Verbosity level can be increased via `-v, -vv, or -vvv` option
+Collected 16 tests
+
+Processing test_adaptive_link in native_adaptive environment
+--------------------------------------------------------------------------------
+Building...
+Testing...
+test\test_adaptive_link\test_main.cpp:370: mixed_profile_codec_and_budget	[PASSED]
+test\test_adaptive_link\test_main.cpp:371: roaming_client_adapts_while_three_peers_deliver	[PASSED]
+test\test_adaptive_link\test_main.cpp:372: missing_grant_ack_and_gateway_outage_leave_peers_safe	[PASSED]
+test\test_adaptive_link\test_main.cpp:373: one_failed_retune_recovers_with_full_roster	[PASSED]
+test\test_adaptive_link\test_main.cpp:374: higher_sf_reservations_protect_two_existing_clients	[PASSED]
+test\test_adaptive_link\test_main.cpp:375: stable_lock_requires_client_ack_receipt	[PASSED]
+test\test_adaptive_link\test_main.cpp:283: accepted_data_remains_observable_when_final_ack_completion_fails: Expected Not-Equal	[FAILED]
+test\test_adaptive_link\test_main.cpp:377: sf9_capacity_uses_the_production_calendar	[PASSED]
+test\test_adaptive_link\test_main.cpp:316: eight_clients_can_adapt_to_sf9_at_the_bench_ceiling: Expected 16 Was 64	[FAILED]
+test\test_adaptive_link\test_main.cpp:379: display_reports_the_last_acknowledged_data_sf	[PASSED]
+test\test_adaptive_link\test_main.cpp:380: driver_controls_adapter_retune_and_failure	[PASSED]
+
+
+Program received signal SIGINT (Interrupt)
+-------- native_adaptive:test_adaptive_link [ERRORED] Took 5.85 seconds --------
+=================================== SUMMARY ===================================
+Environment      Test                Status    Duration
+---------------  ------------------  --------  ------------
+native_adaptive  test_adaptive_link  ERRORED   00:00:05.850
+============= 12 test cases: 2 failed, 9 succeeded in 00:00:05.850 =============
+
+Exit code: 1

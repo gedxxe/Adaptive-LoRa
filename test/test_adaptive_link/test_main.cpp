@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <unity.h>
 #include <vector>
+#include "research_roster.h"
 #include "app/multiclient_link.h"
 #include "common/diagnostics/oled_status_display.h"
 #include "common/radio/radio_driver.h"
@@ -22,9 +23,9 @@ DeviceConfig config(uint16_t id) {
     return device;
 }
 
-Roster roster(uint8_t count) {
+Roster roster(uint8_t count, uint8_t ceiling = kMaxData) {
     Roster result{kAdaptivePeriodUs, count, {}};
-    for (uint8_t i = 0; i < count; ++i) result.nodes[i] = {uint16_t(i + 2), kMaxData};
+    for (uint8_t i = 0; i < count; ++i) result.nodes[i] = {uint16_t(i + 2), ceiling};
     return result;
 }
 
@@ -34,8 +35,11 @@ struct Peer {
     PayloadPort payload;
     MulticlientLink link;
 
-    Peer(uint16_t id, Roster schedule = {}, PayloadPort::Receiver callback = nullptr, void* context = nullptr)
-        : payload(callback, context), link(config(id), radio, log, payload, boot, schedule) { log.begin(config(id)); }
+    Peer(uint16_t id, Roster schedule = {}, PayloadPort::Receiver callback = nullptr, void* context = nullptr,
+         bool adaptDataSf = true)
+        : payload(callback, context), link(config(id), radio, log, payload, boot, schedule, adaptDataSf) {
+        log.begin(config(id));
+    }
 };
 
 struct Tx {
@@ -63,15 +67,20 @@ struct Network {
     bool dropGrant = false;
     bool dropFirstAck = false;
     bool dropAllAck = false;
+    bool dropControl = false;
+    bool dropFirstData = false;
+    bool loseFinalTxDone = false;
+    bool stallFirstRx = false;
+    uint64_t resumeGateway = 0;
     bool outage = false;
 
-    explicit Network(uint8_t n, uint8_t rosterCount = 0)
-        : count(n), gateway(1, roster(rosterCount ? rosterCount : n), accept, this) {}
+    explicit Network(uint8_t n, uint8_t rosterCount = 0, uint8_t ceiling = kMaxData, bool adaptDataSf = true)
+        : count(n), gateway(1, roster(rosterCount ? rosterCount : n, ceiling), accept, this, adaptDataSf) {}
     static bool accept(void* context, const PayloadDelivery& data) {
         auto& n = *static_cast<Network*>(context);
         ++n.delivered[data.source - 2];
         TEST_ASSERT_EQUAL_UINT16(uint16_t(data.frame), data.sequence);
-        TEST_ASSERT_TRUE(data.size == 8 || data.size == 64);
+        TEST_ASSERT_TRUE(data.size == 8 || data.size == 16 || data.size == 64);
         return true;
     }
     Peer& peer(uint8_t i) { return i ? clients[i - 1] : gateway; }
@@ -83,13 +92,17 @@ struct Network {
             events[sender] = radio.completeTx();
             events[sender].hasCompletionTime = true;
             events[sender].completionUs = txEnd;
+            if (loseFinalTxDone && sender == 0 && frame.type == MessageType::ACK_BITMAP &&
+                frame.sequence == kAttempts - 1)
+                events[sender] = radio.error(RadioEventType::ERROR, -910);
             for (uint8_t i = 0; i <= count; ++i) {
                 if (!(listening & (1u << i)) || !peer(i).radio.receiving() || peer(i).radio.sf != txSf) continue;
                 if (frame.destinationId != kGroup && frame.destinationId != i + 1) continue;
                 if (outage && (i == 1 || sender == 1)) continue;
-                if (sender == 1 && txSf < minDataSf[0]) continue;
-                if (sender > 1 && txSf < minDataSf[sender - 1]) continue;
-                if (i == 1 && ((dropGrant && frame.type == MessageType::SLOT_GRANT) ||
+                if (sender > 0 && frame.type == MessageType::DATA && txSf < minDataSf[sender - 1])
+                    continue;
+                if (i == 1 && ((dropControl && frame.type != MessageType::DATA) ||
+                    (dropGrant && frame.type == MessageType::SLOT_GRANT) ||
                     (frame.type == MessageType::ACK_BITMAP &&
                      (dropAllAck || (dropFirstAck && frame.sequence == 0))))) continue;
                 events[i] = peer(i).radio.deliver(radio.lastTx);
@@ -104,7 +117,15 @@ struct Network {
             sender = -1;
         }
         host_clock::set(now);
-        for (uint8_t i = 0; i <= count; ++i) peer(i).link.update(now, events[i]);
+        for (uint8_t i = 0; i <= count; ++i) {
+            if (i == 0 && now < resumeGateway) continue;
+            peer(i).link.update(now, events[i]);
+        }
+        if (stallFirstRx && events[0].type == RadioEventType::TX_DONE &&
+            frame.type == MessageType::SLOT_GRANT) {
+            // Grant completion was serviced. Sleep across the first RX retune and DATA.
+            resumeGateway = txEnd + kSlotGuardUs + dataAir(8, kBaseSf);
+        }
         for (uint8_t i = 0; i <= count; ++i) {
             auto& p = peer(i);
             TEST_ASSERT_EQUAL_UINT(0, p.radio.contractViolations);
@@ -121,6 +142,10 @@ struct Network {
                     if (peer(j).radio.receiving() && peer(j).radio.sf == txSf) listening |= 1u << j;
                 if (frame.type != MessageType::DATA) TEST_ASSERT_EQUAL_UINT8(kControlSf, txSf);
                 tx.push_back({frame.type, i, txSf, frame.frameId, frame.sequence});
+                if (dropFirstData && i == 1 && frame.type == MessageType::DATA) {
+                    listening &= ~1u;
+                    dropFirstData = false;
+                }
             }
             for (unsigned drain = 0; drain < 24 && !p.log.empty(); ++drain) p.log.drain();
         }
@@ -163,15 +188,17 @@ void mixed_profile_codec_and_budget() {
     uint8_t bytes[kMaxFrameSize]{};
     size_t length = 0;
     TEST_ASSERT_EQUAL_INT(int(CodecResult::OK), int(encode(grant, bytes, sizeof(bytes), length)));
-    TEST_ASSERT_EQUAL_UINT8(4, bytes[2]);
+    TEST_ASSERT_EQUAL_UINT8(5, bytes[2]);
     Frame decoded;
     TEST_ASSERT_EQUAL_INT(int(CodecResult::OK), int(decode(bytes, length, 1, 2, decoded)));
     Plan decodedPlan;
     TEST_ASSERT_TRUE(readPlan(decoded, decodedPlan));
     TEST_ASSERT_EQUAL_UINT8(9, decodedPlan.slots[0].sf);
     bytes[kHeaderSize + 6] = 10;
+    TEST_ASSERT_EQUAL_INT(int(CodecResult::OK), int(decode(bytes, length, 1, 2, decoded)));
+    bytes[kHeaderSize + 6] = 11;
     TEST_ASSERT_EQUAL_INT(int(CodecResult::PAYLOAD), int(decode(bytes, length, 1, 2, decoded)));
-    bytes[2] = 3;
+    bytes[2] = 4;
     TEST_ASSERT_EQUAL_INT(int(CodecResult::VERSION), int(decode(bytes, length, 1, 2, decoded)));
     for (auto& slot : plan.slots) slot = {1, 64, 9};
     TEST_ASSERT_FALSE(plan.matches(r));
@@ -268,14 +295,184 @@ void stable_lock_requires_client_ack_receipt() {
     TEST_ASSERT_NOT_EQUAL(std::string::npos, Serial.output.find("next_sf=7,locked=1,adr=locked"));
 }
 
+void accepted_data_remains_observable_when_final_ack_completion_fails() {
+    Network n(1);
+    n.rounds(2);
+    n.loseFinalTxDone = true;
+    n.rounds(1);
+    TEST_ASSERT_EQUAL_UINT(3, n.delivered[0]);
+    TEST_ASSERT_EQUAL_INT(int(PayloadResult::ACCEPTED), int(n.clients[0].payload.result()));
+    TEST_ASSERT_NOT_EQUAL(std::string::npos, Serial.output.find("sf=7,locked=0,adr=timing_invalid"));
+    TEST_ASSERT_NOT_EQUAL(std::string::npos, Serial.output.find("timing=invalid,payload_bytes=8,rx_us="));
+    TEST_ASSERT_EQUAL(std::string::npos, Serial.output.find("timing=invalid,payload_bytes=8,rx_us=N/A"));
+    TEST_ASSERT_EQUAL(std::string::npos, Serial.output.find("locked=1"));
+
+    n.loseFinalTxDone = false;
+    n.rounds(1);
+    TEST_ASSERT_NOT_EQUAL(std::string::npos, Serial.output.find("next_sf=7,locked=1,adr=locked"));
+}
+
+void sf9_capacity_uses_the_production_calendar() {
+    constexpr uint8_t nodeCounts[] = {4, 6, 8};
+    constexpr uint8_t ceilings[] = {16, 24, 32, 64};
+    constexpr uint8_t expected[][4] = {{4, 4, 4, 4}, {6, 6, 6, 3}, {8, 8, 5, 2}};
+    for (unsigned row = 0; row < 3; ++row) {
+        for (unsigned column = 0; column < 4; ++column) {
+            const auto r = roster(nodeCounts[row], ceilings[column]);
+            TEST_ASSERT_TRUE(r.valid(1));
+            Plan plan;
+            plan.count = r.count;
+            for (uint8_t i = 0; i < plan.count; ++i) plan.slots[i] = {1, r.nodes[i].budget, 7};
+            TEST_ASSERT_TRUE(plan.matches(r));
+            uint8_t admitted = 0;
+            for (uint8_t i = 0; i < plan.count; ++i) {
+                plan.slots[i].sf = 9;
+                if (!plan.matches(r)) break;
+                ++admitted;
+            }
+            TEST_ASSERT_EQUAL_UINT8(expected[row][column], admitted);
+        }
+    }
+}
+
+void eight_clients_can_adapt_to_sf9_at_the_bench_ceiling() {
+    const auto ceiling = kBenchRoster.nodes[0].budget;
+    TEST_ASSERT_EQUAL_UINT8(16, ceiling);
+    Network n(kBenchRoster.count, kBenchRoster.count, ceiling);
+    for (uint8_t i = 0; i < n.count; ++i) {
+        n.minDataSf[i] = 9;
+        n.snr[i] = -9;
+    }
+    n.rounds(7, ceiling);
+    for (uint8_t i = 0; i < n.count; ++i) {
+        TEST_ASSERT_EQUAL_UINT(3, n.delivered[i]);
+        TEST_ASSERT_EQUAL_UINT8(9, n.clients[i].link.telemetry().confirmedDataSf);
+    }
+}
+
 void display_reports_the_last_acknowledged_data_sf() {
     DisplaySnapshot snapshot;
     snapshot.config = config(2);
     snapshot.protocol = kWireVersion;
     snapshot.multiclient.confirmedDataSf = 8;
     const auto formatted = formatOledStatus(snapshot, 0, 1);
-    TEST_ASSERT_EQUAL_STRING("V4 DATA 2/3", formatted.rows[0]);
     TEST_ASSERT_EQUAL_STRING("ACKED DATA SF8", formatted.rows[6]);
+}
+
+void oled_tracks_actual_data_on_both_roles_even_without_ack() {
+    Network n(1);
+    DisplaySnapshot client, gateway;
+    client.config = config(2);
+    gateway.config = config(1);
+    client.protocol = gateway.protocol = kWireVersion;
+    TEST_ASSERT_EQUAL_STRING("1/3 TX -- CR4/5", formatOledStatus(client, 0, 0).rows[0]);
+    n.dropGrant = true;
+    n.rounds(1);
+    client.multiclient = n.clients[0].link.telemetry();
+    TEST_ASSERT_EQUAL_STRING("2/3 TX -- CR4/5", formatOledStatus(client, n.now, 1).rows[0]);
+    n.dropGrant = false;
+    n.dropAllAck = true;
+    n.rounds(1);
+    client.multiclient = n.clients[0].link.telemetry();
+    gateway.multiclient = n.gateway.link.telemetry();
+    TEST_ASSERT_EQUAL_STRING("2/3 TX SF7 CR4/5", formatOledStatus(client, n.now, 1).rows[0]);
+    TEST_ASSERT_EQUAL_STRING("ACKED DATA SF N/A", formatOledStatus(client, n.now, 1).rows[6]);
+    TEST_ASSERT_EQUAL_STRING("3/3 RX SF7 CR4/5", formatOledStatus(gateway, n.now, 2).rows[0]);
+    n.dropAllAck = false;
+    n.minDataSf[0] = 9;
+    n.rounds(3);
+    client.multiclient = n.clients[0].link.telemetry();
+    gateway.multiclient = n.gateway.link.telemetry();
+    TEST_ASSERT_EQUAL_STRING("1/3 TX SF8 CR4/5", formatOledStatus(client, n.now, 0).rows[0]);
+    TEST_ASSERT_EQUAL_STRING("1/3 RX SF7 CR4/5", formatOledStatus(gateway, n.now, 0).rows[0]);
+}
+
+void gateway_stall_cannot_train_rf_loss_for_the_missed_slot() {
+    Network n(2);
+    n.stallFirstRx = true;
+    n.rounds(4);
+    TEST_ASSERT_EQUAL_UINT(4, n.delivered[0]);  // Recovered in the retry pool.
+    TEST_ASSERT_EQUAL_UINT(4, n.delivered[1]);
+    TEST_ASSERT_NOT_EQUAL(std::string::npos, Serial.output.find("adr=rx_window_unobserved,timing=invalid"));
+    TEST_ASSERT_FALSE(n.sent(1, 8));
+    TEST_ASSERT_NOT_EQUAL(std::string::npos, Serial.output.find("locked=1,adr=locked,timing=ok"));
+}
+
+void fixed_comparison_keeps_peers_and_feedback_on_the_same_calendar() {
+    Network n(8, 8, 16, false);
+    n.minDataSf[0] = 8;
+    n.rounds(6, 16);
+    TEST_ASSERT_EQUAL_UINT(0, n.delivered[0]);
+    for (uint8_t i = 1; i < n.count; ++i) TEST_ASSERT_EQUAL_UINT(6, n.delivered[i]);
+    TEST_ASSERT_GREATER_THAN_UINT32(0, n.clients[0].link.telemetry().retries);
+    for (const auto& packet : n.tx)
+        TEST_ASSERT_EQUAL_UINT8(packet.type == MessageType::DATA ? kBaseSf : kControlSf, packet.sf);
+    TEST_ASSERT_NOT_EQUAL(std::string::npos, Serial.output.find("adr=fixed_sf,timing=ok"));
+}
+
+void two_clients_use_sf10_with_sf9_control_and_retry() {
+    Network n(8, 8, 16);
+    n.minDataSf[0] = n.minDataSf[1] = 10;
+    n.snr[0] = -8.6f;
+    n.snr[1] = -13;
+    n.rounds(12, 16);
+    for (uint8_t sf = 7; sf <= 10; ++sf) TEST_ASSERT_TRUE(n.sent(1, sf));
+    TEST_ASSERT_EQUAL_UINT8(10, n.clients[0].link.telemetry().confirmedDataSf);
+    TEST_ASSERT_EQUAL_UINT8(10, n.clients[1].link.telemetry().confirmedDataSf);
+    DisplaySnapshot screen;
+    screen.config = config(2);
+    screen.protocol = kWireVersion;
+    screen.multiclient = n.clients[0].link.telemetry();
+    const auto page = formatOledStatus(screen, n.now, 1);
+    TEST_ASSERT_EQUAL_STRING("2/3 TX SF10 CR4/5", page.rows[0]);
+    TEST_ASSERT_EQUAL_STRING("ACKED DATA SF10", page.rows[6]);
+    TEST_ASSERT_NOT_EQUAL(std::string::npos, Serial.output.find("next_sf=10,locked=1,adr=locked"));
+    TEST_ASSERT_EQUAL(std::string::npos, Serial.output.find("adr=probe_lower"));
+
+    const auto retriesBefore = n.clients[0].link.telemetry().retries;
+    n.dropFirstData = true;
+    n.rounds(1, 16);
+    TEST_ASSERT_EQUAL_UINT8(10, n.clients[0].link.telemetry().confirmedDataSf);
+    TEST_ASSERT_EQUAL_UINT(retriesBefore + 1, n.clients[0].link.telemetry().retries);
+    TEST_ASSERT_NOT_EQUAL(std::string::npos, Serial.output.find("sf=10,outcome=retry,app=accepted"));
+
+    n.minDataSf[2] = 10;
+    n.rounds(8, 16);
+    TEST_ASSERT_TRUE(n.sent(3, 9));
+    TEST_ASSERT_FALSE(n.sent(3, 10));
+    TEST_ASSERT_NOT_EQUAL(std::string::npos, Serial.output.find("adr=budget_limited"));
+    for (uint8_t i = 3; i < n.count; ++i) TEST_ASSERT_EQUAL_UINT(21, n.delivered[i]);
+
+    n.minDataSf[0] = 9;
+    n.snr[0] = -7;
+    n.rounds(18, 16);
+    TEST_ASSERT_EQUAL_UINT8(9, n.clients[0].link.telemetry().confirmedDataSf);
+    TEST_ASSERT_EQUAL_UINT8(10, n.clients[2].link.telemetry().confirmedDataSf);
+    for (uint8_t i = 3; i < n.count; ++i) TEST_ASSERT_EQUAL_UINT(39, n.delivered[i]);
+}
+
+void sf10_client_stops_data_when_control_is_lost() {
+    Network n(2, 8, 16);
+    n.minDataSf[0] = 10;
+    n.snr[0] = -10;
+    n.rounds(9, 16);
+    TEST_ASSERT_EQUAL_UINT8(10, n.clients[0].link.telemetry().confirmedDataSf);
+    const auto delivered = n.delivered[0];
+    n.dropControl = true;
+    n.rounds(2, 16);
+    TEST_ASSERT_EQUAL_UINT(delivered, n.delivered[0]);
+    TEST_ASSERT_TRUE(n.clients[0].link.searchingForBeacon(n.now));
+    TEST_ASSERT_EQUAL_UINT8(kControlSf, n.clients[0].radio.sf);
+    n.dropControl = false;
+    n.rounds(1, 16);
+    TEST_ASSERT_EQUAL_UINT(delivered + 1, n.delivered[0]);
+    TEST_ASSERT_EQUAL_UINT(12, n.delivered[1]);
+}
+
+void sf10_airtime_fits_driver_tx_deadline() {
+    TEST_ASSERT_EQUAL_UINT32(575488, dataAir(16, 10));
+    TEST_ASSERT_EQUAL_UINT32(985088, dataAir(kMaxData, 10));
+    TEST_ASSERT_TRUE(dataAir(kMaxData, 10) + kSlotGuardUs < kTxTimeoutUs);
 }
 
 void driver_controls_adapter_retune_and_failure() {
@@ -285,12 +482,16 @@ void driver_controls_adapter_retune_and_failure() {
     RadioDriver driver(hardware);
     TEST_ASSERT_EQUAL_INT16(0, driver.begin());
     TEST_ASSERT_EQUAL_INT16(0, driver.receive());
-    TEST_ASSERT_EQUAL_INT16(0, driver.setSpreadingFactor(9));
+    TEST_ASSERT_EQUAL_INT16(0, driver.setSpreadingFactor(10));
     TEST_ASSERT_EQUAL_INT(host_adapter::STANDBY, physical.trace[physical.traceLength - 2]);
     TEST_ASSERT_EQUAL_INT(host_adapter::RETUNE, physical.trace[physical.traceLength - 1]);
-    TEST_ASSERT_EQUAL_UINT8(9, physical.sf);
+    TEST_ASSERT_EQUAL_UINT8(10, physical.sf);
     TEST_ASSERT_FALSE(driver.receiving());
     TEST_ASSERT_EQUAL_INT16(0, driver.receive());
+    const auto beforeInvalid = physical.calls[host_adapter::RETUNE];
+    TEST_ASSERT_NOT_EQUAL(0, driver.setSpreadingFactor(11));
+    TEST_ASSERT_EQUAL_UINT(beforeInvalid, physical.calls[host_adapter::RETUNE]);
+    TEST_ASSERT_TRUE(driver.receiving());
     physical.codes[host_adapter::RETUNE] = -88;
     TEST_ASSERT_EQUAL_INT16(-88, driver.setSpreadingFactor(8));
     TEST_ASSERT_FALSE(driver.healthy());
@@ -315,7 +516,16 @@ int main() {
     RUN_TEST(one_failed_retune_recovers_with_full_roster);
     RUN_TEST(higher_sf_reservations_protect_two_existing_clients);
     RUN_TEST(stable_lock_requires_client_ack_receipt);
+    RUN_TEST(accepted_data_remains_observable_when_final_ack_completion_fails);
+    RUN_TEST(sf9_capacity_uses_the_production_calendar);
+    RUN_TEST(eight_clients_can_adapt_to_sf9_at_the_bench_ceiling);
     RUN_TEST(display_reports_the_last_acknowledged_data_sf);
+    RUN_TEST(oled_tracks_actual_data_on_both_roles_even_without_ack);
+    RUN_TEST(gateway_stall_cannot_train_rf_loss_for_the_missed_slot);
+    RUN_TEST(fixed_comparison_keeps_peers_and_feedback_on_the_same_calendar);
+    RUN_TEST(two_clients_use_sf10_with_sf9_control_and_retry);
+    RUN_TEST(sf10_client_stops_data_when_control_is_lost);
+    RUN_TEST(sf10_airtime_fits_driver_tx_deadline);
     RUN_TEST(driver_controls_adapter_retune_and_failure);
     return UNITY_END();
 }
