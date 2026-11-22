@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="500" viewBox="0 0 1040 500" role="img" aria-labelledby="title desc">
+  <title id="title">Adaptive-LoRa single-radio network architecture</title>
+  <desc id="desc">A Gateway uses control frames on SF9 to coordinate a roster of Clients. A single SX1262 alternates between control and one scheduled DATA transmission at a time. The Gateway uses delivery history and Client ACK receipts to select a DATA spreading factor for each Client.</desc>
+  <defs>
+    <marker id="grayArrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 10 5 0 10Z" fill="#536177"/>
+    </marker>
+    <marker id="blueArrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0 0 10 5 0 10Z" fill="#185785"/>
+    </marker>
+    <g id="radioIcon" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <circle cx="16" cy="15" r="2" fill="currentColor"/>
+      <path d="M11 20a7 7 0 0 1 0-10m10 0a7 7 0 0 1 0 10M7 24a13 13 0 0 1 0-18m18 0a13 13 0 0 1 0 18m-9-7v12"/>
+    </g>
+    <style>
+      text { font-family: "Helvetica Neue", Arial, sans-serif; fill: #12243a }
+      .name { font-size: 24px; font-weight: 700 }
+      .label { font-size: 17px; font-weight: 700 }
+      .detail { font-size: 16px; fill: #3e4e65 }
+      .tiny { font-size: 15px; fill: #3e4e65 }
+      .card { fill: #fff; stroke: #738599; stroke-width: 1.5 }
+      .internal { fill: #eef4f8; stroke: #a8b6c3; stroke-width: 1.2 }
+      .control { fill: none; stroke: #536177; stroke-width: 2; stroke-dasharray: 7 5; marker-start: url(#grayArrow); marker-end: url(#grayArrow) }
+      .data { fill: none; stroke: #185785; stroke-width: 2.5; marker-end: url(#blueArrow) }
+    </style>
+  </defs>
+
+  <rect width="1040" height="500" rx="13" fill="#fff"/>
+  <rect x="36" y="37" width="372" height="372" rx="12" fill="#f5f8fb" stroke="#5f758c" stroke-width="1.8"/>
+  <text x="62" y="80" class="name">Gateway</text>
+  <text x="62" y="106" class="detail">ESP32-S3 · one SX1262</text>
+  <rect x="62" y="132" width="320" height="66" rx="7" class="internal"/>
+  <text x="78" y="157" class="label">Assign transmission slots</text>
+  <text x="78" y="180" class="detail">Payload length · SF · retry airtime</text>
+  <rect x="62" y="210" width="320" height="66" rx="7" class="internal"/>
+  <text x="78" y="235" class="label">Adapt each Client's DATA SF</text>
+  <text x="78" y="258" class="detail">Delivery history · SNR · ACK receipt</text>
+  <rect x="62" y="288" width="320" height="66" rx="7" class="internal"/>
+  <text x="78" y="313" class="label">Deliver application data</text>
+  <text x="78" y="336" class="detail">Verify identity · suppress duplicates</text>
+  <use href="#radioIcon" x="72" y="365" color="#185785"/>
+  <text x="121" y="387" class="detail">One radio listens or transmits</text>
+
+  <text x="750" y="59" class="label">Up to eight Clients</text>
+  <rect x="750" y="78" width="254" height="85" rx="9" class="card"/>
+  <text x="773" y="111" class="label">Client 2</text>
+  <text x="773" y="138" class="detail">Example DATA SF7</text>
+  <use href="#radioIcon" x="950" y="103" color="#536177"/>
+  <rect x="750" y="192" width="254" height="85" rx="9" class="card"/>
+  <text x="773" y="225" class="label">Client 3</text>
+  <text x="773" y="252" class="detail">Example DATA SF8</text>
+  <use href="#radioIcon" x="950" y="217" color="#536177"/>
+  <rect x="750" y="306" width="254" height="85" rx="9" class="card"/>
+  <text x="773" y="339" class="label">Client 4</text>
+  <text x="773" y="366" class="detail">Example DATA SF9</text>
+  <use href="#radioIcon" x="950" y="331" color="#536177"/>
+
+  <path d="M418 108H739" class="control"/>
+  <path d="M418 222H739" class="control"/>
+  <path d="M418 336H739" class="control"/>
+  <path d="M739 132H418" class="data"/>
+  <path d="M739 246H418" class="data"/>
+  <path d="M739 360H418" class="data"/>
+  <rect x="26" y="432" width="988" height="49" rx="5" fill="#f5f8fb"/>
+  <path d="M49 457h56" class="control"/>
+  <text x="120" y="462" class="tiny">Control, SF9</text>
+  <path d="M351 457h-56" class="data"/>
+  <text x="366" y="462" class="tiny">DATA, assigned SF7–SF9</text>
+  <text x="660" y="462" class="tiny">Clients transmit in separate time slots.</text>
+</svg>

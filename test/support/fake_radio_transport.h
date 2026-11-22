@@ -17,6 +17,8 @@ public:
     bool ready = true;  // Apps are constructed only after successful real begin.
     unsigned rxFailuresLeft = 0;
     bool failNextTx = false;
+    bool failNextRetune = false;
+    uint8_t sf = 7;
     unsigned rxCalls = 0;
     unsigned txCalls = 0;
     unsigned successfulTxStarts = 0;
@@ -52,6 +54,13 @@ public:
     bool receiving() const override { return mode == Mode::RX; }
     bool healthy() const override { return ready && mode != Mode::FAULT; }
     uint32_t timeOnAir(size_t) override { return 1000; }  // Synthetic, never RF evidence.
+    int16_t setSpreadingFactor(uint8_t requested) override {
+        if (transmitting()) { ++contractViolations; return -905; }
+        if (failNextRetune) { failNextRetune = false; mode = Mode::FAULT; return -906; }
+        sf = requested;
+        mode = Mode::IDLE;
+        return 0;
+    }
 
     RadioEvent completeTx() {
         if (!transmitting()) { ++contractViolations; return {}; }

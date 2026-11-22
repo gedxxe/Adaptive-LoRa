@@ -1,6 +1,6 @@
 # 串口日志
 
-## v3 日志采集
+## 要记录的事件
 
 使用 [台架流程](BENCH_RUNBOOK.md) 中的命令采集，保留每块板的原始 `*.log`、
 chunk 索引和 `capture.json`。在 [试验记录](../../logs/test/RUN_RECORD_TEMPLATE.md)
@@ -14,7 +14,9 @@ chunk 索引和 `capture.json`。在 [试验记录](../../logs/test/RUN_RECORD_T
 | `V3_DATA_RX` 与 `APP_PAYLOAD` | Gateway 校验与示例应用交付。完全重复的包不再计为交付。 |
 | `V3_BITMAP_RX` | Client 收到的反馈。有效位图中的缺失位与反馈未知或过期分别记录。 |
 | `V3_PAYLOAD_RESULT` | Client 事务结果，包括已接受、明确缺失或反馈未知。 |
-| `V3_LINK_SAMPLE` | 每次授权的离线 ADR 观测，记录首轮收到、重传收到或未收到有效 DATA，以及可用的 RSSI/SNR。 |
+| `V3_LINK_SAMPLE` | 各 Client 首轮收到、重传收到或未收到有效 DATA。自适应镜像同时记录 `sf`、`next_sf`、`locked` 和 ADR 决策。 |
+| `ADR_APPLY` | Client 从有效 Grant 取得的 DATA SF。结合 DATA 结果判断是否收到确认。 |
+| `ADR_TIMING` | `status` 输出的切换次数和观测到的最长切换至 RX 就绪耗时。 |
 | `V3_LINK_STATUS` 与 `OLED_STATUS` | 链路接收新鲜度和显示处理时延。`worst_step_us` 包含格式化和一次显示服务。 |
 
 按网络、帧号、Gateway 会话和 Client 身份匹配两端日志，并把同一事务的重传合并。
@@ -23,11 +25,11 @@ chunk 索引和 `capture.json`。在 [试验记录](../../logs/test/RUN_RECORD_T
 
 串口时间戳反映主循环记录事件的时刻。实测无线完成和处理延迟须用无线与总线波形。
 串口记录缺失、`log_dropped` 非零或试验被截断时单独处理。
-状态和刷新计数见 [屏幕诊断](DISPLAY_DIAGNOSTICS.md)，离线 ADR 输入见
-[定时链路规范](SCHEDULED_LINK.md#链路自适应实验)。
+状态和刷新计数见[屏幕读数](DISPLAY_DIAGNOSTICS.md)，SF 决策及回执见
+[自适应协议](SCHEDULED_LINK.md#自适应协议-v4)。事件保留原前缀，方便现有工具读取。
 
 <details>
-<summary>旧版 v1 HELLO/ACK 的采集及记录格式（Iteration 013 和 016）</summary>
+<summary>HELLO/ACK 记录格式</summary>
 
 英文规范见 `docs/en/LOGGING_GUIDE.md`。M2 每行一个事件，使用逗号分隔的 `key=value`，未知值为 N/A。帧日志包含 network/source/destination、boot_id、sequence 和版本字段，以及固定 SF/BW/频率；接收成功时带 RSSI/SNR。
 

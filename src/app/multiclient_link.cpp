@@ -1,10 +1,22 @@
 #include "multiclient_link.h"
 #include "radio_config.h"
 #include <cinttypes>
+#include <cmath>
 #include <cstdio>
 
 namespace adaptive_lora {
 using namespace multiclient;
+namespace {
+constexpr uint8_t kAdrConfirmations = 3;
+constexpr uint8_t kAdrDegradedReports = 2;
+constexpr uint8_t kAdrFirstBeforeProbe = 6;
+constexpr uint8_t kAdrRollbackHold = 8;
+constexpr uint8_t kAdrIdleFrames = 4;
+constexpr uint32_t kRetuneRetryUs = 5000;
+// Initial research thresholds include 4 dB over the nominal SF7/SF8 SINR.
+constexpr float kProbeSf7SnrDb = -3.5f;
+constexpr float kProbeSf8SnrDb = -6.0f;
+}
 
 MulticlientLink::MulticlientLink(const DeviceConfig& c, RadioTransport& radio, SerialLogger& log,
                                  PayloadPort& payload, BootIdSource bootId, Roster roster)
@@ -23,7 +35,7 @@ MulticlientTelemetry MulticlientLink::telemetry() const {
 
 bool MulticlientLink::searchingForBeacon(uint64_t now) const {
     return config_.role == DeviceRole::CLIENT &&
-        (!gatewayBoot_ || now >= beaconAt_ + roster_.periodUs + kGuardUs / 2);
+        (!gatewayBoot_ || now >= beaconAt_ + roster_.periodUs + kSlotGuardUs / 2);
 }
 
 bool MulticlientLink::safeToRefreshDisplay(uint64_t now, uint32_t stepBudgetUs) const {
@@ -33,7 +45,7 @@ bool MulticlientLink::safeToRefreshDisplay(uint64_t now, uint32_t stepBudgetUs) 
     if (!boot_ || searchingForBeacon(now)) return true;
     // Local completion does not make peer slots available for display work.
     return now >= displayQuietAt_ && now < displayQuietUntil_ &&
-        displayQuietUntil_ - now >= uint64_t(stepBudgetUs) + kGuardUs / 2;
+        displayQuietUntil_ - now >= uint64_t(stepBudgetUs) + kSlotGuardUs / 2;
 }
 
 void MulticlientLink::observePeer(uint64_t now, uint16_t peer, const RadioEvent& event) {
@@ -50,13 +62,143 @@ void MulticlientLink::logLinkSamples() {
             rx.result == Reception::ACCEPTED ? "accepted" : "refused";
         char metrics[48] = "rssi_dbm=N/A,snr_db=N/A";
         if (rx.metrics) std::snprintf(metrics, sizeof(metrics), "rssi_dbm=%.1f,snr_db=%.1f", rx.rssi, rx.snr);
-        char line[232];
+        char line[304];
+        const auto* action = kAdaptive ? reviewProfile(i) : "";
+        const auto& adr = adr_[kAdaptive ? i : 0];
         std::snprintf(line, sizeof(line), "event=V3_LINK_SAMPLE,network_id=%u,gateway_id=%u,gateway_boot=%" PRIu32
             ",frame_id=%" PRIu32 ",source_id=%u,client_boot=%" PRIu32 ",sf=%u,outcome=%s,app=%s,%s",
             unsigned(config_.networkId), unsigned(config_.nodeId), boot_, frameId_, unsigned(roster_.nodes[i].id),
-            plan_.slots[i].boot, unsigned(phy::dataSf), outcome, application, metrics);
+            plan_.slots[i].boot, unsigned(plan_.slots[i].sf), outcome, application, metrics);
+        if (kAdaptive) {
+            const auto prefix = std::strlen(line);
+            std::snprintf(line + prefix, sizeof(line) - prefix, ",next_sf=%u,locked=%u,adr=%s",
+                unsigned(adr.desired), unsigned(adr.locked), action);
+        }
         log_.text(line);
     }
+}
+
+bool MulticlientLink::prepareSf(uint8_t sf, uint64_t now) {
+    if (radioSf_ == sf) return true;
+    if (radio_.transmitting() || now < nextRetune_) return false;
+    const int16_t code = radio_.setSpreadingFactor(sf);
+    radioSf_ = code ? 0 : sf;
+    phyReadinessPending_ = !code;
+    phyRequestedAt_ = now;
+    if (!code) ++telemetry_.retunes;
+    if (code) {
+        nextRetune_ = now + kRetuneRetryUs;
+        frameTimingOk_ = false;
+        ++telemetry_.radioErrors;
+        log_.event("ADR_RADIO", "retune_error", nullptr, nullptr, code);
+    }
+    // Radio SPI and RX rearm take time. Launch decisions use the next loop clock.
+    return false;
+}
+
+void MulticlientLink::admitProfiles() {
+    // Reserve the full roster at its declared payload ceilings, including
+    // inactive Clients and rollback profiles. A new probe cannot take the
+    // budget reserved for a peer, even if that peer requests more bytes later.
+    Plan reserved;
+    reserved.count = roster_.count;
+    for (uint8_t i = 0; i < plan_.count; ++i) {
+        const auto& slot = plan_.slots[i];
+        auto& state = adr_[i];
+        if ((slot.boot && state.boot != slot.boot) || frameId_ - state.lastRequest >= kAdrIdleFrames)
+            state = {};
+        if (slot.boot) {
+            state.boot = slot.boot;
+            state.lastRequest = frameId_;
+        }
+        reserved.slots[i] = {1, roster_.nodes[i].budget, state.reservedSf};
+    }
+    // Rotate only the first choice among unreserved upgrades.
+    for (uint8_t step = 0; step < plan_.count; ++step) {
+        const auto i = uint8_t((frameId_ % plan_.count + step) % plan_.count);
+        auto& slot = plan_.slots[i];
+        if (!slot.boot) continue;
+        auto& state = adr_[i];
+        while (state.reservedSf < state.desired) {
+            ++reserved.slots[i].sf;
+            if (!reserved.matches(roster_)) {
+                --reserved.slots[i].sf;
+                break;
+            }
+            ++state.reservedSf;
+        }
+        slot.sf = state.desired < state.reservedSf ? state.desired : state.reservedSf;
+    }
+}
+
+const char* MulticlientLink::reviewProfile(uint8_t i) {
+    auto& state = adr_[i];
+    const auto& rx = received_[i];
+    if (rx.result == Reception::REFUSED) return "app_refused";
+    const auto observedSf = plan_.slots[i].sf;
+    if (rx.result == Reception::ACCEPTED) {
+        state.deliveredFrame = frameId_;
+        state.deliveredSf = observedSf;
+    }
+    const bool clientConfirmed = state.acknowledgedSf == observedSf;
+    if (state.observedSf != observedSf) {
+        state.observedSf = observedSf;
+        state.consecutiveFirst = state.consecutiveDegraded = 0;
+        state.hasSnr = false;
+    }
+    const bool first = rx.result == Reception::ACCEPTED && !rx.retried;
+    if (observedSf != state.desired) {
+        if (!first) state.consecutiveFirst = 0;
+        else {
+            if (state.consecutiveFirst < kAdrConfirmations) ++state.consecutiveFirst;
+            if (state.consecutiveFirst >= kAdrConfirmations && clientConfirmed) {
+                state.desired = observedSf;
+                state.locked = true;
+                return "locked_within_budget";
+            }
+        }
+        return "budget_limited";
+    }
+    const char* action = "observe";
+    if (first) {
+        if (rx.metrics && std::isfinite(rx.snr)) {
+            state.filteredSnr = state.hasSnr ? 0.75f * state.filteredSnr + 0.25f * rx.snr : rx.snr;
+            state.hasSnr = true;
+        }
+        state.consecutiveDegraded = 0;
+        if (state.consecutiveFirst < kAdrFirstBeforeProbe) ++state.consecutiveFirst;
+        if (state.consecutiveFirst >= kAdrConfirmations && !state.locked && clientConfirmed) {
+            state.probeReturn = 0;
+            state.reservedSf = state.desired;
+            state.locked = true;
+            action = "locked";
+        }
+        if (state.hold) --state.hold;
+        else if (state.locked && clientConfirmed && state.desired > kBaseSf &&
+                 state.consecutiveFirst >= kAdrFirstBeforeProbe &&
+                 state.hasSnr && state.filteredSnr >= (state.desired == 8 ? kProbeSf7SnrDb : kProbeSf8SnrDb)) {
+            state.probeReturn = state.desired--;
+            state.consecutiveFirst = 0;
+            state.locked = false;
+            action = "probe_lower";
+        }
+    } else {
+        state.consecutiveFirst = 0;
+        if (state.probeReturn || ++state.consecutiveDegraded >= kAdrDegradedReports) {
+            state.locked = false;
+            state.consecutiveDegraded = 0;
+            if (state.probeReturn) {
+                state.desired = state.probeReturn;
+                state.probeReturn = 0;
+                state.hold = kAdrRollbackHold;
+                action = "rollback";
+            } else if (state.desired < kControlSf) {
+                ++state.desired;
+                action = "step_up";
+            } else action = "ceiling";
+        }
+    }
+    return action;
 }
 
 Frame MulticlientLink::frame(MessageType type, uint16_t sequence) const {
@@ -84,12 +226,19 @@ bool MulticlientLink::send(const Frame& f, uint64_t now, const char* event) {
     }
     const int16_t code = radio_.transmit(bytes, length, static_cast<uint32_t>(now));
     if (code) ++telemetry_.radioErrors;
-    log_.event(event, code ? "tx_error" : "started", &f, nullptr, code, airtimeUs(length));
+    log_.event(event, code ? "tx_error" : "started", &f, nullptr, code,
+               kAdaptive ? airAtSf(length, radioSf_) : airtimeUs(length), radioSf_);
     return !code;
 }
 
 void MulticlientLink::update(uint64_t now, const RadioEvent& event, bool allowTx) {
     if (!validConfig_ || !allowTx) return;
+    if (kAdaptive && phyReadinessPending_ && (radio_.receiving() || event.type == RadioEventType::RX_DONE)) {
+        phyReadinessPending_ = false;
+        const auto elapsed = now - phyRequestedAt_;
+        if (elapsed > telemetry_.worstPhyReadyUs)
+            telemetry_.worstPhyReadyUs = elapsed > UINT32_MAX ? UINT32_MAX : static_cast<uint32_t>(elapsed);
+    }
     const bool isGateway = config_.role == DeviceRole::GATEWAY;
     if (pendingBitmap_.seen && !radio_.transmitting()) {
         if (event.type == RadioEventType::TX_DONE) {
@@ -126,10 +275,14 @@ void MulticlientLink::update(uint64_t now, const RadioEvent& event, bool allowTx
         log_.event("V3_RADIO", "event_error", nullptr, &event, event.code);
     }
     if (boot_) {
-        if (isGateway) gateway(now, event, incoming);
-        else client(now, incoming, event);
+        const bool control = phase_ != Phase::DATA ||
+            (isGateway ? now >= nextBeacon_ : searchingForBeacon(now));
+        if (!kAdaptive || !control || prepareSf(kControlSf, now)) {
+            if (isGateway) gateway(now, event, incoming);
+            else client(now, incoming, event);
+        }
     }
-    if (!radio_.transmitting() && !radio_.receiving() && now >= nextRecovery_) {
+    if ((!kAdaptive || radioSf_) && !radio_.transmitting() && !radio_.receiving() && now >= nextRecovery_) {
         const int16_t code = radio_.receive();
         nextRecovery_ = code ? now + kRadioRecoveryUs : now;
         if (code) {
@@ -150,7 +303,7 @@ void MulticlientLink::gateway(uint64_t now, const RadioEvent& event, const Frame
         displayQuietUntil_ = nextBeacon_;
         // If beacon TX fails, reserve a request window in case it went on air.
         displayQuietAt_ = now + payloadAir(rosterBytes(roster_.count)) +
-            grantStart(roster_.count) + kGuardUs / 2;
+            grantStart(roster_.count) + kSlotGuardUs / 2;
         plan_ = Plan{};
         plan_.count = roster_.count;
         for (uint8_t i = 0; i < roster_.count; ++i) received_[i] = Received{};
@@ -193,6 +346,12 @@ void MulticlientLink::gatewayRequest(uint64_t now, uint64_t receivedAt, const Fr
             get32(f.payload) == boot_ && f.payload[4] <= roster_.nodes[i].budget &&
             receiveWindow(receivedAt, beaconAt_ + requestStart(i), payloadAir(kRequestSize)) && !plan_.slots[i].boot) {
             plan_.slots[i] = {f.bootId, f.payload[4]};
+            if (kAdaptive) {
+                auto& state = adr_[i];
+                const auto receipt = get32(f.payload + 5);
+                state.acknowledgedSf = state.boot == f.bootId && receipt && receipt == state.deliveredFrame ?
+                    state.deliveredSf : 0;
+            }
         } else log_.event("V3_DROP", "request_identity_size_or_slot", &f);
     }
     const auto start = beaconAt_ + grantStart(roster_.count);
@@ -204,11 +363,16 @@ void MulticlientLink::gatewayRequest(uint64_t now, uint64_t receivedAt, const Fr
         log_.event("V3_GRANT_TX", "schedule_unavailable");
         return;
     }
+    if (kAdaptive) admitProfiles();
+    if (kAdaptive && !plan_.matches(roster_)) {
+        log_.event("V3_GRANT_TX", "adaptive_schedule_unavailable");
+        return;
+    }
     auto grant = frame(MessageType::SLOT_GRANT, 0);
     writePlan(grant, plan_);
     controlStart_ = now;
     // A reported grant TX failure can still leave peers with a usable grant.
-    displayQuietAt_ = now + payloadAir(grantBytes(plan_.count)) + kGuardUs / 2 +
+    displayQuietAt_ = now + payloadAir(grantBytes(plan_.count)) + kSlotGuardUs / 2 +
         plan_.feedbackStart(kAttempts - 1) + payloadAir(feedbackBytes(plan_.count)) + kLaunchUs;
     if (send(grant, now, "V3_GRANT_TX")) phase_ = Phase::GRANT_TX;
 }
@@ -221,7 +385,9 @@ void MulticlientLink::gatewayData(uint64_t now, const Frame* incoming, const Rad
         if (f.type != MessageType::DATA || i < 0 || f.frameId != frameId_ || get32(f.payload) != boot_ ||
             !(mask_ & slotBit(i)) || f.bootId != plan_.slots[i].boot ||
             f.payloadLength != kPayloadPrefix + plan_.slots[i].bytes ||
-            !receiveWindow(receivedAt, dataAt_ + plan_.dataStart(round_, i, mask_), payloadAir(f.payloadLength))) {
+            (kAdaptive && radioSf_ != plan_.slots[i].sf) ||
+            !receiveWindow(receivedAt, dataAt_ + plan_.dataStart(round_, i, mask_),
+                           dataAir(plan_.slots[i].bytes, plan_.slots[i].sf))) {
             log_.event("V3_DROP", "data_identity_size_or_slot", &f, &event);
         } else {
             const auto* bytes = f.payload + kPayloadPrefix;
@@ -247,10 +413,21 @@ void MulticlientLink::gatewayData(uint64_t now, const Frame* incoming, const Rad
                 if (same) ++telemetry_.duplicates;
                 result = same ? "duplicate" : "conflict";
             }
-            log_.event("V3_DATA_RX", result, &f, &event);
+            log_.event("V3_DATA_RX", result, &f, &event, 0, 0, radioSf_);
         }
     }
     const auto start = dataAt_ + plan_.feedbackStart(round_);
+    if (kAdaptive) {
+        uint8_t nextSf = radioSf_;
+        for (uint8_t i = 0; i < plan_.count; ++i) {
+            if (!(mask_ & slotBit(i))) continue;
+            const auto slot = dataAt_ + plan_.dataStart(round_, i, mask_);
+            if (now + kRetuneLeadUs < slot) break;
+            nextSf = plan_.slots[i].sf;
+        }
+        if (now + kRetuneLeadUs >= start) nextSf = kControlSf;
+        if (nextSf && !prepareSf(nextSf, now) && now < start + kLaunchUs) return;
+    }
     if (now < start) return;
     auto ack = frame(MessageType::ACK_BITMAP, round_);
     ack.payloadLength = feedbackBytes(plan_.count);
@@ -266,7 +443,7 @@ void MulticlientLink::gatewayData(uint64_t now, const Frame* incoming, const Rad
     }
     if (round_ + 1 < kAttempts) ack.payload[2] = retryMask(eligible, plan_.count, frameId_, round_);
     mask_ = 0;
-    if (launchWindow(now, start)) {
+    if (launchWindow(now, start) && (!kAdaptive || radioSf_ == kControlSf)) {
         if (send(ack, now, "V3_BITMAP_TX")) {
             pendingBitmap_ = {true, frameId_, round_, ack.payload[1], ack.payload[2]};
         } else frameTimingOk_ = false;
@@ -280,8 +457,8 @@ void MulticlientLink::gatewayData(uint64_t now, const Frame* incoming, const Rad
 void MulticlientLink::acceptBeacon(uint64_t now, const Frame& beacon) {
     const bool sameBoot = gatewayBoot_ == beacon.bootId;
     if (beacon.bootId == retiredBoot_ || (gatewayBoot_ &&
-        (sameBoot ? (beacon.frameId <= frameId_ || now + kGuardUs < beaconAt_ + roster_.periodUs)
-                  : now < beaconAt_ + roster_.periodUs + kGuardUs))) {
+        (sameBoot ? (beacon.frameId <= frameId_ || now + kSlotGuardUs < beaconAt_ + roster_.periodUs)
+                  : now < beaconAt_ + roster_.periodUs + kSlotGuardUs))) {
         log_.event("V3_DROP", "stale_beacon", &beacon);
         return;
     }
@@ -290,6 +467,8 @@ void MulticlientLink::acceptBeacon(uint64_t now, const Frame& beacon) {
         retiredBoot_ = gatewayBoot_;
         telemetry_.peer = {};
         telemetry_.bitmap = {};
+        telemetry_.confirmedDataSf = 0;
+        acknowledgedFrame_ = 0;
     }
     gatewayBoot_ = beacon.bootId;
     frameId_ = beacon.frameId;
@@ -299,7 +478,8 @@ void MulticlientLink::acceptBeacon(uint64_t now, const Frame& beacon) {
     const auto beaconAir = payloadAir(rosterBytes(roster_.count));
     displayQuietUntil_ = now + roster_.periodUs - beaconAir;
     // With no observed grant, a grant to other nodes may have been lost.
-    displayQuietAt_ = now + requiredPeriodUs(roster_) - beaconAir - kGuardUs / 2;
+    displayQuietAt_ = kAdaptive ? displayQuietUntil_ - kAdaptiveTailUs / 2 :
+        now + requiredPeriodUs(roster_) - beaconAir - kSlotGuardUs / 2;
     const int index = roster_.indexOf(config_.nodeId);
     if (!payload_.pending_) return;
     if (index < 0 || payload_.size_ > roster_.nodes[index].budget) {
@@ -314,13 +494,17 @@ void MulticlientLink::acceptBeacon(uint64_t now, const Frame& beacon) {
 
 void MulticlientLink::clientFinish(PayloadResult result) {
     telemetry_.result = result;
-    if (result == PayloadResult::ACCEPTED) ++telemetry_.accepted;
+    if (result == PayloadResult::ACCEPTED) {
+        ++telemetry_.accepted;
+        telemetry_.confirmedDataSf = plan_.slots[index_].sf;
+        acknowledgedFrame_ = frameId_;
+    }
     payload_.finish(result);
     sentData_ = false;
     phase_ = Phase::WAIT;
     const char* text = result == PayloadResult::ACCEPTED ? "accepted" :
         (result == PayloadResult::MISSING ? "retry_exhausted_missing" : "retry_exhausted_unknown");
-    log_.event("V3_PAYLOAD_RESULT", text, &data_);
+    log_.event("V3_PAYLOAD_RESULT", text, &data_, nullptr, 0, 0, plan_.slots[index_].sf);
 }
 
 void MulticlientLink::acceptFeedback(uint64_t now, const Frame& ack, const RadioEvent& event) {
@@ -334,7 +518,7 @@ void MulticlientLink::acceptFeedback(uint64_t now, const Frame& ack, const Radio
     observePeer(now, ack.sourceId, event);
     telemetry_.bitmap = {true, frameId_, round_, p[1], p[2]};
     if (sentData_ && (p[1] & slotBit(index_))) { clientFinish(PayloadResult::ACCEPTED); return; }
-    log_.event("V3_BITMAP_RX", "missing", &ack, &event);
+    log_.event("V3_BITMAP_RX", "missing", &ack, &event, 0, 0, kControlSf);
     mask_ = p[2];
     launched_ = false;
     if (++round_ == kAttempts) {
@@ -364,7 +548,7 @@ void MulticlientLink::client(uint64_t now, const Frame* incoming, const RadioEve
         } else {
             // Observe grants to peers as well, without granting ourselves a slot.
             displayQuietAt_ = receivedAt + grant.feedbackStart(kAttempts - 1) +
-                payloadAir(feedbackBytes(grant.count)) + kGuardUs / 2;
+                payloadAir(feedbackBytes(grant.count)) + kSlotGuardUs / 2;
         }
     }
     if (phase_ == Phase::REQUEST) {
@@ -376,6 +560,7 @@ void MulticlientLink::client(uint64_t now, const Frame* incoming, const RadioEve
         req.payloadLength = kRequestSize;
         put32(req.payload, gatewayBoot_);
         req.payload[4] = payload_.size_;
+        if (kAdaptive) put32(req.payload + 5, acknowledgedFrame_);
         if (send(req, now, "V3_REQUEST_TX")) phase_ = Phase::GRANT_TX;
         return;
     }
@@ -384,10 +569,16 @@ void MulticlientLink::client(uint64_t now, const Frame* incoming, const RadioEve
         const auto air = payloadAir(grantBytes(roster_.count));
         if (!control || control->type != MessageType::SLOT_GRANT || grant.slots[index_].boot != boot_ ||
             grant.slots[index_].bytes != payload_.size_) {
-            if (now >= start + air + kGuardUs / 2) phase_ = Phase::WAIT;
+            if (now >= start + air + kSlotGuardUs / 2) phase_ = Phase::WAIT;
             return;
         }
         plan_ = grant;
+        if (kAdaptive) {
+            char line[104];
+            std::snprintf(line, sizeof(line), "event=ADR_APPLY,frame_id=%" PRIu32 ",node_id=%u,sf=%u",
+                frameId_, unsigned(config_.nodeId), unsigned(plan_.slots[index_].sf));
+            log_.text(line);
+        }
         observePeer(receivedAt, control->sourceId, event);
         dataAt_ = receivedAt;
         round_ = 0;
@@ -403,7 +594,7 @@ void MulticlientLink::client(uint64_t now, const Frame* incoming, const RadioEve
     if (phase_ != Phase::DATA) return;
     const auto ackAir = payloadAir(feedbackBytes(plan_.count));
     const auto feedbackAt = control && control->type == MessageType::ACK_BITMAP ? receivedAt : now;
-    while (feedbackAt >= dataAt_ + plan_.feedbackStart(round_) + ackAir + kGuardUs / 2) {
+    while (feedbackAt >= dataAt_ + plan_.feedbackStart(round_) + ackAir + kSlotGuardUs / 2) {
         log_.event("V3_BITMAP_RX", "unknown", &data_);
         mask_ = 0;  // Without this round's grant, the retry slot cannot be inferred.
         launched_ = false;
@@ -419,7 +610,13 @@ void MulticlientLink::client(uint64_t now, const Frame* incoming, const RadioEve
         return;
     }
     const auto start = dataAt_ + plan_.dataStart(round_, index_, mask_);
-    if ((mask_ & slotBit(index_)) && !launched_ && now >= start) {
+    const bool assigned = (mask_ & slotBit(index_)) && !launched_;
+    if (kAdaptive) {
+        const auto sf = assigned && now + kRetuneLeadUs >= start && now < start + kLaunchUs ?
+            plan_.slots[index_].sf : kControlSf;
+        if (!prepareSf(sf, now) && !(assigned && now >= start + kLaunchUs)) return;
+    }
+    if (assigned && now >= start) {
         launched_ = true;
         if (!launchWindow(now, start)) { log_.event("V3_DATA_TX", "deadline_miss", &data_); return; }
         if (send(data_, now, "V3_DATA_TX")) {

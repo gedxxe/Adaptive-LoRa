@@ -353,3 +353,22 @@ separate v1 and v2 compatibility builds. Log uplink evidence for each
 granted client after the final bitmap completes. Use experiment-provided
 thresholds and hysteresis for offline SF recommendations. Keep active
 v3 on SF7 while control agreement, recovery and retune costs are open.
+
+## ADR-032 — Per-frame adaptive DATA grants with a common control PHY
+
+2026-11-22. Use an opt-in v4 wire version and SF9 control profile for
+the walking experiment. Each Grant carries the DATA SF along with the
+existing frame and Client boot identity. DATA and its retries use that SF.
+Clients echo their last acknowledged frame in the next Request. Gateway
+stability requires a receipt for a delivery at the same DATA SF, as well
+as the first-slot delivery streak. The Client resynchronizes at SF9 and
+uses volatile PHY state.
+Keep v3 available for fixed-SF comparison and leave NVS schema 1 intact.
+
+Reserve the full eight-Client roster's worst-case application lengths,
+with four shared retry slots per round. Fund a higher SF before granting
+it and keep its reservation during a lower-SF probe. Use an experimental
+15 s frame, 80 ms guard, 20 ms retune lead and 300 ms quiet-tail reserve.
+Measure the retune-to-RX path separately from packet delivery. Nominal
+SNR thresholds and delivery streaks are trial inputs. Evaluate the
+trade-off on one roaming Client while measuring stationary delivery.

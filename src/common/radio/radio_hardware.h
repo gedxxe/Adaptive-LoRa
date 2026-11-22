@@ -23,7 +23,7 @@ constexpr uint32_t timeout = 0x0200;
 }
 
 // Non-owning driver seam, not a general radio/PHY configuration API. The adapter
-// owns fixed-profile setup and IRQ signalling; RadioDriver owns state policy.
+// owns PHY commands and IRQ signalling; RadioDriver owns state policy.
 class RadioHardware {
 public:
     virtual ~RadioHardware() = default;
@@ -45,5 +45,6 @@ public:
     virtual float getRSSI() = 0;
     virtual float getSNR() = 0;
     virtual uint32_t getTimeOnAir(size_t length) = 0;
+    virtual int16_t setSpreadingFactor(uint8_t) { return radio_status::unknown; }
 };
 }  // namespace adaptive_lora

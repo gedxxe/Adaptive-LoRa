@@ -1,52 +1,34 @@
-# Architecture
+# Firmware architecture
 
-The bench pair is Heltec WiFi LoRa 32 V3.4. The owner confirms V3.2
-wiring, so the build uses the Arduino V3 variant and V3.2 electrical reference.
-The default research image uses protocol v3 and NVS schema 1. See
-[HARDWARE.md](HARDWARE.md) for evidence by revision.
+Both roles use the same ESP32-S3 image. At boot, `FirmwareRuntime` loads
+the role and IDs from NVS schema 1. A board with missing or invalid
+settings stays in serial setup with application transmission disabled.
+[Flash and configure a board](../../README.md#flash-and-configure)
 
-## 1. Design overview
+![Gateway and Client architecture](../research/figures/adaptive-architecture.svg)
 
-Every board runs the same image. `FirmwareRuntime` loads and validates role
-and IDs from NVS, then starts the corresponding `MulticlientLink` state
-machine. Invalid or missing configuration leaves application TX disabled.
-The v1 target still runs `GatewayApp` or `ClientApp`, and the v2 target uses
-`ScheduledLink`. Use the same protocol version on every board in a test.
+| Component | Responsibility |
+|---|---|
+| `main.cpp` and `Esp32Firmware` | Hand off Arduino setup and loop, and own the ESP32 storage and radio adapters. |
+| `FirmwareRuntime` | Load settings, initialize the radio, select the role, and service radio events, serial commands and diagnostics. |
+| `MulticlientLink` | Run the Gateway and Client state machines. Validate frame and boot IDs. Assign DATA SF and slots, schedule retries and verify ACK receipts. |
+| `PayloadPort` | Copy one pending outbound payload into a fixed buffer and deliver accepted inbound bytes through a synchronous callback. |
+| `RadioDriver` and `Sx1262Hardware` | Manage the radio state, deadlines and SF changes. The hardware adapter owns SPI and RadioLib. The DIO1 ISR latches the completion timestamp. |
+| `NvsConfigStore` and `PreferencesConfigStorage` | Read saved settings and verify writes before a controlled reboot activates them. |
 
-`MulticlientLink` uses `PayloadPort` for application delivery and reaches the
-SX1262 through the sole radio owner, `RadioDriver`. The [protocol flow in the
-README](../../README.md#how-it-works) shows how Gateway grants, DATA slots
-and feedback fit together. [Scheduled research links](SCHEDULED_LINK.md)
-specifies the wire format and timing rules.
+The loop polls the radio before advancing the state machine. Packet
+completion timestamps anchor the schedule. Transmit decisions use the
+current loop time, including after a profile change. The display updates
+in the quiet part of the frame or while a Client listens for a Beacon.
+It never changes radio settings. [Frame timing and recovery](SCHEDULED_LINK.md#adaptive-protocol-v4)
 
-## 2. Boot and runtime flow
+The codec and timing calculations use neither the ESP32 SDK nor
+application-specific data. Clock and logging services still have ESP32
+dependencies. SDK and RadioLib calls can wait synchronously. The remaining
+timing checks are listed in the [test plan](TEST_PLAN.md).
 
-1.  Initialize serial diagnostics.
-2.  Initialize the NVS configuration store.
-3.  Read the configuration schema version and device settings.
-4.  Validate role, network ID, node ID, gateway ID, and reserved values.
-5.  If configuration is invalid, enter provisioning mode. Do not start
-    normal radio transmission.
-6.  If valid, initialize the radio through the single `RadioDriver` owner.
-7.  Only after successful initialization, construct and begin the selected role application.
-8.  Poll the driver, advance the application at a fresh timestamp, service bounded
-    serial input and drain diagnostics. Dependency calls can wait synchronously;
-    cooperative state machines do not establish a hard loop-time bound.
-
-In the display build, Esp32Firmware owns the display before the runtime. The
-runtime starts display power/reset sequencing even for invalid configuration.
-It takes snapshots after primary loop work and skips display service during TX,
-client ACK wait and reboot. Application snapshots provide counters and the
-last qualifying reception; display never changes radio, application or NVS state.
-A failed display operation produces a display fault event. In the v3 build,
-the display can retry after a delay. The runtime uses `MulticlientLink`
-telemetry, checks for a quiet tail while scheduled, and polls RX between
-display steps while the Client searches for a beacon. See
-[display diagnostics](DISPLAY_DIAGNOSTICS.md) for the runtime guard and fault policy.
-
-A configuration schema mismatch must not be interpreted as a valid role.
-Provide a clear diagnostic and require re-provisioning or a deliberate
-migration.
+<details>
+<summary>Serial command reference and earlier architecture notes</summary>
 
 ## 3. Serial provisioning contract
 
@@ -255,3 +237,5 @@ Verified policy retains app-before-command dispatch, <=64 input bytes and <=128 
 Iteration012 bounds actual raw generation at8 calls, with0 indicating failure. SequenceCounter renewal preserves prior boot/exhausted values on0/same-ID; apps never reset to a failed identity. Client HELLO and Gateway ACK TX are inhibited while unavailable; SESSION_ERROR and1s attempt-start retry maintain observable fail-closed recovery, disabled while reboot pending. Successful recovery uses fresh boot/sequence0; no NVS or wire-format change. Valid-value filtering is not entropy/security or cross-reboot uniqueness.
 
 Runtime passes post-poll time to apps, arms reset100ms after stop returns and evaluates current time after logger drain, correcting ERR-020. This does not preempt blocking calls, timestamp RF completion or eliminate dependency latency. Direct driver/app inputs retain their explicit observation-time contract. See DEPENDENCY_BUDGET_AUDIT.md for exact source-based timing/allocation/ELF budgets, including upstream unbounded BUSY-ramp risk and physical exclusions.
+
+</details>

@@ -112,7 +112,7 @@ Use this template in `BUILD_MEMORY.md`. Keep each entry append-only.
 
 - Verification:
 
-## \### Gaps and assumptions
+### Gaps and assumptions
 
 ### Next action
 

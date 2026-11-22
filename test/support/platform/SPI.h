@@ -10,7 +10,7 @@ constexpr int SS = 8, SCK = 9, MOSI = 10, MISO = 11;
 
 namespace host_adapter {
 enum Call { SPI_BEGIN, BEGIN, CURRENT_LIMIT, HEADER, CRC, IRQ, STANDBY, RX, TX,
-            FINISH_TX, FINISH_RX, FLAGS, LENGTH, READ, RSSI, SNR, TOA, COUNT };
+            FINISH_TX, FINISH_RX, FLAGS, LENGTH, READ, RSSI, SNR, TOA, RETUNE, COUNT };
 // Records arguments and scripted return values, never chip or driver state.
 struct State {
     unsigned calls[COUNT]{};

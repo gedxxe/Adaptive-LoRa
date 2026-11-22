@@ -1,4 +1,6 @@
-# TDMA feasibility and M3 design notes
+# Early TDMA timing study
+
+For the running adaptive image, see [frame timing](SCHEDULED_LINK.md#adaptive-protocol-v4).
 
 The active v3 reservation, payload limits and 1/2/4/8-client implementation
 are documented in [SCHEDULED_LINK.md](SCHEDULED_LINK.md). The v3 model

@@ -5,9 +5,10 @@ from pathlib import Path
 import re
 
 READMES = ("README.md", "README.zh-CN.md")
-CURRENT_DOCS = ("AGENTS.md", *READMES,
-                "docs/en/PROGRESS.md", "docs/zh-CN/PROGRESS.md")
-LINK_DOCS = CURRENT_DOCS + ("PACKAGE_MANIFEST.md", "docs/research/ALGORITHM_TRACEABILITY.md") + tuple(
+CURRENT_DOCS = ("AGENTS.md", "docs/en/PROGRESS.md", "docs/zh-CN/PROGRESS.md")
+README_FIGURES = ("docs/research/figures/adaptive-architecture.svg",
+                  "docs/research/figures/adaptive-frame.svg")
+LINK_DOCS = CURRENT_DOCS + READMES + ("PACKAGE_MANIFEST.md", "docs/research/ALGORITHM_TRACEABILITY.md") + tuple(
     f"docs/{language}/{document}.md"
     for language in ("en", "zh-CN")
     for document in ("ARCHITECTURE", "BENCH_RUNBOOK", "LOGGING_GUIDE", "SCHEDULED_LINK",
@@ -49,6 +50,7 @@ def check(root):
     environments = {name[4:] for name in config.sections() if name.startswith("env:")}
     board = "heltec_wifi_lora_32_V3"
     base = config[f"env:{board}"]
+    adaptive = board + "_adaptive"
     if (environment != board + "_multiclient" or environment not in environments
             or config[f"env:{environment}"].get("extends") != f"env:{board}" or base.get("board") != board):
         errors.append("platformio.ini: default firmware environment/board mismatch")
@@ -58,6 +60,14 @@ def check(root):
             and ("ADAPTIVE_LORA_MULTICLIENT=1" not in config[f"env:{environment}"].get("build_flags", "")
                  or "ADAPTIVE_LORA_OLED=1" not in base.get("build_flags", ""))):
         errors.append("platformio.ini: default firmware must include v3 and the board display")
+    candidate = config[f"env:{adaptive}"] if adaptive in environments else {}
+    if (candidate.get("extends") != f"env:{environment}"
+            or "ADAPTIVE_LORA_LINK_ADAPTATION=1" not in candidate.get("build_flags", "")):
+        errors.append("platformio.ini: expected the adaptive walk-test environment")
+    protocol_source = (root / "src/common/protocol/multiclient_protocol.h").read_text(encoding="utf-8")
+    adaptive_version = re.search(r"kWireVersion\s*=\s*kAdaptive\s*\?\s*(\d+)\s*:", protocol_source)
+    if not adaptive_version:
+        errors.append("multiclient_protocol.h: adaptive wire version missing")
     for name, settings in APPROVED_SETTINGS.items():
         contents = (root / name).read_text(encoding="utf-8")
         for key, value in settings.items():
@@ -71,21 +81,25 @@ def check(root):
          f"config set hello-interval-ms {interval}", "config show", "config save"]
         for role, node in (("gateway", ids["gatewayId"]), ("client", ids["nodeId"]))
     ]
-    diagrams = []
+    equations = []
     for name in READMES:
         text = (root / name).read_text(encoding="utf-8")
         blocks = re.findall(r"^```text\n(config set role [^\n]+\n.*?)^```", text, re.M | re.S)
         if [block.splitlines() for block in blocks] != expected_commands:
             errors.append(f"{name}: gateway and client provisioning examples must match IDs and {interval} ms")
-        upload = f"pio run -e {environment} -t upload --upload-port $port"
+        upload = f"pio run -e {adaptive} -t upload --upload-port $port"
         monitor = f"pio device monitor --port $port --baud {base.get('monitor_speed')}"
         if not {"pio device list", upload, monitor} <= set(text.splitlines()):
-            errors.append(f"{name}: default upload and serial commands must match platformio.ini")
-        graphs = re.findall(r"^```mermaid\n(flowchart TD\n.*?)^```", text, re.M | re.S)
-        # Compare diagram structure while allowing translated labels.
-        diagrams.append([re.sub(r'"[^"\n]*"|\|[^|\n]*\|', "", graph) for graph in graphs])
-    if len(diagrams[0]) != 1 or diagrams[0] != diagrams[1]:
-        errors.append("README diagrams: expected one shared Mermaid flow in both languages")
+            errors.append(f"{name}: adaptive upload and serial commands must match platformio.ini")
+        if adaptive_version and (f"`protocol={adaptive_version.group(1)}`" not in text
+                                 or "`profile=adaptive`" not in text):
+            errors.append(f"{name}: adaptive serial status must match the firmware")
+        images = re.findall(r"!\[[^\]]+\]\(([^\s]+)\)", text)
+        if tuple(images) != README_FIGURES:
+            errors.append(f"{name}: expected the shared architecture and timing figures")
+        equations.append(re.findall(r"^```math\n(.*?)^```$", text, re.M | re.S))
+    if len(equations[0]) != 3 or equations[0] != equations[1] or not all(equations[0]):
+        errors.append("READMEs: use the same pseudocode and two airtime equations")
     header = (root / "include/project_config.h").read_text(encoding="utf-8")
     if not re.search(r'kFirmwareVersion\[\]\s*=\s*"' + re.escape(firmware) + '"', header):
         errors.append("project_config.h: firmware version differs from VERSION")
@@ -113,13 +127,14 @@ def check(root):
         for found in re.findall(r"pio run -e ([A-Za-z0-9_]+)", text):
             if found not in environments:
                 errors.append(f"{name}: unknown build environment {found}")
-        if name.endswith("PROGRESS.md") or name.startswith("README"):
-            row = re.search(r"\| (?:Firmware / protocol|固件 / 协议) \| `([^`]+)` / `([^`]+)`", text)
-            if not row or row.groups() != (firmware, protocol):
-                errors.append(f"{name}: current firmware/protocol row mismatch")
         if name.endswith("PROGRESS.md"):
-            if "| Physical acceptance | IN PROGRESS; NOT RUN |" not in text:
-                errors.append(f"{name}: physical acceptance must remain explicitly open")
+            row = re.search(r"\| (?:Firmware / protocol|固件 / 协议) \| `([^`]+)` / `([^`]+)`", text)
+            if adaptive_version and (not row or row.groups() != (firmware, adaptive_version.group(1))):
+                errors.append(f"{name}: current firmware/protocol row mismatch")
+            field_status = ("| 现场试验 | 走测和无线时序仍待实测 |" if "/zh-CN/" in name
+                            else "| Field test | Walk test and radio timing measurements pending |")
+            if field_status not in text:
+                errors.append(f"{name}: field test and timing measurements must remain pending")
     for name in LINK_DOCS:
         path = root / name
         if not path.exists():

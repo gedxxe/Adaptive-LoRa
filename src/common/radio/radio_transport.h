@@ -32,5 +32,6 @@ public:
     virtual bool receiving() const = 0;
     virtual bool healthy() const = 0;
     virtual uint32_t timeOnAir(size_t length) = 0;
+    virtual int16_t setSpreadingFactor(uint8_t) { return -1; }
 };
 }  // namespace adaptive_lora

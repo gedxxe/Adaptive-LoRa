@@ -1,0 +1,22 @@
+Verbosity level can be increased via `-v, -vv, or -vvv` option
+Collected 16 tests
+
+Processing test_adaptive_link in native_adaptive environment
+--------------------------------------------------------------------------------
+Building...
+
+In file included from src\common\radio\sx1262_hardware.cpp:1:0:
+src\common\radio\sx1262_hardware.h: In member function 'virtual int16_t adaptive_lora::Sx1262Hardware::setSpreadingFactor(uint8_t)':
+src\common\radio\sx1262_hardware.h:30:69: error: 'class SX1262' has no member named 'setSpreadingFactor'
+     int16_t setSpreadingFactor(uint8_t sf) override { return radio_.setSpreadingFactor(sf); }
+                                                                     ^~~~~~~~~~~~~~~~~~
+*** [.pio\build\native_adaptive\src\common\radio\sx1262_hardware.o] Error 1
+Building stage has failed, see errors above. Use `pio test -vvv` option to enable verbose output.
+-------- native_adaptive:test_adaptive_link [ERRORED] Took 2.58 seconds --------
+=================================== SUMMARY ===================================
+Environment      Test                Status    Duration
+---------------  ------------------  --------  ------------
+native_adaptive  test_adaptive_link  ERRORED   00:00:02.579
+================== 1 test cases: 0 succeeded in 00:00:02.579 ==================
+
+Exit code: 1

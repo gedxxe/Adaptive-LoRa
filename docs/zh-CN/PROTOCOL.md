@@ -1,4 +1,11 @@
-# Adaptive-LoRa 通信协议
+# 帧格式
+
+走测镜像使用[自适应协议](SCHEDULED_LINK.md#自适应协议-v4)。帧头为 28 字节，整帧最多
+96 字节，多字节整数使用小端序。解码器先核对空口版本与长度，再解释帧内容。
+原 HELLO/ACK 字段和早期设计说明保留在下方，供对照使用。
+
+<details>
+<summary>HELLO/ACK 格式和早期协议设计</summary>
 
 ## 1. 协议范围
 
@@ -107,3 +114,5 @@ ADR 由 Gateway 控制，初期只允许 BW125 下的 SF7、SF8、SF9。
 通过 CONFIG_PROPOSE、CONFIG_ACCEPT、CONFIG_COMMIT
 完成配置握手，并在约定的 frame boundary 生效。若 COMMIT 未被确认，Client
 保留旧配置。
+
+</details>

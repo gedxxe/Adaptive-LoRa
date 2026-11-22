@@ -1,31 +1,28 @@
 # 开发进度
 
 <!-- current-state:start -->
-## 当前状态 — Iteration 021
+## Iteration 022
 
-Iteration 021 已通过 [PR #8](https://github.com/gedxxe/Adaptive-LoRa/pull/8) 合入 `main`。
+自适应走测镜像的控制帧使用 SF9，每个 Client 的 DATA 分配 SF7–SF9。
+[烧录与配置](../../README.zh-CN.md#烧录与配置) · [走测](BENCH_RUNBOOK.md#自适应-v4-走测)
 
-| 项目 | 当前证据 |
+| 项目 | 结果 |
 |---|---|
-| 固件 / 协议 | `0.2.0-alpha.1` / `3` |
-| 硬件 | Heltec WiFi LoRa 32 V3.4，ESP32-S3/SX1262，V3.2 电气参考 |
-| ESP32 构建 | `heltec_wifi_lora_32_V3_multiclient` 和两套旧版对照镜像均通过。 |
-| 开发名单 | Gateway 1、Client 2–9，每个 Client 预留 64 字节。超帧周期为 6766 ms。 |
-| 时序 | Beacon 和授权以无线完成时间戳为锚点，发射启动仍使用当前处理时间。 |
-| ADR 研究 | Gateway 记录各 Client 首轮收到、重传收到或未收到；离线工具使用实验提供的阈值。 |
-| Host | 356/356 项 native 回归、15/15 项 v3 运行时测试、23/23 项最终 v3 链路专项测试 |
-| Physical acceptance | IN PROGRESS; NOT RUN |
+| 固件 / 协议 | `0.2.0-alpha.1` / `4` |
+| 硬件 | Heltec WiFi LoRa 32 V3.4，ESP32-S3/SX1262 |
+| 自适应镜像 | `heltec_wifi_lora_32_V3_adaptive`，ESP32 构建通过，主机测试 8/8 |
+| 固定 SF 对照 | `heltec_wifi_lora_32_V3_multiclient`，ESP32 构建通过，运行时测试 15/15 |
+| 共享回归 | 主机测试 356/356 |
+| 现场试验 | 走测和无线时序仍待实测 |
 
-操作入口见 [README](../../README.zh-CN.md)。M3 调度和 M4 反馈与重传已在
-八 Client 配置上实现并通过主机验证。M5 已有上行采样和离线分析，空口协商、切换与
-恢复仍待完成。实板先做双节点试验，再逐步扩展到八个 Client。
+主机测试覆盖一个移动节点与三个固定节点、八节点时隙上限、控制帧丢失后的恢复，
+以及确认稳定 SF 所需的 ACK 回执。命令、测试项和镜像哈希见
+[构建记录](../en/BUILD_MEMORY.md#iteration-022--adaptive-sf-walk-test-firmware-2026-11-22)。
 
-PHY、NVS schema、上报周期、M2 ACK 超时、v3 线格式和相对无线时隙保持原样。
-Client 开始监听前最多预留 400 ms 绘制 WAIT。状态含义见[显示诊断](DISPLAY_DIAGNOSTICS.md)，
-完整回归见 [构建记录](../en/BUILD_MEMORY.md)。
-操作者报告独立 SF9/CR 4/6 实验约增加五米，期间仍偶发 STALE。暂无原始采集日志可分析。
-v3 开发镜像使用 SF7。
 <!-- current-state:end -->
+
+<details>
+<summary>早期开发和测试记录</summary>
 
 ## Iteration 020 历史快照
 
@@ -305,5 +302,7 @@ Iteration 009 保留性：driver 仅改硬件转发/常量，状态/deadline/错
 Iteration 009 审查：PlatformIO 日志显示尾空格/末尾空行使暂存检查退出 2（ERR-015）。仅规范化本轮公开日志的 EOL/显示空白，私有原输出保留，源码/编译/测试结果不变；修正后暂存检查退出 0，ERR-015 已验证关闭。
 
 Iteration 010：实际 store 只做引用转发，错误/count/end/readback、数值 namespace/device key/schema/24-byte 格式不变；Runtime header 先构造唯一 PreferencesConfigStorage 后 store，runtime 实现和 39 个保护文件（含163旧tests）逐字节不变，48 个编译输入 hash 相符，main.cpp 15 行。无显式新分配，RAM 24,532 不变，flash 363,854（+124）。无新增 warning，ERR-005/008/009/010 保留；实际 NVS/Flash commit、断电、重启/损坏恢复、磨损/保持时间及 RF 未验证，M0–M2 整体 IN PROGRESS、M3–M8 NOT STARTED。
+
+</details>
 
 </details>

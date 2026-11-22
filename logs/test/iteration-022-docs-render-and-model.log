@@ -1,0 +1,7 @@
+README.md: all three LaTeX blocks rendered
+README.zh-CN.md: all three LaTeX blocks rendered
+195 slot lengths match the airtime model: payload 0–64 bytes, SF7–SF9.
+2 SF9 reservations: 14.156640 s
+3 SF9 reservations: 15.634272 s
+Chromium screenshot desktop: 840 × 1250 pixels
+Chromium screenshot phone: 510 × 1150 pixels

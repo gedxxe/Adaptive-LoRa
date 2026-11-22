@@ -25,8 +25,9 @@ The fixed-PHY M0–M2 HELLO/ACK firmware exists and has host/build evidence.
 electrical behavior, flash/NVS, supply and timing at the bench. Iteration 020
 adds the v3 research profile with up to eight clients, variable-length
 application payloads, aggregate feedback and shared retry slots. The v2
-single-client image remains available. ADR analysis is offline. Historical
-records retain their original hardware and results.
+single-client image remains available. The opt-in v4 adaptive bench
+candidate uses frame-scoped DATA SF7–SF9 grants and fixed SF9 control.
+Historical records retain their original hardware and results.
 
 ## Read before editing
 
@@ -57,10 +58,10 @@ DC-DC selection explicitly. Verify GPIO17/18/21/36, Vext
 polarity and SSD1306/0x3C before using it on the delivered boards. Preserve
 other pin reservations in HARDWARE.md.
 
-Retain 915.0 MHz provisional, BW125, data SF7, reserved control SF9, CR4/5,
+Retain 915.0 MHz provisional, BW125, default v3 SF7, v4 control SF9, CR4/5,
 preamble 8, explicit header, CRC, sync 0x12, 22 dBm requested TX power,
-140 mA SX1262 PA OCP and 1 MHz SPI. Future ADR
-research is limited to SF7–SF9/BW125; no automatic bandwidth/power changes.
+140 mA SX1262 PA OCP and 1 MHz SPI. The v4 bench ADR
+range is SF7–SF9/BW125; no automatic bandwidth/power changes.
 One radio time-shares control and data; it cannot receive multiple SFs at once.
 
 Before power, identify the board, RF variant and antenna connector and connect a suitable
@@ -88,7 +89,7 @@ and ARCHITECTURE; do not write per-packet telemetry to NVS.
 | FirmwareRuntime | Load configuration, initialize radio, select role and dispatch bounded loop work |
 | GatewayApp / ClientApp | Actual role state machines through RadioTransport |
 | ScheduledLink | Opt-in v2 role state machines and one-client schedule through RadioTransport |
-| MulticlientLink / PayloadPort | v3 roster admission, exact-length grants, shared retries and bounded application delivery |
+| MulticlientLink / PayloadPort | Exact-length grants, per-Client DATA SF, shared retries and bounded payload delivery |
 | RadioDriver | Sole radio state/deadline/error policy through RadioHardware |
 | Sx1262Hardware | Owns SX1262, SPI and GPIO, and latches radio IRQ timestamps |
 | NvsConfigStore | Load/save/verify policy through non-owning ConfigStorage |
@@ -131,7 +132,7 @@ third-party libraries or add abstractions speculatively.
 
 ## Scope and next work
 
-Use the [README](README.md#flash-and-configure) for v3 upload and provisioning.
+Use the [README](README.md#flash-and-configure) for the adaptive walk-test setup.
 Keep electrical checks and backups in the [bench procedure](docs/en/BENCH_RUNBOOK.md).
 Start RF testing with one Gateway and one Client, then expand through eight
 Clients. Measure radio turnaround, IRQ latency and drift before closing
@@ -151,8 +152,10 @@ Before reporting a coding iteration complete, run and check exit codes:
 pio run -e heltec_wifi_lora_32_V3
 pio run -e heltec_wifi_lora_32_V3_research
 pio run -e heltec_wifi_lora_32_V3_multiclient
+pio run -e heltec_wifi_lora_32_V3_adaptive
 pio test -e native
 pio test -e native_multiclient
+pio test -e native_adaptive
 python -m unittest discover -s tools -p test_capture_bench.py -v
 python -m unittest discover -s tools -p test_tdma_feasibility.py -v
 python -m unittest discover -s tools -p test_adr_shadow.py -v

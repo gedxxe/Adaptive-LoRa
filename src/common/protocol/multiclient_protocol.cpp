@@ -8,7 +8,7 @@ bool groupType(MessageType type) {
     return type == MessageType::BEACON || type == MessageType::SLOT_GRANT || type == MessageType::ACK_BITMAP;
 }
 bool validCount(uint8_t count) { return count && count <= kMaxClients; }
-uint32_t slotUs(uint8_t bytes) { return dataAir(bytes) + kGuardUs; }
+uint32_t slotUs(const Assignment& slot) { return dataAir(slot.bytes, slot.sf) + kSlotGuardUs; }
 }
 
 int Roster::indexOf(uint16_t id) const {
@@ -23,7 +23,9 @@ bool Roster::valid(uint16_t gateway) const {
         if (!unicast(node.id) || node.id == gateway || node.budget > kMaxData || indexOf(node.id) != i)
             return false;
     }
-    return !periodUs || (periodUs <= kMaxPeriodUs && periodUs % 1000 == 0 && periodUs >= requiredPeriodUs(*this));
+    const auto required = requiredPeriodUs(*this);
+    return required <= kCalendarLimitUs &&
+        (!periodUs || (periodUs <= kCalendarLimitUs && periodUs % 1000 == 0 && periodUs >= required));
 }
 
 uint8_t Plan::activeMask() const {
@@ -34,13 +36,14 @@ uint8_t Plan::activeMask() const {
 
 bool Plan::matches(const Roster& roster) const {
     if (count != roster.count) return false;
-    for (uint8_t i = 0; i < count; ++i) if (slots[i].bytes > roster.nodes[i].budget) return false;
-    return activeMask() && reservationUs(*this) <= roster.periodUs;
+    for (uint8_t i = 0; i < count; ++i)
+        if (slots[i].bytes > roster.nodes[i].budget || !validDataSf(slots[i].sf)) return false;
+    return activeMask() && reservationUs(*this) + (kAdaptive ? kAdaptiveTailUs : 0) <= roster.periodUs;
 }
 
 uint32_t Plan::dataSpan() const {
     uint32_t total = 0;
-    for (uint8_t i = 0; i < count; ++i) if (slots[i].boot) total += slotUs(slots[i].bytes);
+    for (uint8_t i = 0; i < count; ++i) if (slots[i].boot) total += slotUs(slots[i]);
     return total;
 }
 
@@ -51,33 +54,33 @@ uint32_t Plan::retrySpan() const {
     for (uint8_t rank = 0; rank < kRetrySlots && remaining; ++rank) {
         int largest = -1;
         for (uint8_t i = 0; i < count; ++i) {
-            if ((remaining & slotBit(i)) && (largest < 0 || slots[i].bytes > slots[largest].bytes)) largest = i;
+            if ((remaining & slotBit(i)) && (largest < 0 || slotUs(slots[i]) > slotUs(slots[largest]))) largest = i;
         }
-        total += slotUs(slots[largest].bytes);
+        total += slotUs(slots[largest]);
         remaining &= ~slotBit(static_cast<uint8_t>(largest));
     }
     return total;
 }
 
 uint32_t Plan::roundStart(uint8_t round) const {
-    if (!round) return kGuardUs;
-    const uint32_t control = payloadAir(feedbackBytes(count)) + 2 * kGuardUs;
-    return kGuardUs + dataSpan() + control + (round - 1) * (retrySpan() + control);
+    if (!round) return kSlotGuardUs;
+    const uint32_t control = payloadAir(feedbackBytes(count)) + 2 * kSlotGuardUs;
+    return kSlotGuardUs + dataSpan() + control + (round - 1) * (retrySpan() + control);
 }
 
 uint32_t Plan::feedbackStart(uint8_t round) const {
-    return roundStart(round) + (round ? retrySpan() : dataSpan()) + kGuardUs;
+    return roundStart(round) + (round ? retrySpan() : dataSpan()) + kSlotGuardUs;
 }
 
 uint32_t Plan::dataStart(uint8_t round, uint8_t index, uint8_t mask) const {
     uint32_t start = roundStart(round);
-    for (uint8_t i = 0; i < index; ++i) if (mask & slotBit(i)) start += slotUs(slots[i].bytes);
+    for (uint8_t i = 0; i < index; ++i) if (mask & slotBit(i)) start += slotUs(slots[i]);
     return start;
 }
 
 uint32_t reservationUs(const Plan& plan) {
     return payloadAir(rosterBytes(plan.count)) + grantStart(plan.count) + payloadAir(grantBytes(plan.count)) +
-           plan.feedbackStart(kAttempts - 1) + payloadAir(feedbackBytes(plan.count)) + kGuardUs;
+           plan.feedbackStart(kAttempts - 1) + payloadAir(feedbackBytes(plan.count)) + kSlotGuardUs;
 }
 
 uint32_t requiredPeriodUs(const Roster& roster) {
@@ -85,7 +88,7 @@ uint32_t requiredPeriodUs(const Roster& roster) {
     Plan max;
     max.count = roster.count;
     for (uint8_t i = 0; i < max.count; ++i) max.slots[i] = {1, roster.nodes[i].budget};
-    const uint32_t rounded = (reservationUs(max) + 999) / 1000 * 1000;
+    const uint32_t rounded = (reservationUs(max) + (kAdaptive ? kAdaptiveTailUs : 0) + 999) / 1000 * 1000;
     return rounded < kTargetPeriodUs ? kTargetPeriodUs : rounded;
 }
 
@@ -102,7 +105,7 @@ uint8_t retryMask(uint8_t eligible, uint8_t count, uint32_t frame, uint8_t round
 bool launchWindow(uint64_t now, uint64_t start) { return now >= start && now - start < kLaunchUs; }
 bool receiveWindow(uint64_t now, uint64_t start, uint32_t air) {
     const uint64_t end = start + air;
-    return now >= end - kGuardUs / 2 && now < end + kGuardUs / 2;
+    return now >= end - kSlotGuardUs / 2 && now < end + kSlotGuardUs / 2;
 }
 
 void writeRoster(Frame& f, const Roster& roster) {
@@ -130,8 +133,10 @@ void writePlan(Frame& f, const Plan& plan) {
     f.payloadLength = grantBytes(plan.count);
     f.payload[0] = plan.count;
     for (uint8_t i = 0; i < plan.count; ++i) {
-        f.payload[1 + i * 5] = plan.slots[i].boot ? plan.slots[i].bytes : kAbsent;
-        put32(f.payload + 2 + i * 5, plan.slots[i].boot);
+        auto* entry = f.payload + 1 + i * kGrantEntryBytes;
+        entry[0] = plan.slots[i].boot ? plan.slots[i].bytes : kAbsent;
+        put32(entry + 1, plan.slots[i].boot);
+        if (kAdaptive) entry[5] = plan.slots[i].boot ? plan.slots[i].sf : 0;
     }
 }
 
@@ -142,10 +147,15 @@ bool readPlan(const Frame& f, Plan& plan) {
     Plan result;
     result.count = count;
     for (uint8_t i = 0; i < count; ++i) {
-        const uint8_t length = f.payload[1 + i * 5];
-        const uint32_t boot = get32(f.payload + 2 + i * 5);
+        const auto* entry = f.payload + 1 + i * kGrantEntryBytes;
+        const uint8_t length = entry[0];
+        const uint32_t boot = get32(entry + 1);
+        const uint8_t sf = kAdaptive ? entry[5] : kBaseSf;
         if (boot ? length > kMaxData : length != kAbsent) return false;
-        if (boot) result.slots[i] = {boot, length};
+        if (boot) {
+            if (!validDataSf(sf)) return false;
+            result.slots[i] = {boot, length, sf};
+        } else if (kAdaptive && sf) return false;
     }
     if (!result.activeMask()) return false;
     plan = result;
@@ -173,7 +183,8 @@ CodecResult validate(const Frame& f) {
         }
         case MessageType::PAYLOAD_REQUEST:
         case MessageType::DATA:
-            if (f.type == MessageType::PAYLOAD_REQUEST && (f.payloadLength != kRequestSize || p[4] > kMaxData))
+            if (f.type == MessageType::PAYLOAD_REQUEST && (f.payloadLength != kRequestSize ||
+                p[4] > kMaxData || (kAdaptive && get32(p + 5) >= f.frameId)))
                 return CodecResult::PAYLOAD;
             return f.payloadLength >= kPayloadPrefix && get32(p) && f.sequence == uint16_t(f.frameId)
                 ? CodecResult::OK : CodecResult::PAYLOAD;
@@ -199,7 +210,7 @@ CodecResult encode(const Frame& f, uint8_t* b, size_t capacity, size_t& length) 
     if (!b || capacity < kHeaderSize + f.payloadLength) return CodecResult::BUFFER;
     std::memset(b, 0, kHeaderSize);
     put16(b, 0x4D4C);
-    b[2] = kVersion;
+    b[2] = kWireVersion;
     b[3] = uint8_t(f.type);
     b[5] = kHeaderSize;
     put16(b + 6, f.networkId);
@@ -219,7 +230,7 @@ CodecResult decode(const uint8_t* b, size_t length, uint16_t network, uint16_t l
     if (!b) return CodecResult::BUFFER;
     if (length < kHeaderSize || length > kMaxFrameSize || length != kHeaderSize + b[26]) return CodecResult::LENGTH;
     if (get16(b) != 0x4D4C) return CodecResult::MAGIC;
-    if (b[2] != kVersion) return CodecResult::VERSION;
+    if (b[2] != kWireVersion) return CodecResult::VERSION;
     if (b[5] != kHeaderSize) return CodecResult::HEADER;
     if (b[4] || b[27]) return CodecResult::RESERVED;
     if (get16(b + 6) != network) return CodecResult::NETWORK;

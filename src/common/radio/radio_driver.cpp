@@ -47,6 +47,16 @@ int16_t RadioDriver::stop() {
     state_ = code == radio_status::none ? State::IDLE : State::FAULT;
     return code;
 }
+int16_t RadioDriver::setSpreadingFactor(uint8_t sf) {
+    if (!initialized_ || transmitting() || sf < 7 || sf > 9) return radio_status::unknown;
+    int16_t code = stop();
+    if (!code) {
+        hardware_.clearIrqSignal();
+        code = hardware_.setSpreadingFactor(sf);
+    }
+    if (code) state_ = State::FAULT;
+    return code;
+}
 RadioEvent RadioDriver::poll(uint64_t nowUs) {
     RadioEvent event;
     if (state_ != State::TX && state_ != State::RX) return event;

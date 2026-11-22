@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="347" viewBox="0 0 1040 347" role="img" aria-labelledby="title desc">
+  <title id="title">Adaptive-LoRa frame with three DATA slots and a selective retry</title>
+  <desc id="desc">On the SF9 control profile the Gateway sends a Beacon and Grant, and Clients make requests. Clients then send DATA one at a time at their assigned spreading factors. The Gateway returns an ACK bitmap and Client 3 retries at the same spreading factor. A later Request can confirm receipt of the ACK. The sequence is not to scale.</desc>
+  <defs>
+    <pattern id="retryPattern" width="7" height="7" patternUnits="userSpaceOnUse">
+      <rect width="7" height="7" fill="#dce9f4"/>
+      <path d="M0 7 7 0" fill="none" stroke="#89a9c4" stroke-width="1"/>
+    </pattern>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0 0 10 5 0 10Z" fill="#16283c"/>
+    </marker>
+    <style>
+      text { font-family: "Helvetica Neue", Arial, sans-serif; fill: #12243a }
+      .label { font-size: 17px; font-weight: 700 }
+      .slot { font-size: 15px; font-weight: 700; text-anchor: middle }
+      .small { font-size: 14px; fill: #3e4e65 }
+      .control { fill: #f1f3f6; stroke: #536177; stroke-width: 1.4 }
+      .data { fill: #dce9f4; stroke: #185785; stroke-width: 1.5 }
+      .retry { fill: url(#retryPattern); stroke: #185785; stroke-width: 1.5 }
+      .guide { fill: none; stroke: #b2bdc8; stroke-width: 1.2 }
+    </style>
+  </defs>
+  <rect width="1040" height="347" rx="13" fill="#fff"/>
+  <text x="36" y="44" class="label">One superframe on a single radio</text>
+  <text x="1004" y="44" class="small" text-anchor="end">Sequence shown without time scale</text>
+  <path d="M163 81H995" fill="none" stroke="#16283c" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="985" y="69" class="small" text-anchor="end">Time</text>
+
+  <text x="36" y="122" class="label">Gateway TX</text>
+  <text x="36" y="185" class="label">Client TX</text>
+  <path d="M162 140H1000M162 207H1000" class="guide"/>
+
+  <rect x="166" y="100" width="78" height="40" rx="4" class="control"/>
+  <text x="205" y="125" class="slot">Beacon</text>
+  <rect x="252" y="164" width="105" height="43" rx="4" class="control"/>
+  <text x="304.5" y="181" class="slot">Requests</text>
+  <text x="304.5" y="198" class="small" text-anchor="middle">C2 → C3 → C4</text>
+  <rect x="364" y="100" width="76" height="40" rx="4" class="control"/>
+  <text x="402" y="125" class="slot">Grant</text>
+  <rect x="449" y="164" width="76" height="43" rx="4" class="data"/>
+  <text x="487" y="181" class="slot">C2 DATA</text>
+  <text x="487" y="198" class="small" text-anchor="middle">SF7</text>
+  <rect x="532" y="164" width="82" height="43" rx="4" class="data"/>
+  <text x="573" y="181" class="slot">C3 DATA</text>
+  <text x="573" y="198" class="small" text-anchor="middle">SF8</text>
+  <rect x="621" y="164" width="87" height="43" rx="4" class="data"/>
+  <text x="664.5" y="181" class="slot">C4 DATA</text>
+  <text x="664.5" y="198" class="small" text-anchor="middle">SF9</text>
+  <rect x="716" y="100" width="80" height="40" rx="4" class="control"/>
+  <text x="756" y="125" class="slot">Bitmap</text>
+  <rect x="804" y="164" width="82" height="43" rx="4" class="retry"/>
+  <text x="845" y="181" class="slot">C3 retry</text>
+  <text x="845" y="198" class="small" text-anchor="middle">SF8</text>
+  <rect x="893" y="100" width="103" height="40" rx="4" class="control"/>
+  <text x="944.5" y="125" class="slot">Next bitmap</text>
+
+  <path d="M451 223v8h255v-8M717 223v8h278v-8" class="guide"/>
+  <text x="579" y="253" class="small" text-anchor="middle">First DATA attempts</text>
+  <text x="856" y="253" class="small" text-anchor="middle">One of up to three retry rounds</text>
+  <rect x="26" y="278" width="988" height="47" rx="5" fill="#f5f8fb"/>
+  <rect x="52" y="294" width="24" height="15" rx="2" class="control"/>
+  <text x="87" y="306" class="small">SF9 control</text>
+  <rect x="285" y="294" width="24" height="15" rx="2" class="data"/>
+  <text x="320" y="306" class="small">Assigned DATA SF</text>
+  <rect x="559" y="294" width="24" height="15" rx="2" class="retry"/>
+  <text x="594" y="306" class="small">Retry at the same SF</text>
+</svg>

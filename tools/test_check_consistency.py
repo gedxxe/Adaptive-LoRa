@@ -47,7 +47,7 @@ class ConsistencyTests(unittest.TestCase):
 
     def test_bad_build_environment_is_reported(self):
         self.mutate("README.md", "pio run -e heltec_wifi_lora_32_V3", "pio run -e absent_board")
-        self.assertTrue(any("unknown build environment" in e for e in check(self.root)))
+        self.assertTrue(any("adaptive upload" in e for e in check(self.root)))
 
     def test_default_build_requires_display(self):
         self.mutate("platformio.ini", "-D ADAPTIVE_LORA_OLED=1", "")
@@ -58,9 +58,9 @@ class ConsistencyTests(unittest.TestCase):
         self.assertTrue(any("broken relative link" in e for e in check(self.root)))
 
     def test_physical_pass_claim_is_rejected(self):
-        self.mutate("docs/en/PROGRESS.md", "| Physical acceptance | IN PROGRESS; NOT RUN |",
-                    "| Physical acceptance | PASS |")
-        self.assertTrue(any("physical acceptance" in e for e in check(self.root)))
+        self.mutate("docs/en/PROGRESS.md", "| Field test | Walk test and radio timing measurements pending |",
+                    "| Field test | PASS |")
+        self.assertTrue(any("field test and timing" in e for e in check(self.root)))
 
     def test_archived_body_is_preserved_but_notice_is_required(self):
         path = self.root / "CODEX_START_PROMPT.md"
@@ -92,9 +92,17 @@ class ConsistencyTests(unittest.TestCase):
         self.mutate("README.md", "config set node-id 2", "config set node-id 1")
         self.assertTrue(any("provisioning examples" in error for error in check(self.root)))
 
-    def test_diagram_translations_must_preserve_edges(self):
-        self.mutate("README.zh-CN.md", "requests --> active", "requests --> beacon")
-        self.assertTrue(any("shared Mermaid flow" in error for error in check(self.root)))
+    def test_readmes_share_the_same_figures(self):
+        self.mutate("README.zh-CN.md", "adaptive-frame.svg", "adaptive-architecture.svg")
+        self.assertTrue(any("shared architecture and timing figures" in e for e in check(self.root)))
+
+    def test_readmes_share_pseudocode_and_equations(self):
+        self.mutate("README.zh-CN.md", r"\leq\ 15", r"\leq\ 10")
+        self.assertTrue(any("same pseudocode and two airtime equations" in e for e in check(self.root)))
+
+    def test_walk_test_serial_status_must_match_wire_version(self):
+        self.mutate("README.zh-CN.md", "protocol=4", "protocol=3")
+        self.assertTrue(any("adaptive serial status" in e for e in check(self.root)))
 
 
 if __name__ == "__main__":

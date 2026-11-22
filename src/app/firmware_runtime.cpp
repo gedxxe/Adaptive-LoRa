@@ -12,8 +12,8 @@
 namespace adaptive_lora {
 namespace {
 #if defined(ADAPTIVE_LORA_MULTICLIENT)
-constexpr auto wireVersion = multiclient::kVersion;
-constexpr const char* profile = "multiclient";
+constexpr auto wireVersion = multiclient::kWireVersion;
+constexpr const char* profile = multiclient::kAdaptive ? "adaptive" : "multiclient";
 #if defined(ADAPTIVE_LORA_OLED)
 constexpr uint32_t kClientDisplayStartupUs = 400000;
 constexpr uint32_t kDisplayTailReserveUs = 250000;
@@ -83,6 +83,13 @@ void FirmwareRuntime::status() {
                 snapshot.frame, loaded_.role == DeviceRole::CLIENT ?
                     (multicli_->searchingForBeacon(now) ? "search" : "synced") : "n/a");
             log_.text(line);
+            if (multiclient::kAdaptive) {
+                std::snprintf(line, sizeof(line), "event=ADR_TIMING,guard_us=%" PRIu32
+                    ",retune_lead_us=%" PRIu32 ",retunes=%" PRIu32 ",worst_phy_ready_us=%" PRIu32
+                    ",acked_data_sf=%u", multiclient::kSlotGuardUs, multiclient::kRetuneLeadUs,
+                    snapshot.retunes, snapshot.worstPhyReadyUs, unsigned(snapshot.confirmedDataSf));
+                log_.text(line);
+            }
         }
         std::snprintf(line, sizeof(line),
             "event=OLED_STATUS,result=%s,worst_i2c_us=%" PRIu32 ",worst_refresh_io_us=%" PRIu32

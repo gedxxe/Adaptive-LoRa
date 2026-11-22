@@ -1,12 +1,21 @@
-# Milestone Task Plan for Codex
+# Research roadmap
 
-Do not implement all milestones in one large change. Complete one
-milestone, record evidence, and stop for review.
+1. **Check the two-board link.** Confirm saved roles, DATA and ACKs,
+   and recovery after Gateway power loss.
+2. **Measure adaptive operation.** Move one Client while three stay in
+   place. Compare first-attempt delivery, final delivery and gaps per
+   Client. Record changes in SF, control loss and retune time.
+3. **Compare under matched conditions.** Keep control SF, frame period,
+   retry policy, payload and antenna setup equal when isolating the
+   effect of DATA SF adaptation. Measure antenna changes in a separate run.
+4. **Stress the eight-Client schedule.** Verify the deployment's payload
+   and delay requirements with measured timing. Treat larger network
+   sizes as a separate capacity study.
 
-Adaptive-LoRa studies reliability-aware TDMA and link adaptation for
-single-radio LoRa industrial sensing. The default v3 image implements
-M3 scheduling and M4 feedback/retries on fixed PHY. See the
-[progress record](PROGRESS.md) for verification and open bench work.
+[Walk test](BENCH_RUNBOOK.md#adaptive-v4-walk-test) · [Test plan](TEST_PLAN.md)
+
+<details>
+<summary>Earlier milestone plans</summary>
 
 ## Integration boundary work — separately reviewed, not implemented here
 
@@ -68,6 +77,11 @@ separate review and physical evidence for the guard.
 
 ## M5 — Conservative ADR
 
+The v4 [walk-test image](SCHEDULED_LINK.md#adaptive-protocol-v4) runs
+frame-scoped SF grants, uses explicit delivery receipts, and returns to a
+fixed control profile between DATA slots. Validate the candidate before
+adopting longer-lived PHY configurations or changing the default image.
+
 - Use the gateway's per-client evidence and offline analysis for initial
   metric windows, threshold selection and hysteresis.
 - Measure retune, turnaround and oscillator drift with the development roster.
@@ -127,3 +141,5 @@ Before M4: define admission/session eviction and reboot semantics, schedule
 mapping and complete bitmap validation; preserve identity/payload on retry.
 A 70-entry mapping does not fit one current 96-byte beacon, and analytical
 arithmetic does not replace the separate M8 scaling study.
+
+</details>

@@ -102,11 +102,12 @@ OledText formatOledStatus(const DisplaySnapshot& s, uint64_t nowUs, uint8_t v3Pa
     }
     const bool gateway = s.config.role == DeviceRole::GATEWAY;
 #if defined(ADAPTIVE_LORA_MULTICLIENT)
-    if (s.protocol == multiclient::kVersion) {
+    if (s.protocol == multiclient::kWireVersion) {
         const auto& v3 = s.multiclient;
         const auto& peer = v3.peer;
         const unsigned page = v3Page % 3;
-        std::snprintf(r[0], sizeof(r[0]), "V3 %s %u/3", page == 0 ? "LINK" : page == 1 ? "DATA" : "ACK", page + 1);
+        std::snprintf(r[0], sizeof(r[0]), "V%u %s %u/3", unsigned(s.protocol),
+                      page == 0 ? "LINK" : page == 1 ? "DATA" : "ACK", page + 1);
         std::snprintf(r[1], sizeof(r[1]), "%s %u%s", gateway ? "GATEWAY" : "CLIENT", unsigned(s.config.nodeId),
                       s.searchingForBeacon ? " SEARCH" : "");
         if (page == 0) {
@@ -138,6 +139,11 @@ OledText formatOledStatus(const DisplaySnapshot& s, uint64_t nowUs, uint8_t v3Pa
                     case PayloadResult::NOT_ADMITTED: result = "NOT ADMITTED"; break;
                 }
                 std::snprintf(r[5], sizeof(r[5]), "APP %s", result);
+                if (multiclient::kAdaptive) {
+                    if (v3.confirmedDataSf)
+                        std::snprintf(r[6], sizeof(r[6]), "ACKED DATA SF%u", unsigned(v3.confirmedDataSf));
+                    else std::snprintf(r[6], sizeof(r[6]), "ACKED DATA SF N/A");
+                }
             }
             std::snprintf(r[7], sizeof(r[7]), "RADIO ERR %" PRIu32, v3.radioErrors);
         } else {
@@ -230,7 +236,7 @@ bool OledStatusDisplay::needsSnapshot(uint64_t nowUs) const {
 
 void OledStatusDisplay::render(const DisplaySnapshot& snapshot, uint64_t nowUs) {
 #if defined(ADAPTIVE_LORA_MULTICLIENT)
-    v3Screen_ = !snapshot.configError && snapshot.protocol == multiclient::kVersion;
+    v3Screen_ = !snapshot.configError && snapshot.protocol == multiclient::kWireVersion;
     rotateAfterDraw_ = v3Screen_;
     nextPage_ = rotateAfterDraw_ && rotating_
         ? (nowUs >= nextPageAt_ ? (visiblePage_ + 1) % 3 : visiblePage_) : 0;

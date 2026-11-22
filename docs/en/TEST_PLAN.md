@@ -1,9 +1,22 @@
-# Test Plan
+# Test plan
 
-For the current v3 firmware, follow the [bench sequence](BENCH_RUNBOOK.md)
-from one pair through eight Clients. Use the same image and fixed PHY across
-the test. [Progress](PROGRESS.md) distinguishes host tests from physical
-acceptance. The earlier M0–M2 sections below are for explicit v1 comparisons.
+Use the [walk test](BENCH_RUNBOOK.md#adaptive-v4-walk-test) for setup and
+capture. Record the firmware hash, board aliases, radio settings, payload
+size, and when the moving Client leaves and stops. Keep the first run
+simple. Use more runs and fixed conditions when comparing configurations.
+
+| Check | What to record |
+|---|---|
+| Two boards at short range | Saved roles after reboot, accepted DATA at both ends, return after Gateway power loss. |
+| One moving Client and three stationary Clients | First-attempt and final delivery rates per Client, selected SF, matching ACK receipts and recovery time. |
+| Radio timing | Gaps between DIO1, SPI and RX rearm, with the configured guard and any missed slot. Capture these on hardware. |
+| Comparison run | Repeat a route with the same antenna, payload and offered load. Record the control SF, frame period and retry policy. |
+
+The [progress page](PROGRESS.md) gives separate results for builds,
+native tests and physical measurements.
+
+<details>
+<summary>Earlier test procedures and results</summary>
 
 ## 1. Test levels
 
@@ -454,3 +467,5 @@ submitting 64 bytes and checks all application deliveries and evidence
 rows. Run a physical 1 → 2 → 4 → 8 progression with node IDs 2–9. Capture
 Gateway and Client traces, clock offset, radio completion-to-service
 latency, TX launch, RX re-arm and timing misses at each step.
+
+</details>

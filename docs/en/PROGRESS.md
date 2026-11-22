@@ -1,36 +1,30 @@
 # Development progress
 
 <!-- current-state:start -->
-## Current state — Iteration 021
+## Iteration 022
 
-Iteration 021 is on `main` through [PR #8](https://github.com/gedxxe/Adaptive-LoRa/pull/8).
-The [README](../../README.md) is the operator entry point.
+The adaptive walk-test image uses SF9 for control and grants SF7–SF9 to
+each Client's DATA.
+[Setup](../../README.md#flash-and-configure) · [Walk test](BENCH_RUNBOOK.md#adaptive-v4-walk-test)
 
-| Item | Current evidence |
+| Item | Result |
 |---|---|
-| Firmware / protocol | `0.2.0-alpha.1` / `3` |
-| Board | Heltec WiFi LoRa 32 V3.4, ESP32-S3/SX1262, V3.2 electrical reference |
-| ESP32 build | `heltec_wifi_lora_32_V3_multiclient` passed. Both legacy comparison images also passed. |
-| Development roster | Gateway 1, Clients 2–9, each with a 64-byte budget. The advertised period is 6,766 ms. |
-| Timing | Beacon and grant anchors use radio completion timestamps. Slot launches still use current time. |
-| ADR research | The gateway records per-client first delivery, retry or miss. The offline evaluator uses experiment-supplied thresholds. |
-| Host | 356/356 native regressions, 15/15 v3 runtime cases, and 23/23 in the final focused v3 link run |
-| Physical acceptance | IN PROGRESS; NOT RUN |
+| Firmware / protocol | `0.2.0-alpha.1` / `4` |
+| Board | Heltec WiFi LoRa 32 V3.4, ESP32-S3/SX1262 |
+| Adaptive build | `heltec_wifi_lora_32_V3_adaptive`, ESP32 build passed; 8/8 native tests |
+| Fixed-SF comparison | `heltec_wifi_lora_32_V3_multiclient`, ESP32 build passed; 15/15 runtime tests |
+| Shared regressions | 356/356 native tests |
+| Field test | Walk test and radio timing measurements pending |
 
-M3 scheduling and M4 feedback/retries are implemented for the eight-Client
-configuration and verified on the host. M5 has uplink capture and offline
-analysis. On-air negotiation, retuning and recovery remain open. Start the
-physical tests with one pair and expand through eight Clients.
+The host tests cover a roaming Client and three stationary peers, slot
+limits for eight Clients, recovery after control loss, and the ACK receipt
+needed to confirm a stable SF. The [build record](BUILD_MEMORY.md#iteration-022--adaptive-sf-walk-test-firmware-2026-11-22)
+lists commands, test cases and the image hash.
 
-The PHY, NVS schema, report interval, M2 ACK timeout, v3 wire layout and
-relative radio slots are unchanged. See the [display guide](DISPLAY_DIAGNOSTICS.md)
-for freshness and timing counters.
-Client boot reserves up to 400 ms for a WAIT screen before beacon RX.
-The operator reported about five metres of additional reach in a separate
-SF9/CR 4/6 experiment, with intermittent stale status. No raw capture was
-supplied for timing or range analysis. The v3 development target uses SF7.
-See [build memory](BUILD_MEMORY.md) for the full regression record.
 <!-- current-state:end -->
+
+<details>
+<summary>Earlier test and development records</summary>
 
 ## Historical snapshot — Iteration 020
 
@@ -363,5 +357,7 @@ Iteration 009 preservation: RadioDriver state/deadline/error policy remains equi
 Iteration 009 review note: staged log display whitespace triggered ERR-015 (check exit 2); log-format normalization is verified closed by staged check exit 0; source/build/test evidence unaffected.
 
 Iteration 010 preservation: NvsConfigStore error/count/cleanup/readback logic and numeric namespace are equivalent after reference forwarding; key `device`, schema 1 and 24-byte format unchanged. Runtime header constructs one PreferencesConfigStorage before its store; runtime implementation and 39 protected original files (including all 163 old test cases) are byte-identical. All 48 frozen inputs match. Main remains a 15-line entry point; no explicit allocation introduced. RAM 24,532 bytes unchanged, flash 363,854 (+124). No new warning messages; ERR-005/008/009/010 remain. Actual NVS/flash durability, power interruption, reboot/corruption recovery, wear/retention and physical radio/RF remain unverified; M0–M2 overall IN PROGRESS, M3–M8 NOT STARTED.
+
+</details>
 
 </details>

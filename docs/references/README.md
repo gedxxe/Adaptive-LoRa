@@ -1,12 +1,9 @@
 # Adaptive-LoRa research references
 
-The four references inform the project’s single-radio schedule and link
-adaptation research. The default v3 profile provides exact-length grants,
-aggregate feedback and shared retries for one Gateway and up to eight Clients.
-The M2 and v2 images provide HELLO/ACK and one-client TDMA comparators.
-The [traceability matrix](../research/ALGORITHM_TRACEABILITY.md) maps each
-mechanism to its adaptation and software evidence. ADR recommendations are
-evaluated offline from captured samples.
+These four papers inform payload-based slots, shared feedback, frame
+sizing and SF selection. The [research map](../research/ALGORITHM_TRACEABILITY.md)
+shows how those ideas are used by the single-radio design and what still
+needs a field comparison.
 
 The [figure source register](FIGURE_SOURCE_REGISTER.md) gives the exact
 captions, page indices, printed pages, licenses and asset provenance. The

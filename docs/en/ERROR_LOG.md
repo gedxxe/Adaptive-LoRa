@@ -697,3 +697,34 @@ Level-only fallback and physical capture error remain measurable risks.
   `test_check_consistency.py` cases failed because the temporary tree
   lacked the two test sources linked from the research map. The fixture
   now includes those paths. The rerun passed 12/12.
+
+## ERR-044 — Native adaptive build compatibility
+
+The first `pio test -e native_adaptive` exited 1 because MinGW 6.3
+rejected `if constexpr`. A normal conditional with a compile-time
+constant works with the installed toolchain. The second compile exited 1
+because the native SX1262 recorder lacked `setSpreadingFactor`. The
+recorder now forwards the test result and records the call. The third run
+passed its initial five cases. See
+`logs/test/iteration-022-first-native_adaptive.log`,
+`logs/test/iteration-022-second-native_adaptive.log`, and
+`logs/test/iteration-022-third-native_adaptive.log`.
+
+The RadioLib retune call includes synchronous SPI. ERR-021 remains open.
+The host traces exercise guarded retuning and recovery from a returned
+error. No physical bound on BUSY waits or RX readiness was established.
+
+## ERR-045 — Documentation preview
+
+The first README preview and consistency check found unmatched math
+fences. Closing each block with backticks fixed all three renderings in
+each language. The first headless Chromium capture returned 4294930433
+in the sandbox. The local preview succeeded with the approved browser
+invocation. Visual review found missing arrowheads on grouped SVG paths.
+Each connection now has its own path.
+
+Two missing relative links are limited to frozen iteration 006 and 007
+README snapshots. The current run-record template resolves, and the
+original snapshots remain available. See
+`logs/test/iteration-022-docs-inventory.log` and
+`logs/test/iteration-022-docs-render-and-model.log`.

@@ -1,5 +1,11 @@
 # Figure source register
 
+The [architecture](../research/figures/adaptive-architecture.svg) and
+[frame sequence](../research/figures/adaptive-frame.svg) are original
+project drawings based on the adaptive implementation. The example SFs
+and packet positions illustrate how the code works. They are not
+measurements. The antenna symbol is also original.
+
 The [v3 implementation diagram](../research/figures/v3-superframe.svg) was
 drawn for Iteration 020 from the production calendar and bitmap layout. The
 paper figures and the earlier explanatory drawings below remain available

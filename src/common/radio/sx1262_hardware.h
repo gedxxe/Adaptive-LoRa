@@ -27,6 +27,7 @@ public:
     float getRSSI() override { return radio_.getRSSI(); }
     float getSNR() override { return radio_.getSNR(); }
     uint32_t getTimeOnAir(size_t length) override { return radio_.getTimeOnAir(length); }
+    int16_t setSpreadingFactor(uint8_t sf) override { return radio_.setSpreadingFactor(sf); }
 private:
     static void IRAM_ATTR onDio1();
     static bool irq_;
