@@ -46,7 +46,7 @@ class ConsistencyTests(unittest.TestCase):
         self.assertTrue(any("AGENTS.md: current protocol" in e for e in check(self.root)))
 
     def test_bad_build_environment_is_reported(self):
-        self.mutate("README.md", "pio run -e heltec_wifi_lora_32_V3", "pio run -e absent_board")
+        self.mutate("docs/en/BENCH_RUNBOOK.md", "pio run -e heltec_wifi_lora_32_V3", "pio run -e absent_board")
         self.assertTrue(any("adaptive upload" in e for e in check(self.root)))
 
     def test_default_build_requires_display(self):
@@ -54,7 +54,7 @@ class ConsistencyTests(unittest.TestCase):
         self.assertTrue(any("default firmware must include" in e for e in check(self.root)))
 
     def test_broken_current_link_is_reported(self):
-        self.mutate("AGENTS.md", "docs/en/HARDWARE.md)", "docs/en/MISSING.md)")
+        self.mutate("AGENTS.md", "docs/en/SCHEDULED_LINK.md)", "docs/en/MISSING.md)")
         self.assertTrue(any("broken relative link" in e for e in check(self.root)))
 
     def test_physical_pass_claim_is_rejected(self):
@@ -83,25 +83,29 @@ class ConsistencyTests(unittest.TestCase):
 
     def test_phy_and_chinese_provisioning_regressions(self):
         self.mutate("include/radio_config.h", "dataSf = 7", "dataSf = 9")
-        self.mutate("README.zh-CN.md", "hello-interval-ms 3000", "hello-interval-ms 15000")
+        self.mutate("docs/zh-CN/BENCH_RUNBOOK.md", "hello-interval-ms 3000", "hello-interval-ms 15000")
         failures = check(self.root)
         self.assertTrue(any("approved dataSf" in error for error in failures))
-        self.assertTrue(any("README.zh-CN.md" in error and "3000 ms" in error for error in failures))
+        self.assertTrue(any("docs/zh-CN/BENCH_RUNBOOK.md" in error and "3000 ms" in error for error in failures))
 
     def test_client_example_requires_distinct_node_id(self):
-        self.mutate("README.md", "config set node-id 2", "config set node-id 1")
+        self.mutate("docs/en/BENCH_RUNBOOK.md", "config set node-id 2", "config set node-id 1")
         self.assertTrue(any("provisioning examples" in error for error in check(self.root)))
 
     def test_readmes_share_the_same_figures(self):
-        self.mutate("README.zh-CN.md", "adaptive-frame.svg", "adaptive-architecture.svg")
-        self.assertTrue(any("shared architecture and timing figures" in e for e in check(self.root)))
+        self.mutate("README.zh-CN.md", "adaptive-architecture.svg", "adaptive-frame.svg")
+        self.assertTrue(any("shared architecture figure" in e for e in check(self.root)))
 
-    def test_readmes_share_pseudocode_and_equations(self):
-        self.mutate("README.zh-CN.md", r"\leq\ 15", r"\leq\ 10")
-        self.assertTrue(any("same pseudocode and two airtime equations" in e for e in check(self.root)))
+    def test_readmes_share_the_two_role_algorithm(self):
+        self.mutate("README.zh-CN.md", "retry_granted(ack)", "any_ack(ack)")
+        self.assertTrue(any("same gateway and client pseudocode" in e for e in check(self.root)))
+
+    def test_protocol_pages_share_the_symbolic_reservation(self):
+        self.mutate("docs/zh-CN/SCHEDULED_LINK.md", r"\le \tau_{\mathrm{frame}}", r"\le 15")
+        self.assertTrue(any("same airtime equations" in e for e in check(self.root)))
 
     def test_walk_test_serial_status_must_match_wire_version(self):
-        self.mutate("README.zh-CN.md", "protocol=4", "protocol=3")
+        self.mutate("docs/zh-CN/BENCH_RUNBOOK.md", "protocol=4", "protocol=3")
         self.assertTrue(any("adaptive serial status" in e for e in check(self.root)))
 
 

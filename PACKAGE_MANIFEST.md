@@ -9,5 +9,5 @@ credentials and full-text research PDFs stay outside the publication.
 See [third-party rights](THIRD_PARTY.md)
 and the [figure register](docs/references/FIGURE_SOURCE_REGISTER.md).
 
-The [progress archive](docs/en/PROGRESS.md#historical-snapshots-through-iteration-014)
+The [progress archive](docs/en/PROGRESS.md#past-work)
 keeps the early package and migration records.

@@ -1,7 +1,7 @@
 # Research-to-code map
 
 Adaptive-LoRa schedules DATA, feedback and retries on one SX1262.
-Its [adaptive image](../en/SCHEDULED_LINK.md#adaptive-protocol-v4) fits
+Its [adaptive image](../en/SCHEDULED_LINK.md#airtime-and-slot-budget) fits
 each Client's selected DATA SF into the same schedule. The
 [four papers](../references/README.md) inform different parts of the design.
 
