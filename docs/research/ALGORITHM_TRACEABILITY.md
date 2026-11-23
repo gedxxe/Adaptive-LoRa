@@ -27,6 +27,12 @@ for testing that policy.
   slot calculation, retries and the live [SF review](../en/SCHEDULED_LINK.md#adaptation-and-recovery).
   The [offline evaluator](../../tools/adr_shadow.py) uses its own window
   parameters for capture analysis.
+- [Gateway ADR policy](../../src/app/adr_policy.cpp) keeps Legacy as the
+  firmware default and separates SNR margin from loss evidence in two
+  experimental rules. The [seeded model](../../tools/adr_sim.py) runs the
+  same production decision function with ideal control and independent
+  per-attempt interference. It isolates the link rule from multi-Client
+  scheduling and provides no field result.
 
 ## Close the research gaps
 

@@ -7,23 +7,19 @@
 namespace adaptive_lora {
 using namespace multiclient;
 namespace {
-constexpr uint8_t kAdrConfirmations = 3;
-constexpr uint8_t kAdrRecentReportsMask = 0b111;
-constexpr uint8_t kAdrFirstBeforeProbe = 6;
-constexpr uint8_t kAdrProbeReceiptLimit = 6;
-constexpr uint8_t kAdrRollbackHold = 8;
-constexpr uint8_t kAdrIdleFrames = 4;
+constexpr uint8_t kAdrIdleFrames = kAdrParams.idleFrames;
 constexpr uint32_t kRetuneRetryUs = 5000;
-// Provisional SNR needed to try SF7, SF8, or SF9, including 4 dB margin.
-constexpr float kLowerSfProbeSnrDb[] = {-3.5f, -6.0f, -8.5f};
-static_assert(kBaseSf + sizeof(kLowerSfProbeSnrDb) / sizeof(float) == phy::maxDataSf,
-              "Provide a probe threshold for each lower DATA SF");
+
+void formatAdrNumber(char (&buffer)[16], float value) {
+    if (std::isfinite(value)) std::snprintf(buffer, sizeof(buffer), "%.4g", value);
+    else std::memcpy(buffer, "N/A", sizeof("N/A"));
+}
 }
 
 MulticlientLink::MulticlientLink(const DeviceConfig& c, RadioTransport& radio, SerialLogger& log,
-                                 PayloadPort& payload, BootIdSource bootId, Roster roster, bool adaptDataSf)
+                                 PayloadPort& payload, BootIdSource bootId, Roster roster, bool adaptDataSf, AdrRule adrRule)
     : config_(c), radio_(radio), log_(log), payload_(payload), bootIdSource_(bootId),
-      adaptDataSf_(kAdaptive && adaptDataSf), roster_(roster) {
+      adaptDataSf_(kAdaptive && adaptDataSf), adrRule_(adrRule), roster_(roster) {
     validConfig_ = !validateConfig(c) && (c.role == DeviceRole::CLIENT || roster_.valid(c.gatewayId));
     if (validConfig_ && c.role == DeviceRole::GATEWAY && !roster_.periodUs)
         roster_.periodUs = requiredPeriodUs(roster_);
@@ -58,17 +54,28 @@ void MulticlientLink::observePeer(uint64_t now, uint16_t peer, const RadioEvent&
 
 void MulticlientLink::logLinkSamples(bool timingOk) {
     for (uint8_t i = 0; i < plan_.count; ++i) {
-        if (!plan_.slots[i].boot) continue;
+        const auto& slot = plan_.slots[i];
+        if (!slot.boot && !kAdaptive) continue;
         const auto& rx = received_[i];
         const char* outcome = rx.result == Reception::NONE ? "missed" : rx.retried ? "retry" : "first";
         const char* application = rx.result == Reception::NONE ? "n/a" :
             rx.result == Reception::ACCEPTED ? "accepted" : "refused";
         char metrics[48] = "rssi_dbm=N/A,snr_db=N/A";
-        if (rx.metrics) std::snprintf(metrics, sizeof(metrics), "rssi_dbm=%.1f,snr_db=%.1f", rx.rssi, rx.snr);
-        char line[304];
+        if (rx.metrics && std::isfinite(rx.rssi) && std::isfinite(rx.snr))
+            std::snprintf(metrics, sizeof(metrics), "rssi_dbm=%.4g,snr_db=%.4g", rx.rssi, rx.snr);
+        // SerialLogger reserves two bytes for newline and terminator.
+        char line[511];
         const bool sampleTimingOk = timingOk && !rx.rxWindowUnobserved;
-        const auto* action = !timingOk ? "timing_invalid" : rx.rxWindowUnobserved ? "rx_window_unobserved" :
-            (adaptDataSf_ ? reviewProfile(i) : "fixed_sf");
+        const AdrObservation obs{classifyAdr(slot.boot != 0, sampleTimingOk && rx.result != Reception::REFUSED,
+                                             rx.result == Reception::ACCEPTED, rx.retried),
+                                 rx.requestSnr, rx.metrics && rx.result == Reception::ACCEPTED ? rx.snr : kAdrMissingSnr};
+        AdrReview review{"observe"};
+        if (!slot.boot) review.action = "absent";
+        else if (!timingOk) review.action = "timing_invalid";
+        else if (rx.rxWindowUnobserved) review.action = "rx_window_unobserved";
+        else if (!adaptDataSf_) review.action = "fixed_sf";
+        else if (rx.result == Reception::REFUSED) review.action = "app_refused";
+        else review = reviewAdr(adr_[i], adrRule_, slot.sf, obs);
         const auto& adr = adr_[kAdaptive ? i : 0];
         std::snprintf(line, sizeof(line), "event=V3_LINK_SAMPLE,network_id=%u,gateway_id=%u,gateway_boot=%" PRIu32
             ",frame_id=%" PRIu32 ",source_id=%u,client_boot=%" PRIu32 ",sf=%u,outcome=%s,app=%s,%s",
@@ -77,7 +84,7 @@ void MulticlientLink::logLinkSamples(bool timingOk) {
         if (kAdaptive) {
             const auto prefix = std::strlen(line);
             std::snprintf(line + prefix, sizeof(line) - prefix, ",next_sf=%u,locked=%u,adr=%s",
-                unsigned(adr.desired), unsigned(adr.locked), action);
+                unsigned(adr.desired), unsigned(adr.locked), review.action);
         }
         const auto prefix = std::strlen(line);
         char rxTime[24] = "N/A";
@@ -85,8 +92,34 @@ void MulticlientLink::logLinkSamples(bool timingOk) {
             std::snprintf(rxTime, sizeof(rxTime), "%" PRIu64, rx.completedAt);
         std::snprintf(line + prefix, sizeof(line) - prefix, ",timing=%s,payload_bytes=%u,rx_us=%s",
             sampleTimingOk ? "ok" : "invalid", unsigned(plan_.slots[i].bytes), rxTime);
+        if (kAdaptive) {
+            const auto end = std::strlen(line);
+            logAdrFields(line + end, sizeof(line) - end, i, obs, review);
+        }
         log_.text(line);
     }
+}
+
+void MulticlientLink::logAdrFields(char* buffer, size_t size, uint8_t i, const AdrObservation& obs,
+                                 const AdrReview& review) const {
+    const auto& state = adr_[kAdaptive ? i : 0];
+    const bool present = obs.outcome != AdrOutcome::ABSENT;
+    const bool marginRule = adaptDataSf_ && adrRule_ != AdrRule::LEGACY;
+    const auto& estimate = state.estimate;
+    char request[16], data[16], level[16], slope[16], sigma[16], margin[16], score[16];
+    formatAdrNumber(request, obs.requestSnr);
+    formatAdrNumber(data, obs.dataSnr);
+    formatAdrNumber(level, present && adaptDataSf_ ?
+        (marginRule && estimate.ready ? estimate.level : state.filteredSnr) : kAdrMissingSnr);
+    formatAdrNumber(slope, present && marginRule && estimate.ready ? estimate.slope : kAdrMissingSnr);
+    formatAdrNumber(sigma, present && marginRule ? estimate.sigma(adrRule_, kAdrParams) : kAdrMissingSnr);
+    formatAdrNumber(margin, present && marginRule ? estimate.margin(adrRule_, plan_.slots[i].sf, kAdrParams) : kAdrMissingSnr);
+    formatAdrNumber(score, present && marginRule ?
+        (std::isfinite(review.decisionScore) ? review.decisionScore : state.score) : kAdrMissingSnr);
+    std::snprintf(buffer, size,
+        ",node_id=%u,class=%s,snr_req=%s,snr_data=%s,level=%s,slope=%s,sigma=%s,margin=%s,score=%s,decision=%s,rule=%s,params_version=%u",
+        unsigned(roster_.nodes[i].id), adrOutcomeName(obs.outcome), request, data, level, slope, sigma, margin,
+        score, adrDecisionName(review.decision), adaptDataSf_ ? adrRuleName(adrRule_) : "FIXED_SF", unsigned(kAdrParams.version));
 }
 
 bool MulticlientLink::prepareSf(uint8_t sf, uint64_t now) {
@@ -151,78 +184,6 @@ void MulticlientLink::admitProfiles() {
         }
         slot.sf = state.desired < state.reservedSf ? state.desired : state.reservedSf;
     }
-}
-
-const char* MulticlientLink::reviewProfile(uint8_t i) {
-    auto& state = adr_[i];
-    const auto& rx = received_[i];
-    if (rx.result == Reception::REFUSED) return "app_refused";
-    const auto observedSf = plan_.slots[i].sf;
-    const bool clientConfirmed = state.acknowledgedSf == observedSf;
-    if (state.observedSf != observedSf) {
-        state.observedSf = observedSf;
-        state.consecutiveFirst = state.degradedHistory = 0;
-        state.hasSnr = false;
-    }
-    const bool first = rx.result == Reception::ACCEPTED && !rx.retried;
-    if (observedSf != state.desired) {
-        if (!first) state.consecutiveFirst = 0;
-        else {
-            if (state.consecutiveFirst < kAdrConfirmations) ++state.consecutiveFirst;
-            if (state.consecutiveFirst >= kAdrConfirmations && clientConfirmed) {
-                state.desired = observedSf;
-                state.recoverySf = observedSf;
-                state.locked = true;
-                return "locked_within_budget";
-            }
-        }
-        return "budget_limited";
-    }
-    if (state.probeReturn && (!first ||
-        (!clientConfirmed && state.consecutiveFirst + 1 >= kAdrProbeReceiptLimit))) {
-        state.desired = state.probeReturn;
-        state.probeReturn = 0;
-        state.consecutiveFirst = state.degradedHistory = 0;
-        state.hold = kAdrRollbackHold;
-        return first ? "probe_no_receipt" : "rollback";
-    }
-    state.degradedHistory = uint8_t(((state.degradedHistory << 1) | !first) & kAdrRecentReportsMask);
-    const char* action = "observe";
-    if (first) {
-        if (rx.metrics && std::isfinite(rx.snr)) {
-            state.filteredSnr = state.hasSnr ? 0.75f * state.filteredSnr + 0.25f * rx.snr : rx.snr;
-            state.hasSnr = true;
-        }
-        if (state.consecutiveFirst < kAdrFirstBeforeProbe) ++state.consecutiveFirst;
-        if (state.consecutiveFirst >= kAdrConfirmations && !state.locked && clientConfirmed) {
-            state.probeReturn = 0;
-            state.reservedSf = state.desired;
-            state.recoverySf = observedSf;
-            state.locked = true;
-            action = "locked";
-        }
-        if (state.hold) --state.hold;
-        else if (state.locked && clientConfirmed && state.desired > kBaseSf &&
-                 state.consecutiveFirst >= kAdrFirstBeforeProbe &&
-                 state.hasSnr && state.filteredSnr >= kLowerSfProbeSnrDb[state.desired - kBaseSf - 1]) {
-            state.probeReturn = state.desired--;
-            state.consecutiveFirst = 0;
-            state.locked = false;
-            action = "probe_lower";
-        }
-    } else {
-        state.consecutiveFirst = 0;
-        // A mask has at least two misses if clearing its lowest bit leaves another bit.
-        if (state.degradedHistory & (state.degradedHistory - 1)) {
-            state.locked = false;
-            state.degradedHistory = 0;
-            if (state.desired < phy::maxDataSf) {
-                ++state.desired;
-                action = "step_up";
-            } else action = "ceiling";
-        }
-    }
-    return action;
 }
 
 Frame MulticlientLink::frame(MessageType type, uint16_t sequence) const {
@@ -352,12 +313,17 @@ void MulticlientLink::gateway(uint64_t now, const RadioEvent& event, const Frame
         phase_ = Phase::WAIT;
         if (event.type != RadioEventType::TX_DONE || !receiveWindow(completedAt, controlStart_, air)) {
             log_.event("V3_CONTROL", "completion_missing_or_late");
+            if (kAdaptive && !beacon) logLinkSamples(false);
             return;
         }
         if (beacon) { beaconAt_ = completedAt; phase_ = Phase::REQUEST; return; }
         const uint64_t lastTxEnd = completedAt + plan_.feedbackStart(kAttempts - 1) +
             payloadAir(feedbackBytes(plan_.count)) + kLaunchUs;
-        if (lastTxEnd >= nextBeacon_) { log_.event("V3_GRANT_TX", "deadline_miss"); return; }
+        if (lastTxEnd >= nextBeacon_) {
+            log_.event("V3_GRANT_TX", "deadline_miss");
+            if (kAdaptive) logLinkSamples(false);
+            return;
+        }
         dataAt_ = completedAt;
         frameTimingOk_ = true;
         displayQuietAt_ = lastTxEnd;
@@ -367,11 +333,11 @@ void MulticlientLink::gateway(uint64_t now, const RadioEvent& event, const Frame
         phase_ = Phase::DATA;
         return;
     }
-    if (phase_ == Phase::REQUEST) gatewayRequest(now, completedAt, incoming);
+    if (phase_ == Phase::REQUEST) gatewayRequest(now, completedAt, incoming, event);
     if (phase_ == Phase::DATA) gatewayData(now, incoming, event);
 }
 
-void MulticlientLink::gatewayRequest(uint64_t now, uint64_t receivedAt, const Frame* incoming) {
+void MulticlientLink::gatewayRequest(uint64_t now, uint64_t receivedAt, const Frame* incoming, const RadioEvent& event) {
     if (incoming) {
         const auto& f = *incoming;
         const int i = roster_.indexOf(f.sourceId);
@@ -380,6 +346,7 @@ void MulticlientLink::gatewayRequest(uint64_t now, uint64_t receivedAt, const Fr
             receiveWindow(receivedAt, beaconAt_ + requestStart(i), payloadAir(kRequestSize)) && !plan_.slots[i].boot) {
             plan_.slots[i] = {f.bootId, f.payload[4]};
             if (kAdaptive) {
+                if (event.metrics && std::isfinite(event.snr)) received_[i].requestSnr = event.snr;
                 auto& state = adr_[i];
                 const auto receipt = get32(f.payload + 5);
                 state.acknowledgedSf = state.boot == f.bootId && receipt && receipt == state.deliveredFrame ?
@@ -395,14 +362,19 @@ void MulticlientLink::gatewayRequest(uint64_t now, uint64_t receivedAt, const Fr
     if (now < start) return;
     phase_ = Phase::WAIT;
     displayQuietAt_ = now;
-    if (!plan_.activeMask()) return;
+    if (!plan_.activeMask()) {
+        if (kAdaptive) logLinkSamples(launchWindow(now, start));
+        return;
+    }
     if (!launchWindow(now, start) || !plan_.matches(roster_)) {
         log_.event("V3_GRANT_TX", "schedule_unavailable");
+        if (kAdaptive) logLinkSamples(false);
         return;
     }
     if (adaptDataSf_) admitProfiles();
     if (kAdaptive && !plan_.matches(roster_)) {
         log_.event("V3_GRANT_TX", "adaptive_schedule_unavailable");
+        logLinkSamples(false);
         return;
     }
     auto grant = frame(MessageType::SLOT_GRANT, 0);
@@ -412,6 +384,7 @@ void MulticlientLink::gatewayRequest(uint64_t now, uint64_t receivedAt, const Fr
     displayQuietAt_ = now + payloadAir(grantBytes(plan_.count)) + kSlotGuardUs / 2 +
         plan_.feedbackStart(kAttempts - 1) + payloadAir(feedbackBytes(plan_.count)) + kLaunchUs;
     if (send(grant, now, "V3_GRANT_TX")) phase_ = Phase::GRANT_TX;
+    else if (kAdaptive) logLinkSamples(false);
 }
 
 void MulticlientLink::gatewayData(uint64_t now, const Frame* incoming, const RadioEvent& event) {

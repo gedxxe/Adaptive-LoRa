@@ -42,7 +42,7 @@ def read_samples(lines):
         timing = fields.get("timing", "ok")  # Older captures only emitted timely frames.
         if timing not in ("ok", "invalid"):
             raise ValueError("invalid timing flag in link sample")
-        if timing == "invalid" or fields.get("app") == "refused":
+        if timing == "invalid" or fields.get("app") == "refused" or fields.get("class") == "ABSENT":
             continue
         key = tuple(int(fields[name]) for name in IDENTITY)
         frame = int(fields["frame_id"])

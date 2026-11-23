@@ -1,4 +1,5 @@
 #pragma once
+#include "adr_policy.h"
 #include "payload_port.h"
 #include "common/diagnostics/serial_logger.h"
 #include "common/diagnostics/display_snapshot.h"
@@ -9,7 +10,7 @@ public:
     using BootIdSource = uint32_t (*)(uint32_t);
     MulticlientLink(const DeviceConfig& config, RadioTransport& radio, SerialLogger& log,
                     PayloadPort& payload, BootIdSource bootId, multiclient::Roster roster = {},
-                    bool adaptDataSf = multiclient::kAdaptive);
+                    bool adaptDataSf = multiclient::kAdaptive, AdrRule adrRule = kFirmwareAdrRule);
     void update(uint64_t now, const RadioEvent& event, bool allowTx = true);
     MulticlientTelemetry telemetry() const;
     bool safeToRefreshDisplay(uint64_t now, uint32_t stepBudgetUs) const;
@@ -24,33 +25,15 @@ private:
         uint8_t bytes[multiclient::kMaxData]{};
         float rssi = 0;
         float snr = 0;
+        float requestSnr = kAdrMissingSnr;
         bool metrics = false;
         bool retried = false;
         bool rxWindowUnobserved = false;
     };
-    struct AdrState {
-        uint32_t boot = 0;
-        uint32_t lastRequest = 0;
-        uint32_t deliveredFrame = 0;
-        uint8_t desired = multiclient::kBaseSf;
-        uint8_t reservedSf = multiclient::kBaseSf;
-        uint8_t recoverySf = multiclient::kBaseSf;
-        uint8_t observedSf = 0;
-        uint8_t deliveredSf = 0;
-        uint8_t acknowledgedSf = 0;
-        uint8_t consecutiveFirst = 0;
-        uint8_t degradedHistory = 0;
-        uint8_t probeReturn = 0;
-        uint8_t hold = 0;
-        bool locked = false;
-        bool hasSnr = false;
-        float filteredSnr = 0;
-    };
-
     Frame frame(MessageType type, uint16_t sequence) const;
     bool send(const Frame& frame, uint64_t now, const char* event);
     void gateway(uint64_t now, const RadioEvent& event, const Frame* incoming);
-    void gatewayRequest(uint64_t now, uint64_t receivedAt, const Frame* incoming);
+    void gatewayRequest(uint64_t now, uint64_t receivedAt, const Frame* incoming, const RadioEvent& event);
     void gatewayData(uint64_t now, const Frame* incoming, const RadioEvent& event);
     void client(uint64_t now, const Frame* incoming, const RadioEvent& event);
     void acceptBeacon(uint64_t now, const Frame& beacon);
@@ -60,7 +43,7 @@ private:
     void logLinkSamples(bool timingOk);
     bool prepareSf(uint8_t sf, uint64_t now);
     void admitProfiles();
-    const char* reviewProfile(uint8_t index);
+    void logAdrFields(char* buffer, size_t size, uint8_t index, const AdrObservation& obs, const AdrReview& review) const;
 
     DeviceConfig config_;
     RadioTransport& radio_;
@@ -68,6 +51,7 @@ private:
     PayloadPort& payload_;
     BootIdSource bootIdSource_;
     const bool adaptDataSf_;
+    const AdrRule adrRule_;
     multiclient::Roster roster_;
     multiclient::Plan plan_;
     Received received_[multiclient::kMaxClients]{};

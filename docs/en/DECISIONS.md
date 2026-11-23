@@ -438,3 +438,17 @@ advertises a 16 B ceiling cannot grant the new sample.
 At 32 B, five SF9 Clients or two SF10 Clients fit alongside peers at SF7.
 Keep the full-roster admission check and verify the tighter margins on
 real boards before extending the active schedule.
+
+## ADR-038 — Separate loss evidence from SNR margin
+
+Keep Legacy as the default. The Gateway can select EWMA or local-trend
+Kalman at build time. Both use valid Request SNR on a common scale and
+accepted DATA SNR as a fallback. Preserve the estimate across SF changes.
+Reset it on a new session or idle state expiry. Keep the validated
+Request, Grant, DATA, ACK, airtime admission and rollback paths.
+
+A same-SF retry rescue contributes less evidence than complete loss.
+Four consecutive complete losses can request a higher SF even with
+healthy margin. Defer a common-mode filter until measurements can
+distinguish burst interference from simultaneous fades. Treat the
+thresholds and the simulator channel as hypotheses for field comparison.

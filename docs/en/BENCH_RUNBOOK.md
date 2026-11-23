@@ -156,6 +156,16 @@ Run `status` on the Gateway and record `data_sf_policy=fixed_sf7`. The
 same Clients, SF9 control, 15 s period and retry rules apply. To restore
 ADR, upload the ordinary adaptive image and check `data_sf_policy=adaptive`.
 
+**Experimental ADR comparison.** The ordinary Gateway shows
+`adr_rule=LEGACY` in `SCHEDULE_CONFIG`. For a matched EWMA run, build the
+Gateway with the command below. Use `=2` and `.pio/adr-kalman` for Kalman.
+Upload the corresponding Gateway image, verify its `adr_rule`, and use the
+same Clients, route and offered load. The rule does not need provisioning.
+
+```powershell
+cmd /d /c 'set PLATFORMIO_BUILD_SRC_FLAGS=-DADAPTIVE_LORA_ADR_RULE=1&&set PLATFORMIO_BUILD_DIR=.pio/adr-ewma&&pio run -e heltec_wifi_lora_32_V3_adaptive -t upload --upload-port COMx'
+```
+
 ## Save the results
 
 Close monitors before recording. Use the observed ports and a new
@@ -194,8 +204,9 @@ run_id,gateway_boot,frame_id,node_id,client_boot,grant_seen,payload_bytes,data_s
 Join `V3_LINK_SAMPLE`, `APP_PAYLOAD` and the Client `V3_DATA_TX` and
 `V3_PAYLOAD_RESULT` events within one Gateway boot. Start a new segment after
 any boot or intentional outage. Keep absent or ambiguous observations unknown.
-Exclude partial boundary frames. A missing Gateway link-sample row may mean
-the Client never obtained a Grant. `timing=invalid` identifies a local
+Exclude partial boundary frames. `class=ABSENT` means the Gateway saw no
+valid Request. A missing log row alone cannot establish what happened.
+`timing=invalid` identifies a local
 schedule fault and is excluded from RF-only comparisons, while any recorded
 application delivery still counts in the end-to-end result. `rx_us` is
 Gateway uptime at reception, so use it for per-Client gaps within a boot.
