@@ -66,3 +66,6 @@ single-board HELLO/ACK checks above are optional when using this section.
 For a walk recovery run, record the last confirmed DATA SF, the times
 when `SEARCH`, `NO GRANT` or `APP UNKNOWN` appeared, and the first DATA SF
 and ACK after returning. Record whether the Gateway or Client restarted.
+For ADR comparisons, record `adr_rule`, `params_version`, Request and DATA
+SNR, `adr=loss_unconfirmed`, and `ADR_PROBE` expiry events. Match
+`V3_DATA_TX` and Gateway samples by session, frame and node.

@@ -73,8 +73,9 @@ void FirmwareRuntime::status() {
         const auto roster = benchRoster();
         const uint32_t period = roster.periodUs ? roster.periodUs : multiclient::requiredPeriodUs(roster);
         std::snprintf(line, sizeof(line), "event=SCHEDULE_CONFIG,period_us=%" PRIu32
-                      ",roster_count=%u,bench_payload_ceiling_bytes=%u,data_sf_policy=%s", period, roster.count,
-                      unsigned(multiclient::kBenchPayloadBytes), adaptDataSf ? "adaptive" : "fixed_sf7");
+                      ",roster_count=%u,bench_payload_ceiling_bytes=%u,data_sf_policy=%s,adr_rule=%s", period, roster.count,
+                      unsigned(multiclient::kBenchPayloadBytes), adaptDataSf ? "adaptive" : "fixed_sf7",
+                      adaptDataSf ? adrRuleName(kFirmwareAdrRule) : "FIXED_SF");
         log_.text(line);
     }
 #endif

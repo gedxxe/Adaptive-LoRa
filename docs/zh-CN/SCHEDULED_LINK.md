@@ -167,6 +167,8 @@ BW125 下 SF10 符号时长为 8.192 毫秒，无需 LDRO。96 字节包在 SF10
 
 ## 自适应与恢复
 
+下图说明三种构建时可选的规则及其共用的 SF 调整流程。
+
 <img src="../research/figures/adaptive-algorithm-adr.png" alt="Gateway SF 策略，包括会话恢复、近期丢包窗口、降档失败回退和确认。" width="480">
 
 README 算法中的 $\phi$ 为帧 ID，$\phi_{\mathrm{ack}}$ 是同一 Gateway 会话中
@@ -200,7 +202,7 @@ SNR 更新公式如下。
 | $\nu_{\mathrm{obs}}$、$\nu_{\mathrm{up}}$ | 有效记录窗口长度和申请升档所需的首传失败次数 | 3、2 |
 | $\nu_{\mathrm{idle}}$ | 释放较高 SF 额度的帧编号差 | 4 |
 | $\nu_{\mathrm{lock}}$、$\nu_{\mathrm{probe}}$ | 锁定或尝试降档所需的连续首传成功次数 | 3、6 |
-| $\nu_{\mathrm{ack}}$、$\nu_{\mathrm{hold}}$ | 降档试用等待回执的上限及回退等待期间的首传成功次数 | 6、8 |
+| $\nu_{\mathrm{ack}}$、$\nu_{\mathrm{hold}}$ | 降档试用等待回执的帧编号差上限及回退等待期间的首传成功次数 | 6、8 |
 
 $\epsilon_\iota^{\mathrm{fail}}$ 表示首传失败，即使重传后来成功也计入。
 $\alpha_\iota$ 表示最新 Request 回报了已记录交付的帧，并确认对应 SF。
@@ -209,24 +211,31 @@ $\phi_\iota^{\mathrm{req}}$ 和 $\phi_\iota^{\mathrm{del}}$ 是上次 Request �
 $\sigma_\iota^{\mathrm{del}}$ 是该次交付所用 SF。
 $\sigma_\iota^{\mathrm{want}}$、$\sigma_\iota^{\mathrm{res}}$、
 $\sigma_\iota^{\mathrm{mem}}$ 和 $\sigma_\iota^{\mathrm{back}}$ 依次表示目标、预留、记忆及回退 SF。
-$h_\iota$ 是回退后剩余等待次数，$\theta_{\sigma_\iota-1}$ 是试用低一级 SF 的 SNR 门限。
+$h_\iota$ 是回退后剩余等待次数，$\theta_{\sigma_\iota-1}$ 是 Legacy 试用低一级 SF 的 SNR 门限。
+
+设 $r_\sigma=x_{\mathrm{req}}+b_\sigma-\vartheta_\sigma$ 为本次 Request
+换算到已分配 DATA SF $\sigma$ 的 SNR 余量。同 SF 重传成功时，或完全未收到
+DATA 且有效的 Request 余量满足 $r_\sigma<M_{\mathrm{up}}$ 时，丢包指示 $e$ 为 1，
+其余情况为 0。
 
 ```math
 \boldsymbol{\xi}^{\mathrm{loss}}_\iota\gets
   \operatorname{Tail}_{\nu_{\mathrm{obs}}}
-  \bigl(\boldsymbol{\xi}^{\mathrm{loss}}_\iota\mathbin{\|}\epsilon_\iota^{\mathrm{fail}}\bigr),
+  \bigl(\boldsymbol{\xi}^{\mathrm{loss}}_\iota\mathbin{\|}e\bigr),
 \qquad
 \sum_{j}\xi^{\mathrm{loss}}_{\iota,j}\ge\nu_{\mathrm{up}}.
 ```
 
-首传失败后，Gateway 检查当前 SF 的丢包窗口，时序异常和应用拒收不计入。累计两次失败后
-清空窗口，并在下一次 Grant 前核算较高 SF 的额度。
+当前记录满足 $e=1$ 且窗口计数达到门限时，Legacy 申请升档。窗口只包含当前 SF 的有效记录，
+时序异常和应用拒收不计入。准备下一次 Grant 时核算较高 SF 的额度。
 
 连续三次首传成功且有同一 SF 的 ACK 回执后锁定，预算受限而分配较低 SF 时也适用。
 锁定后记录已确认的 SF，并释放为回退保留的较高额度。锁定且等待期结束后，若连续六次首传成功且平滑 SNR
 达到要求，可试用低一级（SF7 至少 −3.5 dB，SF8 至少 −6 dB，SF9 至少 −8.5 dB）。
-试用期间首传失败即回退，连续六次有效首传仍无该 SF 的匹配 ACK 回执也回退。回退后需八次
-首传成功才再次考虑降档。
+试用期间首传失败即回退。若试用始于帧 $\phi_{\mathrm{probe}}$，在
+$\phi-\phi_{\mathrm{probe}}\geq\nu_{\mathrm{ack}}$ 的有效记录处理中仍无匹配回执，也会回退。
+即使期间记录缺失或被排除，未确认的试用也会在下一帧开始时结束。周期为 15 秒时，
+六个帧编号对应 90 秒。回退后需八次首传成功才再次考虑降档。
 
 Client 只有在收到有效位图授权时才重传。Gateway 只有在下一轮开始前及时处理位图发送完成事件，
 才打开重传时隙。保留四帧累计 ACK，允许补确认。时序异常记入帧样本，并排除在 SF 评估之外。
@@ -238,6 +247,44 @@ Gateway 按当前预算重新申请由 ACK 回执或后续锁定记住的 SF。�
 降档试用锁定前，保留此前的恢复 SF。Client boot ID 改变或 Gateway 启动新会话时清除该记录。
 同步无线调用仍可能
 超出软件时序窗口。[LaTeX 源文件](../research/figures/adaptive-algorithm.tex) · [运行时代码](../../src/app/multiclient_link.cpp) · [已知时序风险](../en/ERROR_LOG.md)
+
+### 按丢包情况调整
+
+Gateway 在构建时可选三种规则，默认为 `LEGACY`。 `MARGIN_EWMA` 跟踪指数加权均值与方差。
+`MARGIN_KALMAN` 同时跟踪 SNR 水平与变化趋势，并预测下一条有效记录的 SNR 及不确定度。
+有效记录缺少 SNR 时，EWMA 保留估计值，Kalman 只做预测。
+
+优先使用已验证的 SF9 Request SNR，缺失时使用已接受的 DATA SNR。
+[AdrParams](../../src/app/adr_policy.h) 中每个 SF 的偏移量定义为 DATA SNR 减去 Request SNR，
+初值为零。估计器使用统一的 Request SNR 尺度，切换 SF 时保留状态，更换会话或离线状态到期后重新估计。
+同时保存两种 SNR 以便后续标定偏移。
+
+| 参数 | 初始实验设置 |
+|---|---|
+| SF7/8/9/10 的暂定 SNR 门限 $\vartheta_\sigma$ | −7.5 / −10 / −12.5 / −15 dB。后续用各 SF 实测的 50% 交付门限替换。 |
+| 余量 $m_\sigma=\widehat{x}+b_\sigma-\vartheta_\sigma-z\sigma_x$ | $\widehat{x}$ 为预测 SNR，$b_\sigma$ 为偏移，$\sigma_x$ 为预测标准差，$z=1$ |
+| 丢包分数 $S\gets\rho S+w$ | $\rho=0.75$。符合条件的全丢加 1.0，同 SF 重传成功加 0.4，$e=0$ 时加 0。 |
+| 提高 DATA SF | 要求 $e=1$、$S\geq S_{\mathrm{up}}=1.5$，且 $m_\sigma<M_{\mathrm{up}}=0$ dB。 |
+| 试用较低 DATA SF | 延续锁定和回执规则，连续六次首传成功且 $m_{\sigma-1}\geq4$ dB。保留回退、等待和回执超时处理。 |
+| 估计器 | EWMA 权重为 0.25。Kalman 的水平和趋势过程方差为 0.16 和 0.01，测量方差为 1.0，初始趋势方差为 0.25。每条有效记录为一个时间步。 |
+
+`V3_LINK_SAMPLE` 保留旧采集字段，并在自适应 Gateway 上增加 `node_id`、`class`、`snr_req`、
+`snr_data`、`level`、`slope`、`sigma`、`margin`、`score`、`decision`、`rule` 和
+`params_version`。余量对应已分配的 SF，升档分数在清空前记录，缺失值为 `N/A`。
+`LOST_ALL` 表示已分配机会均未成功交付。`params_version=2` 下，`adr=loss_unconfirmed`
+表示没有收到 DATA，且 Request 余量未满足条件。`ADR_PROBE` 的 `result=expired`
+表示试用在两次评估之间达到帧编号期限。`ABSENT` 表示在已监听的请求阶段未收到有效 Request。
+`EXCLUDED` 对应本地时序问题或应用拒收。这两类均不更新估计器或分数。
+另外两类为 `OK_FIRST` 和 `RESCUED_SAME_SF`。离线解析器兼容旧日志，并跳过时序无效、应用拒收和缺席记录。
+
+所有升档仍需通过完整名单的空口预算检查。即使 Gateway 收到了 Request，Grant 丢失也会造成
+所有 DATA 缺席。低余量可以支持升档判断，但不足以确定丢失原因。归因前应对照 Client 的发射日志。
+
+从零开始，连续 $n$ 次相同权重的分数为 $S_n=w(1-\rho^n)/(1-\rho)$。按现有设置，
+在余量条件也满足时，两次符合条件的全丢或连续十次重传成功即可达到 $S_{\mathrm{up}}$。
+编译时检查 $S_{\mathrm{up}}(1-\rho)<w_{\mathrm{loss}}$，确保分数可以达到门限。
+余量与权重仍须现场标定。[定种子模拟器](../../tools/adr_sim.py) 的 `--policy-snr-shift-db`
+可单独调整策略门限，同时保持假定信道不变。
 
 ## 板卡参考
 

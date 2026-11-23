@@ -5,6 +5,24 @@ changes. It is not a substitute for the append-only build memory.
 
 ## Unreleased
 
+### Gateway ADR hotfix
+
+- Qualify complete DATA loss with the current Request margin in all three
+  ADR rules. This avoids increasing SF solely because DATA was absent
+  after a strong Request.
+- Bound downshift trials by frame ID, even when reports are absent or
+  excluded. Keep the previous reservation for rollback.
+- Check reachability and hysteresis of policy settings at build time,
+  separate model decode and policy thresholds, and update both guides and
+  the LaTeX algorithms.
+
+### Experimental Gateway ADR rules
+
+- Add opt-in EWMA and local-trend Kalman rules that use Request SNR and
+  distinguish first-attempt success, retry rescue and complete loss.
+- Keep Legacy as the default with wire version 5 and the existing
+  full-roster airtime check. Add per-report diagnostics and a seeded host model.
+
 ### 32-byte adaptive test samples
 
 - Generate neutral ASCII DATA with a node ID, sample counter and `HELLO WORLD`.

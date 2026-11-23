@@ -42,6 +42,13 @@ class AdrShadowTests(unittest.TestCase):
         rows = list(evaluate(lines, self.policy))
         self.assertEqual([(1, 4, 1.0)], [(r["first_frame"], r["last_frame"], r["first_pass"]) for r in rows])
 
+    def test_request_metrics_and_absent_rows_preserve_the_legacy_parser(self):
+        extra = ",node_id=2,class=LOST_ALL,snr_req=-14,snr_data=N/A,level=-13,slope=0,sigma=1,margin=-6,score=1,decision=hold,rule=MARGIN_EWMA,params_version=1"
+        missing = sample(2, "missed", "N/A").replace("client_boot=100", "client_boot=0") + ",class=ABSENT"
+        rows = list(evaluate([sample(1, "missed", "N/A") + extra, missing, sample(3)], self.policy))
+        self.assertEqual([(1, 3, 0.5, 6.0)],
+                         [(r["first_frame"], r["last_frame"], r["first_pass"], r["mean_snr_db"]) for r in rows])
+
     def test_invalid_metrics_and_conflicting_observations_are_rejected(self):
         for lines in ([sample(1, snr="nan")], [sample(1), sample(1, snr="0")]):
             with self.subTest(lines=lines), self.assertRaises(ValueError):

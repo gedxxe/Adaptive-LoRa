@@ -27,6 +27,13 @@ for testing that policy.
   slot calculation, retries and the live [SF review](../en/SCHEDULED_LINK.md#adaptation-and-recovery).
   The [offline evaluator](../../tools/adr_shadow.py) uses its own window
   parameters for capture analysis.
+- The [Gateway ADR policy](../../src/app/adr_policy.cpp) qualifies
+  complete DATA loss by current Request margin in all three rules. The
+  production default uses a short loss window. EWMA and Kalman also
+  require forecast margin and decayed loss evidence. The
+  [seeded model](../../tools/adr_sim.py) shares their decision code and
+  keeps its provisional decode curve independent of the policy threshold.
+  It assumes ideal control and independent per-attempt interference.
 
 ## Close the research gaps
 

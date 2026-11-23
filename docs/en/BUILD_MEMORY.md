@@ -2230,3 +2230,91 @@ files under `logs/test/`.
   The first field check is a close-range pair with the same image on
   both boards. Verify Gateway `bench_payload_ceiling_bytes=32` and
   match `bytes=32` in `APP_PAYLOAD` to the Client's accepted result.
+
+## Iteration 030 — Loss-cause-aware Gateway ADR, 2026-11-23
+
+- Based on the verified 32 B revision `efe5e1f58b8ee1f27bf1eada8b6b48be1e4a5894`
+  on `codex/iteration-030-loss-cause-adr`. Iterations 028 and 029
+  already cover walk-recovery integration and the 32 B load. Wire v5,
+  NVS schema 1, firmware `0.2.0-alpha.1`, and the airtime gate are unchanged.
+- `adr_policy.cpp` owns Legacy and the two opt-in margin rules.
+  `multiclient_link.cpp` supplies validated Request and DATA observations
+  and logs decisions. `adr_sim.py` compiles the same policy for a
+  single-Client model. See ADR-038 for the parameter and calibration choices.
+- `python tools/adr_sim.py --seed 42` exited 0 with 30 modeled cases.
+  The margin rules spent less time above the reference SF in the interference case
+  but reacted more slowly to a 9 dB blockage. No physical test was run.
+- `pio test -e native`, `-e native_multiclient` and `-e native_adaptive`
+  exited 0 with 356, 15 and 33 passing cases under `-Wall -Wextra -Werror`.
+  `python -m unittest discover -s tools -p test_<suite>.py -v` passed
+  capture (15), airtime (16), ADR parser (7), multiclient model (6),
+  documentation (19) and ADR simulator (1). `python tools/check_consistency.py`
+  exited 0. A temporary native trace of the shared 26 Legacy cases
+  matched all 3,975 transmitted frames, recording SF, length and the
+  bytes passed to the radio. Trace SHA-256
+  `52209a6773fcca9bd7345c6dcd5f70f26b54aa66c500f756ec3d4ca468bdbc0f`.
+- Toolchain used PlatformIO 6.1.19, Espressif32 55.3.311, Arduino ESP32
+  3.3.11, Xtensa 14.2.0+20260121, RadioLib 7.8.1 and host MinGW GCC 6.3.0.
+- `pio run -e` exited 0 for `heltec_wifi_lora_32_V3`,
+  `heltec_wifi_lora_32_V3_research`, `heltec_wifi_lora_32_V3_multiclient`
+  and `heltec_wifi_lora_32_V3_adaptive`. The adaptive command also exited 0
+  with `PLATFORMIO_BUILD_SRC_FLAGS=-DADAPTIVE_LORA_ADR_RULE=1` and `=2`
+  in a separate build directory. Each adaptive image used 35,184 B static
+  RAM and 392,296 B program storage.
+- The runner used the installed `python -m platformio` for the `pio`
+  commands. Full current outputs, with workstation paths replaced by
+  placeholders, are in `logs/build/iteration-030-verification.log` and
+  `logs/test/iteration-030-verification.log`. Physical follow-up is
+  calibration of SNR offsets and a matched Legacy/EWMA/Kalman walk with
+  serial drop counts and retune timing.
+
+## Iteration 031 — ADR loss gate, expiry and tuning audit, 2026-11-23
+
+- Branch `codex/iteration-031-adr-hotfix` started at canonical
+  `c8a81e15e641cea92242480bde50c3cf3534aec0` and merged verified
+  Iteration 030 from `3560c804d3e6ec08abb715b98661703c01744a0a`.
+- `adr_policy.cpp` qualifies complete loss before updating SF evidence
+  and rolls back unconfirmed lower-SF trials by frame ID. `adr_policy.h`
+  checks parameter reachability and hysteresis. `multiclient_link.cpp`
+  applies the deadline before each Beacon and logs expiry.
+  `adr_sim_driver.cpp` shares the decision rule with an independent
+  decode model. See ADR-039 and ERR-058 through ERR-060.
+- `pio run -e heltec_wifi_lora_32_V3`, `-e heltec_wifi_lora_32_V3_research`,
+  `-e heltec_wifi_lora_32_V3_multiclient` and `-e heltec_wifi_lora_32_V3_adaptive`
+  exited 0. The adaptive command also exited 0 with
+  `PLATFORMIO_BUILD_SRC_FLAGS=-DADAPTIVE_LORA_ADR_RULE=1` and `=2` using
+  `PLATFORMIO_BUILD_DIR=.pio/comparison-build`.
+- `pio test -e native`, `-e native_multiclient` and `-e native_adaptive`
+  exited 0 with 356, 15 and 36 passing cases. The adaptive cases include
+  strong Request followed by Grant loss in every rule, qualifying loss
+  in the native policy, recovery, probe expiry despite capped counters,
+  and parameter checks. `python -m unittest discover -s tools -p test_<suite>.py -v`
+  exited 0 for `capture_bench` (15), `tdma_feasibility` (16),
+  `adr_shadow` (7), `model_multiclient` (6), `check_consistency` (19)
+  and `adr_sim` (2). `python tools/check_consistency.py` exited 0.
+- MathJax rendered 114 distinct expressions. pdfLaTeX and Poppler
+  rendered all three algorithm pages without layout warnings. Link
+  inspection covered 90 Markdown files with zero broken local links
+  or anchors in the active manuals. Two prior broken links remain in
+  frozen snapshots for Iterations 006 and 007.
+- `python tools/adr_sim.py --seed 42` exited 0 with 30 modeled cases.
+  The paired blockage runs started at SF7, idealizing control and
+  scheduling. At 10% independent interference and 9 dB blockage, mean
+  modeled response was 71.7 s for Legacy and 106.5 s for either margin
+  rule. The default remains Legacy. Update thresholds only after
+  collecting paired Request and DATA SNR and delivery outcomes.
+  Running the same command with `--policy-snr-shift-db -2.5` and `2.5`
+  also exited 0. The lower threshold produced 25 EWMA and 22 Kalman
+  trials that stayed below the reference SF throughout the blockage.
+- Build tools were PlatformIO 6.1.19, Espressif32 55.3.311, Arduino
+  ESP32 3.3.11, Xtensa 14.2.0+20260121 and RadioLib 7.8.1.
+  The runner used PlatformIO's Python for the commands above. The logs
+  preserve command output with workstation paths replaced by placeholders
+  and trailing whitespace trimmed. See `logs/build/iteration-031-verification.log`
+  and `logs/test/iteration-031-verification.log`.
+- Firmware `0.2.0-alpha.1`, wire v5, NVS schema 1, SF9 control, SF7–SF10
+  DATA, CR4/5, 32 B sample, 15 s period and full-roster admission continue.
+  `main.cpp` retains its setup/loop delegation. Actual SKU, flash/NVS,
+  RF turnaround and link performance are not measured in this iteration.
+  Run the close-range pair with both node logs, then compare one moving
+  and seven stationary Clients on the authorized RF setup.

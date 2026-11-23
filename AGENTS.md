@@ -64,6 +64,8 @@ The matched comparison freezes Gateway DATA grants at SF7 on the same wire forma
 SF11–SF12 remain scenarios in the host capacity tool.
 Keep the published LaTeX algorithms aligned with the production loss window,
 recovery hint, airtime admission and rollback rules when ADR changes.
+Keep model decode thresholds independent of policy tuning, and calibrate
+Request-to-DATA SNR offsets and loss weights from matched captures.
 One radio time-shares control and data; it cannot receive multiple SFs at once.
 
 Before power, identify the board, RF variant and antenna connector and connect a suitable

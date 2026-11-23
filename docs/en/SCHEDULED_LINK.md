@@ -192,6 +192,8 @@ SF12 are model-only rows. They need LDRO, and the 96 B SF11 packet and the
 
 ## Adaptation and recovery
 
+The figure shows the shared SF policy and the three build-time rules.
+
 <img src="../research/figures/adaptive-algorithm-adr.png" alt="Gateway SF policy showing session recovery, the recent loss window, lower-SF trial rollback and confirmation." width="480">
 
 In the README algorithms, $\phi$ is the frame ID, $\phi_{\mathrm{ack}}$ is
@@ -229,7 +231,7 @@ refer to the active Gateway session.
 | $\nu_{\mathrm{obs}}$, $\nu_{\mathrm{up}}$ | Size of the eligible-report window and misses needed to request an increase | 3, 2 |
 | $\nu_{\mathrm{idle}}$ | Frame-ID gap that frees a higher-SF reservation | 4 |
 | $\nu_{\mathrm{lock}}$, $\nu_{\mathrm{probe}}$ | First-attempt deliveries required to lock or consider a lower SF | 3, 6 |
-| $\nu_{\mathrm{ack}}$, $\nu_{\mathrm{hold}}$ | Lower trial's receipt limit and first-attempt deliveries in the rollback hold | 6, 8 |
+| $\nu_{\mathrm{ack}}$, $\nu_{\mathrm{hold}}$ | Lower-SF receipt deadline in frame IDs and first-attempt deliveries in the rollback hold | 6, 8 |
 
 $\epsilon_\iota^{\mathrm{fail}}$ marks a missed first attempt, including a
 retry that eventually delivered. $\alpha_\iota$ means the latest Request
@@ -242,20 +244,25 @@ state carries desired, reserved, remembered and rollback values
 $\sigma_\iota^{\mathrm{want}}$, $\sigma_\iota^{\mathrm{res}}$,
 $\sigma_\iota^{\mathrm{mem}}$ and $\sigma_\iota^{\mathrm{back}}$.
 $h_\iota$ counts the remaining hold after rollback. $\theta_{\sigma_\iota-1}$
-is the SNR threshold for trying the next lower SF.
+is the Legacy SNR threshold for trying the next lower SF.
+
+Let $r_\sigma=x_{\mathrm{req}}+b_\sigma-\vartheta_\sigma$ be the
+current Request margin at the assigned DATA SF $\sigma$. The loss indicator
+$e$ is one if a same-SF retry delivers, or if no DATA arrives and a finite
+Request sample gives $r_\sigma<M_{\mathrm{up}}$. Otherwise $e$ is zero.
 
 ```math
 \boldsymbol{\xi}^{\mathrm{loss}}_\iota\gets
   \operatorname{Tail}_{\nu_{\mathrm{obs}}}
-  \bigl(\boldsymbol{\xi}^{\mathrm{loss}}_\iota\mathbin{\|}\epsilon_\iota^{\mathrm{fail}}\bigr),
+  \bigl(\boldsymbol{\xi}^{\mathrm{loss}}_\iota\mathbin{\|}e\bigr),
 \qquad
 \sum_{j}\xi^{\mathrm{loss}}_{\iota,j}\ge\nu_{\mathrm{up}}.
 ```
 
-The Gateway evaluates the loss test after a miss. The window contains
-only eligible reports at the current SF and excludes timing faults and
-application refusals. When the count reaches two, the Gateway clears the
-window and checks the higher reservation at the next Grant.
+Legacy requests a higher SF when the window meets the count and the
+current report has $e=1$. The window contains only eligible reports at the
+current SF and excludes timing faults and application refusals. The next
+Grant checks whether the higher reservation fits.
 
 A lock requires three first-slot deliveries and an ACK receipt at the same
 SF, including when the budget limits a Grant to a lower SF. It stores the
@@ -263,8 +270,11 @@ confirmed SF and releases any higher reservation held for rollback. After
 lock and hold expiry, six first-slot deliveries and enough filtered SNR
 can open a lower-SF trial
 (at least −3.5 dB for SF7, −6 dB for SF8 or −8.5 dB for SF9). A degraded
-trial rolls back. It also rolls back after six eligible first-slot
-deliveries without a matching Client ACK receipt for that SF. Either
+trial rolls back. A trial requested in frame $\phi_{\mathrm{probe}}$
+also rolls back at age $\phi-\phi_{\mathrm{probe}}\geq\nu_{\mathrm{ack}}$
+on a reviewed report with no matching receipt. At the start of the next
+frame, an unconfirmed trial expires even if its reports were absent or
+excluded. With a 15 s frame, six frame IDs correspond to 90 s. Either
 rollback delays the next lower-SF trial for eight first-slot deliveries.
 
 A Client retries only when a valid bitmap grants a retry. The Gateway
@@ -285,6 +295,59 @@ trial only lowers the remembered SF once it locks. A new Client boot ID
 or Gateway session clears the hint.
 Synchronous radio dependencies can still overrun
 software windows. [LaTeX source](../research/figures/adaptive-algorithm.tex) · [Runtime](../../src/app/multiclient_link.cpp) · [Known timing risks](ERROR_LOG.md)
+
+### Loss-cause-aware ADR
+
+The Gateway offers three build-time rules. `LEGACY` is the default.
+`MARGIN_EWMA` tracks an exponential mean and variance. `MARGIN_KALMAN`
+tracks level and slope and projects both the level and its uncertainty one
+eligible report ahead. With no SNR in an eligible report, EWMA holds its
+estimate and Kalman predicts without a measurement update.
+
+The Gateway prefers the SNR from a validated SF9 Request and falls back to
+accepted DATA SNR. A per-SF offset in [AdrParams](../../src/app/adr_policy.h)
+models DATA SNR minus Request SNR. It starts at zero. The estimator uses a
+common Request-SNR scale across SF changes and starts fresh for a new session
+or after idle state expires. Log both measurements to estimate the offset.
+
+| Quantity | Initial experimental setting |
+|---|---|
+| Provisional SNR threshold $\vartheta_\sigma$ at SF7/8/9/10 | −7.5 / −10 / −12.5 / −15 dB. Replace with measured SNR at 50% delivery for each SF. |
+| Margin $m_\sigma=\widehat{x}+b_\sigma-\vartheta_\sigma-z\sigma_x$ | Forecast SNR $\widehat{x}$, offset $b_\sigma$, and forecast standard deviation $\sigma_x$ with $z=1$ |
+| Evidence $S\gets\rho S+w$ | $\rho=0.75$. Add 1.0 for qualifying complete loss, 0.4 for a retry rescue, and 0 when $e=0$. |
+| Raise DATA SF | Require $e=1$, $S\geq S_{\mathrm{up}}=1.5$ and $m_\sigma<M_{\mathrm{up}}=0$ dB. |
+| Try lower DATA SF | Existing lock and receipt rules, six first-attempt deliveries, and $m_{\sigma-1}\geq4$ dB. Preserve rollback, hold, and receipt expiry. |
+| Estimators | EWMA weight 0.25. Kalman level and slope process variances 0.16 and 0.01, measurement variance 1.0, initial slope variance 0.25. Units use one step per eligible report. |
+
+`V3_LINK_SAMPLE` keeps the fields used by older captures. Adaptive Gateway
+rows add `node_id`, `class`, `snr_req`, `snr_data`, `level`, `slope`,
+`sigma`, `margin`, `score`, `decision`, `rule` and `params_version`.
+The margin describes the granted SF. The score for an increase is logged
+before clearing its evidence. Missing values appear as `N/A`.
+`LOST_ALL` means that no granted opportunity delivered DATA.
+With `params_version=2`, `adr=loss_unconfirmed` means DATA was absent
+without a qualifying Request margin. `ADR_PROBE` with `result=expired`
+identifies a trial that reached its frame-ID limit between reviews.
+`ABSENT` means the Gateway saw no valid Request during an observed request
+phase. `EXCLUDED` covers local timing faults or application refusal.
+Neither class changes the estimator or score. The other classes are
+`OK_FIRST` and `RESCUED_SAME_SF`. The offline parser skips invalid timing,
+application refusal and absence, and still accepts older captures.
+
+Every increase still passes the full-roster airtime check. The Gateway
+can observe a Request and miss every DATA packet when the Grant itself
+was lost. A weak Request supports an increase without proving the cause.
+Correlate Client transmission logs before attributing misses.
+
+Starting from zero, $n$ consecutive equal weights give
+$S_n=w(1-\rho^n)/(1-\rho)$. With the current settings the score first
+crosses $S_{\mathrm{up}}$ after two qualifying complete losses or ten
+consecutive retry rescues, assuming the margin condition also holds.
+Build-time checks require $S_{\mathrm{up}}(1-\rho)<w_{\mathrm{loss}}$ so the
+threshold remains reachable. Field data are needed to calibrate the
+margins and weights. The [seeded simulator](../../tools/adr_sim.py) can
+shift policy thresholds with `--policy-snr-shift-db` while keeping the
+assumed channel fixed.
 
 ## Board reference
 

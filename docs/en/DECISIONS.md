@@ -438,3 +438,38 @@ advertises a 16 B ceiling cannot grant the new sample.
 At 32 B, five SF9 Clients or two SF10 Clients fit alongside peers at SF7.
 Keep the full-roster admission check and verify the tighter margins on
 real boards before extending the active schedule.
+
+## ADR-038 — Separate loss evidence from SNR margin
+
+Keep Legacy as the default. The Gateway can select EWMA or local-trend
+Kalman at build time. Both use valid Request SNR on a common scale and
+accepted DATA SNR as a fallback. Preserve the estimate across SF changes.
+Reset it on a new session or idle state expiry. Keep the validated
+Request, Grant, DATA, ACK, airtime admission and rollback paths.
+
+A same-SF retry rescue contributes less evidence than complete loss.
+Four consecutive complete losses can request a higher SF even with
+healthy margin. Defer a common-mode filter until measurements can
+distinguish burst interference from simultaneous fades. Treat the
+thresholds and the simulator channel as hypotheses for field comparison.
+
+## ADR-039 — Qualify complete DATA loss and bound trial lifetime
+
+2026-11-23. Supersedes the strong-margin override in ADR-038. A valid
+Request establishes uplink control reception but cannot confirm Grant
+delivery or DATA TX. In every rule, count a complete miss toward an
+increase only with a finite Request margin below the upshift threshold.
+A same-SF retry rescue remains a separate observation. Legacy stays
+the default, and every increase must fit the full roster.
+
+Track a lower-SF trial by frame ID regardless of the success-counter cap
+or availability of usable reports. Allow receipt through the deadline
+frame. Roll back a degraded trial sooner and release an inactive Client's
+reservation through the existing lease rule.
+
+Use parameter revision 2. Check score reachability, positive hysteresis,
+effective threshold order and estimator inputs. Keep the current
+numerical tuning pending field calibration. Use a fixed independent
+decode curve when testing model sensitivity to a policy threshold,
+and start each blockage trial at the same SF with fresh state.
+Wire v5, PHY and NVS schema stay compatible.
