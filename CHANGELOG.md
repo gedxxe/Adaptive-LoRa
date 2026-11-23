@@ -5,6 +5,13 @@ changes. It is not a substitute for the append-only build memory.
 
 ## Unreleased
 
+### 32-byte adaptive test samples
+
+- Generate neutral ASCII DATA with a node ID, sample counter and `HELLO WORLD`.
+- Reserve 32 B per Client in the adaptive roster and keep the 15 s frame.
+- Document the eight-Client airtime limits and the effect on a possible
+  70-Client rotation.
+
 ### Adaptive recovery during a walk
 
 - Keep the last confirmed recovery SF after releasing an idle Client's airtime reservation.

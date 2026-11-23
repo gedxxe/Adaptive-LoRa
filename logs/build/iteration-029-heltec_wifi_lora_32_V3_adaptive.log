@@ -1,0 +1,56 @@
+$ pio run -e heltec_wifi_lora_32_V3_adaptive
+Processing heltec_wifi_lora_32_V3_adaptive (platform: espressif32; board: heltec_wifi_lora_32_V3; framework: arduino)
+--------------------------------------------------------------------------------
+Verbose mode can be enabled via `-v, --verbose` option
+CONFIGURATION: https://docs.platformio.org/page/boards/espressif32/heltec_wifi_lora_32_V3.html
+PLATFORM: Espressif 32 (55.3.311) > Heltec WiFi LoRa 32 (V3)
+HARDWARE: ESP32S3 240MHz, 320KB RAM, 8MB Flash
+DEBUG: Current (cmsis-dap) External (cmsis-dap, esp-bridge, esp-builtin, esp-prog, esp-prog-2, iot-bus-jtag, jlink, minimodule, olimex-arm-usb-ocd, olimex-arm-usb-ocd-h, olimex-arm-usb-tiny-h, olimex-jtag-tiny, tumpa)
+PACKAGES:
+ - contrib-piohome @ 3.4.4
+ - framework-arduinoespressif32 @ 3.3.11
+ - framework-arduinoespressif32-libs @ 5.5.5+sha.b774170ff46
+ - tool-esp-rom-elfs @ 2024.10.11
+ - tool-esptoolpy @ 5.3.0
+ - tool-openocd-esp32 @ 2.1200.20260424 (12.0)
+ - tool-xtensa-esp-elf-gdb @ 17.1.0+20260402
+ - toolchain-xtensa-esp-elf @ 14.2.0+20260121
+LDF: Library Dependency Finder -> https://bit.ly/configure-pio-ldf
+LDF Modes: Finder ~ chain, Compatibility ~ soft
+Found 45 compatible libraries
+Scanning dependencies...
+Dependency Graph
+|-- RadioLib @ 7.8.1
+|-- Wire @ 3.3.11
+|-- SPI @ 3.3.11
+|-- Preferences @ 3.3.11
+Building in release mode
+Compiling .pio\build\heltec_wifi_lora_32_V3_adaptive\src\app\firmware_runtime.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_adaptive\src\main.cpp.o
+Linking .pio\build\heltec_wifi_lora_32_V3_adaptive\firmware.elf
+Firmware metrics can not be shown. Set the terminal codepage to "utf-8" or "cp65001" on Windows.
+Retrieving maximum program size .pio\build\heltec_wifi_lora_32_V3_adaptive\firmware.elf
+Checking size .pio\build\heltec_wifi_lora_32_V3_adaptive\firmware.elf
+Advanced Memory Usage is available via "PlatformIO Home > Project Inspect"
+RAM:   [=         ]  10.6% (used 34864 bytes from 327680 bytes)
+Flash: [=         ]  11.7% (used 389728 bytes from 3342336 bytes)
+Building .pio\build\heltec_wifi_lora_32_V3_adaptive\firmware.bin
+esptool v5.3.0
+Creating ESP32-S3 image...
+Merged 3 ELF sections.
+Successfully created ESP32-S3 image.
+Creating binary "firmware.factory.bin" with:
+    Offset   | File
+ -  0x0000   | bootloader.bin
+ -  0x8000   | partitions.bin
+ -  0xe000   | boot_app0.bin
+ -  0x10000  | firmware.bin
+Successfully created combined binary image.
+========================= [SUCCESS] Took 25.73 seconds =========================
+
+Environment                      Status    Duration
+-------------------------------  --------  ------------
+heltec_wifi_lora_32_V3_adaptive  SUCCESS   00:00:25.727
+========================= 1 succeeded in 00:00:25.727 =========================
+
+Exit code: 0

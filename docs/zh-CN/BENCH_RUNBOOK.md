@@ -78,15 +78,20 @@ config save
 
 后续 Client 使用不同的节点 ID 3–9。用 `config show` 核对设置，看到 `CONFIG_SAVED`
 后发送 `reboot`，再执行 `status`。在每块板上核对角色、ID、`protocol=5` 和 `profile=adaptive`。
-试验前同时升级 Gateway 和 Client 的旧自适应镜像。
-串口配置中的间隔控制 8 字节示例应用生成数据，空口周期取自 Beacon。
+试验前同时升级 Gateway 和 Client 的旧自适应镜像。旧版 Gateway 若仍广播 16 B 上限，
+新版 Client 不会发送 Request。串口配置中的间隔控制 Client 提交样本的时间，空口周期取自 Beacon。
 Gateway 的 `SCHEDULE_CONFIG` 应显示 `period_us=15000000`、`roster_count=8`
-和 `bench_payload_ceiling_bytes=16`。
+和 `bench_payload_ceiling_bytes=32`。
+
+Client 2 的首个样本为 `ID=0002|SEQ=0001|MSG=HELLO WORLD`。ID 和序号均为四位十六进制。
+启动后序号从 1 开始，每次有新样本入队时递增，到 `FFFF` 后回绕。DATA 帧携带恰好 32 字节
+ASCII，不带字符串结束符或换行符。重传沿用相同字节和包标识。
 
 ## 双板检查与走测
 
 1. Client 2 与 Gateway 近距运行至少五个完整帧。核对同一帧的 Gateway `APP_PAYLOAD` 和 Client
-   `V3_PAYLOAD_RESULT,result=accepted`。查看 `ACKED DATA SF`。另做一次 Gateway
+   `V3_PAYLOAD_RESULT,result=accepted`。检查 Gateway 的 `bytes=32` 和十六进制载荷，再查看
+   Client 的 `ACKED DATA SF`。另做一次 Gateway
    断电上电，确认恢复。
 2. 增加固定 Client 3–5 并采集至少五个完整帧，再加入 Client 6–9，全部固定运行至少二十个
    完整帧。确认各节点都有 DATA 交付和 ACK，且没有应用重复交付、意外复位、串口数据缺失

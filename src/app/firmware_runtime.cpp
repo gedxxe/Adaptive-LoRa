@@ -240,8 +240,19 @@ void FirmwareRuntime::loop() {
     if (multicli_ && !waitingForBootScreen) {
         if (example_ && loaded_.role == DeviceRole::CLIENT && appNow >= nextReport_) {
             nextReport_ = appNow + uint64_t(loaded_.helloIntervalMs) * 1000;
-            constexpr uint8_t example[] = {0x01, 0x00, 0x16, 0x80, 0x00, 0x05, 0x00, 0x7f};
-            submitPayload(example, sizeof(example));
+            if (multiclient::kAdaptive) {
+                char sample[sizeof("ID=0000|SEQ=0000|MSG=HELLO WORLD")];
+                static_assert(!multiclient::kAdaptive || sizeof(sample) - 1 == multiclient::kBenchPayloadBytes,
+                              "Synthetic sample must match the adaptive bench ceiling");
+                const int length = std::snprintf(sample, sizeof(sample), "ID=%04X|SEQ=%04X|MSG=HELLO WORLD",
+                    unsigned(loaded_.nodeId), unsigned(exampleSequence_));
+                if (length == static_cast<int>(sizeof(sample) - 1) &&
+                    submitPayload(reinterpret_cast<const uint8_t*>(sample), sizeof(sample) - 1) == SubmitResult::QUEUED)
+                    ++exampleSequence_;
+            } else {
+                constexpr uint8_t example[] = {0x01, 0x00, 0x16, 0x80, 0x00, 0x05, 0x00, 0x7f};
+                submitPayload(example, sizeof(example));
+            }
         }
         multicli_->update(appNow, event, !rebootPending_);
     }

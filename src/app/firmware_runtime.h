@@ -63,6 +63,7 @@ private:
     runtime_optional::optional<MulticlientLink> multicli_;
     bool example_;
     uint64_t nextReport_ = 0;
+    uint16_t exampleSequence_ = 1;
 #elif defined(ADAPTIVE_LORA_SCHEDULED)
     runtime_optional::optional<ScheduledLink> scheduled_;
 #else

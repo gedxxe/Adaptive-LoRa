@@ -425,3 +425,16 @@ Successful retries count as first-attempt misses. A failed lower trial,
 or six first attempts without a matching receipt, restores the prior SF.
 Use the Client display to distinguish missing Beacon, missing Grant and
 local TX failures during a walk. DATA still requires an SF9 Grant.
+
+## ADR-037 — Use 32-byte synthetic DATA in the adaptive field profile
+
+The sample generator sends a 32 B ASCII record with a node ID, sample
+counter and fixed message. It advances the counter on a new queue entry,
+so retries keep the original application bytes and packet identity.
+Reserve 32 B for every adaptive roster position. Keep the 15 s period,
+the PHY and the existing wire and NVS formats. An earlier Gateway that
+advertises a 16 B ceiling cannot grant the new sample.
+
+At 32 B, five SF9 Clients or two SF10 Clients fit alongside peers at SF7.
+Keep the full-roster admission check and verify the tighter margins on
+real boards before extending the active schedule.

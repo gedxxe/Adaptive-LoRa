@@ -10,7 +10,7 @@
 namespace adaptive_lora::test {
 enum class HardwareCall {
     BEGIN, HEADER, CRC, ENABLE_IRQ, CLEAR_SIGNAL, SIGNAL, STANDBY, START_RX,
-    START_TX, FINISH_TX, FINISH_RX, FLAGS, LENGTH, READ, RSSI, SNR, AIRTIME, COUNT
+    START_TX, FINISH_TX, FINISH_RX, FLAGS, LENGTH, READ, RSSI, SNR, AIRTIME, RETUNE, COUNT
 };
 
 // Injects API results/data only. No driver state, deadlines or event policy.
@@ -64,6 +64,7 @@ public:
     }
     int16_t finishTransmit() override { record(HardwareCall::FINISH_TX); return finishTxCode; }
     int16_t finishReceive() override { record(HardwareCall::FINISH_RX); return finishRxCode; }
+    int16_t setSpreadingFactor(uint8_t) override { record(HardwareCall::RETUNE); return 0; }
     uint32_t getIrqFlags() override { record(HardwareCall::FLAGS); return flags; }
     size_t getPacketLength() override { record(HardwareCall::LENGTH); return packetLength; }
     int16_t readData(uint8_t* bytes, size_t length) override {

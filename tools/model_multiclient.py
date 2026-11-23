@@ -15,6 +15,7 @@ PHY = Phy()
 ADAPTIVE_PERIOD = 15_000_000
 ADAPTIVE_GUARD = 80_000
 ADAPTIVE_TAIL = 300_000
+ADAPTIVE_TEST_PAYLOAD = 32
 CONTROL_PHY = Phy(sf=9)
 
 
@@ -104,11 +105,12 @@ def adaptive_budget(count, size, sf9):
 
 
 def extended_sf_rows():
-    """Eight 16-byte payload ceilings, SF9 control; vary DATA SF only."""
+    """Sweep DATA SF for the full adaptive test roster."""
     rows = []
     for sf in range(7, 13):
-        headroom = [mixed_sf_budget([sf] * n + [7] * (8 - n), 16)["headroom_us"] for n in range(9)]
-        rows.append({"sf": sf, "data_air_us": airtime_us(HEADER + 4 + 16, Phy(sf=sf)),
+        headroom = [mixed_sf_budget([sf] * n + [7] * (MAX_IMPLEMENTED - n), ADAPTIVE_TEST_PAYLOAD)["headroom_us"]
+                    for n in range(MAX_IMPLEMENTED + 1)]
+        rows.append({"sf": sf, "data_air_us": airtime_us(HEADER + 4 + ADAPTIVE_TEST_PAYLOAD, Phy(sf=sf)),
                      "headroom_one_us": headroom[1], "headroom_all_us": headroom[8],
                      "max_at_sf_with_others_at_sf7": max(n for n, spare in enumerate(headroom) if spare >= 0)})
     return rows
@@ -140,7 +142,7 @@ def main():
         for case in details["cases"]:
             row = case["most_sf9_that_fit"]
             print(*(row[key] for key in ("clients", "payload_ceiling_bytes", "sf9_clients", "reserved_us", "headroom_us")))
-        print("8 x 16 B, control SF9; SF11-12 model only")
+        print(f"{MAX_IMPLEMENTED} x {ADAPTIVE_TEST_PAYLOAD} B, control SF9; SF11-12 model only")
         rows = details["eight_client_sf_sweep"]
         print(*rows[0].keys())
         for row in rows:

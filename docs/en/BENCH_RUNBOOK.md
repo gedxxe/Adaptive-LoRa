@@ -88,16 +88,24 @@ config save
 Give additional Clients unique node IDs 3–9. Check `config show`, wait for
 `CONFIG_SAVED`, send `reboot` and run `status`. Verify the role, IDs,
 `protocol=5` and `profile=adaptive` on every board. Replace earlier
-adaptive images on both roles before the run. The configured interval feeds the
-8-byte sample application. The over-the-air period comes from the Beacon.
+adaptive images on both roles before the run. A new Client skips its Request
+if the Gateway still advertises a 16 B ceiling. The configured interval controls
+when the Client queues a sample. The over-the-air period comes from the Beacon.
 The Gateway must report `period_us=15000000`, `roster_count=8` and
-`bench_payload_ceiling_bytes=16` in `SCHEDULE_CONFIG`.
+`bench_payload_ceiling_bytes=32` in `SCHEDULE_CONFIG`.
+
+With Client 2, the first sample is `ID=0002|SEQ=0001|MSG=HELLO WORLD`.
+Both fields use four hexadecimal digits. The sequence starts at one after
+boot, advances when a new sample enters the queue and wraps after `FFFF`.
+The DATA frame carries exactly 32 ASCII bytes, with no terminator or newline.
+A retry sends the same bytes and packet identity.
 
 ## Check the pair and walk the route
 
 1. Run Client 2 close to the Gateway for at least five complete frames. Match
    Gateway `APP_PAYLOAD` with Client `V3_PAYLOAD_RESULT,result=accepted`
-   for the same frame. Check `ACKED DATA SF` on the Client. In a separate
+   for the same frame. Check `bytes=32` and the Gateway's hexadecimal payload,
+   then check `ACKED DATA SF` on the Client. In a separate
    run, power-cycle the Gateway and check that the Client reconnects.
 2. Add stationary Clients 3–5 and collect at least five complete frames.
    Then add Clients 6–9 and collect at least 20 complete frames with all

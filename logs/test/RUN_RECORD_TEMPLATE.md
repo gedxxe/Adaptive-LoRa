@@ -55,7 +55,8 @@ Bench pair: Heltec WiFi LoRa 32 V3.4, owner-confirmed 902–928 MHz procurement 
 
 Use the [current field procedure](../../docs/en/BENCH_RUNBOOK.md). Record
 the Gateway ID, Client IDs, COM mapping, channel authorization, firmware
-hash, `SCHEDULE_CONFIG` including `data_sf_policy`, start/end `status`, and segment boundaries.
+hash, `SCHEDULE_CONFIG` including `data_sf_policy` and `bench_payload_ceiling_bytes`,
+the observed `APP_PAYLOAD` byte count, start/end `status`, and segment boundaries.
 List which streams are present (`gateway`, `client`, `client-2` through
 `client-8`). Record completed frames per node, deliveries, ACK receipts,
 retries, consecutive delivery gaps, and `timing=invalid` rows. Exclude

@@ -1,0 +1,14 @@
+$ python -m unittest discover -s tools -p test_adr_shadow.py -v
+test_clients_and_reboot_sessions_keep_separate_windows (test_adr_shadow.AdrShadowTests.test_clients_and_reboot_sessions_keep_separate_windows) ... ok
+test_invalid_metrics_and_conflicting_observations_are_rejected (test_adr_shadow.AdrShadowTests.test_invalid_metrics_and_conflicting_observations_are_rejected) ... ok
+test_local_timing_faults_and_application_refusals_do_not_train_adr (test_adr_shadow.AdrShadowTests.test_local_timing_faults_and_application_refusals_do_not_train_adr) ... ok
+test_low_snr_counts_even_when_all_data_arrive (test_adr_shadow.AdrShadowTests.test_low_snr_counts_even_when_all_data_arrive) ... ok
+test_missing_capture_lines_do_not_imply_packet_loss (test_adr_shadow.AdrShadowTests.test_missing_capture_lines_do_not_imply_packet_loss) ... ok
+test_weak_windows_raise_then_healthy_windows_clear_the_candidate (test_adr_shadow.AdrShadowTests.test_weak_windows_raise_then_healthy_windows_clear_the_candidate) ... ok
+
+----------------------------------------------------------------------
+Ran 6 tests in 0.001s
+
+OK
+
+Exit code: 0

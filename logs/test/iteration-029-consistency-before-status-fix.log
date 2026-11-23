@@ -1,0 +1,6 @@
+$ python tools/check_consistency.py
+docs/en/PROGRESS.md: field test and timing measurements must remain pending
+docs/zh-CN/PROGRESS.md: field test and timing measurements must remain pending
+FAIL: selected current-document consistency (2 errors)
+
+Exit code: 1
