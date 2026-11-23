@@ -5,6 +5,13 @@ changes. It is not a substitute for the append-only build memory.
 
 ## Unreleased
 
+### Experimental Gateway ADR rules
+
+- Add opt-in EWMA and local-trend Kalman rules that use Request SNR and
+  distinguish first-attempt success, retry rescue and complete loss.
+- Keep Legacy as the default with wire version 5 and the existing
+  full-roster airtime check. Add per-report diagnostics and a seeded host model.
+
 ### 32-byte adaptive test samples
 
 - Generate neutral ASCII DATA with a node ID, sample counter and `HELLO WORLD`.

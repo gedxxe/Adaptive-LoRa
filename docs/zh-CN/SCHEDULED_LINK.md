@@ -167,6 +167,8 @@ BW125 下 SF10 符号时长为 8.192 毫秒，无需 LDRO。96 字节包在 SF10
 
 ## 自适应与恢复
 
+下图与丢包窗口描述默认的 `LEGACY` 规则。
+
 <img src="../research/figures/adaptive-algorithm-adr.png" alt="Gateway SF 策略，包括会话恢复、近期丢包窗口、降档失败回退和确认。" width="480">
 
 README 算法中的 $\phi$ 为帧 ID，$\phi_{\mathrm{ack}}$ 是同一 Gateway 会话中
@@ -238,6 +240,37 @@ Gateway 按当前预算重新申请由 ACK 回执或后续锁定记住的 SF。�
 降档试用锁定前，保留此前的恢复 SF。Client boot ID 改变或 Gateway 启动新会话时清除该记录。
 同步无线调用仍可能
 超出软件时序窗口。[LaTeX 源文件](../research/figures/adaptive-algorithm.tex) · [运行时代码](../../src/app/multiclient_link.cpp) · [已知时序风险](../en/ERROR_LOG.md)
+
+### 按丢包情况调整
+
+Gateway 在构建时可选三种规则，默认为 `LEGACY`。 `MARGIN_EWMA` 跟踪指数加权均值与方差。
+`MARGIN_KALMAN` 同时跟踪 SNR 水平与变化趋势，并预测下一条有效记录的 SNR 及不确定度。
+有效记录缺少 SNR 时，EWMA 保留估计值，Kalman 只做预测。
+
+优先使用已验证的 SF9 Request SNR，缺失时使用已接受的 DATA SNR。
+[AdrParams](../../src/app/adr_policy.h) 中每个 SF 的偏移量定义为 DATA SNR 减去 Request SNR，
+初值为零。估计器使用统一的 Request SNR 尺度，切换 SF 时保留状态，更换会话或离线状态到期后重新估计。
+同时保存两种 SNR 以便后续标定偏移。
+
+| 参数 | 初始实验设置 |
+|---|---|
+| SF7/8/9/10 的暂定 SNR 门限 $\vartheta_\sigma$ | −7.5 / −10 / −12.5 / −15 dB。后续用各 SF 实测的 50% 交付门限替换。 |
+| 余量 $m_\sigma=\widehat{x}+b_\sigma-\vartheta_\sigma-z\sigma_x$ | $\widehat{x}$ 为预测 SNR，$b_\sigma$ 为偏移，$\sigma_x$ 为预测标准差，$z=1$ |
+| 丢包分数 $S$ | 每条有效记录先乘 0.75。全丢加 1.0，同 SF 重传成功加 0.4，首传成功加 0。 |
+| 提高 DATA SF | $S\geq1.5$ 且 $m_\sigma<0$ dB。连续四条有效记录全丢时，不受余量限制。 |
+| 试用较低 DATA SF | 延续锁定和回执规则，连续六次首传成功且 $m_{\sigma-1}\geq4$ dB。保留回退、等待和回执超时处理。 |
+| 估计器 | EWMA 权重为 0.25。Kalman 的水平和趋势过程方差为 0.16 和 0.01，测量方差为 1.0，初始趋势方差为 0.25。每条有效记录为一个时间步。 |
+
+`V3_LINK_SAMPLE` 保留旧采集字段，并在自适应 Gateway 上增加 `node_id`、`class`、`snr_req`、
+`snr_data`、`level`、`slope`、`sigma`、`margin`、`score`、`decision`、`rule` 和
+`params_version`。余量对应已分配的 SF，升档分数在清空前记录，缺失值为 `N/A`。
+`LOST_ALL` 表示已分配机会均未成功交付。 `ABSENT` 表示在已监听的请求阶段未收到有效 Request。
+`EXCLUDED` 对应本地时序问题或应用拒收。这两类均不更新估计器或分数。
+另外两类为 `OK_FIRST` 和 `RESCUED_SAME_SF`。离线解析器兼容旧日志，并跳过时序无效、应用拒收和缺席记录。
+
+所有升档仍需通过完整名单的空口预算检查。高余量下丢包可能和 SF 无关，单个 Gateway 无法据此确认干扰源。
+等待现场数据能区分共同干扰与多个节点同时衰落后，再评估全组丢包掩码。
+[定种子模拟器](../../tools/adr_sim.py) 使用假定的信道模型比较三种规则。
 
 ## 板卡参考
 

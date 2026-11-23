@@ -890,3 +890,18 @@ intended regression. Use the active model to choose the ceiling and SF12
 row to mutate. All 19 cases passed on rerun. See
 `logs/test/iteration-029-test_check_consistency.log` and
 `logs/test/iteration-029-test_check_consistency-final.log`.
+
+## ERR-057 — ADR test fixture carried earlier loss into the blockage case
+
+The first expanded `pio test -e native_adaptive` expected a hold on the
+first blockage report. Prior alternating losses had already accumulated
+enough evidence for an immediate increase. Use a separately initialized
+link with a clean delivery history for the two-report blockage test.
+The corrected suite passed all 33 cases.
+
+The first isolated wire-trace run exited 1 because its temporary
+candidate harness removed the new test registrations but left unused
+functions under `-Werror`. Remove both in the temporary copy. Both
+baseline and candidate then passed the 26 shared scenarios and their
+transmit traces matched byte for byte.
+The failed and corrected runs are in `logs/test/iteration-030-verification.log`.

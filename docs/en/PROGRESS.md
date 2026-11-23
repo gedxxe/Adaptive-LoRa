@@ -7,9 +7,9 @@
 |---|---|
 | Firmware / protocol | `0.2.0-alpha.1` / `5` |
 | Board | Heltec WiFi LoRa 32 V3.4, ESP32-S3/SX1262 |
-| Adaptive image | `heltec_wifi_lora_32_V3_adaptive`, ESP32 build passed, 26/26 native cases with the 32 B profile |
+| Adaptive image | `heltec_wifi_lora_32_V3_adaptive`, ESP32 builds passed for Legacy, EWMA and Kalman. Native cases 33/33. |
 | Fixed-SF image | `heltec_wifi_lora_32_V3_multiclient`, ESP32 build passed, 15/15 runtime cases |
-| Shared tests | 356/356 native and 62/62 Python cases passed |
+| Shared tests | 356/356 native and 64/64 Python cases passed |
 | Toolchain | PlatformIO 6.1.19, Espressif32 55.3.311, Arduino ESP32 3.3.11, Xtensa 14.2.0+20260121, RadioLib 7.8.1 |
 | Field test | Walk test and radio timing measurements pending |
 <!-- current-state:end -->
@@ -30,6 +30,26 @@ walk. The current 32 B profile still needs a field run.
 | The capture tool records nine streams with separate timestamps and hashes | Simulated serial ports. |
 
 [Capacity matrix](SCHEDULED_LINK.md#capacity-at-15-seconds) · [Build and test records](BUILD_MEMORY.md)
+
+## Experimental ADR model
+
+`python tools/adr_sim.py --seed 42` ran 128 paired trials of 480 frames
+per scenario, rate and rule. The model assumes one Client, perfect SF9
+control, independent per-attempt interference and a provisional decode
+curve. Loss is measured after up to four DATA attempts.
+
+| Selected model scenario | Legacy | EWMA | Kalman |
+|---|---:|---:|---:|
+| 20% independent interference, time above reference SF | 78.77% | 0.00% | 0.00% |
+| Same case, final loss | 0.174% | 0.179% | 0.179% |
+| 9 dB blockage with 10% interference, mean time to reference SF | 56.5 s | 92.5 s | 92.5 s |
+| Same blockage case, final loss | 0.524% | 0.874% | 0.874% |
+
+The reference is the lowest SF that meets the model's provisional 50%
+decode threshold. A trial already at or above that SF when blockage
+starts has a reaction time of zero. The experimental rules spent less
+time above the reference SF and reached it later after blockage. Field
+results require matched runs and calibration of Request-to-DATA SNR offsets.
 
 ## Papers and comparison runs
 

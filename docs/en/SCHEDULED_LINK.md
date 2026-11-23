@@ -192,6 +192,8 @@ SF12 are model-only rows. They need LDRO, and the 96 B SF11 packet and the
 
 ## Adaptation and recovery
 
+The figure and loss window below describe the default `LEGACY` rule.
+
 <img src="../research/figures/adaptive-algorithm-adr.png" alt="Gateway SF policy showing session recovery, the recent loss window, lower-SF trial rollback and confirmation." width="480">
 
 In the README algorithms, $\phi$ is the frame ID, $\phi_{\mathrm{ack}}$ is
@@ -285,6 +287,48 @@ trial only lowers the remembered SF once it locks. A new Client boot ID
 or Gateway session clears the hint.
 Synchronous radio dependencies can still overrun
 software windows. [LaTeX source](../research/figures/adaptive-algorithm.tex) · [Runtime](../../src/app/multiclient_link.cpp) · [Known timing risks](ERROR_LOG.md)
+
+### Loss-cause-aware ADR
+
+The Gateway offers three build-time rules. `LEGACY` is the default.
+`MARGIN_EWMA` tracks an exponential mean and variance. `MARGIN_KALMAN`
+tracks level and slope and projects both the level and its uncertainty one
+eligible report ahead. With no SNR in an eligible report, EWMA holds its
+estimate and Kalman predicts without a measurement update.
+
+The Gateway prefers the SNR from a validated SF9 Request and falls back to
+accepted DATA SNR. A per-SF offset in [AdrParams](../../src/app/adr_policy.h)
+models DATA SNR minus Request SNR. It starts at zero. The estimator uses a
+common Request-SNR scale across SF changes and starts fresh for a new session
+or after idle state expires. Log both measurements to estimate the offset.
+
+| Quantity | Initial experimental setting |
+|---|---|
+| Provisional SNR threshold $\vartheta_\sigma$ at SF7/8/9/10 | −7.5 / −10 / −12.5 / −15 dB. Replace with measured SNR at 50% delivery for each SF. |
+| Margin $m_\sigma=\widehat{x}+b_\sigma-\vartheta_\sigma-z\sigma_x$ | Forecast SNR $\widehat{x}$, offset $b_\sigma$, and forecast standard deviation $\sigma_x$ with $z=1$ |
+| Evidence $S$ | Decay by 0.75 per eligible report. Add 1.0 after complete loss, 0.4 after a same-SF retry delivers, or 0 after a first-attempt delivery. |
+| Raise DATA SF | $S\geq1.5$ and $m_\sigma<0$ dB. Four consecutive eligible reports with complete loss override the margin. |
+| Try lower DATA SF | Existing lock and receipt rules, six first-attempt deliveries, and $m_{\sigma-1}\geq4$ dB. Preserve rollback, hold, and receipt expiry. |
+| Estimators | EWMA weight 0.25. Kalman level and slope process variances 0.16 and 0.01, measurement variance 1.0, initial slope variance 0.25. Units use one step per eligible report. |
+
+`V3_LINK_SAMPLE` keeps the fields used by older captures. Adaptive Gateway
+rows add `node_id`, `class`, `snr_req`, `snr_data`, `level`, `slope`,
+`sigma`, `margin`, `score`, `decision`, `rule` and `params_version`.
+The margin describes the granted SF. The score for an increase is logged
+before clearing its evidence. Missing values appear as `N/A`.
+`LOST_ALL` means that no granted opportunity delivered DATA.
+`ABSENT` means the Gateway saw no valid Request during an observed request
+phase. `EXCLUDED` covers local timing faults or application refusal.
+Neither class changes the estimator or score. The other classes are
+`OK_FIRST` and `RESCUED_SAME_SF`. The offline parser skips invalid timing,
+application refusal and absence, and still accepts older captures.
+
+Every increase still passes the original full-roster airtime check.
+High-margin losses suggest an SF-independent cause, but a single Gateway
+cannot identify the interferer from these observations. A network-wide
+loss mask is deferred until measurements separate shared interference
+from several Clients fading at once. The [seeded simulator](../../tools/adr_sim.py)
+compares the rules under an assumed channel model.
 
 ## Board reference
 
