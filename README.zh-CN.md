@@ -14,7 +14,8 @@ Client ID 为 2–9。每个 Client 提交 32 字节 ASCII 样本，例如
 Gateway 显示最近一次收到的 DATA 的 SF。Gateway 为各 Client 调整 DATA SF7–SF10，按申请的字节数
 分配时隙，并通过 ACK 位图分配重传机会。控制帧固定用 SF9，编码率、带宽、发射功率和帧周期均固定。
 
-默认 Legacy 规则下，同一 SF 最近三条有效记录中有两次首传失败时，Gateway 可升档。断联后同一会话的 Client 返回时，
+默认 Legacy 规则下，同一 SF 最近三条有效记录中有两次丢包计入窗口时，Gateway 可升档。
+重传成功计入窗口。完全未收到 DATA 时，只有本次 Request 的 SNR 余量偏低才计入。断联后同一会话的 Client 返回时，
 若预算允许，Gateway 可恢复上次确认的 SF。`SEARCH` 表示在等新的 SF9 Beacon。
 `NO GRANT` 表示已启动 Request，但未收到匹配的 Grant。
 Gateway 还提供两种[基于 SNR 余量的实验规则](docs/zh-CN/SCHEDULED_LINK.md#按丢包情况调整)。

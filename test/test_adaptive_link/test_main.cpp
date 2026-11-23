@@ -121,9 +121,12 @@ struct Network {
                     events[i].rssi = -95.0f;
                     events[i].snr = snr[sender - 1];
                 }
-                if (hasRequestSnr && i == 0 && frame.type == MessageType::PAYLOAD_REQUEST) {
+                if (i == 0 && frame.type == MessageType::PAYLOAD_REQUEST) {
+                    const auto floor = minDataSf[sender - 1];
+                    constexpr float fixtureSnr[] = {-2, -9, -11, -13};
                     events[i].metrics = true;
-                    events[i].snr = requestSnr[sender - 1];
+                    events[i].snr = hasRequestSnr ? requestSnr[sender - 1] :
+                        fixtureSnr[floor > kBaseSf ? floor - kBaseSf : 0];
                 }
             }
             sender = -1;
@@ -205,9 +208,9 @@ void adr_ewma_holds_missing_samples_and_prefers_request_snr() {
     AdrParams params = kAdrParams;
     params.dataOffsetDb[0] = 4;
     AdrState state;
-    reviewAdr(state, rule, 7, {AdrOutcome::OK_FIRST, -5, 9}, params);
+    reviewAdr(state, rule, 7, 1, {AdrOutcome::OK_FIRST, -5, 9}, params);
     TEST_ASSERT_EQUAL_FLOAT(-5, state.estimate.level);
-    reviewAdr(state, rule, 7, {AdrOutcome::OK_FIRST, kAdrMissingSnr, -1}, params);
+    reviewAdr(state, rule, 7, 2, {AdrOutcome::OK_FIRST, kAdrMissingSnr, -1}, params);
     TEST_ASSERT_EQUAL_FLOAT(-5, state.estimate.level);
     TEST_ASSERT_EQUAL_FLOAT(6.5f - std::sqrt(0.75f), state.estimate.margin(rule, 7, params));
 }
@@ -226,49 +229,51 @@ void adr_kalman_converges_and_predicts_missing_samples() {
     TEST_ASSERT_TRUE(estimate.sigma(rule, kAdrParams) > oldSigma);
 }
 
-void adr_margin_and_hard_override_decision_table() {
+void adr_margin_gates_weak_and_unconfirmed_loss() {
     for (auto rule : {AdrRule::MARGIN_EWMA, AdrRule::MARGIN_KALMAN}) {
         AdrState healthy;
         for (unsigned i = 0; i < 10; ++i) {
             for (auto outcome : {AdrOutcome::RESCUED_SAME_SF, AdrOutcome::LOST_ALL, AdrOutcome::OK_FIRST}) {
-                TEST_ASSERT_EQUAL_INT(int(AdrDecision::HOLD), int(reviewAdr(healthy, rule, 7, {outcome, -2}).decision));
+                TEST_ASSERT_EQUAL_INT(int(AdrDecision::HOLD), int(reviewAdr(healthy, rule, 7, i + 1, {outcome, -2}).decision));
             }
         }
         TEST_ASSERT_EQUAL_UINT8(7, healthy.desired);
 
         AdrState blocked;
-        for (unsigned i = 0; i < 20; ++i) reviewAdr(blocked, rule, 7, {AdrOutcome::OK_FIRST, -2});
-        TEST_ASSERT_EQUAL_INT(int(AdrDecision::HOLD), int(reviewAdr(blocked, rule, 7, {AdrOutcome::LOST_ALL, -16}).decision));
-        const auto fade = reviewAdr(blocked, rule, 7, {AdrOutcome::LOST_ALL, -16});
+        for (unsigned i = 1; i <= 20; ++i) reviewAdr(blocked, rule, 7, i, {AdrOutcome::OK_FIRST, -2});
+        TEST_ASSERT_EQUAL_INT(int(AdrDecision::HOLD), int(reviewAdr(blocked, rule, 7, 21, {AdrOutcome::LOST_ALL, -16}).decision));
+        const auto fade = reviewAdr(blocked, rule, 7, 22, {AdrOutcome::LOST_ALL, -16});
         TEST_ASSERT_EQUAL_INT(int(AdrDecision::UP), int(fade.decision));
         TEST_ASSERT_TRUE(fade.decisionScore >= kAdrParams.upScore);
         TEST_ASSERT_EQUAL_UINT8(8, blocked.desired);
 
-        AdrState override;
-        for (unsigned i = 1; i < kAdrParams.hardLosses; ++i)
-            TEST_ASSERT_EQUAL_INT(int(AdrDecision::HOLD), int(reviewAdr(override, rule, 7, {AdrOutcome::LOST_ALL, -2}).decision));
-        TEST_ASSERT_EQUAL_INT(int(AdrDecision::OVERRIDE),
-                              int(reviewAdr(override, rule, 7, {AdrOutcome::LOST_ALL, -2}).decision));
-        TEST_ASSERT_EQUAL_UINT8(8, override.desired);
+        AdrState unknown;
+        for (unsigned i = 1; i <= 20; ++i) {
+            const float snr = i % 2 ? -2.0f : kAdrMissingSnr;
+            const auto result = reviewAdr(unknown, rule, 7, i, {AdrOutcome::LOST_ALL, snr});
+            TEST_ASSERT_EQUAL_INT(int(AdrDecision::HOLD), int(result.decision));
+            TEST_ASSERT_EQUAL_STRING("loss_unconfirmed", result.action);
+        }
+        TEST_ASSERT_EQUAL_UINT8(7, unknown.desired);
+        TEST_ASSERT_EQUAL_FLOAT(0, unknown.score);
     }
 }
 
 void adr_ignores_absence_and_keeps_estimate_across_an_sf_change() {
     for (auto rule : {AdrRule::MARGIN_EWMA, AdrRule::MARGIN_KALMAN}) {
         AdrState state;
-        reviewAdr(state, rule, 7, {AdrOutcome::LOST_ALL, -2});
+        reviewAdr(state, rule, 7, 1, {AdrOutcome::LOST_ALL, -12});
         const auto before = state.estimate;
         for (auto outcome : {AdrOutcome::ABSENT, AdrOutcome::EXCLUDED})
-            reviewAdr(state, rule, 7, {outcome, -30});
+            reviewAdr(state, rule, 7, 2, {outcome, -30});
         TEST_ASSERT_EQUAL_FLOAT(before.level, state.estimate.level);
         TEST_ASSERT_EQUAL_FLOAT(before.variance, state.estimate.variance);
         TEST_ASSERT_EQUAL_FLOAT(kAdrParams.lostWeight, state.score);
-        TEST_ASSERT_EQUAL_UINT8(1, state.consecutiveLost);
         state.desired = 8;
-        reviewAdr(state, rule, 8, {AdrOutcome::OK_FIRST});
+        reviewAdr(state, rule, 8, 3, {AdrOutcome::OK_FIRST});
         TEST_ASSERT_TRUE(state.estimate.ready);
         TEST_ASSERT_EQUAL_FLOAT(before.level, state.estimate.level);
-        TEST_ASSERT_EQUAL_UINT8(0, state.consecutiveLost);
+        TEST_ASSERT_EQUAL_FLOAT(0, state.score);
     }
 }
 
@@ -277,17 +282,72 @@ void adr_hysteresis_waits_for_good_margin_and_keeps_probe_rollback() {
         AdrState state;
         state.desired = state.reservedSf = state.acknowledgedSf = 8;
         for (unsigned i = 0; i < 20; ++i)
-            TEST_ASSERT_NOT_EQUAL(int(AdrDecision::DOWN), int(reviewAdr(state, rule, 8,
+            TEST_ASSERT_NOT_EQUAL(int(AdrDecision::DOWN), int(reviewAdr(state, rule, 8, i + 1,
                 {AdrOutcome::OK_FIRST, i % 2 ? -5.3f : -5.7f}).decision));
         TEST_ASSERT_EQUAL_UINT8(8, state.desired);
         for (unsigned i = 0; i < 20 && state.desired == 8; ++i)
-            reviewAdr(state, rule, 8, {AdrOutcome::OK_FIRST, 0});
+            reviewAdr(state, rule, 8, 21 + i, {AdrOutcome::OK_FIRST, 0});
         TEST_ASSERT_EQUAL_UINT8(7, state.desired);
         TEST_ASSERT_EQUAL_UINT8(8, state.reservedSf);
         TEST_ASSERT_EQUAL_INT(int(AdrDecision::ROLLBACK),
-                              int(reviewAdr(state, rule, 7, {AdrOutcome::RESCUED_SAME_SF, 0}).decision));
+                              int(reviewAdr(state, rule, 7, state.probeStartedFrame + 1,
+                                            {AdrOutcome::RESCUED_SAME_SF, 0}).decision));
         TEST_ASSERT_EQUAL_UINT8(8, state.desired);
         TEST_ASSERT_EQUAL_UINT8(kAdrParams.rollbackHold, state.hold);
+    }
+}
+
+void adr_probe_expires_independently_of_success_and_observation_counts() {
+    AdrParams params = kAdrParams;
+    params.probeReceiptLimit = 8;
+    TEST_ASSERT_TRUE(validAdrParams(params));
+    AdrState trial;
+    trial.probeStartedFrame = 10;
+    trial.desired = 7;
+    trial.reservedSf = trial.probeReturn = trial.acknowledgedSf = 8;
+    auto unobserved = trial;
+    for (uint32_t frame = 11; frame < 18; ++frame)
+        TEST_ASSERT_EQUAL_INT(int(AdrDecision::HOLD), int(reviewAdr(trial, AdrRule::MARGIN_EWMA, 7, frame,
+            {AdrOutcome::OK_FIRST, 0}, params).decision));
+    TEST_ASSERT_EQUAL_UINT8(6, trial.consecutiveFirst);
+    TEST_ASSERT_EQUAL_STRING("probe_no_receipt", reviewAdr(trial, AdrRule::MARGIN_EWMA, 7, 18,
+        {AdrOutcome::OK_FIRST, 0}, params).action);
+    TEST_ASSERT_EQUAL_UINT8(8, trial.desired);
+    TEST_ASSERT_FALSE(expireAdrProbe(unobserved, 18, params));
+    TEST_ASSERT_TRUE(expireAdrProbe(unobserved, 19, params));
+    TEST_ASSERT_EQUAL_UINT8(8, unobserved.desired);
+    TEST_ASSERT_EQUAL_UINT8(0, unobserved.probeReturn);
+    TEST_ASSERT_EQUAL_UINT8(params.rollbackHold, unobserved.hold);
+}
+
+void adr_rejects_invalid_or_unreachable_tuning_values() {
+    auto params = kAdrParams;
+    params.upScore = params.lostWeight / (1 - params.decay);
+    TEST_ASSERT_FALSE(validAdrParams(params));
+    params = kAdrParams;
+    params.probeReceiptLimit = params.confirmations - 1;
+    TEST_ASSERT_FALSE(validAdrParams(params));
+    params = kAdrParams;
+    params.measurementVariance = 0;
+    TEST_ASSERT_FALSE(validAdrParams(params));
+    params = kAdrParams;
+    params.dataOffsetDb[0] = kAdrMissingSnr;
+    TEST_ASSERT_FALSE(validAdrParams(params));
+}
+
+void gateway_does_not_raise_data_sf_when_healthy_requests_lose_their_grants() {
+    for (auto rule : {AdrRule::LEGACY, AdrRule::MARGIN_EWMA, AdrRule::MARGIN_KALMAN}) {
+        Serial.output.clear();
+        Network n(1, 8, kBenchPayloadBytes, true, rule);
+        n.dropGrant = true;
+        n.rounds(7, kBenchPayloadBytes);
+        TEST_ASSERT_FALSE(n.sent(1, 7));
+        TEST_ASSERT_NOT_EQUAL(std::string::npos, Serial.output.find("adr=loss_unconfirmed"));
+        TEST_ASSERT_EQUAL(std::string::npos, Serial.output.find("next_sf=8"));
+        n.dropGrant = false;
+        n.rounds(1, kBenchPayloadBytes);
+        TEST_ASSERT_TRUE(n.sent(1, 7));
+        TEST_ASSERT_EQUAL_UINT(1, n.delivered[0]);
     }
 }
 
@@ -316,7 +376,7 @@ void gateway_margin_policy_uses_request_snr_and_logs_absent_roster_slots() {
         for (auto begin = Serial.output.find(event); begin != std::string::npos; begin = Serial.output.find(event, begin + 1)) {
             const auto end = Serial.output.find('\n', begin);
             TEST_ASSERT_TRUE(end != std::string::npos && end - begin <= 510);
-            TEST_ASSERT_NOT_EQUAL(std::string::npos, Serial.output.substr(begin, end - begin).find("params_version=1"));
+            TEST_ASSERT_NOT_EQUAL(std::string::npos, Serial.output.substr(begin, end - begin).find("params_version=2"));
         }
     }
 }
@@ -911,9 +971,12 @@ int main() {
     RUN_TEST(adr_classifies_only_eligible_reports);
     RUN_TEST(adr_ewma_holds_missing_samples_and_prefers_request_snr);
     RUN_TEST(adr_kalman_converges_and_predicts_missing_samples);
-    RUN_TEST(adr_margin_and_hard_override_decision_table);
+    RUN_TEST(adr_margin_gates_weak_and_unconfirmed_loss);
     RUN_TEST(adr_ignores_absence_and_keeps_estimate_across_an_sf_change);
     RUN_TEST(adr_hysteresis_waits_for_good_margin_and_keeps_probe_rollback);
+    RUN_TEST(adr_probe_expires_independently_of_success_and_observation_counts);
+    RUN_TEST(adr_rejects_invalid_or_unreachable_tuning_values);
+    RUN_TEST(gateway_does_not_raise_data_sf_when_healthy_requests_lose_their_grants);
     RUN_TEST(gateway_margin_policy_uses_request_snr_and_logs_absent_roster_slots);
     RUN_TEST(mixed_profile_codec_and_budget);
     RUN_TEST(roaming_client_adapts_while_three_peers_deliver);

@@ -75,7 +75,7 @@ void MulticlientLink::logLinkSamples(bool timingOk) {
         else if (rx.rxWindowUnobserved) review.action = "rx_window_unobserved";
         else if (!adaptDataSf_) review.action = "fixed_sf";
         else if (rx.result == Reception::REFUSED) review.action = "app_refused";
-        else review = reviewAdr(adr_[i], adrRule_, slot.sf, obs);
+        else review = reviewAdr(adr_[i], adrRule_, slot.sf, frameId_, obs);
         const auto& adr = adr_[kAdaptive ? i : 0];
         std::snprintf(line, sizeof(line), "event=V3_LINK_SAMPLE,network_id=%u,gateway_id=%u,gateway_boot=%" PRIu32
             ",frame_id=%" PRIu32 ",source_id=%u,client_boot=%" PRIu32 ",sf=%u,outcome=%s,app=%s,%s",
@@ -292,6 +292,16 @@ void MulticlientLink::gateway(uint64_t now, const RadioEvent& event, const Frame
         phase_ = Phase::WAIT;
         if (frameId_ == UINT32_MAX) return;
         ++frameId_;
+        if (adaptDataSf_) {
+            for (uint8_t i = 0; i < roster_.count; ++i) {
+                if (expireAdrProbe(adr_[i], frameId_)) {
+                    char line[96];
+                    std::snprintf(line, sizeof(line), "event=ADR_PROBE,frame_id=%" PRIu32
+                        ",node_id=%u,result=expired", frameId_, unsigned(roster_.nodes[i].id));
+                    log_.text(line);
+                }
+            }
+        }
         nextBeacon_ = now + roster_.periodUs;
         displayQuietUntil_ = nextBeacon_;
         // If beacon TX fails, reserve a request window in case it went on air.

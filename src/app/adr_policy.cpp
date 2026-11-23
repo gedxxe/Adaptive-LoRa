@@ -7,7 +7,15 @@ namespace {
 void clearEvidence(AdrState& state) {
     state.degradedHistory = 0;
     state.score = 0;
-    state.consecutiveLost = 0;
+}
+
+void rollbackProbe(AdrState& state, const AdrParams& params) {
+    state.desired = state.probeReturn;
+    state.probeReturn = 0;
+    state.probeStartedFrame = 0;
+    state.consecutiveFirst = 0;
+    clearEvidence(state);
+    state.hold = params.rollbackHold;
 }
 
 uint8_t countMisses(uint8_t mask) {
@@ -59,6 +67,7 @@ float AdrEstimate::sigma(AdrRule rule, const AdrParams& p) const {
 }
 
 float AdrEstimate::margin(AdrRule rule, uint8_t sf, const AdrParams& p) const {
+    if (sf < phy::dataSf || sf > phy::maxDataSf) return kAdrMissingSnr;
     const auto index = sf - phy::dataSf;
     const float predicted = rule == AdrRule::MARGIN_KALMAN ? level + slope : level;
     return ready ? predicted + p.dataOffsetDb[index] - p.requiredSnrDb[index] - p.uncertaintyZ * sigma(rule, p) : kAdrMissingSnr;
@@ -71,10 +80,24 @@ AdrOutcome classifyAdr(bool requested, bool usable, bool accepted, bool retried)
     return retried ? AdrOutcome::RESCUED_SAME_SF : AdrOutcome::OK_FIRST;
 }
 
-AdrReview reviewAdr(AdrState& state, AdrRule rule, uint8_t sf, const AdrObservation& obs, const AdrParams& p) {
+bool expireAdrProbe(AdrState& state, uint32_t frame, const AdrParams& p) {
+    if (!state.probeReturn || frame - state.probeStartedFrame <= p.probeReceiptLimit) return false;
+    rollbackProbe(state, p);
+    return true;
+}
+
+AdrReview reviewAdr(AdrState& state, AdrRule rule, uint8_t sf, uint32_t frame,
+                    const AdrObservation& obs, const AdrParams& p) {
     if (obs.outcome == AdrOutcome::ABSENT || obs.outcome == AdrOutcome::EXCLUDED) return {"observe"};
+    if (sf < phy::dataSf || sf > phy::maxDataSf) return {"invalid_sf"};
     const bool legacy = rule == AdrRule::LEGACY;
     const bool first = obs.outcome == AdrOutcome::OK_FIRST;
+    const bool lost = obs.outcome == AdrOutcome::LOST_ALL;
+    const auto index = sf - phy::dataSf;
+    // The Gateway cannot tell whether the Client received a Grant or transmitted DATA.
+    const bool weakRequest = std::isfinite(obs.requestSnr) &&
+        obs.requestSnr + p.dataOffsetDb[index] - p.requiredSnrDb[index] < p.upMarginDb;
+    const bool unconfirmedLoss = lost && !weakRequest;
     const bool clientConfirmed = state.acknowledgedSf == sf;
     if (state.observedSf != sf) {
         state.observedSf = sf;
@@ -83,12 +106,10 @@ AdrReview reviewAdr(AdrState& state, AdrRule rule, uint8_t sf, const AdrObservat
         clearEvidence(state);
     }
     if (!legacy) {
-        const float sample = std::isfinite(obs.requestSnr) ? obs.requestSnr : obs.dataSnr - p.dataOffsetDb[sf - phy::dataSf];
+        const float sample = std::isfinite(obs.requestSnr) ? obs.requestSnr : obs.dataSnr - p.dataOffsetDb[index];
         state.estimate.update(rule, sample, p);
-        const bool lost = obs.outcome == AdrOutcome::LOST_ALL;
-        state.score = p.decay * state.score + (first ? 0.0f : lost ? p.lostWeight : p.rescuedWeight);
-        if (!lost) state.consecutiveLost = 0;
-        else if (state.consecutiveLost < p.hardLosses) ++state.consecutiveLost;
+        const float weight = first || unconfirmedLoss ? 0.0f : lost ? p.lostWeight : p.rescuedWeight;
+        state.score = p.decay * state.score + weight;
     }
     if (sf != state.desired) {
         if (!first) state.consecutiveFirst = 0;
@@ -104,32 +125,27 @@ AdrReview reviewAdr(AdrState& state, AdrRule rule, uint8_t sf, const AdrObservat
         return {"budget_limited"};
     }
     if (state.probeReturn && (!first ||
-        (!clientConfirmed && state.consecutiveFirst + 1 >= p.probeReceiptLimit))) {
+        (!clientConfirmed && frame - state.probeStartedFrame >= p.probeReceiptLimit))) {
         const float score = state.score;
-        state.desired = state.probeReturn;
-        state.probeReturn = 0;
-        state.consecutiveFirst = 0;
-        clearEvidence(state);
-        state.hold = p.rollbackHold;
+        rollbackProbe(state, p);
         return {first ? "probe_no_receipt" : "rollback", AdrDecision::ROLLBACK, score};
     }
     if (legacy) {
         const unsigned mask = (1u << p.legacyWindow) - 1u;
-        state.degradedHistory = uint8_t(((state.degradedHistory << 1) | !first) & mask);
+        state.degradedHistory = uint8_t(((state.degradedHistory << 1) | (!first && !unconfirmedLoss)) & mask);
     }
     if (!first) {
         state.consecutiveFirst = 0;
-        const bool override = !legacy && state.consecutiveLost >= p.hardLosses;
+        if (unconfirmedLoss) return {"loss_unconfirmed"};
         const bool weak = legacy ? countMisses(state.degradedHistory) >= p.legacyMisses :
             state.score >= p.upScore && state.estimate.margin(rule, sf, p) < p.upMarginDb;
-        if (!override && !weak) return {"observe"};
+        if (!weak) return {"observe"};
         const float score = state.score;
         state.locked = false;
         clearEvidence(state);
         if (state.desired == phy::maxDataSf) return {"ceiling", AdrDecision::HOLD, score};
         ++state.desired;
-        return override ? AdrReview{"hard_override", AdrDecision::OVERRIDE, score} :
-                          AdrReview{"step_up", AdrDecision::UP, score};
+        return {"step_up", AdrDecision::UP, score};
     }
 
     if (legacy && std::isfinite(obs.dataSnr)) {
@@ -140,6 +156,7 @@ AdrReview reviewAdr(AdrState& state, AdrRule rule, uint8_t sf, const AdrObservat
     const char* action = "observe";
     if (state.consecutiveFirst >= p.confirmations && !state.locked && clientConfirmed) {
         state.probeReturn = 0;
+        state.probeStartedFrame = 0;
         state.reservedSf = state.desired;
         state.recoverySf = sf;
         state.locked = true;
@@ -151,6 +168,7 @@ AdrReview reviewAdr(AdrState& state, AdrRule rule, uint8_t sf, const AdrObservat
             state.estimate.margin(rule, uint8_t(sf - 1), p) >= p.downMarginDb;
         if (enoughMargin) {
             state.probeReturn = state.desired--;
+            state.probeStartedFrame = frame;
             state.consecutiveFirst = 0;
             state.locked = false;
             return {"probe_lower", AdrDecision::DOWN};
@@ -185,7 +203,6 @@ const char* adrDecisionName(AdrDecision decision) {
         case AdrDecision::UP: return "up";
         case AdrDecision::DOWN: return "down";
         case AdrDecision::ROLLBACK: return "rollback";
-        case AdrDecision::OVERRIDE: return "override";
     }
     return "unknown";
 }

@@ -5,10 +5,10 @@
 namespace adaptive_lora {
 enum class AdrRule : uint8_t { LEGACY = 0, MARGIN_EWMA = 1, MARGIN_KALMAN = 2 };
 enum class AdrOutcome : uint8_t { ABSENT, OK_FIRST, RESCUED_SAME_SF, LOST_ALL, EXCLUDED };
-enum class AdrDecision : uint8_t { HOLD, UP, DOWN, ROLLBACK, OVERRIDE };
+enum class AdrDecision : uint8_t { HOLD, UP, DOWN, ROLLBACK };
 
 struct AdrParams {
-    uint8_t version = 1;
+    uint8_t version = 2;
     uint8_t legacyWindow = 3;
     uint8_t legacyMisses = 2;
     uint8_t confirmations = 3;
@@ -16,7 +16,6 @@ struct AdrParams {
     uint8_t probeReceiptLimit = 6;
     uint8_t rollbackHold = 8;
     uint8_t idleFrames = 4;
-    uint8_t hardLosses = 4;
     float alpha = 0.25f;
     float decay = 0.75f;
     float lostWeight = 1.0f;
@@ -38,10 +37,34 @@ struct AdrParams {
 };
 
 constexpr AdrParams kAdrParams{};
-static_assert(kAdrParams.legacyWindow <= 8 && kAdrParams.legacyMisses <= kAdrParams.legacyWindow,
-              "The legacy window must fit in one byte");
-static_assert(kAdrParams.downMarginDb - kAdrParams.upMarginDb >= kAdrParams.hysteresisDb,
-              "The ADR margins must leave room for hysteresis");
+
+constexpr bool finiteAdrValue(float value) {
+    return value >= -std::numeric_limits<float>::max() && value <= std::numeric_limits<float>::max();
+}
+
+constexpr bool validAdrParams(const AdrParams& p) {
+    if (!p.legacyMisses || p.legacyMisses > p.legacyWindow || p.legacyWindow > 8 ||
+        !p.confirmations || p.confirmations > p.firstBeforeProbe || p.confirmations > p.probeReceiptLimit ||
+        !p.idleFrames || !(p.alpha > 0 && p.alpha <= 1) || !(p.decay >= 0 && p.decay < 1) ||
+        !finiteAdrValue(p.lostWeight) || !(p.rescuedWeight >= 0 && p.rescuedWeight <= p.lostWeight) ||
+        !(p.upScore > 0 && p.upScore * (1 - p.decay) < p.lostWeight) ||
+        !finiteAdrValue(p.upMarginDb) || !finiteAdrValue(p.downMarginDb) ||
+        !finiteAdrValue(p.hysteresisDb) || !(p.hysteresisDb > 0 && p.downMarginDb - p.upMarginDb >= p.hysteresisDb))
+        return false;
+    if (!finiteAdrValue(p.uncertaintyZ) || p.uncertaintyZ < 0 ||
+        !finiteAdrValue(p.qLevel) || p.qLevel < 0 || !finiteAdrValue(p.qSlope) || p.qSlope < 0 ||
+        !finiteAdrValue(p.initialSlopeVariance) || p.initialSlopeVariance < 0 ||
+        !finiteAdrValue(p.measurementVariance) || p.measurementVariance <= 0)
+        return false;
+    for (unsigned i = 0; i <= phy::maxDataSf - phy::dataSf; ++i)
+        if (!finiteAdrValue(p.requiredSnrDb[i] - p.dataOffsetDb[i]) ||
+            (i && p.requiredSnrDb[i] - p.dataOffsetDb[i] > p.requiredSnrDb[i - 1] - p.dataOffsetDb[i - 1]))
+            return false;
+    for (float threshold : p.legacyProbeSnrDb)
+        if (!finiteAdrValue(threshold)) return false;
+    return true;
+}
+static_assert(validAdrParams(kAdrParams), "Invalid ADR parameters");
 #if defined(ADAPTIVE_LORA_ADR_RULE)
 static_assert(ADAPTIVE_LORA_ADR_RULE >= 0 && ADAPTIVE_LORA_ADR_RULE <= 2, "Unknown ADR rule");
 constexpr auto kFirmwareAdrRule = static_cast<AdrRule>(ADAPTIVE_LORA_ADR_RULE);
@@ -73,6 +96,7 @@ struct AdrState {
     uint32_t boot = 0;
     uint32_t lastRequest = 0;
     uint32_t deliveredFrame = 0;
+    uint32_t probeStartedFrame = 0;
     uint8_t desired = phy::dataSf;
     uint8_t reservedSf = phy::dataSf;
     uint8_t recoverySf = phy::dataSf;
@@ -87,7 +111,6 @@ struct AdrState {
     float filteredSnr = kAdrMissingSnr;
     AdrEstimate estimate;
     float score = 0;
-    uint8_t consecutiveLost = 0;
 };
 
 struct AdrReview {
@@ -97,7 +120,8 @@ struct AdrReview {
 };
 
 AdrOutcome classifyAdr(bool requested, bool usable, bool accepted, bool retried);
-AdrReview reviewAdr(AdrState& state, AdrRule rule, uint8_t observedSf,
+bool expireAdrProbe(AdrState& state, uint32_t frame, const AdrParams& params = kAdrParams);
+AdrReview reviewAdr(AdrState& state, AdrRule rule, uint8_t observedSf, uint32_t frame,
                     const AdrObservation& observation, const AdrParams& params = kAdrParams);
 const char* adrRuleName(AdrRule rule);
 const char* adrOutcomeName(AdrOutcome outcome);

@@ -905,3 +905,35 @@ functions under `-Werror`. Remove both in the temporary copy. Both
 baseline and candidate then passed the 26 shared scenarios and their
 transmit traces matched byte for byte.
 The failed and corrected runs are in `logs/test/iteration-030-verification.log`.
+
+## ERR-058 — A missing Grant can train SF upward
+
+Drop each Grant after a valid strong Request while the Gateway observes
+the assigned RX window. The Client sends no DATA. Legacy counted every
+miss, and the experimental rules could eventually bypass their SNR
+check. All three now hold the SF in the strong-Request fault injection
+and deliver at the original SF once Grants resume. Weak Request margin
+can still qualify a miss because wire v5 has no Grant receipt.
+
+## ERR-059 — A lower-SF trial can outlive its receipt limit
+
+Set the frame receipt limit above the capped first-attempt counter, omit
+Client ACK receipts, and continue reporting. The earlier success-counter
+test never reached the limit. Without a review, it could not evaluate
+the old deadline at all. Native cases now verify frame-based rollback
+with capped counters and after missing reviews. Field behavior is pending.
+
+## ERR-060 — Documentation verification launcher and log path
+
+Launching an inline Python rendering helper through a nested command
+misquoted its source and raised a syntax error. Running the same helper
+from a file generated all three figures. The final render reported no
+overfull or underfull boxes.
+The follow-up verification invocation also failed with a quoted
+interpreter path in the Windows launcher. Removing the outer quotes
+from the expanded path restored the command. MathJax and link checks
+then completed.
+The first verification log was written outside the scratch directory
+because the launcher replaced its source prefix first. The collector
+exited 1 with a missing file. Correcting the substitution order restored
+collection.

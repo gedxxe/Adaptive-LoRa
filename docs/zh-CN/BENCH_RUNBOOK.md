@@ -179,6 +179,9 @@ run_id,gateway_boot,frame_id,node_id,client_boot,grant_seen,payload_bytes,data_s
 `rx_us` 为接收时的 Gateway 启动后时间，可用于统计同一会话内单个 Client 的交付间隔。
 若出现 `adr=rx_window_unobserved`，Gateway 既未在发送前确认已用指定 SF 监听，也未在该时隙
 收到有效 DATA。其他节点时序正常的记录仍用于 ADR。
+`params_version=2` 下，`adr=loss_unconfirmed` 表示 Gateway 未收到 DATA，且本次
+Request 未显示余量偏低。按会话、帧编号和节点匹配 Client 的 `V3_DATA_TX` 与 Gateway 的样本，
+再判断丢失原因。`ADR_PROBE` 的 `result=expired` 表示降档试用在回执期限届满后结束。
 
 用高阻探头观察 DIO1、NSS、BUSY 和 SCL。每种测试使用的 SF 切换方向至少记录 30 次，包含
 回到控制 SF 的切换，核对延迟尾部和最大值能否满足 20 毫秒切换提前量及 40 毫秒接收半窗。

@@ -26,6 +26,13 @@ class AdrSimTests(unittest.TestCase):
         self.assertTrue(all(r["mean_reaction_s"] is None for r in rows if r["scenario"] == "interference"))
         self.assertTrue(all(1 <= r["reacted_trials"] <= 4 for r in rows if r["scenario"] == "blockage"))
 
+    def test_policy_shift_does_not_change_the_channel_reference(self):
+        result = simulate(self.program, 42, 4, 90, policy_snr_shift_db=-20)
+        self.assertEqual(-20, result["policy_snr_shift_db"])
+        rows = [r for r in result["rows"] if r["scenario"] == "blockage" and r["attempt_loss_pct"] == 1]
+        self.assertEqual(3, len(rows))
+        self.assertTrue(all(r["reacted_trials"] == 0 and r["mean_reaction_s"] is None for r in rows))
+
 
 if __name__ == "__main__":
     unittest.main()

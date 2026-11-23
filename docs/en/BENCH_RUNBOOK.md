@@ -213,6 +213,11 @@ Gateway uptime at reception, so use it for per-Client gaps within a boot.
 For `adr=rx_window_unobserved`, the Gateway could neither establish that
 it was listening at the assigned SF before launch nor verify DATA in that
 slot. Other Clients with valid timing still contribute ADR samples.
+With `params_version=2`, `adr=loss_unconfirmed` means the Gateway missed
+all DATA and the current Request did not indicate low margin. Match the
+Client's `V3_DATA_TX` with the Gateway sample by session, frame and node
+before attributing the loss. `ADR_PROBE` with `result=expired` marks a
+lower-SF trial that ended after its receipt deadline.
 
 Probe DIO1, NSS, BUSY and SCL with high-impedance probes. Measure at least
 30 transitions per SF pair used, including both directions and return to
