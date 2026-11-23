@@ -136,7 +136,8 @@ third-party libraries or add abstractions speculatively.
 ## Scope and next work
 
 Use the [setup guide](docs/en/BENCH_RUNBOOK.md#flash-and-set-roles) for the adaptive field test.
-Keep the 16 B adaptive test ceiling separate from the 64 B wire limit.
+The adaptive Client generates a 32 B ASCII sample, and the Gateway reserves
+32 B per roster position. The wire format can carry up to 64 B of application data.
 Keep electrical checks and backups in the [bench procedure](docs/en/BENCH_RUNBOOK.md).
 Start RF testing with one Gateway and one Client, then expand through eight
 Clients. Measure radio turnaround, IRQ latency and drift before closing

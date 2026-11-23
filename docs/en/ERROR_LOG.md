@@ -859,3 +859,34 @@ exited 1 after validating the three PNG files. The replacement check
 rendered the Markdown math with the existing MathJax runner and checked
 the local links and rendered PNGs separately. See
 `logs/test/iteration-028-figures-and-links.log`.
+
+## ERR-055 — Native compiler and package lock during the 32 B revision
+
+The first `pio test -e native_adaptive` exited 1 because the sandbox
+could not write PlatformIO's package lock. See
+`logs/test/iteration-029-native-package-lock.log`. The first elevated
+launch also exited 1 when the command runner passed literal quotes in
+the executable name. The elevated PlatformIO Python runner resolved both
+execution issues.
+
+The next run exited 1 because the native compiler rejected
+`if constexpr` inside `FirmwareRuntime::loop()`. Use an ordinary
+conditional with the existing compile-time adaptive flag.
+See `logs/test/iteration-029-focus.log` and the passing compatibility
+run in `logs/test/iteration-029-focus-compat.log`.
+
+## ERR-056 — Field status wording in the bilingual consistency check
+
+`python tools/check_consistency.py` exited 1 when the progress snapshots
+replaced the required pending field status with a report from the earlier
+walk. See `logs/test/iteration-029-consistency-before-status-fix.log`.
+Restore the pending status for the new profile and put the earlier operator
+report in a separate paragraph. The checker then exited 0. See
+`logs/test/iteration-029-consistency.log`.
+
+Two documentation unit tests also retained literal values from the 16 B
+profile. The first full suite exited 1 before either test could check its
+intended regression. Use the active model to choose the ceiling and SF12
+row to mutate. All 19 cases passed on rerun. See
+`logs/test/iteration-029-test_check_consistency.log` and
+`logs/test/iteration-029-test_check_consistency-final.log`.

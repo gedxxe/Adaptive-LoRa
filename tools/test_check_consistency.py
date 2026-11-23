@@ -4,6 +4,7 @@ import tempfile
 import unittest
 
 from check_consistency import ADR_FIGURE, ALGORITHM_FIGURES, APPROVED_SETTINGS, LINK_DOCS, check, current_text
+from model_multiclient import ADAPTIVE_TEST_PAYLOAD, extended_sf_rows
 
 
 class ConsistencyTests(unittest.TestCase):
@@ -118,14 +119,18 @@ class ConsistencyTests(unittest.TestCase):
         self.assertTrue(any("adaptive serial status" in e for e in check(self.root)))
 
     def test_bench_ceiling_and_capacity_rows_must_match(self):
-        self.mutate("docs/en/BENCH_RUNBOOK.md", "bench_payload_ceiling_bytes=16", "bench_payload_ceiling_bytes=64")
+        self.mutate("docs/en/BENCH_RUNBOOK.md", f"bench_payload_ceiling_bytes={ADAPTIVE_TEST_PAYLOAD}",
+                    "bench_payload_ceiling_bytes=65")
         self.mutate("docs/zh-CN/SCHEDULED_LINK.md", "| 8 | 8 | 8 | 5 | 2 |", "| 8 | 8 | 7 | 5 | 2 |")
         failures = check(self.root)
         self.assertTrue(any("bench payload ceiling" in e for e in failures))
         self.assertTrue(any("capacity row for 8 Clients" in e for e in failures))
 
     def test_extended_capacity_and_matched_comparison_in_both_languages(self):
-        self.mutate("docs/zh-CN/SCHEDULED_LINK.md", "2.302 | -3.688", "2.302 | 3.688")
+        sf12 = next(row for row in extended_sf_rows() if row["sf"] == 12)
+        air = sf12["data_air_us"] / 1e6
+        spare = sf12["headroom_one_us"] / 1e6
+        self.mutate("docs/zh-CN/SCHEDULED_LINK.md", f"{air:.3f} | {spare:.3f}", f"{air:.3f} | {spare + 1:.3f}")
         self.mutate("docs/en/BENCH_RUNBOOK.md", ".pio/comparison-build", ".pio/build")
         failures = check(self.root)
         self.assertTrue(any("SF12 study row" in e for e in failures))

@@ -9,8 +9,9 @@ each new SF to the airtime available to the full roster.
 
 **Eight-Client test.** Build the default `heltec_wifi_lora_32_V3_adaptive`
 image for all nine boards. Verify wire version 5 after flashing. Use Gateway
-ID 1 and Client IDs 2–9. The 15 s frame reserves up to
-16 payload bytes per Client. The example sends 8 bytes.
+ID 1 and Client IDs 2–9. Each Client queues a 32-byte ASCII sample such as
+`ID=0002|SEQ=0001|MSG=HELLO WORLD`. The 15 s frame reserves that size
+per Client. Check `APP_PAYLOAD` for `bytes=32` on the Gateway.
 
 During a walk, read the top line on any page. `TX SF8 CR4/5` on the Client
 identifies its last DATA attempt. The Gateway shows the last received DATA SF.
@@ -66,9 +67,8 @@ The [derivation](docs/en/SCHEDULED_LINK.md#airtime-and-slot-budget) defines
 each symbol, expands the control overhead and lists the settings used
 by the current firmware.
 
-The model reserves 14.084 s when all eight Clients use SF9 at the test
-ceiling, including the 300 ms end reserve. This leaves 0.916 s of additional
-headroom. Coverage and timing still need measurements on the boards.
-With the other Clients at SF7, up to two can reserve SF10. The Gateway may
-grant fewer if other Clients already use a higher SF. [Capacity and SF10](docs/en/SCHEDULED_LINK.md#sf10-capacity-and-higher-sf-options) ·
+With 32-byte samples and the other Clients at SF7, the 15 s model fits up
+to five Clients at SF9 or two at SF10. The two-SF10 case leaves 77 ms beyond
+the scheduled end reserve. Coverage and timing still need field measurements.
+[Capacity and SF10](docs/en/SCHEDULED_LINK.md#sf10-capacity-and-higher-sf-options) ·
 [Results and the 70-Client research plan](docs/en/PROGRESS.md)

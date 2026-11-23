@@ -113,7 +113,7 @@ reservation. Lower-SF trials retain the previous reservation.
 | Symbol | Meaning | Current adaptive image |
 |---|---|---|
 | $\eta_{\mathrm{header}}$, $\eta_{\mathrm{session}}$ | Frame header and Gateway boot ID in DATA | 28 B, 4 B |
-| $\nu_\Omega$, $\lambda_\iota$ | Bench roster and per-Client payload ceiling | 8 Clients, 16 B. The wire format allows 64 B. |
+| $\nu_\Omega$, $\lambda_\iota$ | Bench roster and per-Client payload ceiling | 8 Clients, 32 B. The wire format allows 64 B. |
 | $\varrho$, $\varkappa$ | Retry rounds and shared retry slots per round | 3 rounds, up to 4 slots |
 | $\delta$, $\tau_{\mathrm{tail}}$, $\tau_{\mathrm{frame}}$ | Slot guard, end reserve, superframe period | 80 ms, 300 ms, 15 s |
 
@@ -143,12 +143,12 @@ SF9 and the rest at SF7. The maximum number of SF9 reservations is
 | 6 | 6 | 6 | 6 | 3 |
 | 8 | 8 | 8 | 5 | 2 |
 
-At eight Clients, 16 B with all SF9 reserves 14.083936 s, leaving 0.916064 s
-after the end reserve. At 24 B the same SF mix leaves 0.096864 s. The bench
-uses 16 B to leave more margin while carrying the 8 B sample. With all
-eight requesting, Beacon, Grant and four ACKs account for 2.361344 s of
-modeled Gateway transmission in 15 s. Requests and control gaps bring
-the control portion to 6.019456 s. These are computed durations.
+The adaptive sample carries 32 B of ASCII (256 bits). With the 28 B frame
+header and 4 B Gateway boot ID, DATA is 64 B before LoRa PHY overhead.
+Five SF9 Clients and three SF7 Clients reserve 14.905952 s. Eight at SF9
+would need 15.722336 s. With all eight requesting, Beacon, Grant and four
+ACKs account for 2.361344 s of Gateway transmission. Requests and control
+gaps bring the control portion to 6.019456 s. These are computed durations.
 [Bench ceiling](../../include/research_roster.h) · [Capacity model](../../tools/model_multiclient.py)
 
 For a fixed roster, both the sum of DATA slots and the sum of the longest
@@ -159,21 +159,22 @@ have to fit the guards.
 
 ### SF10 capacity and higher SF options
 
-Eight Clients, 16 B each, the same SF9 control exchange, four cumulative ACKs
+Eight Clients, 32 B each, SF9 control, four cumulative ACKs
 and the full retry reservation. The second numeric column puts one Client at
 the listed SF with seven at SF7. The last column gives the maximum number at
 that SF when every other Client uses SF7. Times are modeled seconds.
 
-| DATA SF | One 48 B DATA packet (s) | Frame headroom with one (s) | Maximum at this SF |
+| DATA SF | One 64 B DATA packet (s) | Frame headroom with one (s) | Maximum at this SF |
 |---|---:|---:|---:|
-| SF9 | 0.308 | 4.287 | 8 |
-| SF10 | 0.575 | 3.218 | 2 |
-| SF11 | 1.233 | 0.588 | 1 |
-| SF12 | 2.302 | -3.688 | 0 |
+| SF7 | 0.118 | 4.720 | 8 |
+| SF8 | 0.216 | 4.330 | 8 |
+| SF9 | 0.390 | 3.632 | 5 |
+| SF10 | 0.698 | 2.399 | 2 |
+| SF11 | 1.561 | -1.050 | 0 |
+| SF12 | 2.793 | -5.982 | 0 |
 
-With six peers at SF7, two SF10 reservations leave 1.306208 s beyond the
-end reserve. A third SF10 exceeds the frame by 605.600 ms. With seven
-peers at SF9, even one SF10 exceeds the frame by 152.992 ms. The Gateway
+With six peers at SF7, two SF10 reservations leave 77.408 ms beyond the
+end reserve. A third SF10 exceeds the frame by 2.244 s. The Gateway
 checks the current SF reservations and rejects increases that exceed the budget.
 
 The radio sends Beacon, Request, Grant and ACK bitmaps at SF9. Both ends
@@ -185,7 +186,7 @@ and Grant. A higher DATA SF extends only the DATA link.
 SF10 gives 8.192 ms per symbol at BW125 and uses no LDRO. Even a 96 B
 packet at SF10 takes 0.985088 s, within the 2 s driver deadline. SF11 and
 SF12 are model-only rows. They need LDRO, and the 96 B SF11 packet and the
-48 B SF12 packet each exceed the current TX deadline.
+64 B SF12 packet each exceed the current TX deadline.
 [RadioLib SF limits](https://github.com/jgromes/RadioLib/blob/7.8.1/src/modules/SX126x/SX126x_config.cpp) ·
 [RadioLib LDRO selection](https://github.com/jgromes/RadioLib/blob/7.8.1/src/modules/SX126x/SX126x_commands.cpp)
 

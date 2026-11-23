@@ -1,0 +1,174 @@
+$ pio test -e native_adaptive
+Verbosity level can be increased via `-v, -vv, or -vvv` option
+Collected 16 tests
+
+Processing test_adaptive_link in native_adaptive environment
+--------------------------------------------------------------------------------
+Building...
+src\app\firmware_runtime.cpp: In member function 'void adaptive_lora::FirmwareRuntime::loop()':
+src\app\firmware_runtime.cpp:243:16: error: expected '(' before 'constexpr'
+             if constexpr (multiclient::kAdaptive) {
+                ^~~~~~~~~
+src\app\firmware_runtime.cpp:251:15: error: expected '}' before 'else'
+             } else {
+               ^~~~
+src\app\firmware_runtime.cpp: At global scope:
+src\app\firmware_runtime.cpp:265:5: error: expected unqualified-id before 'for'
+     for (unsigned budget = 0; budget < 64 && Serial.available(); ++budget)
+     ^~~
+src\app\firmware_runtime.cpp:265:31: error: 'budget' does not name a type
+     for (unsigned budget = 0; budget < 64 && Serial.available(); ++budget)
+                               ^~~~~~
+src\app\firmware_runtime.cpp:265:66: error: expected unqualified-id before '++' token
+     for (unsigned budget = 0; budget < 64 && Serial.available(); ++budget)
+                                                                  ^~
+src\app\firmware_runtime.cpp:267:5: error: expected unqualified-id before 'if'
+     if (rebootPending_ && !rebootStopped_ && !radio_.transmitting()) {
+     ^~
+src\app\firmware_runtime.cpp:273:5: error: 'log_' does not name a type
+     log_.drain();
+     ^~~~
+src\app\firmware_runtime.cpp:274:5: error: expected unqualified-id before 'if'
+     if (rebootStopped_ && deadlineReached(micros(), rebootAt_)) {
+     ^~
+src\app\firmware_runtime.cpp:281:5: error: expected unqualified-id before 'if'
+     if (safeToRefreshDisplay(displayNow)) serviceDisplay(displayNow);
+     ^~
+src\app\firmware_runtime.cpp:290:6: error: 'FirmwareRuntime' has not been declared
+ bool FirmwareRuntime::safeToRefreshDisplay(uint64_t now) const {
+      ^~~~~~~~~~~~~~~
+src\app\firmware_runtime.cpp:290:58: error: non-member function 'bool safeToRefreshDisplay(uint64_t)' cannot have cv-qualifier
+ bool FirmwareRuntime::safeToRefreshDisplay(uint64_t now) const {
+                                                          ^~~~~
+src\app\firmware_runtime.cpp: In function 'bool safeToRefreshDisplay(uint64_t)':
+src\app\firmware_runtime.cpp:291:10: error: 'display_' was not declared in this scope
+     if (!display_ || !display_->canService(now) || rebootPending_) return false;
+          ^~~~~~~~
+src\app\firmware_runtime.cpp:291:52: error: 'rebootPending_' was not declared in this scope
+     if (!display_ || !display_->canService(now) || rebootPending_) return false;
+                                                    ^~~~~~~~~~~~~~
+src\app\firmware_runtime.cpp:292:9: error: 'clientDisplayUntil_' was not declared in this scope
+     if (clientDisplayUntil_) {
+         ^~~~~~~~~~~~~~~~~~~
+src\app\firmware_runtime.cpp:294:74: error: 'kOledStepBudgetUs' was not declared in this scope
+         return now < clientDisplayUntil_ && clientDisplayUntil_ - now >= kOledStepBudgetUs &&
+                                                                          ^~~~~~~~~~~~~~~~~
+src\app\firmware_runtime.cpp:294:74: note: suggested alternative:
+In file included from src\app\firmware_runtime.h:15:0,
+                 from src\app\firmware_runtime.cpp:1:
+src/common/diagnostics/oled_status_display.h:8:20: note:   'adaptive_lora::kOledStepBudgetUs'
+ constexpr uint32_t kOledStepBudgetUs = 10000;
+                    ^~~~~~~~~~~~~~~~~
+src\app\firmware_runtime.cpp:295:17: error: 'radio_' was not declared in this scope
+                !radio_.receiving() && !radio_.transmitting();
+                 ^~~~~~
+src\app\firmware_runtime.cpp:297:13: error: 'radio_' was not declared in this scope
+     return !radio_.initialized() ||
+             ^~~~~~
+src\app\firmware_runtime.cpp:298:10: error: 'multicli_' was not declared in this scope
+         (multicli_ && multicli_->safeToRefreshDisplay(now, kOledStepBudgetUs) && !radio_.irqPending());
+          ^~~~~~~~~
+src\app\firmware_runtime.cpp:298:60: error: 'kOledStepBudgetUs' was not declared in this scope
+         (multicli_ && multicli_->safeToRefreshDisplay(now, kOledStepBudgetUs) && !radio_.irqPending());
+                                                            ^~~~~~~~~~~~~~~~~
+src\app\firmware_runtime.cpp:298:60: note: suggested alternative:
+In file included from src\app\firmware_runtime.h:15:0,
+                 from src\app\firmware_runtime.cpp:1:
+src/common/diagnostics/oled_status_display.h:8:20: note:   'adaptive_lora::kOledStepBudgetUs'
+ constexpr uint32_t kOledStepBudgetUs = 10000;
+                    ^~~~~~~~~~~~~~~~~
+src\app\firmware_runtime.cpp: At global scope:
+src\app\firmware_runtime.cpp:301:6: error: 'FirmwareRuntime' has not been declared
+ void FirmwareRuntime::serviceDisplay(uint64_t now) {
+      ^~~~~~~~~~~~~~~
+src\app\firmware_runtime.cpp: In function 'void serviceDisplay(uint64_t)':
+src\app\firmware_runtime.cpp:302:9: error: 'display_' was not declared in this scope
+     if (display_->needsSnapshot(now)) {
+         ^~~~~~~~
+src\app\firmware_runtime.cpp:303:9: error: 'DisplaySnapshot' was not declared in this scope
+         DisplaySnapshot snapshot;
+         ^~~~~~~~~~~~~~~
+src\app\firmware_runtime.cpp:303:9: note: suggested alternative:
+In file included from src/client/client_app.h:3:0,
+                 from src\app\firmware_runtime.h:12,
+                 from src\app\firmware_runtime.cpp:1:
+src/common/diagnostics/display_snapshot.h:82:8: note:   'adaptive_lora::DisplaySnapshot'
+ struct DisplaySnapshot {
+        ^~~~~~~~~~~~~~~
+src\app\firmware_runtime.cpp:304:9: error: 'snapshot' was not declared in this scope
+         snapshot.config = loaded_;
+         ^~~~~~~~
+src\app\firmware_runtime.cpp:304:27: error: 'loaded_' was not declared in this scope
+         snapshot.config = loaded_;
+                           ^~~~~~~
+src\app\firmware_runtime.cpp:305:32: error: 'loadError_' was not declared in this scope
+         snapshot.configError = loadError_;
+                                ^~~~~~~~~~
+src\app\firmware_runtime.cpp:306:31: error: 'radio_' was not declared in this scope
+         snapshot.radioReady = radio_.healthy();
+                               ^~~~~~
+src\app\firmware_runtime.cpp:308:31: error: 'log_' was not declared in this scope
+         snapshot.logDropped = log_.dropped();
+                               ^~~~
+src\app\firmware_runtime.cpp:310:29: error: 'wireVersion' was not declared in this scope
+         snapshot.protocol = wireVersion;
+                             ^~~~~~~~~~~
+src\app\firmware_runtime.cpp:310:29: note: suggested alternatives:
+src\app\firmware_runtime.cpp:15:16: note:   'adaptive_lora::{anonymous}::wireVersion'
+ constexpr auto wireVersion = multiclient::kWireVersion;
+                ^~~~~~~~~~~
+src\app\firmware_runtime.cpp:15:16: note:   'adaptive_lora::{anonymous}::wireVersion'
+src\app\firmware_runtime.cpp:311:13: error: 'multicli_' was not declared in this scope
+         if (multicli_) {
+             ^~~~~~~~~
+src\app\firmware_runtime.cpp:325:42: error: 'display_' was not declared in this scope
+     if (safeToRefreshDisplay(serviceAt)) display_->service(serviceAt);
+                                          ^~~~~~~~
+src\app\firmware_runtime.cpp:327:19: error: 'worstDisplayStepUs_' was not declared in this scope
+     if (elapsed > worstDisplayStepUs_) worstDisplayStepUs_ = elapsed;
+                   ^~~~~~~~~~~~~~~~~~~
+src\app\firmware_runtime.cpp:328:19: error: 'kOledStepBudgetUs' was not declared in this scope
+     if (elapsed > kOledStepBudgetUs) display_->stopOnOverrun();
+                   ^~~~~~~~~~~~~~~~~
+src\app\firmware_runtime.cpp:328:19: note: suggested alternative:
+In file included from src\app\firmware_runtime.h:15:0,
+                 from src\app\firmware_runtime.cpp:1:
+src/common/diagnostics/oled_status_display.h:8:20: note:   'adaptive_lora::kOledStepBudgetUs'
+ constexpr uint32_t kOledStepBudgetUs = 10000;
+                    ^~~~~~~~~~~~~~~~~
+src\app\firmware_runtime.cpp:328:38: error: 'display_' was not declared in this scope
+     if (elapsed > kOledStepBudgetUs) display_->stopOnOverrun();
+                                      ^~~~~~~~
+src\app\firmware_runtime.cpp:332:9: error: 'display_' was not declared in this scope
+     if (display_->error() && !displayErrorLogged_) {
+         ^~~~~~~~
+src\app\firmware_runtime.cpp:332:31: error: 'displayErrorLogged_' was not declared in this scope
+     if (display_->error() && !displayErrorLogged_) {
+                               ^~~~~~~~~~~~~~~~~~~
+src\app\firmware_runtime.cpp:334:9: error: 'log_' was not declared in this scope
+         log_.event(displayReadyLogged_ ? "OLED_ERROR" : "OLED_INIT", display_->error());
+         ^~~~
+src\app\firmware_runtime.cpp:334:20: error: 'displayReadyLogged_' was not declared in this scope
+         log_.event(displayReadyLogged_ ? "OLED_ERROR" : "OLED_INIT", display_->error());
+                    ^~~~~~~~~~~~~~~~~~~
+src\app\firmware_runtime.cpp:335:39: error: 'displayReadyLogged_' was not declared in this scope
+     } else if (display_->ready() && (!displayReadyLogged_ || displayErrorLogged_)) {
+                                       ^~~~~~~~~~~~~~~~~~~
+src\app\firmware_runtime.cpp:338:9: error: 'log_' was not declared in this scope
+         log_.event("OLED_INIT", "ready");
+         ^~~~
+src\app\firmware_runtime.cpp: At global scope:
+src\app\firmware_runtime.cpp:342:1: error: expected declaration before '}' token
+ }  // namespace adaptive_lora
+ ^
+*** [.pio\build\native_adaptive\src\app\firmware_runtime.o] Error 1
+Building stage has failed, see errors above. Use `pio test -vvv` option to enable verbose output.
+-------- native_adaptive:test_adaptive_link [ERRORED] Took 3.27 seconds --------
+
+=================================== SUMMARY ===================================
+Environment      Test                Status    Duration
+---------------  ------------------  --------  ------------
+native_adaptive  test_adaptive_link  ERRORED   00:00:03.270
+================== 1 test cases: 0 succeeded in 00:00:03.270 ==================
+
+Exit code: 1

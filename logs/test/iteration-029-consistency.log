@@ -1,0 +1,4 @@
+$ python tools/check_consistency.py
+PASS: selected current-document consistency (0 errors)
+
+Exit code: 0

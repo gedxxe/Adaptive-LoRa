@@ -7,17 +7,21 @@
 |---|---|
 | Firmware / protocol | `0.2.0-alpha.1` / `5` |
 | Board | Heltec WiFi LoRa 32 V3.4, ESP32-S3/SX1262 |
-| Adaptive image | `heltec_wifi_lora_32_V3_adaptive`, ESP32 build passed, 24/24 native cases with the walk recovery patch |
+| Adaptive image | `heltec_wifi_lora_32_V3_adaptive`, ESP32 build passed, 26/26 native cases with the 32 B profile |
 | Fixed-SF image | `heltec_wifi_lora_32_V3_multiclient`, ESP32 build passed, 15/15 runtime cases |
-| Shared tests | 356/356 native cases and 62/62 Python tests in the merge check |
+| Shared tests | 356/356 native and 62/62 Python cases passed |
+| Toolchain | PlatformIO 6.1.19, Espressif32 55.3.311, Arduino ESP32 3.3.11, Xtensa 14.2.0+20260121, RadioLib 7.8.1 |
 | Field test | Walk test and radio timing measurements pending |
 <!-- current-state:end -->
 
+The operator reported SF adaptation through SF10 on an earlier one-pair
+walk. The current 32 B profile still needs a field run.
+
 | Claim | Verification |
 |---|---|
-| Eight Clients can all obtain SF9 at the 16 B bench ceiling | Production state machines over fake radio. Real delivery and link range still need measurement. |
-| The 15 s frame has 0.916064 s beyond its end reserve at that load | Analytical model checked against the production calendar. |
-| Two SF10 Clients can deliver alongside six SF7 peers | Fake-radio tests cover SF9 control, an SF10 retry, a refused third SF10 upgrade, and reuse of the reservation after a successful drop to SF9. |
+| The adaptive image sends exact 32-byte ASCII samples | Native runtime test decodes two samples and checks identical retry frames. |
+| Eight Clients can deliver 32 B at five SF9 and three SF7, or two SF10 and six SF7 | Production state machines over fake radio. The two-SF10 test covers a retry and rejection of a third increase. |
+| The two-SF10 mix leaves 77.408 ms beyond the end reserve | Analytical model. Real delivery and link timing still need measurement. |
 | A Client waits on SF9 when control is lost | Fake-radio outage after SF10 delivery. The next valid Beacon and Grant restored delivery. |
 | A returning Client can reuse its confirmed SF without taking a peer's reservation | Hosts drive the real Gateway and Client state machines through idle expiry, a late ACK receipt and limited SF10 airtime. |
 | An unsuccessful downshift cannot leave a Client at an unconfirmed lower SF | Fake-radio tests cover a failed trial, missing ACK receipts and a control outage during a trial. |
@@ -50,11 +54,12 @@ are selected by the build. All images share `VERSION` and NVS schema 1.
 
 Test when a single half-duplex radio can keep low-rate telemetry fresh.
 The target is 70 Clients per Gateway with a 2–5 minute reporting interval.
-The running firmware serves eight active roster positions. A first model
-can partition 70 IDs into nine rosters, taking 135 s for one scheduled
-opportunity per Client at the current 15 s frame period. That number
-describes the schedule alone. Loss, retry contention, outage, and sample
-generation can all increase the gap between fresh readings.
+The running firmware serves a single roster of eight positions. For a
+future rotation at 32 B and 15 s per group, the model gives one scheduled
+opportunity per Client every 135 s with eight SF7 or SF8 positions per group,
+150 s with seven SF9 positions, and 360 s with three SF10 positions.
+Mixed groups depend on their SF reservations. Loss, retry contention,
+outages, and sample generation can increase the gap between fresh readings.
 
 ```math
 \tau_{\mathrm{cycle}}=\left\lceil\frac{\nu}{\nu_{\mathrm{group}}}\right\rceil\tau_{\mathrm{frame}},

@@ -2173,3 +2173,60 @@ files under `logs/test/`.
 - The local radio and display checks remain host simulations. No board
   was flashed or taken on a new walk. Earlier records and results remain
   in their original entries.
+
+## Iteration 029 — 32-byte synthetic field load, 2026-11-23
+
+- Branch `codex/iteration-029-32-byte-test-load`, based on fetched main
+  `43eab859432d28132b2a946dd62e08a7e98d7d45`. Firmware
+  `0.2.0-alpha.1`, adaptive wire version 5 and NVS schema 1.
+- `FirmwareRuntime` generates ASCII with the Client ID and a sample
+  counter that advances on enqueue. Each retry sends the same frame.
+  `research_roster.h` reserves 32 B per Client. The 15 s period,
+  SF7–SF10 DATA, SF9 control, BW125 and CR4/5 still apply. The
+  earlier fixed-SF image retains its 8-byte sample and 64 B ceiling.
+- The tests exercise the production runtime and the scheduler over
+  radio fakes. The capacity model now evaluates the 32 B field load by
+  default in its SF sweep. The READMEs, setup guides, protocol guides,
+  progress snapshots, decision records and capture template explain
+  how to verify the load and interpret the capacity figures.
+- The model gives 94.048 ms beyond the end reserve for five SF9 and
+  three SF7 Clients, and 77.408 ms for two SF10 and six SF7 Clients.
+  A 70-Client rotation is still a research target. The 32 B profile
+  has no physical timing, delivery, or range measurements.
+- The focused regression first hit an installed package lock, then
+  a legacy MinGW language incompatibility. The compatible run exited
+  0 with 25 cases. The bilingual status wording check also passed after
+  correction. See ERR-055 and ERR-056.
+- The adaptive image resolves PlatformIO Core 6.1.19, Espressif32 55.3.311,
+  Arduino ESP32 3.3.11, ESP-IDF libraries 5.5.5+sha.b774170ff46,
+  Xtensa 14.2.0+20260121 and RadioLib 7.8.1. Native MinGW GCC is 6.3.0.
+  The adaptive build uses 34,864 B static RAM and 389,728 B flash.
+  The 401,648 B image has SHA-256
+  `3cc0d1ea7e465f58271d975d00fb770f5dda749f429cc68b31bd1f2dfabd5e4a`.
+- `pio run -e heltec_wifi_lora_32_V3`,
+  `pio run -e heltec_wifi_lora_32_V3_research`,
+  `pio run -e heltec_wifi_lora_32_V3_multiclient`, and
+  `pio run -e heltec_wifi_lora_32_V3_adaptive` each exited 0.
+  The adaptive build with
+  `PLATFORMIO_BUILD_SRC_FLAGS=-DADAPTIVE_LORA_FIXED_SF_COMPARISON`
+  and `PLATFORMIO_BUILD_DIR=.pio/comparison-build` also exited 0.
+  See `logs/build/iteration-029-heltec_wifi_lora_32_V3*.log`
+  and `logs/build/iteration-029-matched-sf7.log`.
+- `pio test -e native`, `pio test -e native_multiclient` and
+  `pio test -e native_adaptive` each exited 0, with 356/356, 15/15 and
+  26/26 cases. See `logs/test/iteration-029-native*.log`. The adaptive
+  suite checks the 64 B encoded DATA frame, two sample sequence values,
+  byte-for-byte retry identity, eight-way mixed-SF delivery and airtime
+  protection when a third Client requests higher SF.
+- Ran `python -m unittest discover -s tools -p <file> -v` with
+  `test_capture_bench.py` (15), `test_tdma_feasibility.py` (16),
+  `test_adr_shadow.py` (6), `test_model_multiclient.py` (6) and
+  `test_check_consistency.py` (19). The first documentation run exited 1
+  on two stale fixtures. The rerun and all other suites exited 0, for
+  62 passing cases. `python tools/check_consistency.py` exited 0.
+  See `logs/test/iteration-029-test_*.log` and
+  `logs/test/iteration-029-consistency-final.log`.
+- Logs use workspace and toolchain path placeholders where applicable.
+  The first field check is a close-range pair with the same image on
+  both boards. Verify Gateway `bench_payload_ceiling_bytes=32` and
+  match `bytes=32` in `APP_PAYLOAD` to the Client's accepted result.

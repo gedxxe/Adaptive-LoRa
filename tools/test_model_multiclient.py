@@ -30,9 +30,9 @@ class MulticlientBudgetTests(unittest.TestCase):
         cases = adaptive_report()["cases"]
         self.assertEqual([4, 4, 4, 4, 6, 6, 6, 3, 8, 8, 5, 2],
                          [case["most_sf9_that_fit"]["sf9_clients"] for case in cases])
-        bench = adaptive_budget(8, 16, 8)
-        self.assertEqual(14_083_936, bench["reserved_us"])
-        self.assertEqual(916_064, bench["headroom_us"])
+        bench = adaptive_budget(8, 32, 5)
+        self.assertEqual(14_905_952, bench["reserved_us"])
+        self.assertEqual(94_048, bench["headroom_us"])
         self.assertEqual(2_361_344, bench["gateway_tx_us"])
         self.assertEqual(15_634_272, adaptive_budget(8, 64, 3)["reserved_us"])
 
@@ -43,12 +43,13 @@ class MulticlientBudgetTests(unittest.TestCase):
 
     def test_extended_sf_includes_ldro_and_shared_retries(self):
         rows = extended_sf_rows()
-        self.assertEqual([97_536, 174_592, 308_224, 575_488, 1_232_896, 2_301_952],
+        self.assertEqual([118_016, 215_552, 390_144, 698_368, 1_560_576, 2_793_472],
                          [row["data_air_us"] for row in rows])
-        self.assertEqual([8, 8, 8, 2, 1, 0], [row["max_at_sf_with_others_at_sf7"] for row in rows])
-        self.assertEqual(-3_687_840, rows[-1]["headroom_one_us"])
-        self.assertEqual(-152_992, mixed_sf_budget([9] * 7 + [10], 16)["headroom_us"])
-        self.assertEqual(mixed_sf_budget([7] * 7 + [12], 16), mixed_sf_budget([12] + [7] * 7, 16))
+        self.assertEqual([8, 8, 5, 2, 0, 0], [row["max_at_sf_with_others_at_sf7"] for row in rows])
+        self.assertEqual(-5_981_600, rows[-1]["headroom_one_us"])
+        self.assertEqual(77_408, mixed_sf_budget([7] * 6 + [10] * 2, 32)["headroom_us"])
+        self.assertEqual(-2_244_000, mixed_sf_budget([7] * 5 + [10] * 3, 32)["headroom_us"])
+        self.assertEqual(mixed_sf_budget([7] * 7 + [12], 32), mixed_sf_budget([12] + [7] * 7, 32))
 
 
 if __name__ == "__main__":

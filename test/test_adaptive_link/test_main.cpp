@@ -2,10 +2,13 @@
 #include <unity.h>
 #include <vector>
 #include "research_roster.h"
+#include "app/firmware_runtime.h"
 #include "app/multiclient_link.h"
 #include "common/diagnostics/oled_status_display.h"
 #include "common/radio/radio_driver.h"
 #include "common/radio/sx1262_hardware.h"
+#include "../support/fake_config_storage.h"
+#include "../support/fake_radio_hardware.h"
 #include "../support/fake_radio_transport.h"
 
 using namespace adaptive_lora;
@@ -81,7 +84,7 @@ struct Network {
         auto& n = *static_cast<Network*>(context);
         ++n.delivered[data.source - 2];
         TEST_ASSERT_EQUAL_UINT16(uint16_t(data.frame), data.sequence);
-        TEST_ASSERT_TRUE(data.size == 8 || data.size == 16 || data.size == 64);
+        TEST_ASSERT_TRUE(data.size == 8 || data.size == 16 || data.size == 32 || data.size == 64);
         return true;
     }
     Peer& peer(uint8_t i) { return i ? clients[i - 1] : gateway; }
@@ -340,18 +343,117 @@ void sf9_capacity_uses_the_production_calendar() {
     }
 }
 
-void eight_clients_can_adapt_to_sf9_at_the_bench_ceiling() {
-    const auto ceiling = kBenchRoster.nodes[0].budget;
-    TEST_ASSERT_EQUAL_UINT8(16, ceiling);
-    Network n(kBenchRoster.count, kBenchRoster.count, ceiling);
+void full_bench_roster_delivers_at_mixed_sf_with_32_byte_samples() {
+    TEST_ASSERT_EQUAL_UINT8(32, kBenchPayloadBytes);
+    Network n(kBenchRoster.count, kBenchRoster.count, kBenchPayloadBytes);
     for (uint8_t i = 0; i < n.count; ++i) {
-        n.minDataSf[i] = 9;
-        n.snr[i] = -9;
+        n.minDataSf[i] = i < 5 ? 9 : 7;
+        n.snr[i] = i < 5 ? -9 : 6;
     }
-    n.rounds(7, ceiling);
+    n.rounds(7, kBenchPayloadBytes);
     for (uint8_t i = 0; i < n.count; ++i) {
-        TEST_ASSERT_EQUAL_UINT(3, n.delivered[i]);
-        TEST_ASSERT_EQUAL_UINT8(9, n.clients[i].link.telemetry().confirmedDataSf);
+        TEST_ASSERT_EQUAL_UINT(i < 5 ? 3 : 7, n.delivered[i]);
+        TEST_ASSERT_EQUAL_UINT8(n.minDataSf[i], n.clients[i].link.telemetry().confirmedDataSf);
+    }
+}
+
+void bench_sf10_retries_keep_room_for_six_sf7_peers() {
+    Network n(kBenchRoster.count, kBenchRoster.count, kBenchPayloadBytes);
+    n.minDataSf[0] = n.minDataSf[1] = 10;
+    n.snr[0] = n.snr[1] = -13;
+    n.rounds(12, kBenchPayloadBytes);
+    TEST_ASSERT_EQUAL_UINT8(10, n.clients[0].link.telemetry().confirmedDataSf);
+    TEST_ASSERT_EQUAL_UINT8(10, n.clients[1].link.telemetry().confirmedDataSf);
+    n.dropFirstData = true;
+    n.rounds(1, kBenchPayloadBytes);
+    TEST_ASSERT_NOT_EQUAL(std::string::npos, Serial.output.find("sf=10,outcome=retry,app=accepted"));
+    for (uint8_t i = 2; i < n.count; ++i) TEST_ASSERT_EQUAL_UINT(13, n.delivered[i]);
+
+    n.minDataSf[2] = 10;
+    n.rounds(8, kBenchPayloadBytes);
+    TEST_ASSERT_FALSE(n.sent(3, 8));
+    TEST_ASSERT_FALSE(n.sent(3, 10));
+    TEST_ASSERT_NOT_EQUAL(std::string::npos, Serial.output.find("adr=budget_limited"));
+    for (uint8_t i = 3; i < n.count; ++i) TEST_ASSERT_EQUAL_UINT(21, n.delivered[i]);
+}
+
+void runtime_sends_exact_ascii_sample_and_reuses_bytes_on_retry() {
+    FakeConfigStorage storage;
+    FakeRadioHardware radio;
+    const auto device = config(2);
+    TEST_ASSERT_TRUE(encodeConfig(device, storage.bytes, sizeof(storage.bytes)));
+    storage.length = kConfigBlobSize;
+    FirmwareRuntime runtime(storage, radio, true);
+    host_clock::set(0);
+    runtime.setup();
+
+    auto loop = [&](uint64_t now, uint32_t irq = 0) {
+        host_clock::set(now);
+        radio.resetTrace();
+        radio.signal(irq, irq != 0);
+        runtime.loop();
+        radio.signal(0, false);
+        TEST_ASSERT_FALSE(radio.violation);
+    };
+    auto receive = [&](Frame control, MessageType type, uint64_t end) {
+        control.type = type;
+        TEST_ASSERT_EQUAL_INT(int(CodecResult::OK),
+            int(encode(control, radio.rxBytes, sizeof(radio.rxBytes), radio.packetLength)));
+        loop(end, radio_irq::rxDone);
+    };
+    loop(0);
+    Frame control;
+    control.networkId = control.sourceId = control.bootId = control.frameId = 1;
+    control.destinationId = kGroup;
+    control.scheduleVersion = kScheduleVersion;
+    for (uint32_t frameId = 1; frameId <= 2; ++frameId) {
+        control.frameId = frameId;
+        control.sequence = 0;
+        writeRoster(control, kBenchRoster);
+        const auto count = kBenchRoster.count;
+        const uint64_t beaconEnd = uint64_t(frameId - 1) * kAdaptivePeriodUs + payloadAir(rosterBytes(count));
+        receive(control, MessageType::BEACON, beaconEnd);
+        const auto requestAt = beaconEnd + requestStart(0);
+        loop(requestAt);
+        Frame request;
+        TEST_ASSERT_EQUAL_UINT(1, radio.count(HardwareCall::START_TX));
+        TEST_ASSERT_EQUAL_INT(int(CodecResult::OK), int(decode(radio.txBytes, radio.txLength, 1, 1, request)));
+        TEST_ASSERT_EQUAL_INT(int(MessageType::PAYLOAD_REQUEST), int(request.type));
+        TEST_ASSERT_EQUAL_UINT8(32, request.payload[4]);
+        loop(requestAt + payloadAir(kRequestSize), radio_irq::txDone);
+
+        Plan plan{count, {{request.bootId, 32, kControlSf}}};
+        writePlan(control, plan);
+        const auto grantEnd = beaconEnd + grantStart(count) + payloadAir(grantBytes(count));
+        receive(control, MessageType::SLOT_GRANT, grantEnd);
+        const auto dataAt = grantEnd + plan.dataStart(0, 0, 1);
+        loop(dataAt);
+        TEST_ASSERT_EQUAL_UINT(1, radio.count(HardwareCall::START_TX));
+        TEST_ASSERT_EQUAL_UINT(64, radio.txLength);
+        const auto* expected = frameId == 1 ? "ID=0002|SEQ=0001|MSG=HELLO WORLD" : "ID=0002|SEQ=0002|MSG=HELLO WORLD";
+        TEST_ASSERT_EQUAL_MEMORY(expected, radio.txBytes + kHeaderSize + kPayloadPrefix, 32);
+        uint8_t original[64];
+        std::memcpy(original, radio.txBytes, sizeof(original));
+        loop(dataAt + dataAir(32, kControlSf), radio_irq::txDone);
+
+        control.payloadLength = feedbackBytes(count);
+        std::memset(control.payload, 0, control.payloadLength);
+        control.payload[0] = count;
+        control.payload[2] = 1;
+        receive(control, MessageType::ACK_BITMAP, grantEnd + plan.feedbackStart(0) + payloadAir(feedbackBytes(count)));
+        const auto retryAt = grantEnd + plan.dataStart(1, 0, 1);
+        loop(retryAt);
+        TEST_ASSERT_EQUAL_UINT(1, radio.count(HardwareCall::START_TX));
+        TEST_ASSERT_EQUAL_UINT(sizeof(original), radio.txLength);
+        TEST_ASSERT_EQUAL_MEMORY(original, radio.txBytes, sizeof(original));
+        loop(retryAt + dataAir(32, kControlSf), radio_irq::txDone);
+        control.sequence = 1;
+        control.payload[1] = 1;
+        control.payload[2] = 0;
+        put32(control.payload + 3, request.bootId);
+        receive(control, MessageType::ACK_BITMAP, grantEnd + plan.feedbackStart(1) + payloadAir(feedbackBytes(count)));
+        TEST_ASSERT_EQUAL_INT(int(PayloadResult::ACCEPTED), int(runtime.payloadResult()));
+        loop(uint64_t(frameId) * kAdaptivePeriodUs);
     }
 }
 
@@ -668,7 +770,9 @@ int main() {
     RUN_TEST(stable_lock_requires_client_ack_receipt);
     RUN_TEST(accepted_data_remains_observable_when_final_ack_completion_fails);
     RUN_TEST(sf9_capacity_uses_the_production_calendar);
-    RUN_TEST(eight_clients_can_adapt_to_sf9_at_the_bench_ceiling);
+    RUN_TEST(full_bench_roster_delivers_at_mixed_sf_with_32_byte_samples);
+    RUN_TEST(bench_sf10_retries_keep_room_for_six_sf7_peers);
+    RUN_TEST(runtime_sends_exact_ascii_sample_and_reuses_bytes_on_retry);
     RUN_TEST(display_reports_the_last_acknowledged_data_sf);
     RUN_TEST(oled_tracks_actual_data_on_both_roles_even_without_ack);
     RUN_TEST(gateway_stall_cannot_train_rf_loss_for_the_missed_slot);
