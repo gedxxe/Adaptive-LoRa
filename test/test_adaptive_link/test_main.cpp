@@ -78,6 +78,8 @@ struct Network {
     bool dropFirstData = false;
     bool failDataLaunch = false;
     bool loseFinalTxDone = false;
+    bool failPrimaryRx = false;
+    uint32_t lastPrimaryFaultFrame = 0;
     bool stallFirstRx = false;
     uint64_t resumeGateway = 0;
     bool outage = false;
@@ -108,6 +110,14 @@ struct Network {
                 if (!(listening & (1u << i)) || !peer(i).radio.receiving() || peer(i).radio.sf != txSf) continue;
                 if (frame.destinationId != kGroup && frame.destinationId != i + 1) continue;
                 if (outage && (i == 1 || sender == 1)) continue;
+                if (failPrimaryRx && i == 0 && sender == 1 && frame.type == MessageType::DATA &&
+                    lastPrimaryFaultFrame != frame.frameId) {
+                    lastPrimaryFaultFrame = frame.frameId;
+                    events[i] = gateway.radio.error(RadioEventType::ERROR, -910);
+                    events[i].hasCompletionTime = true;
+                    events[i].completionUs = txEnd;
+                    continue;
+                }
                 if (sender > 0 && frame.type == MessageType::DATA && txSf < minDataSf[sender - 1])
                     continue;
                 if (i == 1 && ((dropControl && frame.type != MessageType::DATA) ||
@@ -249,7 +259,7 @@ void adr_margin_gates_weak_and_unconfirmed_loss() {
         TEST_ASSERT_EQUAL_UINT8(8, blocked.desired);
 
         AdrState unknown;
-        for (unsigned i = 1; i < kAdrParams.legacyWindow; ++i) {
+        for (unsigned i = 1; i < kAdrParams.legacyMisses; ++i) {
             const float snr = i % 2 ? -2.0f : kAdrMissingSnr;
             const auto result = reviewAdr(unknown, rule, 7, i, {AdrOutcome::LOST_ALL, snr});
             TEST_ASSERT_EQUAL_INT(int(AdrDecision::HOLD), int(result.decision));
@@ -341,11 +351,11 @@ void recovery_search_rolls_back_when_healthy_requests_lose_their_grants() {
         Serial.output.clear();
         Network n(2, 8, kBenchPayloadBytes, true, rule);
         n.dropGrant = true;
-        n.rounds(2, kBenchPayloadBytes);
+        n.rounds(kAdrParams.legacyMisses - 1, kBenchPayloadBytes);
         TEST_ASSERT_FALSE(n.sent(1, 7));
         TEST_ASSERT_NOT_EQUAL(std::string::npos, Serial.output.find("adr=loss_unconfirmed"));
         TEST_ASSERT_EQUAL(std::string::npos, Serial.output.find("next_sf=8"));
-        n.rounds(5, kBenchPayloadBytes);
+        n.rounds(7 - (kAdrParams.legacyMisses - 1), kBenchPayloadBytes);
         TEST_ASSERT_NOT_EQUAL(std::string::npos, Serial.output.find("adr=recovery_probe"));
         TEST_ASSERT_NOT_EQUAL(std::string::npos, Serial.output.find("adr=recovery_failed"));
         TEST_ASSERT_FALSE(n.sent(1, 10));
@@ -361,15 +371,16 @@ void recovery_probe_respects_airtime_deadline_and_cooldown() {
     const auto rule = AdrRule::LEGACY;
     const AdrObservation missing{AdrOutcome::LOST_ALL};
     AdrState state;
-    for (uint32_t frame = 1; frame <= 3; ++frame) reviewAdr(state, rule, 7, frame, missing);
+    const uint32_t denied = kAdrParams.legacyMisses + 1;
+    for (uint32_t frame = 1; frame < denied; ++frame) reviewAdr(state, rule, 7, frame, missing);
     TEST_ASSERT_EQUAL_UINT8(8, state.desired);
-    TEST_ASSERT_EQUAL_STRING("recovery_budget", reviewAdr(state, rule, 7, 4, missing).action);
+    TEST_ASSERT_EQUAL_STRING("recovery_budget", reviewAdr(state, rule, 7, denied, missing).action);
     TEST_ASSERT_EQUAL_UINT8(7, state.desired);
-    for (uint32_t frame = 5; frame < 4 + kAdrParams.probeReceiptLimit; ++frame) {
+    for (uint32_t frame = denied + 1; frame < denied + kAdrParams.probeReceiptLimit; ++frame) {
         reviewAdr(state, rule, 7, frame, missing);
         TEST_ASSERT_EQUAL_UINT8(7, state.desired);
     }
-    const uint32_t start = 4 + kAdrParams.probeReceiptLimit;
+    const uint32_t start = denied + kAdrParams.probeReceiptLimit;
     TEST_ASSERT_EQUAL_STRING("recovery_probe", reviewAdr(state, rule, 7, start, missing).action);
     state.reservedSf = 8;
     TEST_ASSERT_FALSE(expireAdrProbe(state, start + kAdrParams.probeReceiptLimit));
@@ -452,7 +463,7 @@ void gateway_margin_policy_uses_request_snr_and_logs_absent_roster_slots() {
         for (auto begin = Serial.output.find(event); begin != std::string::npos; begin = Serial.output.find(event, begin + 1)) {
             const auto end = Serial.output.find('\n', begin);
             TEST_ASSERT_TRUE(end != std::string::npos && end - begin <= 510);
-            TEST_ASSERT_NOT_EQUAL(std::string::npos, Serial.output.substr(begin, end - begin).find("params_version=3"));
+            TEST_ASSERT_NOT_EQUAL(std::string::npos, Serial.output.substr(begin, end - begin).find("params_version=4"));
         }
     }
 }
@@ -600,6 +611,50 @@ void accepted_data_remains_observable_when_final_ack_completion_fails() {
     n.loseFinalTxDone = false;
     n.rounds(1);
     TEST_ASSERT_NOT_EQUAL(std::string::npos, Serial.output.find("next_sf=7,locked=1,adr=locked"));
+}
+
+void observed_primary_loss_still_recovers_after_final_ack_faults() {
+    const uint8_t populations[] = {2, kMaxClients};
+    for (const auto count : populations) {
+        Serial.output.clear();
+        Network n(count, kMaxClients, kBenchPayloadBytes);
+        n.loseFinalTxDone = true;
+        n.hasRequestSnr = true;
+        for (auto& snr : n.requestSnr) snr = -2;
+        n.minDataSf[0] = phy::maxDataSf;
+        n.rounds(8, kBenchPayloadBytes);
+        TEST_ASSERT_EQUAL_UINT8(phy::maxDataSf, n.clients[0].link.telemetry().confirmedDataSf);
+        for (uint8_t i = 1; i < count; ++i) {
+            TEST_ASSERT_EQUAL_UINT(8, n.delivered[i]);
+            TEST_ASSERT_FALSE(n.sent(i + 1, kBaseSf + 1));
+        }
+        TEST_ASSERT_NOT_EQUAL(std::string::npos, Serial.output.find("class=PRIMARY_MISS"));
+    }
+}
+
+void primary_rx_fault_does_not_train_that_client_or_hide_peer_loss() {
+    Network n(2, 8, kBenchPayloadBytes);
+    n.failPrimaryRx = true;
+    n.minDataSf[0] = n.minDataSf[1] = kBaseSf + 1;
+    n.rounds(7, kBenchPayloadBytes);
+    TEST_ASSERT_EQUAL_UINT8(kBaseSf + 1, n.clients[1].link.telemetry().confirmedDataSf);
+    TEST_ASSERT_FALSE(n.sent(1, kBaseSf + 1));
+    TEST_ASSERT_EQUAL_UINT(0, n.delivered[0]);
+}
+
+void intermittent_complete_misses_still_trigger_a_bounded_search() {
+    Network n(2, 8, kBenchPayloadBytes);
+    n.hasRequestSnr = true;
+    n.requestSnr[0] = n.requestSnr[1] = -2;
+    n.minDataSf[0] = kBaseSf + 1;
+    n.rounds(1, kBenchPayloadBytes);
+    n.minDataSf[0] = kBaseSf;
+    n.rounds(1, kBenchPayloadBytes);
+    n.minDataSf[0] = kBaseSf + 1;
+    n.rounds(2, kBenchPayloadBytes);
+    TEST_ASSERT_EQUAL_UINT8(kBaseSf + 1, n.clients[0].link.telemetry().confirmedDataSf);
+    TEST_ASSERT_EQUAL_UINT(4, n.delivered[1]);
+    TEST_ASSERT_FALSE(n.sent(2, kBaseSf + 1));
 }
 
 void sf9_capacity_uses_the_production_calendar() {
@@ -769,7 +824,7 @@ void oled_tracks_actual_data_on_both_roles_even_without_ack() {
     TEST_ASSERT_EQUAL_STRING("3/3 RX SF7 CR4/5", formatOledStatus(gateway, n.now, 2).rows[0]);
     n.dropAllAck = false;
     n.minDataSf[0] = 9;
-    n.rounds(3);
+    n.rounds(2);  // Observe the first higher-SF attempt before the search reaches SF9.
     client.multiclient = n.clients[0].link.telemetry();
     gateway.multiclient = n.gateway.link.telemetry();
     TEST_ASSERT_EQUAL_STRING("1/3 TX SF8 CR4/5", formatOledStatus(client, n.now, 0).rows[0]);
@@ -1084,6 +1139,9 @@ int main() {
     RUN_TEST(higher_sf_reservations_protect_two_existing_clients);
     RUN_TEST(stable_lock_requires_client_ack_receipt);
     RUN_TEST(accepted_data_remains_observable_when_final_ack_completion_fails);
+    RUN_TEST(observed_primary_loss_still_recovers_after_final_ack_faults);
+    RUN_TEST(primary_rx_fault_does_not_train_that_client_or_hide_peer_loss);
+    RUN_TEST(intermittent_complete_misses_still_trigger_a_bounded_search);
     RUN_TEST(sf9_capacity_uses_the_production_calendar);
     RUN_TEST(full_bench_roster_delivers_at_mixed_sf_with_32_byte_samples);
     RUN_TEST(bench_sf10_retries_keep_room_for_six_sf7_peers);

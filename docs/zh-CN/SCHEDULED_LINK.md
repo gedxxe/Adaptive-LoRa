@@ -216,30 +216,35 @@ $\phi_\iota^{\mathrm{req}}$ 和 $\phi_\iota^{\mathrm{del}}$ 是上次 Request �
 $\sigma_\iota^{\mathrm{del}}$ 是该次交付所用 SF。
 $\sigma_\iota^{\mathrm{want}}$、$\sigma_\iota^{\mathrm{res}}$、
 $\sigma_\iota^{\mathrm{mem}}$ 和 $\sigma_\iota^{\mathrm{back}}$ 依次表示目标、预留、记忆及回退 SF。
-$h_\iota$ 是回退后剩余等待次数，$\theta_{\sigma_\iota-1}$ 是 Legacy 试用低一级 SF 的 SNR 门限。
+$h_\iota$ 是回退后剩余等待次数，$\theta_{\sigma_\iota-1}$ 是交付窗口规则试用低一级 SF 的 SNR 门限。
 
 设 $r_\sigma=x_{\mathrm{req}}+b_\sigma-\vartheta_\sigma$ 为本次 Request
 换算到已分配 DATA SF $\sigma$ 的 SNR 余量。同 SF 重传成功时，或完全未收到
 DATA 且有效的 Request 余量满足 $r_\sigma<M_{\mathrm{up}}$ 时，丢包指示 $e$ 为 1，
-其余情况为 0。
+仅有首传窗观测时 $e$ 为 0。三种规则均在已分配 SF 上维护独立的窗口
+$\boldsymbol{\chi}_\iota$。伪代码中 $q_\iota$ 表示首传接收窗有效，
+$m_\iota=1$ 表示此时也没有收到 DATA。符合条件的 DATA 交付记零。缺席、应用拒收、首传窗未观测或存在本地故障的记录
+不进入该窗口。
 
 ```math
-\boldsymbol{\xi}^{\mathrm{loss}}_\iota\gets
-  \operatorname{Tail}_{\nu_{\mathrm{obs}}}
+\begin{aligned}
+\boldsymbol{\xi}^{\mathrm{loss}}_\iota
+  &\gets \operatorname{Tail}_{\nu_{\mathrm{obs}}}
   \bigl(\boldsymbol{\xi}^{\mathrm{loss}}_\iota\mathbin{\|}e\bigr),
-\qquad
-\sum_{j}\xi^{\mathrm{loss}}_{\iota,j}\ge\nu_{\mathrm{up}}.
+  & e=1 &\;\land\; \sum_j\xi^{\mathrm{loss}}_{\iota,j}\ge\nu_{\mathrm{up}},\\
+\boldsymbol{\chi}_\iota
+  &\gets \operatorname{Tail}_{\nu_{\mathrm{obs}}}
+  \bigl(\boldsymbol{\chi}_\iota\mathbin{\|}m_\iota\bigr),
+  & m_\iota=1 &\;\land\; \sum_j\chi_{\iota,j}\ge\nu_{\mathrm{up}}.
+\end{aligned}
 ```
 
-当前记录满足 $e=1$ 且窗口计数达到门限时，Legacy 申请升档。窗口只包含当前 SF 的有效记录，
-时序异常和应用拒收不计入。准备下一次 Grant 时核算较高 SF 的额度。
-
-三种规则均在当前分配的 SF 上统计连续有效记录中的全丢次数 $\ell_\iota$。收到有效
-DATA 后清零。常规升档优先。当 $\ell_\iota\ge\nu_{\mathrm{obs}}$ 且尚未达到最高 SF 时，
-Gateway 可试用高一级 SF。若在已获授权的试用 SF 上仍全丢，就再升一级。收到 DATA 后等
+第一行给出优先处理的常规升档规则。常规规则保持原 SF 时，第二行可触发高一级 SF 试用。下一次 Grant
+核对完整名单的空口预算。已获授权的候选 SF 若首传丢失且最终仍未收到 DATA，则再升一级。收到 DATA 后等
 Request 回报匹配的 ACK。预算不足、最高 SF 仍全丢或回执超时均会回退并释放额外预留。
 当 $\phi-\phi_{\mathrm{failed}}\ge\nu_{\mathrm{ack}}$ 时可再次尝试。周期为 15 秒时，连续
-三次全丢对应约 45 秒后首次获得高一级 SF 的发送机会。即使后来没有有效记录，回执期限仍有效。
+两次有效丢失对应约 30 秒后首次获得高一级 SF 的机会。窗口中间若有一次成功则再等一帧。
+即使后来没有有效记录，回执期限仍有效。
 
 连续三次首传成功且有同一 SF 的 ACK 回执后锁定，预算受限而分配较低 SF 时也适用。
 锁定后记录已确认的 SF，并释放为回退保留的较高额度。锁定且等待期结束后，若连续六次首传成功且平滑 SNR
@@ -250,9 +255,9 @@ $\phi-\phi_{\mathrm{probe}}\geq\nu_{\mathrm{ack}}$ 的有效记录处理中仍�
 六个帧编号对应 90 秒。回退后需八次首传成功才再次考虑降档。
 
 Client 只有在收到有效位图授权时才重传。Gateway 只有在下一轮开始前及时处理位图发送完成事件，
-才打开重传时隙。保留四帧累计 ACK，允许补确认。时序异常记入帧样本，并排除在 SF 评估之外。
-对每个获分配的时隙，Gateway 会检查是否在切换提前量内已按指定 SF 就绪，或是否收到了有效
-DATA；两项均无记录时，跳过该 Client 本帧的 SF 评估。
+才打开重传时隙。保留四帧累计 ACK，允许补确认。Gateway 分别核对每个 Client 的首传窗口
+是否已按授权 SF 开启 RX，以及窗口内是否发生本地无线故障。ACK 或重传时序异常，或其他
+节点的接收故障，仍保留该节点已观测的首传丢失，用于限时搜索。时序异常仍不参与常规余量和稳定性判断。
 Beacon 过期后 Client 停止按时隙发射，并返回控制 SF 搜索。准备 Grant 时距某个 Client
 上次 Request 达四个帧编号，Gateway 释放其较高 SF 的预留。相同 boot ID 的 Client 返回时，
 Gateway 按当前预算重新申请由 ACK 回执或后续锁定记住的 SF。如果最近收到的 DATA 使用了更高
@@ -263,7 +268,7 @@ SF，但仍没有 ACK 回执，也可按相同期限和预算试用该 SF。预�
 
 ### 按丢包情况调整
 
-Gateway 在构建时可选三种规则，默认为 `LEGACY`。 `MARGIN_EWMA` 跟踪指数加权均值与方差。
+默认采用交付窗口规则。两种构建选项使用 SNR 估计做常规 SF 决策。`MARGIN_EWMA` 跟踪指数加权均值与方差。
 `MARGIN_KALMAN` 同时跟踪 SNR 水平与变化趋势，并预测下一条有效记录的 SNR 及不确定度。
 有效记录缺少 SNR 时，EWMA 保留估计值，Kalman 只做预测。
 
@@ -277,14 +282,15 @@ Gateway 在构建时可选三种规则，默认为 `LEGACY`。 `MARGIN_EWMA` 跟
 | SF7/8/9/10 的暂定 SNR 门限 $\vartheta_\sigma$ | −7.5 / −10 / −12.5 / −15 dB。后续用各 SF 实测的 50% 交付门限替换。 |
 | 余量 $m_\sigma=\widehat{x}+b_\sigma-\vartheta_\sigma-z\sigma_x$ | $\widehat{x}$ 为预测 SNR，$b_\sigma$ 为偏移，$\sigma_x$ 为预测标准差，$z=1$ |
 | 丢包分数 $S\gets\rho S+w$ | $\rho=0.75$。符合条件的全丢加 1.0，同 SF 重传成功加 0.4，$e=0$ 时加 0。 |
-| 根据余量提高 DATA SF | 要求 $e=1$、$S\geq S_{\mathrm{up}}=1.5$，且 $m_\sigma<M_{\mathrm{up}}=0$ dB。限时搜索则使用单独的全丢计数。 |
+| 根据余量提高 DATA SF | 要求 $e=1$、$S\geq S_{\mathrm{up}}=1.5$，且 $m_\sigma<M_{\mathrm{up}}=0$ dB。限时搜索使用独立的丢失窗口。 |
 | 试用较低 DATA SF | 延续锁定和回执规则，连续六次首传成功且 $m_{\sigma-1}\geq4$ dB。保留回退、等待和回执超时处理。 |
 | 估计器 | EWMA 权重为 0.25。Kalman 的水平和趋势过程方差为 0.16 和 0.01，测量方差为 1.0，初始趋势方差为 0.25。每条有效记录为一个时间步。 |
 
 `V3_LINK_SAMPLE` 保留旧采集字段，并在自适应 Gateway 上增加 `node_id`、`class`、`snr_req`、
 `snr_data`、`level`、`slope`、`sigma`、`margin`、`score`、`decision`、`rule` 和
 `params_version`。余量对应已分配的 SF，升档分数在清空前记录，缺失值为 `N/A`。
-`LOST_ALL` 表示已分配机会均未成功交付。`params_version=3` 下，`adr=loss_unconfirmed`
+`LOST_ALL` 表示已分配机会均未成功交付。`params_version=4` 下，`PRIMARY_MISS`
+表示首传窗已观测且未收到 DATA，但整体时序无法支持全丢分类。`adr=loss_unconfirmed`
 表示没有收到 DATA，且 Request 余量未满足条件。`recovery_probe` 和 `recovery_next` 申请试用
 SF，`recovery_wait_ack` 表示已收到 DATA 并等待回执，`recovery_confirmed` 表示回执匹配。
 `recovery_budget` 与 `recovery_failed` 表示回退。`ADR_PROBE` 的 `result=expired`

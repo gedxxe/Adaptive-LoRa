@@ -29,6 +29,7 @@ private:
         bool metrics = false;
         bool retried = false;
         bool rxWindowUnobserved = false;
+        bool primaryMiss = false;
     };
     Frame frame(MessageType type, uint16_t sequence) const;
     bool send(const Frame& frame, uint64_t now, const char* event);
@@ -41,6 +42,7 @@ private:
     void clientFinish(PayloadResult result);
     void observePeer(uint64_t now, uint16_t peer, const RadioEvent& event);
     void logLinkSamples(bool timingOk);
+    void invalidatePrimaryRx(uint64_t at);
     bool prepareSf(uint8_t sf, uint64_t now);
     void admitProfiles();
     void logAdrFields(char* buffer, size_t size, uint8_t index, const AdrObservation& obs, const AdrReview& review) const;

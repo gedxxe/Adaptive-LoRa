@@ -93,6 +93,8 @@ if the Gateway still advertises a 16 B ceiling. The configured interval controls
 when the Client queues a sample. The over-the-air period comes from the Beacon.
 The Gateway must report `period_us=15000000`, `roster_count=8` and
 `bench_payload_ceiling_bytes=32` in `SCHEDULE_CONFIG`.
+Check `data_sf_policy=adaptive` before the walk. The Gateway reports
+`params_version=4` in its link samples.
 
 With Client 2, the first sample is `ID=0002|SEQ=0001|MSG=HELLO WORLD`.
 Both fields use four hexadecimal digits. The sequence starts at one after
@@ -160,8 +162,7 @@ Run `status` on the Gateway and record `data_sf_policy=fixed_sf7`. The
 same Clients, SF9 control, 15 s period and retry rules apply. To restore
 ADR, upload the ordinary adaptive image and check `data_sf_policy=adaptive`.
 
-**Experimental ADR comparison.** The ordinary Gateway shows
-`adr_rule=LEGACY` in `SCHEDULE_CONFIG`. For a matched EWMA run, build the
+**Experimental ADR comparison.** For a matched EWMA run, build the
 Gateway with the command below. Use `=2` and `.pio/adr-kalman` for Kalman.
 Upload the corresponding Gateway image, verify its `adr_rule`, and use the
 same Clients, route and offered load. The rule does not need provisioning.
@@ -216,9 +217,11 @@ application delivery still counts in the end-to-end result. `rx_us` is
 Gateway uptime at reception, so use it for per-Client gaps within a boot.
 For `adr=rx_window_unobserved`, the Gateway could neither establish that
 it was listening at the assigned SF before launch nor verify DATA in that
-slot. Other Clients with valid timing still contribute ADR samples.
-With `params_version=3`, `adr=loss_unconfirmed` means the Gateway missed
-all DATA and the current Request did not indicate low margin. Match the
+slot. A sample with `class=PRIMARY_MISS` records a usable primary
+receive window with no DATA even if timing elsewhere in the frame is
+invalid. The Gateway can use that evidence for a bounded SF trial.
+`adr=loss_unconfirmed` means the Gateway missed all DATA and the current
+Request did not indicate low margin. Match the
 Client's `V3_DATA_TX` with the Gateway sample by session, frame and node
 before attributing the loss. `recovery_probe` and `recovery_next` indicate
 trial SF requests. Confirm them with a corresponding `V3_DATA_TX`.

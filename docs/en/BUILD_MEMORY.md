@@ -2370,3 +2370,48 @@ files under `logs/test/`.
   Physical RF, NVS persistence and retune latency were not measured in
   this iteration. Repeat the route with one moving Client and one fixed
   Client before expanding to eight and compare ACK receipts and peer delivery.
+
+## Iteration 033 — Per-Client receive evidence, 2026-11-24
+
+- Branch `codex/iteration-033-per-client-adr-evidence` from fetched main
+  `fc2fbcd0ca03a0ee6834366b79b9c2cab0adf70d`. The operator reported SF7
+  stalling in a multi-Client field run. Host fault injection reproduced
+  timing exclusion and intermittent-loss paths. See ERR-063 and ERR-064.
+- `multiclient_link.cpp` and its header preserve a usable primary miss
+  per Client and invalidate only a primary slot affected by a local RX
+  failure. Aggregate timing status remains available for capture analysis.
+  `adr_policy.cpp` and its header use a bounded rolling history and share
+  the existing window length and miss threshold. No new SF or timing
+  parameters were added. The history excludes absent and invalid primary
+  observations. Trial confirmation still requires a matching ACK receipt.
+- `test/test_adaptive_link/test_main.cpp` covers a miss–success–miss trace,
+  an RX fault isolated to one Client, and a final bitmap completion
+  fault with two and eight Clients. The first run of the three new
+  cases against the previous implementation exited 1. A follow-up run
+  found a display test that needed to sample the faster SF transition.
+  `pio test -e native`, `-e native_multiclient` and `-e native_adaptive`
+  exited 0 with 356, 15 and 43 cases. The final adaptive rerun included
+  the expanded eight-Client fixture. No native cases were skipped.
+- `pio run -e heltec_wifi_lora_32_V3`, `-e heltec_wifi_lora_32_V3_research`,
+  `-e heltec_wifi_lora_32_V3_multiclient` and `-e heltec_wifi_lora_32_V3_adaptive`
+  exited 0. The adaptive build uses 35,216 B static RAM and 393,404 B
+  program storage. Tools were PlatformIO Core 6.1.19, Espressif32
+  55.3.311, Arduino ESP32 3.3.11, Xtensa 14.2.0+20260121 and RadioLib 7.8.1.
+- `python -m unittest discover -s tools -p test_<suite>.py -v` covered
+  capture (15), airtime (16), ADR parser (7), multiclient model (6),
+  documentation (19) and ADR simulator (2). The documentation suite
+  and `python tools/check_consistency.py` were rerun after ERR-065.
+  `python tools/adr_sim.py --seed 42` and the two policy-threshold
+  shifts of −2.5 and +2.5 dB each exited 0 with 30 analytical cases.
+  These ideal-control model results are separate from native timing tests.
+- Shared control SF9, DATA SF7–SF10, protocol 5, NVS schema 1, firmware
+  `0.2.0-alpha.1`, CR4/5, the 32 B payload and 15 s period continue.
+  `main.cpp` still delegates Arduino setup and loop to the runtime.
+  Reviewed the full change, synchronized the active manuals in both
+  languages and rendered the Gateway scheduling and SF decision figures
+  from the symbolic LaTeX source. Earlier records remain intact.
+- Command output with workstation paths replaced and trailing whitespace
+  trimmed is in `logs/build/iteration-033-verification.log` and
+  `logs/test/iteration-033-verification.log`. RF, NVS persistence and
+  retune timing remain unmeasured for this revision. Repeat the field
+  route with one moving Client and one fixed Client, matching both logs.

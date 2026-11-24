@@ -5,6 +5,14 @@ changes. It is not a substitute for the append-only build memory.
 
 ## Unreleased
 
+### Per-Client receive evidence for SF recovery
+
+- Keep an observed primary DATA miss available to the SF search when a
+  later retry or ACK has a timing fault. A local error in the primary RX
+  window disqualifies that window.
+- Start a budgeted higher-SF trial using the configured rolling miss
+  window, so an occasional delivery can coexist with signs of degradation.
+
 ### Bounded DATA SF recovery
 
 - After persistent complete DATA misses, try higher SFs within the
@@ -28,7 +36,7 @@ changes. It is not a substitute for the append-only build memory.
 
 - Add opt-in EWMA and local-trend Kalman rules that use Request SNR and
   distinguish first-attempt success, retry rescue and complete loss.
-- Keep Legacy as the default with wire version 5 and the existing
+- Keep the delivery-window rule as the default with wire version 5 and the existing
   full-roster airtime check. Add per-report diagnostics and a seeded host model.
 
 ### 32-byte adaptive test samples

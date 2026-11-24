@@ -251,38 +251,46 @@ state carries desired, reserved, remembered and rollback values
 $\sigma_\iota^{\mathrm{want}}$, $\sigma_\iota^{\mathrm{res}}$,
 $\sigma_\iota^{\mathrm{mem}}$ and $\sigma_\iota^{\mathrm{back}}$.
 $h_\iota$ counts the remaining hold after rollback. $\theta_{\sigma_\iota-1}$
-is the Legacy SNR threshold for trying the next lower SF.
+is the delivery-window rule's SNR threshold for trying the next lower SF.
 
 Let $r_\sigma=x_{\mathrm{req}}+b_\sigma-\vartheta_\sigma$ be the
 current Request margin at the assigned DATA SF $\sigma$. The loss indicator
 $e$ is one if a same-SF retry delivers, or if no DATA arrives and a finite
-Request sample gives $r_\sigma<M_{\mathrm{up}}$. Otherwise $e$ is zero.
+Request sample gives $r_\sigma<M_{\mathrm{up}}$. It is zero with only
+primary-slot evidence. All rules also track a separate window
+$\boldsymbol{\chi}_\iota$ at the assigned SF. In the pseudocode,
+$q_\iota$ means the primary receive window is usable, and $m_\iota=1$
+means there is also no accepted DATA. An eligible accepted DATA report
+contributes zero. Absence,
+application refusal, and an unobserved or faulty primary slot do not
+enter this window.
 
 ```math
-\boldsymbol{\xi}^{\mathrm{loss}}_\iota\gets
-  \operatorname{Tail}_{\nu_{\mathrm{obs}}}
+\begin{aligned}
+\boldsymbol{\xi}^{\mathrm{loss}}_\iota
+  &\gets \operatorname{Tail}_{\nu_{\mathrm{obs}}}
   \bigl(\boldsymbol{\xi}^{\mathrm{loss}}_\iota\mathbin{\|}e\bigr),
-\qquad
-\sum_{j}\xi^{\mathrm{loss}}_{\iota,j}\ge\nu_{\mathrm{up}}.
+  & e=1 &\;\land\; \sum_j\xi^{\mathrm{loss}}_{\iota,j}\ge\nu_{\mathrm{up}},\\
+\boldsymbol{\chi}_\iota
+  &\gets \operatorname{Tail}_{\nu_{\mathrm{obs}}}
+  \bigl(\boldsymbol{\chi}_\iota\mathbin{\|}m_\iota\bigr),
+  & m_\iota=1 &\;\land\; \sum_j\chi_{\iota,j}\ge\nu_{\mathrm{up}}.
+\end{aligned}
 ```
 
-Legacy requests a higher SF when the window meets the count and the
-current report has $e=1$. The window contains only eligible reports at the
-current SF and excludes timing faults and application refusals. The next
-Grant checks whether the higher reservation fits.
-
-All three rules also count consecutive complete misses $\ell_\iota$
-at the assigned SF across eligible reports. Accepted DATA clears the
-count. A normal increase takes priority. If $\ell_\iota\ge\nu_{\mathrm{obs}}$
-and the SF is below the ceiling, the Gateway can try the next higher SF.
-A complete miss at an admitted candidate advances the search one step.
+The first row gives the normal delivery-window rule, which takes
+priority. The second row can open a trial
+at the next SF when the normal rule holds. The next Grant checks the full
+roster reservation. A primary miss with no accepted DATA at an admitted
+candidate advances the search one step.
 After a delivery the trial waits for a matching ACK receipt in a Request.
 The search rolls back on budget denial, loss at the maximum SF, or
 receipt expiry, releasing any additional reservation. Another search
 can begin at $\phi-\phi_{\mathrm{failed}}\ge\nu_{\mathrm{ack}}$.
-At 15 s per frame, three consecutive complete misses give a nominal
-45 s to the first higher-SF opportunity. The clock for receipt expiry
-runs even if later reports are unavailable.
+With a 15 s period, two successive eligible misses give a nominal
+30 s from the first missed frame to the first higher-SF opportunity.
+One intervening delivery within the window adds one frame. The clock for
+receipt expiry runs even if later reports are unavailable.
 
 A lock requires three first-slot deliveries and an ACK receipt at the same
 SF, including when the budget limits a Grant to a lower SF. It stores the
@@ -300,11 +308,13 @@ rollback delays the next lower-SF trial for eight first-slot deliveries.
 A Client retries only when a valid bitmap grants a retry. The Gateway
 opens those slots after an in-window TX completion serviced before the
 next DATA round. Later cumulative feedback can acknowledge an earlier
-delivery after an ACK loss. All four bitmaps are retained. A local timing
-fault is reported in the frame sample and excluded from SF review. For
-each assigned slot, the Gateway checks for RX armed at the assigned SF
-during the retune lead or a valid DATA reception. Without either observation
-it skips SF review for that Client in this frame. If the Beacon expires,
+delivery after an ACK loss. All four bitmaps are retained. For each
+Client, the Gateway checks whether RX was armed at the assigned SF
+before the primary slot and whether a local radio failure invalidated
+that window. An ACK or retry timing fault, or a local fault in a peer's
+slot, leaves a usable primary miss available for the bounded search.
+Timing-invalid reports stay out of the ordinary margin and stability
+decisions. If the Beacon expires,
 the Client stops scheduled TX and searches on the control SF. The
 Gateway releases the inactive Client's higher-SF reservation at a Grant
 prepared at least four frame IDs after its previous Request. When the
@@ -320,7 +330,8 @@ software windows. [LaTeX source](../research/figures/adaptive-algorithm.tex) · 
 
 ### Loss-cause-aware ADR
 
-The Gateway offers three build-time rules. `LEGACY` is the default.
+The delivery-window rule is the default. Two build-time options use SNR
+estimates for the ordinary SF decision.
 `MARGIN_EWMA` tracks an exponential mean and variance. `MARGIN_KALMAN`
 tracks level and slope and projects both the level and its uncertainty one
 eligible report ahead. With no SNR in an eligible report, EWMA holds its
@@ -337,7 +348,7 @@ or after idle state expires. Log both measurements to estimate the offset.
 | Provisional SNR threshold $\vartheta_\sigma$ at SF7/8/9/10 | −7.5 / −10 / −12.5 / −15 dB. Replace with measured SNR at 50% delivery for each SF. |
 | Margin $m_\sigma=\widehat{x}+b_\sigma-\vartheta_\sigma-z\sigma_x$ | Forecast SNR $\widehat{x}$, offset $b_\sigma$, and forecast standard deviation $\sigma_x$ with $z=1$ |
 | Evidence $S\gets\rho S+w$ | $\rho=0.75$. Add 1.0 for qualifying complete loss, 0.4 for a retry rescue, and 0 when $e=0$. |
-| Raise DATA SF through the margin rule | Require $e=1$, $S\geq S_{\mathrm{up}}=1.5$ and $m_\sigma<M_{\mathrm{up}}=0$ dB. The bounded recovery search uses the separate complete-miss count. |
+| Raise DATA SF through the margin rule | Require $e=1$, $S\geq S_{\mathrm{up}}=1.5$ and $m_\sigma<M_{\mathrm{up}}=0$ dB. The bounded recovery search uses the separate miss window. |
 | Try lower DATA SF | Existing lock and receipt rules, six first-attempt deliveries, and $m_{\sigma-1}\geq4$ dB. Preserve rollback, hold, and receipt expiry. |
 | Estimators | EWMA weight 0.25. Kalman level and slope process variances 0.16 and 0.01, measurement variance 1.0, initial slope variance 0.25. Units use one step per eligible report. |
 
@@ -347,8 +358,10 @@ rows add `node_id`, `class`, `snr_req`, `snr_data`, `level`, `slope`,
 The margin describes the granted SF. The score for an increase is logged
 before clearing its evidence. Missing values appear as `N/A`.
 `LOST_ALL` means that no granted opportunity delivered DATA.
-With `params_version=3`, `adr=loss_unconfirmed` means DATA was absent
-without a qualifying Request margin. `recovery_probe` and `recovery_next`
+With `params_version=4`, `PRIMARY_MISS` means the primary RX window
+was observed without DATA, and overall timing prevents a complete-loss
+classification. `adr=loss_unconfirmed` means DATA was absent without a
+qualifying Request margin. `recovery_probe` and `recovery_next`
 request a trial SF, and `recovery_wait_ack` reports DATA without a receipt.
 `recovery_confirmed` records a receipt. `recovery_budget` and `recovery_failed`
 mark rollback. `ADR_PROBE` with `result=expired`

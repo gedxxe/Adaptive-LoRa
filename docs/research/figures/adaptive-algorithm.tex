@@ -26,6 +26,7 @@
 \DeclareMathOperator{\Probe}{Probe}
 \DeclareMathOperator{\Expire}{Expire}
 \DeclareMathOperator{\Tail}{Tail}
+\DeclareMathOperator{\ObservePrimary}{ObservePrimary}
 \DeclareMathOperator{\ValidGrant}{ValidGrant}
 \DeclareMathOperator{\ValidACK}{ValidACK}
 \newcommand{\ctrl}{\sigma_{\mathrm{ctrl}}}
@@ -57,6 +58,7 @@
   \Block{\textbf{for} $\jmath=0,\ldots,\varrho$ \textbf{do}}{%
     \Block{\textbf{for} $\iota\in\Theta_\jmath$ in slot order \textbf{do}}{%
       \Step{$\Delta_\iota\gets\Rx{\sigma_\iota}{\phi,\jmath,\iota}$}
+      \Step{\textbf{if} $\jmath=0$ \textbf{then} $q_\iota\gets\ObservePrimary(\phi,\iota)$}
       \Step{$\Xi\gets\Xi\cup\Deliver(\Delta_\iota)$}%
     }
     \Step{$\Pi_\jmath\gets\begin{cases}
@@ -69,7 +71,7 @@
       \varnothing, & \text{otherwise}
     \end{cases}$}%
   }
-  \Step{$\Review_\iota(\phi)$ for each $\iota\in\Theta_0$ satisfying $\Eligible_\iota(\phi)$}
+  \Step{$\Review_\iota(\phi,q_\iota)$ for each $\iota\in\Theta_0$ satisfying $\Eligible_\iota(\phi)$}
 \end{algorithm}
 
 \begin{algorithm}{2}{Client delivery}
@@ -116,10 +118,12 @@
   }
   \vspace{3pt}
   \Step{\textbf{After feedback:} $\Review_\iota$ for an eligible report}
+  \Step{$m_\iota\gets q_\iota\land(\iota\notin\Xi)$}
   \Step{On SF change, clear the loss history and first-delivery count}
   \Step{$r_\sigma\gets x_{\mathrm{req}}+b_\sigma-\vartheta_\sigma$}
   \Step{$e\gets\mathrm{retry\ rescue}\lor(\mathrm{no\ DATA}\land
       x_{\mathrm{req}}\ne\bot\land r_\sigma<M_{\mathrm{up}})$}
+  \Step{Set $e\gets0$ with only primary-slot evidence}
   \Block{\textbf{if} EWMA or Kalman \textbf{then}}{%
     \Step{Update $\widehat{x}$ and $\sigma_x$ on the Request SNR scale}
     \Step{$S\gets\rho S+w$, where $w=0$ if $\neg e$}%
@@ -128,8 +132,8 @@
     \Step{$a\gets(\sigma_\iota=\sigma^{\mathrm{want}}_\iota)$}
     \Step{\textbf{if} $a\land\alpha_\iota$ \textbf{then} keep $\sigma_\iota$ and clear trial}
     \Step{\textbf{else if} $\neg a\lor(\phi-\phi_{\mathrm{probe}}\ge\nu_{\mathrm{ack}})
-      \lor(\mathrm{no\ DATA}\land\sigma_\iota=\sigma_{\max})$ \textbf{then} roll back}
-    \Step{\textbf{else if} no DATA \textbf{then} $\sigma^{\mathrm{want}}_\iota\gets\sigma_\iota+1$}
+      \lor(m_\iota\land\sigma_\iota=\sigma_{\max})$ \textbf{then} roll back}
+    \Step{\textbf{else if} $m_\iota$ \textbf{then} $\sigma^{\mathrm{want}}_\iota\gets\sigma_\iota+1$}
     \Step{\textbf{return}}%
   }
   \Block{\textbf{if} $\sigma_\iota<\sigma^{\mathrm{want}}_\iota$ \textbf{then}}{%
@@ -142,7 +146,7 @@
     \Step{$\Rollback(\sigma^{\mathrm{back}}_\iota,\nu_{\mathrm{hold}})$}
     \Step{\textbf{return}}%
   }
-  \Block{\textbf{if} Legacy \textbf{then}}{%
+  \Block{\textbf{if} delivery-window rule \textbf{then}}{%
     \Step{$\boldsymbol{\xi}\gets\Tail_{\nu_{\mathrm{obs}}}(\boldsymbol{\xi},e)$}
     \Step{$u\gets\left(\sum_j\xi_j\ge\nu_{\mathrm{up}}\right)$}
     \Step{$d\gets(\overline{\upsilon}\ge\theta_{\sigma-1})$ for $\sigma>\sigma_{\min}$}
@@ -152,24 +156,22 @@
     \Step{$u\gets(S\ge S_{\mathrm{up}})\land(m_\sigma<M_{\mathrm{up}})$}
     \Step{$d\gets(m_{\sigma-1}\ge M_{\mathrm{down}})$ for $\sigma>\sigma_{\min}$}
   }
-  \Step{$\ell_\iota\gets
-    \begin{cases}\min(\ell_\iota+1,\nu_{\mathrm{obs}}), & \text{no DATA}\\
-       0, & \text{otherwise}\end{cases}$}
+  \Step{$\boldsymbol{\chi}_\iota\gets\Tail_{\nu_{\mathrm{obs}}}(\boldsymbol{\chi}_\iota,m_\iota)$}
   \Block{\textbf{if} $\epsilon_\iota^{\mathrm{fail}}$ \textbf{then}}{%
     \Block{\textbf{if} $e\land u$ \textbf{then}}{%
       \Step{$\sigma^{\mathrm{want}}_\iota\gets\min(\sigma_\iota+1,\sigma_{\max})$}
       \Step{Unlock and clear the loss history}%
     }
-    \Step{\textbf{else if} $\ell_\iota\ge\nu_{\mathrm{obs}}$ and cooldown has elapsed
+    \Step{\textbf{else if} $m_\iota\land\left(\sum_j\chi_{\iota,j}\ge\nu_{\mathrm{up}}\right)$ and cooldown has elapsed
       \textbf{then} try $\sigma_\iota+1$ if $\sigma_\iota<\sigma_{\max}$}
     \Step{\textbf{return}}%
   }
   \Step{\textbf{if} unlocked and $\nu^{\mathrm{first}}_\iota\ge\nu_{\mathrm{lock}}\land\alpha_\iota$
     \textbf{then} $\Lock(\sigma_\iota)$}
   \Step{\textbf{if} $h_\iota>0$ \textbf{then} $h_\iota\gets h_\iota-1$ \enspace\textbf{return}}
-  \Step{$\chi_\iota\gets\alpha_\iota\land(\sigma_\iota>\sigma_{\min})
+  \Step{$\zeta_\iota\gets\alpha_\iota\land(\sigma_\iota>\sigma_{\min})
     \land(\nu^{\mathrm{first}}_\iota\ge\nu_{\mathrm{probe}})$}
-  \Step{\textbf{if} locked and $\chi_\iota\land d$ \textbf{then}
+  \Step{\textbf{if} locked and $\zeta_\iota\land d$ \textbf{then}
     $\Probe(\sigma_\iota-1)$ and $\phi_{\mathrm{probe}}\gets\phi$}
 \end{algorithm}
 \end{document}
