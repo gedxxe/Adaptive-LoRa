@@ -28,9 +28,10 @@ for testing that policy.
   The [offline evaluator](../../tools/adr_shadow.py) uses its own window
   parameters for capture analysis.
 - The [Gateway ADR policy](../../src/app/adr_policy.cpp) uses Request
-  margin for normal SF increases and lets every rule try a time-limited
-  search after persistent complete loss. An ACK receipt confirms the
-  trial. The default uses a short loss window. EWMA and Kalman also
+  margin for normal SF increases and keeps an independent receive miss
+  window per Client. An observed primary miss can still inform the
+  budgeted search during a frame timing fault. An ACK receipt confirms
+  the trial. The default uses a short delivery window. EWMA and Kalman also
   model forecast margin and decayed loss evidence. The
   [seeded model](../../tools/adr_sim.py) shares their decision code and
   keeps its provisional decode curve independent of the policy threshold.

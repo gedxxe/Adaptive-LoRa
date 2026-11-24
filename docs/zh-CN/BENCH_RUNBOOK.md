@@ -82,6 +82,7 @@ config save
 新版 Client 不会发送 Request。串口配置中的间隔控制 Client 提交样本的时间，空口周期取自 Beacon。
 Gateway 的 `SCHEDULE_CONFIG` 应显示 `period_us=15000000`、`roster_count=8`
 和 `bench_payload_ceiling_bytes=32`。
+走测前核对 `data_sf_policy=adaptive`。Gateway 的链路样本应显示 `params_version=4`。
 
 Client 2 的首个样本为 `ID=0002|SEQ=0001|MSG=HELLO WORLD`。ID 和序号均为四位十六进制。
 启动后序号从 1 开始，每次有新样本入队时递增，到 `FFFF` 后回绕。DATA 帧携带恰好 32 字节
@@ -133,8 +134,7 @@ cmd /d /c 'set PLATFORMIO_BUILD_SRC_FLAGS=-DADAPTIVE_LORA_FIXED_SF_COMPARISON&&s
 15 秒周期及重传规则与自适应试验相同。恢复时重新烧录普通自适应镜像，确认
 `data_sf_policy=adaptive`。
 
-**实验 ADR 对照。** 常规 Gateway 的 `SCHEDULE_CONFIG` 显示 `adr_rule=LEGACY`。
-下列命令构建并烧录 EWMA 版 Gateway。将参数改为 `=2`，并使用 `.pio/adr-kalman`，
+**实验 ADR 对照。** 下列命令构建并烧录 EWMA 版 Gateway。将参数改为 `=2`，并使用 `.pio/adr-kalman`，
 即可构建 Kalman 版。将 `COMx` 换成实际端口，核对 `adr_rule`，沿用相同 Client、路线与负载。
 规则在构建时选择，无需修改配置。
 
@@ -181,8 +181,9 @@ run_id,gateway_boot,frame_id,node_id,client_boot,grant_seen,payload_bytes,data_s
 `timing=invalid` 属于本地调度异常，从射频对比中排除，已记录的应用交付仍计入端到端结果。
 `rx_us` 为接收时的 Gateway 启动后时间，可用于统计同一会话内单个 Client 的交付间隔。
 若出现 `adr=rx_window_unobserved`，Gateway 既未在发送前确认已用指定 SF 监听，也未在该时隙
-收到有效 DATA。其他节点时序正常的记录仍用于 ADR。
-`params_version=3` 下，`adr=loss_unconfirmed` 表示 Gateway 未收到 DATA，且本次
+收到有效 DATA。`class=PRIMARY_MISS` 表示首传有可用的接收窗口却未收到 DATA，
+即便帧内其他时序存在异常。Gateway 可用该记录启动限时 SF 试用。
+`adr=loss_unconfirmed` 表示 Gateway 未收到 DATA，且本次
 Request 未显示余量偏低。按会话、帧编号和节点匹配 Client 的 `V3_DATA_TX` 与 Gateway 的样本，
 再判断丢失原因。`recovery_probe` 和 `recovery_next` 表示申请试用 SF，应与相应
 `V3_DATA_TX` 核对。`recovery_confirmed` 表示回执匹配，`recovery_budget` 表示预算不足，

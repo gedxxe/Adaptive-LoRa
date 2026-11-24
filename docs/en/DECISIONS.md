@@ -490,3 +490,19 @@ still clears historical candidates. Never grant outside the calculated
 full-roster budget. Keep control at SF9 because SF10 control would consume
 the space for even one DATA SF9 slot in the eight-Client 15 s profile.
 Use parameter revision 3 and keep the RF thresholds provisional.
+
+## ADR-041 — Track primary receive evidence per Client
+
+2026-11-24. Keep end-to-end timing status for capture analysis. Record a
+primary miss separately when RX at the assigned SF was observed and no
+DATA arrived. A local radio failure during that slot invalidates its
+observation. A fault in another slot or in later feedback does not
+invalidate it. A partial observation can guide a bounded recovery trial.
+It does not qualify for the ordinary margin decision or a stability lock.
+
+Use the existing window length and miss threshold for the recovery
+history. An eligible accepted report adds a zero to that window.
+This allows intermittent degradation to open a trial without a special
+per-Client override. Keep grants within the full-roster reservation and
+require the existing matching ACK receipt to confirm a trial. Label the
+policy as parameter revision 4.

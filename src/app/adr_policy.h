@@ -4,11 +4,11 @@
 
 namespace adaptive_lora {
 enum class AdrRule : uint8_t { LEGACY = 0, MARGIN_EWMA = 1, MARGIN_KALMAN = 2 };
-enum class AdrOutcome : uint8_t { ABSENT, OK_FIRST, RESCUED_SAME_SF, LOST_ALL, EXCLUDED };
+enum class AdrOutcome : uint8_t { ABSENT, OK_FIRST, RESCUED_SAME_SF, LOST_ALL, PRIMARY_MISS, EXCLUDED };
 enum class AdrDecision : uint8_t { HOLD, UP, DOWN, ROLLBACK };
 
 struct AdrParams {
-    uint8_t version = 3;
+    uint8_t version = 4;
     uint8_t legacyWindow = 3;
     uint8_t legacyMisses = 2;
     uint8_t confirmations = 3;
@@ -107,7 +107,7 @@ struct AdrState {
     uint8_t acknowledgedSf = 0;
     uint8_t consecutiveFirst = 0;
     uint8_t degradedHistory = 0;
-    uint8_t completeLosses = 0;
+    uint8_t missedHistory = 0;
     uint8_t probeReturn = 0;
     uint8_t hold = 0;
     bool locked = false;

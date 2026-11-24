@@ -960,3 +960,31 @@ reached the test. The existing case expected zero reactions after a
 −20 dB policy shift. Recovery now reaches the fixed channel's reference
 SF after a delay. The test checks for that delay and continues to catch
 a reference that shifts with the policy.
+
+## ERR-063 — Frame timing status suppresses otherwise usable primary loss
+
+Against `fc2fbcd`, run the adaptive native fixture with one weak and one
+stationary Client. Suppress the Gateway's final bitmap completion every
+frame, while delivering earlier valid bitmaps. The weak Client never
+received an acknowledged SF increase. In another fixture, a local error
+inside one Client's primary RX window also prevented a peer's increase.
+After isolating primary RX evidence, both fixtures pass. The Client
+whose primary window had a local error provides no missing DATA evidence.
+
+## ERR-064 — Intermittent complete loss never opens the recovery trial
+
+At SF7, provide a strong Request SNR and alternate complete loss,
+accepted DATA, then complete loss. The former consecutive counter
+stopped at one. The configured rolling window now allows the trial at
+SF8. A follow-up display test initially sampled after recovery had
+already reached SF9. It now checks the earlier SF8 TX without an ACK.
+Before-and-after native results are in
+`logs/test/iteration-033-verification.log`. The operator's field cause
+has not been confirmed with matched captures.
+
+## ERR-065 — An extra display-math block violates the bilingual layout check
+
+Adding a ninth block to both protocol guides caused
+`tools/check_consistency.py` to report differing airtime equations.
+Combine the two loss-window expressions into the existing bilingual
+block. The check then verifies both expressions together.

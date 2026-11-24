@@ -19,13 +19,12 @@ The Gateway adjusts DATA SF7–SF10 per Client, sizes slots to the requested
 bytes and grants retries from the ACK bitmap. Control stays at SF9. Coding
 rate, bandwidth, TX power and frame period stay fixed.
 
-The default Legacy rule can raise DATA SF after two qualifying misses in
-three eligible reports. A miss qualifies when a retry delivers DATA, or
-when all DATA is missing and the current Request indicates low SNR margin.
-After a gap, the Gateway can offer the last confirmed SF to the same
-Client session if it still fits the schedule. Three consecutive complete
-misses can trigger a temporary higher-SF search when Request SNR gives no
-reason to raise SF. An ACK receipt confirms the result.
+The Gateway tracks delivery separately for each Client. Two misses in
+three eligible reports can start an airtime-checked trial at a higher
+DATA SF, including when later ACK or retry timing is uncertain but the
+primary receive window was observed. An ACK receipt confirms the trial.
+After an outage, the same Client session can resume a confirmed SF if it
+still fits the schedule.
 `SEARCH` means the Client is waiting for a fresh SF9 Beacon. `NO GRANT`
 means its Request started but a matching Grant did not arrive.
 The Gateway also has two [experimental SNR-margin rules](docs/en/SCHEDULED_LINK.md#loss-cause-aware-adr).

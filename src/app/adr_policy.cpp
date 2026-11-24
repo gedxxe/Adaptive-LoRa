@@ -6,7 +6,7 @@ namespace adaptive_lora {
 namespace {
 void clearEvidence(AdrState& state) {
     state.degradedHistory = 0;
-    state.completeLosses = 0;
+    state.missedHistory = 0;
     state.score = 0;
 }
 
@@ -123,12 +123,13 @@ AdrReview reviewAdr(AdrState& state, AdrRule rule, uint8_t sf, uint32_t frame,
     if (sf < phy::dataSf || sf > phy::maxDataSf) return {"invalid_sf"};
     const bool legacy = rule == AdrRule::LEGACY;
     const bool first = obs.outcome == AdrOutcome::OK_FIRST;
-    const bool lost = obs.outcome == AdrOutcome::LOST_ALL;
+    const bool primaryMiss = obs.outcome == AdrOutcome::PRIMARY_MISS;
+    const bool lost = primaryMiss || obs.outcome == AdrOutcome::LOST_ALL;
     const auto index = sf - phy::dataSf;
     // The Gateway cannot tell whether the Client received a Grant or transmitted DATA.
     const bool weakRequest = std::isfinite(obs.requestSnr) &&
         obs.requestSnr + p.dataOffsetDb[index] - p.requiredSnrDb[index] < p.upMarginDb;
-    const bool unconfirmedLoss = lost && !weakRequest;
+    const bool unconfirmedLoss = lost && (primaryMiss || !weakRequest);
     const bool clientConfirmed = state.acknowledgedSf == sf;
     if (state.observedSf != sf) {
         state.observedSf = sf;
@@ -176,21 +177,20 @@ AdrReview reviewAdr(AdrState& state, AdrRule rule, uint8_t sf, uint32_t frame,
         rollbackProbe(state, frame, p);
         return {first ? "probe_no_receipt" : "rollback", AdrDecision::ROLLBACK, score};
     }
-    if (legacy) {
-        const unsigned mask = (1u << p.legacyWindow) - 1u;
+    const unsigned mask = (1u << p.legacyWindow) - 1u;
+    if (legacy)
         state.degradedHistory = uint8_t(((state.degradedHistory << 1) | (!first && !unconfirmedLoss)) & mask);
-    }
-    if (!lost) state.completeLosses = 0;
-    else if (state.completeLosses < p.legacyWindow) ++state.completeLosses;
+    state.missedHistory = uint8_t(((state.missedHistory << 1) | lost) & mask);
     if (!first) {
         state.consecutiveFirst = 0;
         const bool weak = !unconfirmedLoss && (legacy ? countMisses(state.degradedHistory) >= p.legacyMisses :
             state.score >= p.upScore && state.estimate.margin(rule, sf, p) < p.upMarginDb);
         if (!weak) {
             // Missing DATA alone only permits a bounded search. A receipt commits the result.
-            if (lost && state.completeLosses >= p.legacyWindow &&
+            if (lost && countMisses(state.missedHistory) >= p.legacyMisses &&
                 startRecoveryProbe(state, uint8_t(sf + 1), frame, p))
                 return {"recovery_probe", AdrDecision::UP};
+            if (primaryMiss) return {"primary_loss"};
             return {unconfirmedLoss ? "loss_unconfirmed" : "observe"};
         }
         const float score = state.score;
@@ -244,6 +244,7 @@ const char* adrOutcomeName(AdrOutcome outcome) {
         case AdrOutcome::OK_FIRST: return "OK_FIRST";
         case AdrOutcome::RESCUED_SAME_SF: return "RESCUED_SAME_SF";
         case AdrOutcome::LOST_ALL: return "LOST_ALL";
+        case AdrOutcome::PRIMARY_MISS: return "PRIMARY_MISS";
         case AdrOutcome::EXCLUDED: return "EXCLUDED";
     }
     return "UNKNOWN";

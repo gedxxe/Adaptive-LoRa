@@ -66,13 +66,16 @@ void MulticlientLink::logLinkSamples(bool timingOk) {
         // SerialLogger reserves two bytes for newline and terminator.
         char line[511];
         const bool sampleTimingOk = timingOk && !rx.rxWindowUnobserved;
-        const AdrObservation obs{classifyAdr(slot.boot != 0, sampleTimingOk && rx.result != Reception::REFUSED,
+        // Later timing faults cannot erase a completed observation of the primary slot.
+        const bool primaryOnly = !sampleTimingOk && rx.primaryMiss && rx.result == Reception::NONE;
+        const AdrObservation obs{primaryOnly ? AdrOutcome::PRIMARY_MISS :
+                                 classifyAdr(slot.boot != 0, sampleTimingOk && rx.result != Reception::REFUSED,
                                              rx.result == Reception::ACCEPTED, rx.retried),
                                  rx.requestSnr, rx.metrics && rx.result == Reception::ACCEPTED ? rx.snr : kAdrMissingSnr};
         AdrReview review{"observe"};
         if (!slot.boot) review.action = "absent";
-        else if (!timingOk) review.action = "timing_invalid";
-        else if (rx.rxWindowUnobserved) review.action = "rx_window_unobserved";
+        else if (!timingOk && !primaryOnly) review.action = "timing_invalid";
+        else if (rx.rxWindowUnobserved && !primaryOnly) review.action = "rx_window_unobserved";
         else if (!adaptDataSf_) review.action = "fixed_sf";
         else if (rx.result == Reception::REFUSED) review.action = "app_refused";
         else review = reviewAdr(adr_[i], adrRule_, slot.sf, frameId_, obs);
@@ -138,6 +141,20 @@ bool MulticlientLink::prepareSf(uint8_t sf, uint64_t now) {
     }
     // Radio SPI and RX rearm take time. Launch decisions use the next loop clock.
     return false;
+}
+
+void MulticlientLink::invalidatePrimaryRx(uint64_t at) {
+    if (!kAdaptive || config_.role != DeviceRole::GATEWAY || phase_ != Phase::DATA || round_) return;
+    for (uint8_t i = 0; i < plan_.count; ++i) {
+        const auto bit = slotBit(i);
+        if (!(rxReadyMask_ & bit)) continue;
+        const auto& slot = plan_.slots[i];
+        const auto start = dataAt_ + plan_.dataStart(0, i, mask_);
+        if (at >= start && at - start < dataAir(slot.bytes, slot.sf) + kSlotGuardUs / 2) {
+            rxReadyMask_ &= uint8_t(~bit);
+            return;
+        }
+    }
 }
 
 void MulticlientLink::admitProfiles() {
@@ -263,7 +280,10 @@ void MulticlientLink::update(uint64_t now, const RadioEvent& event, bool allowTx
         if (result == CodecResult::OK) incoming = &f;
         else log_.event("V3_DROP", codecResultName(result), nullptr, &event);
     } else if (event.type != RadioEventType::NONE && event.type != RadioEventType::TX_DONE) {
-        if (event.type == RadioEventType::ERROR) frameTimingOk_ = false;
+        if (event.type == RadioEventType::ERROR) {
+            frameTimingOk_ = false;
+            invalidatePrimaryRx(event.completedAt(now));
+        }
         ++telemetry_.radioErrors;
         log_.event("V3_RADIO", "event_error", nullptr, &event, event.code);
     }
@@ -280,6 +300,7 @@ void MulticlientLink::update(uint64_t now, const RadioEvent& event, bool allowTx
         nextRecovery_ = code ? now + kRadioRecoveryUs : now;
         if (code) {
             frameTimingOk_ = false;
+            invalidatePrimaryRx(now);
             ++telemetry_.radioErrors;
             log_.event("V3_RADIO", "rx_start_error", nullptr, nullptr, code);
         }
@@ -464,8 +485,11 @@ void MulticlientLink::gatewayData(uint64_t now, const Frame* incoming, const Rad
     ack.payload[0] = plan_.count;
     uint8_t eligible = 0;
     for (uint8_t i = 0; i < plan_.count; ++i) {
-        if (kAdaptive && (mask_ & slotBit(i)) && !(rxReadyMask_ & slotBit(i)))
-            received_[i].rxWindowUnobserved = true;
+        if (kAdaptive && (mask_ & slotBit(i))) {
+            const bool observed = rxReadyMask_ & slotBit(i);
+            if (!observed) received_[i].rxWindowUnobserved = true;
+            if (!round_ && observed && received_[i].result == Reception::NONE) received_[i].primaryMiss = true;
+        }
         if (received_[i].result == Reception::ACCEPTED) {
             ack.payload[1] |= slotBit(i);
             put32(ack.payload + 3 + 4 * i, plan_.slots[i].boot);
