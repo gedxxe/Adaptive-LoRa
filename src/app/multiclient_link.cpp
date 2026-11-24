@@ -159,10 +159,11 @@ void MulticlientLink::admitProfiles() {
             inactive.deliveredFrame = state.deliveredFrame;
             inactive.deliveredSf = state.deliveredSf;
             inactive.recoverySf = state.recoverySf;
+            inactive.recoveryFailedFrame = state.recoveryFailedFrame;
             state = inactive;
         }
         if (slot.boot) {
-            if (!state.lastRequest) state.desired = state.recoverySf;
+            if (!state.lastRequest) resumeAdrAfterIdle(state, frameId_);
             state.boot = slot.boot;
             state.lastRequest = frameId_;
         }

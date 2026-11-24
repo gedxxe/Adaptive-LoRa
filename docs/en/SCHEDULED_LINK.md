@@ -177,6 +177,13 @@ With six peers at SF7, two SF10 reservations leave 77.408 ms beyond the
 end reserve. A third SF10 exceeds the frame by 2.244 s. The Gateway
 checks the current SF reservations and rejects increases that exceed the budget.
 
+Keep control at SF9 for this roster. Switching just the control PHY to
+SF10 would add 3.721 s to the modeled eight-Client frame, including
+eight Requests and four ACK bitmaps. At 32 B and 15 s it would fit
+at most two DATA SF8 Clients alongside SF7 peers. Even one DATA SF9
+Client would exceed the frame by 89.504 ms. Gateway control TX alone
+would rise from 2.361 s to 4.272 s per frame.
+
 The radio sends Beacon, Request, Grant and ACK bitmaps at SF9. Both ends
 retune to the granted SF for a DATA slot. The Client returns to SF9 for
 feedback and the Gateway uses each next Client's SF before returning to
@@ -231,7 +238,7 @@ refer to the active Gateway session.
 | $\nu_{\mathrm{obs}}$, $\nu_{\mathrm{up}}$ | Size of the eligible-report window and misses needed to request an increase | 3, 2 |
 | $\nu_{\mathrm{idle}}$ | Frame-ID gap that frees a higher-SF reservation | 4 |
 | $\nu_{\mathrm{lock}}$, $\nu_{\mathrm{probe}}$ | First-attempt deliveries required to lock or consider a lower SF | 3, 6 |
-| $\nu_{\mathrm{ack}}$, $\nu_{\mathrm{hold}}$ | Lower-SF receipt deadline in frame IDs and first-attempt deliveries in the rollback hold | 6, 8 |
+| $\nu_{\mathrm{ack}}$, $\nu_{\mathrm{hold}}$ | Trial deadline and failed recovery cooldown in frame IDs, and first-attempt deliveries in the downshift hold | 6, 8 |
 
 $\epsilon_\iota^{\mathrm{fail}}$ marks a missed first attempt, including a
 retry that eventually delivered. $\alpha_\iota$ means the latest Request
@@ -264,6 +271,19 @@ current report has $e=1$. The window contains only eligible reports at the
 current SF and excludes timing faults and application refusals. The next
 Grant checks whether the higher reservation fits.
 
+All three rules also count consecutive complete misses $\ell_\iota$
+at the assigned SF across eligible reports. Accepted DATA clears the
+count. A normal increase takes priority. If $\ell_\iota\ge\nu_{\mathrm{obs}}$
+and the SF is below the ceiling, the Gateway can try the next higher SF.
+A complete miss at an admitted candidate advances the search one step.
+After a delivery the trial waits for a matching ACK receipt in a Request.
+The search rolls back on budget denial, loss at the maximum SF, or
+receipt expiry, releasing any additional reservation. Another search
+can begin at $\phi-\phi_{\mathrm{failed}}\ge\nu_{\mathrm{ack}}$.
+At 15 s per frame, three consecutive complete misses give a nominal
+45 s to the first higher-SF opportunity. The clock for receipt expiry
+runs even if later reports are unavailable.
+
 A lock requires three first-slot deliveries and an ACK receipt at the same
 SF, including when the budget limits a Grant to a lower SF. It stores the
 confirmed SF and releases any higher reservation held for rollback. After
@@ -289,7 +309,9 @@ the Client stops scheduled TX and searches on the control SF. The
 Gateway releases the inactive Client's higher-SF reservation at a Grant
 prepared at least four frame IDs after its previous Request. When the
 same Client boot returns, the Gateway proposes the SF it remembered from
-a matching ACK receipt or later lock. The Gateway checks the new Grant
+a matching ACK receipt or later lock. It can also try the SF of the
+latest accepted DATA if it was higher and its ACK never came back.
+That candidate follows the same deadline and budget. The Gateway checks the new Grant
 against the current budget, so a returning Client may receive a lower SF. A lower-SF
 trial only lowers the remembered SF once it locks. A new Client boot ID
 or Gateway session clears the hint.
@@ -315,7 +337,7 @@ or after idle state expires. Log both measurements to estimate the offset.
 | Provisional SNR threshold $\vartheta_\sigma$ at SF7/8/9/10 | −7.5 / −10 / −12.5 / −15 dB. Replace with measured SNR at 50% delivery for each SF. |
 | Margin $m_\sigma=\widehat{x}+b_\sigma-\vartheta_\sigma-z\sigma_x$ | Forecast SNR $\widehat{x}$, offset $b_\sigma$, and forecast standard deviation $\sigma_x$ with $z=1$ |
 | Evidence $S\gets\rho S+w$ | $\rho=0.75$. Add 1.0 for qualifying complete loss, 0.4 for a retry rescue, and 0 when $e=0$. |
-| Raise DATA SF | Require $e=1$, $S\geq S_{\mathrm{up}}=1.5$ and $m_\sigma<M_{\mathrm{up}}=0$ dB. |
+| Raise DATA SF through the margin rule | Require $e=1$, $S\geq S_{\mathrm{up}}=1.5$ and $m_\sigma<M_{\mathrm{up}}=0$ dB. The bounded recovery search uses the separate complete-miss count. |
 | Try lower DATA SF | Existing lock and receipt rules, six first-attempt deliveries, and $m_{\sigma-1}\geq4$ dB. Preserve rollback, hold, and receipt expiry. |
 | Estimators | EWMA weight 0.25. Kalman level and slope process variances 0.16 and 0.01, measurement variance 1.0, initial slope variance 0.25. Units use one step per eligible report. |
 
@@ -325,8 +347,11 @@ rows add `node_id`, `class`, `snr_req`, `snr_data`, `level`, `slope`,
 The margin describes the granted SF. The score for an increase is logged
 before clearing its evidence. Missing values appear as `N/A`.
 `LOST_ALL` means that no granted opportunity delivered DATA.
-With `params_version=2`, `adr=loss_unconfirmed` means DATA was absent
-without a qualifying Request margin. `ADR_PROBE` with `result=expired`
+With `params_version=3`, `adr=loss_unconfirmed` means DATA was absent
+without a qualifying Request margin. `recovery_probe` and `recovery_next`
+request a trial SF, and `recovery_wait_ack` reports DATA without a receipt.
+`recovery_confirmed` records a receipt. `recovery_budget` and `recovery_failed`
+mark rollback. `ADR_PROBE` with `result=expired`
 identifies a trial that reached its frame-ID limit between reviews.
 `ABSENT` means the Gateway saw no valid Request during an observed request
 phase. `EXCLUDED` covers local timing faults or application refusal.

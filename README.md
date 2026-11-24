@@ -23,7 +23,9 @@ The default Legacy rule can raise DATA SF after two qualifying misses in
 three eligible reports. A miss qualifies when a retry delivers DATA, or
 when all DATA is missing and the current Request indicates low SNR margin.
 After a gap, the Gateway can offer the last confirmed SF to the same
-Client session if it still fits the schedule.
+Client session if it still fits the schedule. Three consecutive complete
+misses can trigger a temporary higher-SF search when Request SNR gives no
+reason to raise SF. An ACK receipt confirms the result.
 `SEARCH` means the Client is waiting for a fresh SF9 Beacon. `NO GRANT`
 means its Request started but a matching Grant did not arrive.
 The Gateway also has two [experimental SNR-margin rules](docs/en/SCHEDULED_LINK.md#loss-cause-aware-adr).
