@@ -94,7 +94,8 @@ when the Client queues a sample. The over-the-air period comes from the Beacon.
 The Gateway must report `period_us=15000000`, `roster_count=8` and
 `bench_payload_ceiling_bytes=32` in `SCHEDULE_CONFIG`.
 Check `data_sf_policy=adaptive` before the walk. The Gateway reports
-`params_version=4` in its link samples.
+`params_version=5` in its link samples. Record the flashed commit for all
+boards before moving them to the route.
 
 With Client 2, the first sample is `ID=0002|SEQ=0001|MSG=HELLO WORLD`.
 Both fields use four hexadecimal digits. The sequence starts at one after
@@ -120,7 +121,7 @@ A retry sends the same bytes and packet identity.
    rollback. Track peer delivery alongside `ADR_APPLY` and `V3_LINK_SAMPLE`.
    To check SF10, look for Client `TX SF10`, then `ACKED DATA SF10`, and
    continuing SF9 control exchanges. If SF10 is never granted, distinguish an
-   over-budget profile (`adr=budget_limited`) from loss of SF9 control (`SEARCH`
+   over-budget profile (`adr=recovery_budget` or `adr=budget_limited`) from loss of SF9 control (`SEARCH`
    or missing Request/Grant). Keep this check separate from the acceptance run.
 4. Record first-attempt and final delivery, SF, missed slots, resets and log
    drops per Client. A screen showing `SEARCH` is listening for a Beacon.
@@ -223,11 +224,14 @@ invalid. The Gateway can use that evidence for a bounded SF trial.
 `adr=loss_unconfirmed` means the Gateway missed all DATA and the current
 Request did not indicate low margin. Match the
 Client's `V3_DATA_TX` with the Gateway sample by session, frame and node
-before attributing the loss. `recovery_probe` and `recovery_next` indicate
-trial SF requests. Confirm them with a corresponding `V3_DATA_TX`.
-`recovery_confirmed` records a matching receipt, `recovery_budget` means
-the trial could not fit, and `ADR_PROBE` with `result=expired` marks an
-unconfirmed trial that reached its receipt deadline.
+before attributing the loss. `step_up` and `recovery_probe` open temporary
+trials. `recovery_next` requests the next candidate. Match the Grant to
+the Client's `V3_DATA_TX` to see what it used. `recovery_confirmed` records
+a receipt matched during Request processing. `recovery_budget` means the
+trial could not fit, `recovery_cooldown` marks the wait after rollback,
+and `ADR_PROBE` with `result=expired` marks an unconfirmed trial that
+reached its deadline. Record both RSSI and SNR alongside the delivery
+result when interference is suspected.
 
 Probe DIO1, NSS, BUSY and SCL with high-impedance probes. Measure at least
 30 transitions per SF pair used, including both directions and return to

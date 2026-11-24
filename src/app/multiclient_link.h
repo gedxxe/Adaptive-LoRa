@@ -30,6 +30,7 @@ private:
         bool retried = false;
         bool rxWindowUnobserved = false;
         bool primaryMiss = false;
+        bool recoveryConfirmed = false;
     };
     Frame frame(MessageType type, uint16_t sequence) const;
     bool send(const Frame& frame, uint64_t now, const char* event);

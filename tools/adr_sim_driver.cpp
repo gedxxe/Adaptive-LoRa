@@ -34,15 +34,14 @@ void run(Counts& counts, uint32_t seed, AdrRule rule, unsigned frames, float int
     std::normal_distribution<float> measurementNoise(0.0f, 1.0f);
     AdrState state;
     uint8_t lastSf = phy::dataSf;
-    uint8_t lastDeliveredSf = 0;
     bool reacted = false;
     for (unsigned frame = 0; frame < frames; ++frame) {
         if (blockage && frame == frames / 3) {
             // Compare recovery from the same SF and state when attenuation begins.
             state = {};
-            lastDeliveredSf = 0;
         }
         expireAdrProbe(state, frame + 1, params);
+        applyAdrReceipt(state, state.deliveredFrame);
         const bool blocked = blockage && frame >= frames / 3 && frame < 2 * frames / 3;
         const float trueSnr = healthySnr + (blocked ? blockageDb : 0.0f);
         const float requestSnr = trueSnr + measurementNoise(generator);
@@ -72,10 +71,12 @@ void run(Counts& counts, uint32_t seed, AdrRule rule, unsigned frames, float int
         }
         const bool delivered = success < kAttempts;
         counts.lost += !delivered;
-        state.acknowledgedSf = lastDeliveredSf;
         reviewAdr(state, rule, sf, frame + 1, {classifyAdr(true, true, delivered, success != 0),
                                              requestSnr, delivered ? dataSnr : kAdrMissingSnr}, params);
-        if (delivered) lastDeliveredSf = sf;
+        if (delivered) {
+            state.deliveredFrame = frame + 1;
+            state.deliveredSf = sf;
+        }
     }
 }
 }

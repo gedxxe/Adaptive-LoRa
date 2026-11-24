@@ -278,12 +278,14 @@ enter this window.
 \end{aligned}
 ```
 
-The first row gives the normal delivery-window rule, which takes
-priority. The second row can open a trial
-at the next SF when the normal rule holds. The next Grant checks the full
-roster reservation. A primary miss with no accepted DATA at an admitted
-candidate advances the search one step.
-After a delivery the trial waits for a matching ACK receipt in a Request.
+The first row gives the normal delivery-window rule. The second row can
+request an increase when the normal rule holds. Either trigger starts
+the same deadline-bound trial. The next Grant checks the full roster
+reservation. A primary miss with no accepted DATA at an admitted
+candidate advances the search one step. After a delivery, a validated
+Request confirms the trial when its receipt matches DATA accepted at
+the candidate SF since the trial began. Confirmation happens during
+Request processing and survives a later frame timing fault.
 The search rolls back on budget denial, loss at the maximum SF, or
 receipt expiry, releasing any additional reservation. Another search
 can begin at $\phi-\phi_{\mathrm{failed}}\ge\nu_{\mathrm{ack}}$.
@@ -337,7 +339,12 @@ tracks level and slope and projects both the level and its uncertainty one
 eligible report ahead. With no SNR in an eligible report, EWMA holds its
 estimate and Kalman predicts without a measurement update.
 
-The Gateway prefers the SNR from a validated SF9 Request and falls back to
+An RSSI reading describes packet strength. A weak reading with good
+delivery can stay at its current SF. A strong reading can still coincide
+with poor SNR and lost packets. The firmware records RSSI alongside SNR
+and delivery for diagnosis. A raw RSSI reading cannot start a trial.
+
+The margin estimators prefer the SNR from a validated SF9 Request and fall back to
 accepted DATA SNR. A per-SF offset in [AdrParams](../../src/app/adr_policy.h)
 models DATA SNR minus Request SNR. It starts at zero. The estimator uses a
 common Request-SNR scale across SF changes and starts fresh for a new session
@@ -358,13 +365,15 @@ rows add `node_id`, `class`, `snr_req`, `snr_data`, `level`, `slope`,
 The margin describes the granted SF. The score for an increase is logged
 before clearing its evidence. Missing values appear as `N/A`.
 `LOST_ALL` means that no granted opportunity delivered DATA.
-With `params_version=4`, `PRIMARY_MISS` means the primary RX window
+With `params_version=5`, `PRIMARY_MISS` means the primary RX window
 was observed without DATA, and overall timing prevents a complete-loss
 classification. `adr=loss_unconfirmed` means DATA was absent without a
-qualifying Request margin. `recovery_probe` and `recovery_next`
-request a trial SF, and `recovery_wait_ack` reports DATA without a receipt.
-`recovery_confirmed` records a receipt. `recovery_budget` and `recovery_failed`
-mark rollback. `ADR_PROBE` with `result=expired`
+qualifying Request margin. `step_up` and `recovery_probe` start a trial,
+`recovery_next` advances it, and `recovery_wait_ack` reports DATA without
+a matching receipt. `recovery_confirmed` records a validated receipt.
+`recovery_budget` and `recovery_failed` mark rollback.
+`recovery_cooldown` identifies a candidate held back after a failed trial.
+`ADR_PROBE` with `result=expired`
 identifies a trial that reached its frame-ID limit between reviews.
 `ABSENT` means the Gateway saw no valid Request during an observed request
 phase. `EXCLUDED` covers local timing faults or application refusal.

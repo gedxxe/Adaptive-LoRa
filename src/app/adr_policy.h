@@ -8,7 +8,7 @@ enum class AdrOutcome : uint8_t { ABSENT, OK_FIRST, RESCUED_SAME_SF, LOST_ALL, P
 enum class AdrDecision : uint8_t { HOLD, UP, DOWN, ROLLBACK };
 
 struct AdrParams {
-    uint8_t version = 4;
+    uint8_t version = 5;
     uint8_t legacyWindow = 3;
     uint8_t legacyMisses = 2;
     uint8_t confirmations = 3;
@@ -124,6 +124,7 @@ struct AdrReview {
 
 AdrOutcome classifyAdr(bool requested, bool usable, bool accepted, bool retried);
 void resumeAdrAfterIdle(AdrState& state, uint32_t frame, const AdrParams& params = kAdrParams);
+bool applyAdrReceipt(AdrState& state, uint32_t receipt);
 bool expireAdrProbe(AdrState& state, uint32_t frame, const AdrParams& params = kAdrParams);
 AdrReview reviewAdr(AdrState& state, AdrRule rule, uint8_t observedSf, uint32_t frame,
                     const AdrObservation& observation, const AdrParams& params = kAdrParams);

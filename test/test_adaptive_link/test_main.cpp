@@ -59,6 +59,7 @@ struct Network {
     unsigned delivered[kMaxClients]{};
     uint8_t minDataSf[kMaxClients]{};
     float snr[kMaxClients]{};
+    float rssi[kMaxClients]{};
     float requestSnr[kMaxClients]{};
     bool hasRequestSnr = false;
     uint8_t count;
@@ -86,7 +87,9 @@ struct Network {
 
     explicit Network(uint8_t n, uint8_t rosterCount = 0, uint8_t ceiling = kMaxData, bool adaptDataSf = true,
                      AdrRule rule = AdrRule::LEGACY)
-        : count(n), gateway(1, roster(rosterCount ? rosterCount : n, ceiling), accept, this, adaptDataSf, rule) {}
+        : count(n), gateway(1, roster(rosterCount ? rosterCount : n, ceiling), accept, this, adaptDataSf, rule) {
+        std::fill_n(rssi, kMaxClients, -95.0f);
+    }
     static bool accept(void* context, const PayloadDelivery& data) {
         auto& n = *static_cast<Network*>(context);
         ++n.delivered[data.source - 2];
@@ -129,7 +132,7 @@ struct Network {
                 events[i].completionUs = txEnd;
                 if (i == 0 && frame.type == MessageType::DATA) {
                     events[i].metrics = true;
-                    events[i].rssi = -95.0f;
+                    events[i].rssi = rssi[sender - 1];
                     events[i].snr = snr[sender - 1];
                 }
                 if (i == 0 && frame.type == MessageType::PAYLOAD_REQUEST) {
@@ -177,7 +180,8 @@ struct Network {
                     dropFirstData = false;
                 }
             }
-            for (unsigned drain = 0; drain < 24 && !p.log.empty(); ++drain) p.log.drain();
+            // Native endpoints share one writable fake Serial. Keep complete lines together.
+            while (!p.log.empty()) p.log.drain();
         }
     }
     void rounds(unsigned n, uint8_t size = 8) {
@@ -389,6 +393,22 @@ void recovery_probe_respects_airtime_deadline_and_cooldown() {
     TEST_ASSERT_EQUAL_UINT8(7, state.reservedSf);
 }
 
+void recovery_requires_a_matching_delivery_from_the_current_trial() {
+    AdrState state;
+    const AdrObservation missing{AdrOutcome::LOST_ALL};
+    const uint32_t start = kAdrParams.legacyMisses;
+    for (uint32_t frame = 1; frame <= start; ++frame)
+        reviewAdr(state, AdrRule::LEGACY, kBaseSf, frame, missing);
+    state.deliveredSf = state.reservedSf = kBaseSf + 1;
+    state.deliveredFrame = start - 1;
+    TEST_ASSERT_FALSE(applyAdrReceipt(state, state.deliveredFrame));
+    state.deliveredFrame = start + 1;
+    TEST_ASSERT_FALSE(applyAdrReceipt(state, state.deliveredFrame + 1));
+    TEST_ASSERT_TRUE(applyAdrReceipt(state, state.deliveredFrame));
+    TEST_ASSERT_FALSE(expireAdrProbe(state, start + kAdrParams.probeReceiptLimit + 1));
+    TEST_ASSERT_EQUAL_UINT8(kBaseSf + 1, state.reservedSf);
+}
+
 void two_clients_recover_when_request_margin_overestimates_data_reach() {
     for (auto rule : {AdrRule::LEGACY, AdrRule::MARGIN_EWMA, AdrRule::MARGIN_KALMAN}) {
         Serial.output.clear();
@@ -438,6 +458,46 @@ void recovery_search_cannot_displace_eight_client_reservations() {
     for (uint8_t i = 3; i < 8; ++i) TEST_ASSERT_EQUAL_UINT(14, n.delivered[i]);
 }
 
+void failed_upshifts_release_airtime_for_a_recoverable_client() {
+    Network n(kMaxClients, kMaxClients, kBenchPayloadBytes);
+    n.hasRequestSnr = true;
+    n.requestSnr[0] = n.requestSnr[1] = -18;
+    n.minDataSf[0] = n.minDataSf[1] = phy::maxDataSf + 1;
+    n.rounds(8, kBenchPayloadBytes);
+    TEST_ASSERT_TRUE(n.sent(1, phy::maxDataSf));
+    TEST_ASSERT_TRUE(n.sent(2, phy::maxDataSf));
+
+    n.requestSnr[2] = -16;
+    n.snr[2] = -13;
+    n.minDataSf[2] = phy::maxDataSf;
+    n.rounds(12, kBenchPayloadBytes);
+    TEST_ASSERT_EQUAL_UINT8(phy::maxDataSf, n.clients[2].link.telemetry().confirmedDataSf);
+    TEST_ASSERT_EQUAL_UINT(0, n.delivered[0]);
+    TEST_ASSERT_EQUAL_UINT(0, n.delivered[1]);
+    for (uint8_t i = 3; i < kMaxClients; ++i) {
+        TEST_ASSERT_EQUAL_UINT(20, n.delivered[i]);
+        TEST_ASSERT_FALSE(n.sent(i + 1, kBaseSf + 1));
+    }
+}
+
+void low_rssi_with_good_delivery_does_not_force_a_higher_sf() {
+    Network n(2, kMaxClients, kBenchPayloadBytes);
+    n.hasRequestSnr = true;
+    n.requestSnr[0] = -16;
+    n.requestSnr[1] = 8;
+    n.snr[0] = -13;
+    n.snr[1] = 8;
+    n.rssi[0] = -65;
+    n.rssi[1] = -117;
+    n.minDataSf[0] = phy::maxDataSf;
+    n.rounds(12, kBenchPayloadBytes);
+    TEST_ASSERT_EQUAL_UINT8(phy::maxDataSf, n.clients[0].link.telemetry().confirmedDataSf);
+    TEST_ASSERT_EQUAL_UINT8(kBaseSf, n.clients[1].link.telemetry().confirmedDataSf);
+    TEST_ASSERT_EQUAL_UINT(12, n.delivered[1]);
+    TEST_ASSERT_FALSE(n.sent(2, kBaseSf + 1));
+    TEST_ASSERT_NOT_EQUAL(std::string::npos, Serial.output.find("rssi_dbm=-117,snr_db=8"));
+}
+
 void gateway_margin_policy_uses_request_snr_and_logs_absent_roster_slots() {
     for (auto rule : {AdrRule::MARGIN_EWMA, AdrRule::MARGIN_KALMAN}) {
         Serial.output.clear();
@@ -463,7 +523,7 @@ void gateway_margin_policy_uses_request_snr_and_logs_absent_roster_slots() {
         for (auto begin = Serial.output.find(event); begin != std::string::npos; begin = Serial.output.find(event, begin + 1)) {
             const auto end = Serial.output.find('\n', begin);
             TEST_ASSERT_TRUE(end != std::string::npos && end - begin <= 510);
-            TEST_ASSERT_NOT_EQUAL(std::string::npos, Serial.output.substr(begin, end - begin).find("params_version=4"));
+            TEST_ASSERT_NOT_EQUAL(std::string::npos, Serial.output.substr(begin, end - begin).find("params_version=5"));
         }
     }
 }
@@ -579,7 +639,7 @@ void higher_sf_reservations_protect_two_existing_clients() {
     TEST_ASSERT_FALSE(n.sent(3, 9));
     TEST_ASSERT_EQUAL_UINT(firstDelivered + 6, n.delivered[0]);
     TEST_ASSERT_EQUAL_UINT(secondDelivered + 6, n.delivered[1]);
-    TEST_ASSERT_NOT_EQUAL(std::string::npos, Serial.output.find("adr=budget_limited"));
+    TEST_ASSERT_NOT_EQUAL(std::string::npos, Serial.output.find("adr=recovery_budget"));
     for (uint8_t i = 3; i < 8; ++i) TEST_ASSERT_EQUAL_UINT(13, n.delivered[i]);
 }
 
@@ -629,6 +689,9 @@ void observed_primary_loss_still_recovers_after_final_ack_faults() {
             TEST_ASSERT_FALSE(n.sent(i + 1, kBaseSf + 1));
         }
         TEST_ASSERT_NOT_EQUAL(std::string::npos, Serial.output.find("class=PRIMARY_MISS"));
+        const auto delivered = n.delivered[0];
+        n.rounds(kAdrParams.probeReceiptLimit + 1, kBenchPayloadBytes);
+        TEST_ASSERT_EQUAL_UINT(delivered + kAdrParams.probeReceiptLimit + 1, n.delivered[0]);
     }
 }
 
@@ -689,7 +752,7 @@ void full_bench_roster_delivers_at_mixed_sf_with_32_byte_samples() {
     }
     n.rounds(7, kBenchPayloadBytes);
     for (uint8_t i = 0; i < n.count; ++i) {
-        TEST_ASSERT_EQUAL_UINT(i < 5 ? 3 : 7, n.delivered[i]);
+        TEST_ASSERT_EQUAL_UINT(i < 5 ? 4 : 7, n.delivered[i]);
         TEST_ASSERT_EQUAL_UINT8(n.minDataSf[i], n.clients[i].link.telemetry().confirmedDataSf);
     }
 }
@@ -710,7 +773,7 @@ void bench_sf10_retries_keep_room_for_six_sf7_peers() {
     n.rounds(8, kBenchPayloadBytes);
     TEST_ASSERT_FALSE(n.sent(3, 8));
     TEST_ASSERT_FALSE(n.sent(3, 10));
-    TEST_ASSERT_NOT_EQUAL(std::string::npos, Serial.output.find("adr=budget_limited"));
+    TEST_ASSERT_NOT_EQUAL(std::string::npos, Serial.output.find("adr=recovery_budget"));
     for (uint8_t i = 3; i < n.count; ++i) TEST_ASSERT_EQUAL_UINT(21, n.delivered[i]);
 }
 
@@ -884,7 +947,7 @@ void two_clients_use_sf10_with_sf9_control_and_retry() {
     n.rounds(8, 16);
     TEST_ASSERT_TRUE(n.sent(3, 9));
     TEST_ASSERT_FALSE(n.sent(3, 10));
-    TEST_ASSERT_NOT_EQUAL(std::string::npos, Serial.output.find("adr=budget_limited"));
+    TEST_ASSERT_NOT_EQUAL(std::string::npos, Serial.output.find("adr=recovery_budget"));
     for (uint8_t i = 3; i < n.count; ++i) TEST_ASSERT_EQUAL_UINT(21, n.delivered[i]);
 
     n.minDataSf[0] = 9;
@@ -1129,8 +1192,11 @@ int main() {
     RUN_TEST(adr_rejects_invalid_or_unreachable_tuning_values);
     RUN_TEST(recovery_search_rolls_back_when_healthy_requests_lose_their_grants);
     RUN_TEST(recovery_probe_respects_airtime_deadline_and_cooldown);
+    RUN_TEST(recovery_requires_a_matching_delivery_from_the_current_trial);
     RUN_TEST(two_clients_recover_when_request_margin_overestimates_data_reach);
     RUN_TEST(recovery_search_cannot_displace_eight_client_reservations);
+    RUN_TEST(failed_upshifts_release_airtime_for_a_recoverable_client);
+    RUN_TEST(low_rssi_with_good_delivery_does_not_force_a_higher_sf);
     RUN_TEST(gateway_margin_policy_uses_request_snr_and_logs_absent_roster_slots);
     RUN_TEST(mixed_profile_codec_and_budget);
     RUN_TEST(roaming_client_adapts_while_three_peers_deliver);

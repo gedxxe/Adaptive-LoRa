@@ -79,6 +79,8 @@ void MulticlientLink::logLinkSamples(bool timingOk) {
         else if (!adaptDataSf_) review.action = "fixed_sf";
         else if (rx.result == Reception::REFUSED) review.action = "app_refused";
         else review = reviewAdr(adr_[i], adrRule_, slot.sf, frameId_, obs);
+        if (rx.recoveryConfirmed && review.decision == AdrDecision::HOLD)
+            review.action = "recovery_confirmed";
         const auto& adr = adr_[kAdaptive ? i : 0];
         std::snprintf(line, sizeof(line), "event=V3_LINK_SAMPLE,network_id=%u,gateway_id=%u,gateway_boot=%" PRIu32
             ",frame_id=%" PRIu32 ",source_id=%u,client_boot=%" PRIu32 ",sf=%u,outcome=%s,app=%s,%s",
@@ -381,12 +383,8 @@ void MulticlientLink::gatewayRequest(uint64_t now, uint64_t receivedAt, const Fr
                 if (event.metrics && std::isfinite(event.snr)) received_[i].requestSnr = event.snr;
                 auto& state = adr_[i];
                 const auto receipt = get32(f.payload + 5);
-                state.acknowledgedSf = state.boot == f.bootId && receipt && receipt == state.deliveredFrame ?
-                    state.deliveredSf : 0;
-                // One verified receipt can teach a more robust recovery SF.
-                // Lowering the hint requires a confirmed lower-SF lock.
-                if (state.acknowledgedSf > state.recoverySf)
-                    state.recoverySf = state.acknowledgedSf;
+                // The validated Request can confirm the trial even if later frame timing fails.
+                received_[i].recoveryConfirmed = applyAdrReceipt(state, state.boot == f.bootId ? receipt : 0);
             }
         } else log_.event("V3_DROP", "request_identity_size_or_slot", &f);
     }

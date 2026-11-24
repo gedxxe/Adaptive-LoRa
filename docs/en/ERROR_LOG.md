@@ -988,3 +988,32 @@ Adding a ninth block to both protocol guides caused
 `tools/check_consistency.py` to report differing airtime equations.
 Combine the two loss-window expressions into the existing bilingual
 block. The check then verifies both expressions together.
+
+## ERR-066 — Failed normal upshifts keep holding airtime
+
+Against `d97b6d7`, run the eight-Client native fixture at 32 B. Give
+two Clients a weak but decodable Request and drop their DATA at all SFs.
+After they reach SF10, require SF10 for a third Client. The third stayed
+at SF7 because the failed reservations never lapsed as long as Requests
+arrived. All increases now use the bounded trial. The third Client
+reaches SF10 and five fixed peers continue delivery.
+
+## ERR-067 — Frame timing faults can prevent committing a valid SF
+
+Extend the two- and eight-Client final-ACK timing fixture beyond the
+trial deadline. The Gateway accepted Requests containing valid receipts
+and then reverted to SF7 because frame-level review was excluded.
+Commit the candidate while validating the receipt in the Request.
+The expanded fixture keeps delivering at the higher SF past the deadline.
+Mismatched and pre-trial receipts are rejected.
+
+## ERR-068 — Native timing and capture assertions needed alignment
+
+The first corrected native run found test assumptions tied to the
+former unbounded upshift timing and denial labels. The stable lock also
+lost successful DATA evidence while waiting for confirmation. Keep that
+delivery evidence, but require the receipt for the lock. Update the
+capacity assertions for bounded denial and earlier delivery. Fully drain
+one fake serial endpoint before the next to avoid splitting an extended
+Gateway sample with another node's log. The final suite passed.
+See `logs/test/iteration-034-verification.log`.
