@@ -117,7 +117,10 @@ Gateway 顶行显示最近一次有效 DATA 的接收 SF，第一页显示发送
 DATA 事件。屏幕在无线收发阶段之间刷新。
 
 走测出现断联时，原地等待六个帧并记录 Client 屏幕。返回 SF9 覆盖范围后检查第一次新 DATA。
-启动会话未变且仍有足够的空口预算时，Gateway 可以恢复上次确认的 SF。
+启动会话未变且仍有足够的空口预算时，Gateway 可以恢复上次确认的 SF，或试用最近一次
+收到 DATA 时使用的更高 SF。让一个固定节点继续记录。若要检查控制仍通而 DATA 丢失的
+恢复过程，在同一位置最多等待十个帧，给 Gateway 留出识别丢失、试用更高 SF 和收取回执的时间。
+核对移动节点的 `TX SF`、`ACKED DATA SF` 以及固定节点的交付情况。
 
 **同条件 SF7 对照。** 沿同一路线复测，只需更换 Gateway 镜像。将 `COMx` 换为实测
 端口。以下命令在子进程中构建，输出到独立目录：
@@ -179,9 +182,11 @@ run_id,gateway_boot,frame_id,node_id,client_boot,grant_seen,payload_bytes,data_s
 `rx_us` 为接收时的 Gateway 启动后时间，可用于统计同一会话内单个 Client 的交付间隔。
 若出现 `adr=rx_window_unobserved`，Gateway 既未在发送前确认已用指定 SF 监听，也未在该时隙
 收到有效 DATA。其他节点时序正常的记录仍用于 ADR。
-`params_version=2` 下，`adr=loss_unconfirmed` 表示 Gateway 未收到 DATA，且本次
+`params_version=3` 下，`adr=loss_unconfirmed` 表示 Gateway 未收到 DATA，且本次
 Request 未显示余量偏低。按会话、帧编号和节点匹配 Client 的 `V3_DATA_TX` 与 Gateway 的样本，
-再判断丢失原因。`ADR_PROBE` 的 `result=expired` 表示降档试用在回执期限届满后结束。
+再判断丢失原因。`recovery_probe` 和 `recovery_next` 表示申请试用 SF，应与相应
+`V3_DATA_TX` 核对。`recovery_confirmed` 表示回执匹配，`recovery_budget` 表示预算不足，
+`ADR_PROBE` 的 `result=expired` 表示试用未确认且已到期限。
 
 用高阻探头观察 DIO1、NSS、BUSY 和 SCL。每种测试使用的 SF 切换方向至少记录 30 次，包含
 回到控制 SF 的切换，核对延迟尾部和最大值能否满足 20 毫秒切换提前量及 40 毫秒接收半窗。

@@ -155,6 +155,11 @@ Grant 的载荷和 SF 均受各节点预留值限制，因此模型时长受名�
 2.244 秒。
 Gateway 根据现有的 SF 预留核算预算，拒绝超额升档。
 
+八节点配置继续使用 SF9 控制。如果只将控制改为 SF10，八个 Request 与四次 ACK 位图
+在内的控制时段将使模型帧增加 3.721 秒。32 B、15 秒的配置下，其余节点均用 SF7 时，
+最多只容纳两个 DATA SF8 节点。仅一个 DATA SF9 节点就会超出 89.504 毫秒。
+Gateway 每帧控制发射时间将从 2.361 秒增至 4.272 秒。
+
 Beacon、Request、Grant 和 ACK 位图均使用 SF9。到 DATA 时隙时双方切换至授权 SF。
 Client 切回 SF9 等反馈，Gateway 逐个切换到下一个 Client 的 SF，再回到 SF9。
 控制链路中断后，Client 等待新的有效 Beacon 和 Grant。提高 DATA SF 只能改善 DATA 链路。
@@ -202,7 +207,7 @@ SNR 更新公式如下。
 | $\nu_{\mathrm{obs}}$、$\nu_{\mathrm{up}}$ | 有效记录窗口长度和申请升档所需的首传失败次数 | 3、2 |
 | $\nu_{\mathrm{idle}}$ | 释放较高 SF 额度的帧编号差 | 4 |
 | $\nu_{\mathrm{lock}}$、$\nu_{\mathrm{probe}}$ | 锁定或尝试降档所需的连续首传成功次数 | 3、6 |
-| $\nu_{\mathrm{ack}}$、$\nu_{\mathrm{hold}}$ | 降档试用等待回执的帧编号差上限及回退等待期间的首传成功次数 | 6、8 |
+| $\nu_{\mathrm{ack}}$、$\nu_{\mathrm{hold}}$ | 试用期限和恢复失败后的冷却帧数，以及降档等待期要求的首传成功次数 | 6、8 |
 
 $\epsilon_\iota^{\mathrm{fail}}$ 表示首传失败，即使重传后来成功也计入。
 $\alpha_\iota$ 表示最新 Request 回报了已记录交付的帧，并确认对应 SF。
@@ -229,6 +234,13 @@ DATA 且有效的 Request 余量满足 $r_\sigma<M_{\mathrm{up}}$ 时，丢包�
 当前记录满足 $e=1$ 且窗口计数达到门限时，Legacy 申请升档。窗口只包含当前 SF 的有效记录，
 时序异常和应用拒收不计入。准备下一次 Grant 时核算较高 SF 的额度。
 
+三种规则均在当前分配的 SF 上统计连续有效记录中的全丢次数 $\ell_\iota$。收到有效
+DATA 后清零。常规升档优先。当 $\ell_\iota\ge\nu_{\mathrm{obs}}$ 且尚未达到最高 SF 时，
+Gateway 可试用高一级 SF。若在已获授权的试用 SF 上仍全丢，就再升一级。收到 DATA 后等
+Request 回报匹配的 ACK。预算不足、最高 SF 仍全丢或回执超时均会回退并释放额外预留。
+当 $\phi-\phi_{\mathrm{failed}}\ge\nu_{\mathrm{ack}}$ 时可再次尝试。周期为 15 秒时，连续
+三次全丢对应约 45 秒后首次获得高一级 SF 的发送机会。即使后来没有有效记录，回执期限仍有效。
+
 连续三次首传成功且有同一 SF 的 ACK 回执后锁定，预算受限而分配较低 SF 时也适用。
 锁定后记录已确认的 SF，并释放为回退保留的较高额度。锁定且等待期结束后，若连续六次首传成功且平滑 SNR
 达到要求，可试用低一级（SF7 至少 −3.5 dB，SF8 至少 −6 dB，SF9 至少 −8.5 dB）。
@@ -243,7 +255,8 @@ Client 只有在收到有效位图授权时才重传。Gateway 只有在下一�
 DATA；两项均无记录时，跳过该 Client 本帧的 SF 评估。
 Beacon 过期后 Client 停止按时隙发射，并返回控制 SF 搜索。准备 Grant 时距某个 Client
 上次 Request 达四个帧编号，Gateway 释放其较高 SF 的预留。相同 boot ID 的 Client 返回时，
-Gateway 按当前预算重新申请由 ACK 回执或后续锁定记住的 SF。预算不足时可能分配较低 SF。
+Gateway 按当前预算重新申请由 ACK 回执或后续锁定记住的 SF。如果最近收到的 DATA 使用了更高
+SF，但仍没有 ACK 回执，也可按相同期限和预算试用该 SF。预算不足时可能分配较低 SF。
 降档试用锁定前，保留此前的恢复 SF。Client boot ID 改变或 Gateway 启动新会话时清除该记录。
 同步无线调用仍可能
 超出软件时序窗口。[LaTeX 源文件](../research/figures/adaptive-algorithm.tex) · [运行时代码](../../src/app/multiclient_link.cpp) · [已知时序风险](../en/ERROR_LOG.md)
@@ -264,15 +277,17 @@ Gateway 在构建时可选三种规则，默认为 `LEGACY`。 `MARGIN_EWMA` 跟
 | SF7/8/9/10 的暂定 SNR 门限 $\vartheta_\sigma$ | −7.5 / −10 / −12.5 / −15 dB。后续用各 SF 实测的 50% 交付门限替换。 |
 | 余量 $m_\sigma=\widehat{x}+b_\sigma-\vartheta_\sigma-z\sigma_x$ | $\widehat{x}$ 为预测 SNR，$b_\sigma$ 为偏移，$\sigma_x$ 为预测标准差，$z=1$ |
 | 丢包分数 $S\gets\rho S+w$ | $\rho=0.75$。符合条件的全丢加 1.0，同 SF 重传成功加 0.4，$e=0$ 时加 0。 |
-| 提高 DATA SF | 要求 $e=1$、$S\geq S_{\mathrm{up}}=1.5$，且 $m_\sigma<M_{\mathrm{up}}=0$ dB。 |
+| 根据余量提高 DATA SF | 要求 $e=1$、$S\geq S_{\mathrm{up}}=1.5$，且 $m_\sigma<M_{\mathrm{up}}=0$ dB。限时搜索则使用单独的全丢计数。 |
 | 试用较低 DATA SF | 延续锁定和回执规则，连续六次首传成功且 $m_{\sigma-1}\geq4$ dB。保留回退、等待和回执超时处理。 |
 | 估计器 | EWMA 权重为 0.25。Kalman 的水平和趋势过程方差为 0.16 和 0.01，测量方差为 1.0，初始趋势方差为 0.25。每条有效记录为一个时间步。 |
 
 `V3_LINK_SAMPLE` 保留旧采集字段，并在自适应 Gateway 上增加 `node_id`、`class`、`snr_req`、
 `snr_data`、`level`、`slope`、`sigma`、`margin`、`score`、`decision`、`rule` 和
 `params_version`。余量对应已分配的 SF，升档分数在清空前记录，缺失值为 `N/A`。
-`LOST_ALL` 表示已分配机会均未成功交付。`params_version=2` 下，`adr=loss_unconfirmed`
-表示没有收到 DATA，且 Request 余量未满足条件。`ADR_PROBE` 的 `result=expired`
+`LOST_ALL` 表示已分配机会均未成功交付。`params_version=3` 下，`adr=loss_unconfirmed`
+表示没有收到 DATA，且 Request 余量未满足条件。`recovery_probe` 和 `recovery_next` 申请试用
+SF，`recovery_wait_ack` 表示已收到 DATA 并等待回执，`recovery_confirmed` 表示回执匹配。
+`recovery_budget` 与 `recovery_failed` 表示回退。`ADR_PROBE` 的 `result=expired`
 表示试用在两次评估之间达到帧编号期限。`ABSENT` 表示在已监听的请求阶段未收到有效 Request。
 `EXCLUDED` 对应本地时序问题或应用拒收。这两类均不更新估计器或分数。
 另外两类为 `OK_FIRST` 和 `RESCUED_SAME_SF`。离线解析器兼容旧日志，并跳过时序无效、应用拒收和缺席记录。

@@ -5,6 +5,14 @@ changes. It is not a substitute for the append-only build memory.
 
 ## Unreleased
 
+### Bounded DATA SF recovery
+
+- After persistent complete DATA misses, try higher SFs within the
+  existing airtime budget and require an ACK receipt to keep a trial result.
+- After a control gap, allow a same-session Client to retry a higher SF
+  at which DATA was accepted before its ACK receipt went missing.
+- Keep shared control at SF9 and preserve the 15 s adaptive schedule.
+
 ### Gateway ADR hotfix
 
 - Qualify complete DATA loss with the current Request margin in all three

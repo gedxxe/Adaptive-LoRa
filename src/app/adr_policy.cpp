@@ -6,16 +6,41 @@ namespace adaptive_lora {
 namespace {
 void clearEvidence(AdrState& state) {
     state.degradedHistory = 0;
+    state.completeLosses = 0;
     state.score = 0;
 }
 
-void rollbackProbe(AdrState& state, const AdrParams& params) {
-    state.desired = state.probeReturn;
+bool probingHigher(const AdrState& state) {
+    return state.probeReturn && state.desired > state.probeReturn;
+}
+
+void clearProbe(AdrState& state) {
     state.probeReturn = 0;
     state.probeStartedFrame = 0;
+}
+
+void rollbackProbe(AdrState& state, uint32_t frame, const AdrParams& params) {
+    if (probingHigher(state)) {
+        state.reservedSf = std::min(state.reservedSf, state.probeReturn);
+        state.recoveryFailedFrame = frame;
+    }
+    state.desired = state.probeReturn;
+    clearProbe(state);
     state.consecutiveFirst = 0;
     clearEvidence(state);
     state.hold = params.rollbackHold;
+}
+
+bool startRecoveryProbe(AdrState& state, uint8_t candidate, uint32_t frame, const AdrParams& params) {
+    if (candidate <= state.desired || candidate > phy::maxDataSf ||
+        (state.recoveryFailedFrame && frame - state.recoveryFailedFrame < params.probeReceiptLimit))
+        return false;
+    state.probeReturn = state.desired;
+    state.probeStartedFrame = frame;
+    state.desired = candidate;
+    state.locked = false;
+    clearEvidence(state);
+    return true;
 }
 
 uint8_t countMisses(uint8_t mask) {
@@ -80,9 +105,15 @@ AdrOutcome classifyAdr(bool requested, bool usable, bool accepted, bool retried)
     return retried ? AdrOutcome::RESCUED_SAME_SF : AdrOutcome::OK_FIRST;
 }
 
+void resumeAdrAfterIdle(AdrState& state, uint32_t frame, const AdrParams& p) {
+    state.desired = state.recoverySf;
+    // The most recent accepted DATA is a useful candidate even if its ACK was lost.
+    startRecoveryProbe(state, state.deliveredSf, frame, p);
+}
+
 bool expireAdrProbe(AdrState& state, uint32_t frame, const AdrParams& p) {
     if (!state.probeReturn || frame - state.probeStartedFrame <= p.probeReceiptLimit) return false;
-    rollbackProbe(state, p);
+    rollbackProbe(state, frame, p);
     return true;
 }
 
@@ -111,6 +142,21 @@ AdrReview reviewAdr(AdrState& state, AdrRule rule, uint8_t sf, uint32_t frame,
         const float weight = first || unconfirmedLoss ? 0.0f : lost ? p.lostWeight : p.rescuedWeight;
         state.score = p.decay * state.score + weight;
     }
+    if (probingHigher(state)) {
+        const bool admitted = sf == state.desired;
+        if (admitted && clientConfirmed) {
+            clearProbe(state);
+            return {"recovery_confirmed"};
+        }
+        if (!admitted || frame - state.probeStartedFrame >= p.probeReceiptLimit ||
+            (lost && sf == phy::maxDataSf)) {
+            rollbackProbe(state, frame, p);
+            return {admitted ? "recovery_failed" : "recovery_budget", AdrDecision::ROLLBACK};
+        }
+        if (!lost) return {"recovery_wait_ack"};
+        ++state.desired;
+        return {"recovery_next", AdrDecision::UP};
+    }
     if (sf != state.desired) {
         if (!first) state.consecutiveFirst = 0;
         else {
@@ -127,19 +173,26 @@ AdrReview reviewAdr(AdrState& state, AdrRule rule, uint8_t sf, uint32_t frame,
     if (state.probeReturn && (!first ||
         (!clientConfirmed && frame - state.probeStartedFrame >= p.probeReceiptLimit))) {
         const float score = state.score;
-        rollbackProbe(state, p);
+        rollbackProbe(state, frame, p);
         return {first ? "probe_no_receipt" : "rollback", AdrDecision::ROLLBACK, score};
     }
     if (legacy) {
         const unsigned mask = (1u << p.legacyWindow) - 1u;
         state.degradedHistory = uint8_t(((state.degradedHistory << 1) | (!first && !unconfirmedLoss)) & mask);
     }
+    if (!lost) state.completeLosses = 0;
+    else if (state.completeLosses < p.legacyWindow) ++state.completeLosses;
     if (!first) {
         state.consecutiveFirst = 0;
-        if (unconfirmedLoss) return {"loss_unconfirmed"};
-        const bool weak = legacy ? countMisses(state.degradedHistory) >= p.legacyMisses :
-            state.score >= p.upScore && state.estimate.margin(rule, sf, p) < p.upMarginDb;
-        if (!weak) return {"observe"};
+        const bool weak = !unconfirmedLoss && (legacy ? countMisses(state.degradedHistory) >= p.legacyMisses :
+            state.score >= p.upScore && state.estimate.margin(rule, sf, p) < p.upMarginDb);
+        if (!weak) {
+            // Missing DATA alone only permits a bounded search. A receipt commits the result.
+            if (lost && state.completeLosses >= p.legacyWindow &&
+                startRecoveryProbe(state, uint8_t(sf + 1), frame, p))
+                return {"recovery_probe", AdrDecision::UP};
+            return {unconfirmedLoss ? "loss_unconfirmed" : "observe"};
+        }
         const float score = state.score;
         state.locked = false;
         clearEvidence(state);
@@ -155,8 +208,7 @@ AdrReview reviewAdr(AdrState& state, AdrRule rule, uint8_t sf, uint32_t frame,
     if (state.consecutiveFirst < p.firstBeforeProbe) ++state.consecutiveFirst;
     const char* action = "observe";
     if (state.consecutiveFirst >= p.confirmations && !state.locked && clientConfirmed) {
-        state.probeReturn = 0;
-        state.probeStartedFrame = 0;
+        clearProbe(state);
         state.reservedSf = state.desired;
         state.recoverySf = sf;
         state.locked = true;

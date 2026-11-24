@@ -142,7 +142,11 @@ in this session. The display updates between radio phases.
 To check a walk outage, hold position for six frames and record the
 Client screen before moving again. Step back into SF9 coverage and check
 the first new DATA attempt. The Gateway can restore the previous confirmed
-SF in the same session if its retry and peer reservations still fit.
+SF or try the higher SF of its last accepted DATA in the same session
+if the full roster still fits. Keep a stationary peer logging. To test
+recovery with control still working, hold for up to ten frames so the
+Gateway has time to detect the misses, try higher SFs and see a receipt.
+Compare the moving node's `TX SF` and `ACKED DATA SF` with peer delivery.
 
 **Matched SF7 comparison.** For a second run on the same route, change only
 the Gateway image. Replace `COMx` with its observed port. This command uses
@@ -213,11 +217,14 @@ Gateway uptime at reception, so use it for per-Client gaps within a boot.
 For `adr=rx_window_unobserved`, the Gateway could neither establish that
 it was listening at the assigned SF before launch nor verify DATA in that
 slot. Other Clients with valid timing still contribute ADR samples.
-With `params_version=2`, `adr=loss_unconfirmed` means the Gateway missed
+With `params_version=3`, `adr=loss_unconfirmed` means the Gateway missed
 all DATA and the current Request did not indicate low margin. Match the
 Client's `V3_DATA_TX` with the Gateway sample by session, frame and node
-before attributing the loss. `ADR_PROBE` with `result=expired` marks a
-lower-SF trial that ended after its receipt deadline.
+before attributing the loss. `recovery_probe` and `recovery_next` indicate
+trial SF requests. Confirm them with a corresponding `V3_DATA_TX`.
+`recovery_confirmed` records a matching receipt, `recovery_budget` means
+the trial could not fit, and `ADR_PROBE` with `result=expired` marks an
+unconfirmed trial that reached its receipt deadline.
 
 Probe DIO1, NSS, BUSY and SCL with high-impedance probes. Measure at least
 30 transitions per SF pair used, including both directions and return to

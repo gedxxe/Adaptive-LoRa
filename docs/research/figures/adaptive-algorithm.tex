@@ -110,8 +110,10 @@
   \Block{\textbf{if} $\phi^{\mathrm{req}}_\iota\ne0$ and $\phi-\phi^{\mathrm{req}}_\iota\ge\nu_{\mathrm{idle}}$ \textbf{then}}{%
     \Step{$\sigma^{\mathrm{res}}_\iota\gets\sigma_{\min}$ and clear the sample history}%
   }
-  \Step{\textbf{if} rejoining after expiry \textbf{then}
-    $\sigma^{\mathrm{want}}_\iota\gets\sigma^{\mathrm{mem}}_\iota$}
+  \Block{\textbf{if} rejoining after expiry \textbf{then}}{%
+    \Step{$\sigma^{\mathrm{want}}_\iota\gets\sigma^{\mathrm{mem}}_\iota$}
+    \Step{Try $\sigma^{\mathrm{del}}_\iota$ if higher and cooldown has elapsed}%
+  }
   \vspace{3pt}
   \Step{\textbf{After feedback:} $\Review_\iota$ for an eligible report}
   \Step{On SF change, clear the loss history and first-delivery count}
@@ -121,6 +123,14 @@
   \Block{\textbf{if} EWMA or Kalman \textbf{then}}{%
     \Step{Update $\widehat{x}$ and $\sigma_x$ on the Request SNR scale}
     \Step{$S\gets\rho S+w$, where $w=0$ if $\neg e$}%
+  }
+  \Block{\textbf{if} higher-SF trial \textbf{then}}{%
+    \Step{$a\gets(\sigma_\iota=\sigma^{\mathrm{want}}_\iota)$}
+    \Step{\textbf{if} $a\land\alpha_\iota$ \textbf{then} keep $\sigma_\iota$ and clear trial}
+    \Step{\textbf{else if} $\neg a\lor(\phi-\phi_{\mathrm{probe}}\ge\nu_{\mathrm{ack}})
+      \lor(\mathrm{no\ DATA}\land\sigma_\iota=\sigma_{\max})$ \textbf{then} roll back}
+    \Step{\textbf{else if} no DATA \textbf{then} $\sigma^{\mathrm{want}}_\iota\gets\sigma_\iota+1$}
+    \Step{\textbf{return}}%
   }
   \Block{\textbf{if} $\sigma_\iota<\sigma^{\mathrm{want}}_\iota$ \textbf{then}}{%
     \Step{\textbf{if} $\nu^{\mathrm{first}}_\iota\ge\nu_{\mathrm{lock}}\land\alpha_\iota$
@@ -142,11 +152,16 @@
     \Step{$u\gets(S\ge S_{\mathrm{up}})\land(m_\sigma<M_{\mathrm{up}})$}
     \Step{$d\gets(m_{\sigma-1}\ge M_{\mathrm{down}})$ for $\sigma>\sigma_{\min}$}
   }
+  \Step{$\ell_\iota\gets
+    \begin{cases}\min(\ell_\iota+1,\nu_{\mathrm{obs}}), & \text{no DATA}\\
+       0, & \text{otherwise}\end{cases}$}
   \Block{\textbf{if} $\epsilon_\iota^{\mathrm{fail}}$ \textbf{then}}{%
     \Block{\textbf{if} $e\land u$ \textbf{then}}{%
       \Step{$\sigma^{\mathrm{want}}_\iota\gets\min(\sigma_\iota+1,\sigma_{\max})$}
       \Step{Unlock and clear the loss history}%
     }
+    \Step{\textbf{else if} $\ell_\iota\ge\nu_{\mathrm{obs}}$ and cooldown has elapsed
+      \textbf{then} try $\sigma_\iota+1$ if $\sigma_\iota<\sigma_{\max}$}
     \Step{\textbf{return}}%
   }
   \Step{\textbf{if} unlocked and $\nu^{\mathrm{first}}_\iota\ge\nu_{\mathrm{lock}}\land\alpha_\iota$

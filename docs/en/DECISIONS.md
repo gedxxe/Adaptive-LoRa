@@ -473,3 +473,20 @@ numerical tuning pending field calibration. Use a fixed independent
 decode curve when testing model sensitivity to a policy threshold,
 and start each blockage trial at the same SF with fresh state.
 Wire v5, PHY and NVS schema stay compatible.
+
+## ADR-040 — Search for a usable DATA SF within the roster budget
+
+2026-11-24. Keep the margin rule for normal increases. After
+three consecutive complete misses across eligible reports at the
+assigned SF, any rule can try higher SFs. A complete miss at an
+admitted candidate advances one step. Require an ACK receipt for
+the candidate. On budget denial, a miss at the ceiling, or expiry, release
+the extra reservation and wait six frame IDs before another search.
+Use the same six-frame receipt deadline already used for downshift trials.
+
+After same-session inactivity, try the last accepted higher DATA SF
+if it lacked an ACK receipt and the cooldown has elapsed. A new session
+still clears historical candidates. Never grant outside the calculated
+full-roster budget. Keep control at SF9 because SF10 control would consume
+the space for even one DATA SF9 slot in the eight-Client 15 s profile.
+Use parameter revision 3 and keep the RF thresholds provisional.

@@ -8,7 +8,7 @@ enum class AdrOutcome : uint8_t { ABSENT, OK_FIRST, RESCUED_SAME_SF, LOST_ALL, E
 enum class AdrDecision : uint8_t { HOLD, UP, DOWN, ROLLBACK };
 
 struct AdrParams {
-    uint8_t version = 2;
+    uint8_t version = 3;
     uint8_t legacyWindow = 3;
     uint8_t legacyMisses = 2;
     uint8_t confirmations = 3;
@@ -45,6 +45,7 @@ constexpr bool finiteAdrValue(float value) {
 constexpr bool validAdrParams(const AdrParams& p) {
     if (!p.legacyMisses || p.legacyMisses > p.legacyWindow || p.legacyWindow > 8 ||
         !p.confirmations || p.confirmations > p.firstBeforeProbe || p.confirmations > p.probeReceiptLimit ||
+        p.probeReceiptLimit <= phy::maxDataSf - phy::dataSf ||
         !p.idleFrames || !(p.alpha > 0 && p.alpha <= 1) || !(p.decay >= 0 && p.decay < 1) ||
         !finiteAdrValue(p.lostWeight) || !(p.rescuedWeight >= 0 && p.rescuedWeight <= p.lostWeight) ||
         !(p.upScore > 0 && p.upScore * (1 - p.decay) < p.lostWeight) ||
@@ -97,6 +98,7 @@ struct AdrState {
     uint32_t lastRequest = 0;
     uint32_t deliveredFrame = 0;
     uint32_t probeStartedFrame = 0;
+    uint32_t recoveryFailedFrame = 0;
     uint8_t desired = phy::dataSf;
     uint8_t reservedSf = phy::dataSf;
     uint8_t recoverySf = phy::dataSf;
@@ -105,6 +107,7 @@ struct AdrState {
     uint8_t acknowledgedSf = 0;
     uint8_t consecutiveFirst = 0;
     uint8_t degradedHistory = 0;
+    uint8_t completeLosses = 0;
     uint8_t probeReturn = 0;
     uint8_t hold = 0;
     bool locked = false;
@@ -120,6 +123,7 @@ struct AdrReview {
 };
 
 AdrOutcome classifyAdr(bool requested, bool usable, bool accepted, bool retried);
+void resumeAdrAfterIdle(AdrState& state, uint32_t frame, const AdrParams& params = kAdrParams);
 bool expireAdrProbe(AdrState& state, uint32_t frame, const AdrParams& params = kAdrParams);
 AdrReview reviewAdr(AdrState& state, AdrRule rule, uint8_t observedSf, uint32_t frame,
                     const AdrObservation& observation, const AdrParams& params = kAdrParams);

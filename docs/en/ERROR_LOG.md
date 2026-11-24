@@ -937,3 +937,26 @@ The first verification log was written outside the scratch directory
 because the launcher replaced its source prefix first. The collector
 exited 1 with a missing file. Correcting the substitution order restored
 collection.
+
+## ERR-061 — DATA SF stalls when the Request margin is optimistic
+
+The operator reported SF8 attempts followed by stale delivery and a
+return to SF7 with two Clients. The actual RF cause was not measured.
+On the host, use two Clients on the 32 B eight-position roster. Set
+Request SNR to −9 dB on one Client and drop DATA below SF10. Iteration
+031 reaches SF8, then the normal margin test blocks further increases.
+The updated native test reaches SF10 and the fixed peer keeps delivering.
+A second host test suppresses the ACK after accepted SF8 DATA and drops
+control for five frames. The earlier recovery rule fell back to SF7
+and missed delivery. The new first Grant tries the observed SF8 while
+awaiting the Client receipt. Logs are in `logs/test/iteration-032-verification.log`.
+
+## ERR-062 — Simulator test expected the former stalled behavior
+
+`python -m unittest discover -s tools -p test_adr_sim.py -v` first failed
+with Windows error 623 launching the host compiler within the restricted
+shell. Running with the installed compiler outside the restriction then
+reached the test. The existing case expected zero reactions after a
+−20 dB policy shift. Recovery now reaches the fixed channel's reference
+SF after a delay. The test checks for that delay and continues to catch
+a reference that shifts with the policy.

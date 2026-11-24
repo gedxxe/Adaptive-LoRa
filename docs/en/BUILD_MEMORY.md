@@ -2318,3 +2318,55 @@ files under `logs/test/`.
   RF turnaround and link performance are not measured in this iteration.
   Run the close-range pair with both node logs, then compare one moving
   and seven stationary Clients on the authorized RF setup.
+
+## Iteration 032 — Recover DATA SF with intermittent control, 2026-11-24
+
+- Branch `codex/iteration-032-bounded-sf-recovery` from fetched main
+  `2cd9af0a8a36c16a69cb59177e130e5fa0f22500`. The operator reported a
+  two-Client SF8 stall and apparent SF7 fallback. The host reproduced
+  two plausible software paths (ERR-061). The field cause is unconfirmed.
+- `adr_policy.cpp` and its header add a receipt-limited SF search and an
+  idle recovery candidate. `multiclient_link.cpp` supplies same-session
+  history to the policy. Grant admission, the Client state machine and
+  `main.cpp` were inspected and retain their scheduling responsibilities.
+  No change to wire v5, NVS schema 1, firmware `0.2.0-alpha.1`, fixed SF9
+  control, SF7–SF10 DATA, CR4/5, the 32 B load or the 15 s period.
+- `pio run -e heltec_wifi_lora_32_V3`, `-e heltec_wifi_lora_32_V3_research`,
+  `-e heltec_wifi_lora_32_V3_multiclient` and `-e heltec_wifi_lora_32_V3_adaptive`
+  each exited 0. The default adaptive build uses 35,216 B static RAM
+  and 392,956 B program storage. Tools include PlatformIO Core 6.1.19,
+  Espressif32 55.3.311, Arduino ESP32 3.3.11, Xtensa 14.2.0+20260121
+  and RadioLib 7.8.1.
+  The adaptive build also exited 0 with `PLATFORMIO_BUILD_SRC_FLAGS` set to
+  `-DADAPTIVE_LORA_ADR_RULE=1` or `=2` and
+  `PLATFORMIO_BUILD_DIR=.pio/comparison-build`.
+- `pio test -e native`, `-e native_multiclient` and `-e native_adaptive`
+  exited 0 with 356, 15 and 40 passing cases. Covered recovery with two
+  Clients, a lost ACK followed by a control outage, an ambiguous Grant
+  loss, the recovery deadline, cooldown and budget rejection with eight
+  active Clients. The adaptive suite rerun also checked that the default
+  rule attempted SF8, SF9 and SF10 within two, five and six frame intervals
+  after the first faded frame in the two-Client fixture.
+  `python -m unittest discover -s tools -p test_<suite>.py -v`
+  passed capture (15), airtime (16), ADR parser (7), multiclient model (6),
+  documentation (19) and ADR simulator (2). `python tools/check_consistency.py`
+  exited 0. No skipped cases were reported.
+- `python tools/adr_sim.py --seed 42` and both `--policy-snr-shift-db`
+  runs at −2.5 and +2.5 dB exited 0 with 30 cases each. At −2.5 dB in
+  the selected 9 dB blockage case, all 128 trials per rule attained the
+  same channel reference. EWMA and Kalman averaged 282.3 s and 274.7 s.
+  These are ideal-control model results. For 32 B and eight Clients,
+  changing control from SF9 to SF10 adds 3,721,216 µs to scheduled time.
+  The counterfactual used the existing `mixed_sf_budget` with the chosen
+  control PHY; its output includes 70-Client group rotation estimates.
+- README, the two manuals, ADR-040, the research-to-code map and the
+  updated ADR LaTeX source and PNG describe the same policy. MathJax
+  rendered 117 expressions. pdfLaTeX rendered three pages without layout
+  warnings. Of 90 Markdown files inspected, the only two broken local links
+  were in the frozen Iteration 006 and 007 snapshots.
+- Command output is in `logs/build/iteration-032-verification.log` and
+  `logs/test/iteration-032-verification.log`. The collector replaced local
+  paths with placeholders and trimmed trailing whitespace.
+  Physical RF, NVS persistence and retune latency were not measured in
+  this iteration. Repeat the route with one moving Client and one fixed
+  Client before expanding to eight and compare ACK receipts and peer delivery.

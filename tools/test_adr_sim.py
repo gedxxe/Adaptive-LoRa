@@ -31,7 +31,9 @@ class AdrSimTests(unittest.TestCase):
         self.assertEqual(-20, result["policy_snr_shift_db"])
         rows = [r for r in result["rows"] if r["scenario"] == "blockage" and r["attempt_loss_pct"] == 1]
         self.assertEqual(3, len(rows))
-        self.assertTrue(all(r["reacted_trials"] == 0 and r["mean_reaction_s"] is None for r in rows))
+        for row in rows:
+            self.assertGreater(row["reacted_trials"], 0)
+            self.assertGreaterEqual(row["mean_reaction_s"], 45)
 
 
 if __name__ == "__main__":
