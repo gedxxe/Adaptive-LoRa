@@ -1017,3 +1017,35 @@ capacity assertions for bounded denial and earlier delivery. Fully drain
 one fake serial endpoint before the next to avoid splitting an extended
 Gateway sample with another node's log. The final suite passed.
 See `logs/test/iteration-034-verification.log`.
+
+## ERR-069 — Rotating build and Windows test launcher
+
+- `pio run -e heltec_wifi_lora_32_V3_rotating` inside the managed
+  sandbox could not create the installed PlatformIO `platforms.lock`.
+  Run with access to the installed SDK. The same command then built.
+- The first `pio test -e native_rotating` failed because
+  `multiclient_link.cpp` used `std::max` without including
+  `<algorithm>`. Added the direct include. The native suite then passed.
+- The sandboxed `python -m unittest discover -s tools -p test_adr_sim.py -v`
+  could not start MinGW with Windows error 623. The retry using the installed
+  compiler outside the sandbox passed both cases. The failed and successful
+  outputs are in `logs/test/iteration-035-python.log` and
+  `logs/test/iteration-035-python-verified.log`.
+- The local PDF extractor also failed to read its registry configuration in
+  the sandbox. The bundled Python `pypdf` read all 14 pages without using
+  that installation. Review material remains local.
+
+## ERR-070 — Unsupported operator macro on GitHub
+
+The two scheduled link documents used `\operatorname{Tail}` in the
+ADR loss-window equation. GitHub reported the macro as disallowed.
+Both now use `\mathrm{Tail}`. The documentation regression rejects
+the original macro in a display-math block and checks that both
+language editions use the same equations.
+
+## ERR-071 — Compatibility table checker expected only four firmware profiles
+
+After adding the wire-v6 row, `python tools/check_consistency.py` reported
+a comparison version mismatch for both languages. The checker now reads
+the rotating version from the protocol header and requires the matching
+PlatformIO environment and table row.

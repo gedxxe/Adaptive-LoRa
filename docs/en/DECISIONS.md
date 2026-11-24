@@ -521,3 +521,27 @@ must refer to a delivery from the trial. An unrelated later timing
 fault cannot reverse that confirmation. Record as policy revision 5.
 Use RSSI for field diagnosis and keep the existing SNR and delivery
 criteria without adding a fixed RSSI trigger.
+
+## ADR-043 — Rotate the registry through feasible groups
+
+Status: Implemented in the opt-in wire-v6 research profile.
+
+Keep the 8-bit bitmap and eight-entry active group. The Gateway advances a
+cursor through at most 128 deterministic IDs, taking the longest prefix
+that fits full payload ceilings and planned DATA SF reservations. If the
+next ID cannot fit the current group, it starts the next one. The
+registry cursor and wire frame advance on an attempted Beacon even if its
+TX fails. Fixed profiles with a stable group size get one opportunity per
+sweep under normal radio service. Missed Beacons and DATA can delay delivery.
+
+Index Gateway ADR state by registered ID and count timeouts in each
+Client's service opportunities. Keep wire receipt identities on the
+Gateway frame counter. Use the first active Client's opportunity for
+retry priority so a fixed sweep length cannot repeat the same initial
+retry mask on every visit. Retain wire v5 as the default test baseline.
+
+Security is a separate release gate. Compare signed Gateway control
+with per-Client tags using the same frame budget, and reserve a new wire
+version once credential lifecycle, authenticated freshness and cryptographic
+timing are verified. Wire v6 uses plaintext. See the
+[security and capacity study](SCHEDULED_LINK.md#rotating-schedule).

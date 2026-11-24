@@ -11,6 +11,7 @@ GUIDES = ("docs/en/BENCH_RUNBOOK.md", "docs/zh-CN/BENCH_RUNBOOK.md")
 PROTOCOLS = ("docs/en/SCHEDULED_LINK.md", "docs/zh-CN/SCHEDULED_LINK.md")
 CURRENT_DOCS = ("AGENTS.md", "docs/en/PROGRESS.md", "docs/zh-CN/PROGRESS.md")
 ARCHITECTURE = "docs/research/figures/adaptive-architecture.svg"
+ROTATION = "docs/research/figures/rotation.svg"
 ALGORITHM_FIGURES = tuple(f"docs/research/figures/adaptive-algorithm-{role}.png"
                           for role in ("gateway", "client"))
 ALGORITHM_SOURCE = "docs/research/figures/adaptive-algorithm.tex"
@@ -76,6 +77,10 @@ def check(root):
     adaptive_version = re.search(r"kWireVersion\s*=\s*kAdaptive\s*\?\s*(\d+)\s*:", protocol_source)
     if not adaptive_version:
         errors.append("multiclient_protocol.h: adaptive wire version missing")
+    rotating_version = re.search(r"kWireVersion\s*=\s*(\d+)\s*;", protocol_source)
+    rotating = board + "_rotating"
+    if not rotating_version or rotating not in environments:
+        errors.append("platformio.ini and protocol: rotating environment or wire version missing")
     roster = (root / "include/research_roster.h").read_text(encoding="utf-8")
     ceiling = re.search(r"kBenchPayloadBytes\s*=\s*kAdaptive\s*\?\s*(\d+)\s*:\s*kMaxData", roster)
     if not ceiling:
@@ -121,8 +126,8 @@ def check(root):
         if not all(f"]({target})" in text for target in (guide, protocol_page)):
             errors.append(f"{name}: link directly to setup and protocol")
         images = re.findall(r"!\[[^\]]+\]\(([^\s]+)\)", text)
-        if images != [ARCHITECTURE]:
-            errors.append(f"{name}: expected the shared architecture figure")
+        if images != [ARCHITECTURE, ROTATION]:
+            errors.append(f"{name}: expected the shared architecture figure and rotating schedule")
         protocol_text = (root / protocol_page).read_text(encoding="utf-8")
         if f"]({TIMELINE})" not in protocol_text:
             errors.append(f"{protocol_page}: expected the frame timeline")
@@ -147,11 +152,13 @@ def check(root):
                         f"{row['max_at_sf_with_others_at_sf7']} |")
             if row["sf"] >= 9 and expected not in text.splitlines():
                 errors.append(f"{page}: SF{row['sf']} study row differs from the airtime model")
-    for pair, expected in ((READMES, 1), (PROTOCOLS, 8)):
+    for pair, expected in ((READMES, 1), (PROTOCOLS, 9)):
         equations = [re.findall(r"^```math\n(.*?)^```$",
                                 (root / name).read_text(encoding="utf-8"), re.M | re.S) for name in pair]
         if len(equations[0]) != expected or equations[0] != equations[1] or not all(equations[0]):
             errors.append(f"{pair[0]}: use the same airtime equations in both languages")
+        if any(r"\operatorname" in block for document in equations for block in document):
+            errors.append(f"{pair[0]}: use GitHub-compatible math macros")
     header = (root / "include/project_config.h").read_text(encoding="utf-8")
     if not re.search(r'kFirmwareVersion\[\]\s*=\s*"' + re.escape(firmware) + '"', header):
         errors.append("project_config.h: firmware version differs from VERSION")
@@ -181,11 +188,12 @@ def check(root):
             if adaptive_version and (not row or row.groups() != (firmware, adaptive_version.group(1))):
                 errors.append(f"{name}: current firmware/protocol row mismatch")
             wire_versions = dict(re.findall(r"\| `([A-Za-z0-9_]+)` \| (\d+) \|", body))
-            if adaptive_version and wire_versions != {
+            if adaptive_version and rotating_version and wire_versions != {
                 board: legacy_protocol,
                 board + "_research": APPROVED_SETTINGS["src/common/protocol/scheduled_protocol.h"]["kVersion"],
                 multiclient: protocol,
                 adaptive: adaptive_version.group(1),
+                rotating: rotating_version.group(1),
             }:
                 errors.append(f"{name}: comparison wire versions differ from firmware")
             field_status = ("| 现场试验 | 走测和无线时序仍待实测 |" if "/zh-CN/" in name

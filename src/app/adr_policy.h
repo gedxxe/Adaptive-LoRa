@@ -97,6 +97,9 @@ struct AdrState {
     uint32_t boot = 0;
     uint32_t lastRequest = 0;
     uint32_t deliveredFrame = 0;
+#if defined(ADAPTIVE_LORA_ROTATING)
+    uint32_t deliveredOpportunity = 0;
+#endif
     uint32_t probeStartedFrame = 0;
     uint32_t recoveryFailedFrame = 0;
     uint8_t desired = phy::dataSf;

@@ -122,6 +122,7 @@ OledText formatOledStatus(const DisplaySnapshot& s, uint64_t nowUs, uint8_t v3Pa
                 case ClientScheduleIssue::REQUEST_TX: suffix = "REQ FAIL"; break;
                 case ClientScheduleIssue::NO_GRANT: suffix = "NO GRANT"; break;
                 case ClientScheduleIssue::NO_DATA_TX: suffix = "NO TX"; break;
+                case ClientScheduleIssue::GROUP_WAIT: suffix = "GROUP WAIT"; break;
                 case ClientScheduleIssue::NONE: break;
             }
         }
@@ -129,7 +130,9 @@ OledText formatOledStatus(const DisplaySnapshot& s, uint64_t nowUs, uint8_t v3Pa
         std::snprintf(r[1], sizeof(r[1]), "%s %u%s%s", gateway ? "GATEWAY" : "CLIENT",
                       unsigned(s.config.nodeId), *suffix ? " " : "", suffix);
         if (page == 0) {
-            if (peer.seen)
+            if (!gateway && !s.searchingForBeacon && v3.clientIssue == ClientScheduleIssue::GROUP_WAIT)
+                std::snprintf(r[2], sizeof(r[2]), "BEACON SYNC");
+            else if (peer.seen)
                 std::snprintf(r[2], sizeof(r[2]), "LAST %s P %u", linkName(v3.freshness(nowUs)), unsigned(peer.peer));
             else
                 std::snprintf(r[2], sizeof(r[2]), "LAST WAIT");

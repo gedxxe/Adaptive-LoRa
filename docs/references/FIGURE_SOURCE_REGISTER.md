@@ -6,6 +6,10 @@ project drawings based on the adaptive implementation. The example SFs
 and packet positions illustrate how the code works. They are not
 measurements. The antenna symbol is also original.
 
+The [group rotation](../research/figures/rotation.svg) and [profile badges](../research/figures/project-profile.svg)
+are original project SVGs. The rotation figure explains the registry cursor and
+the frame phases. The badges name the hardware and tools in plain text.
+
 The [Gateway](../research/figures/adaptive-algorithm-gateway.png) and
 [Client](../research/figures/adaptive-algorithm-client.png) listings describe
 the [adaptive runtime](../../src/app/multiclient_link.cpp). Both come from

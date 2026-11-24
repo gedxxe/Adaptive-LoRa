@@ -103,7 +103,9 @@ boot, advances when a new sample enters the queue and wraps after `FFFF`.
 The DATA frame carries exactly 32 ASCII bytes, with no terminator or newline.
 A retry sends the same bytes and packet identity.
 
-## Check the pair and walk the route
+<a name="check-the-pair-and-walk-the-route"></a>
+
+## Verify delivery and link recovery
 
 1. Run Client 2 close to the Gateway for at least five complete frames. Match
    Gateway `APP_PAYLOAD` with Client `V3_PAYLOAD_RESULT,result=accepted`
@@ -128,7 +130,7 @@ A retry sends the same bytes and packet identity.
    An SF shown under `ACKED DATA SF` belongs to the last confirmed packet.
    Read `ADR_TIMING` with `status` before and after the run.
 
-**Walking without a laptop.** On every Client page, `TX SF8 CR4/5` means
+**Reading the display at a test point.** On every Client page, `TX SF8 CR4/5` means
 the last DATA transmission started at SF8. It survives the switch back to
 SF9 for control. On page 2, `ACKED DATA SF` changes only after a matching
 ACK. At a stop, read both values and the AGE on page 1. Client AGE measures
@@ -171,6 +173,28 @@ same Clients, route and offered load. The rule does not need provisioning.
 ```powershell
 cmd /d /c 'set PLATFORMIO_BUILD_SRC_FLAGS=-DADAPTIVE_LORA_ADR_RULE=1&&set PLATFORMIO_BUILD_DIR=.pio/adr-ewma&&pio run -e heltec_wifi_lora_32_V3_adaptive -t upload --upload-port COMx'
 ```
+
+## Test the rotating profile
+
+Use the same build on the Gateway and all Clients.
+
+```sh
+pio run -e heltec_wifi_lora_32_V3_rotating
+pio run -e heltec_wifi_lora_32_V3_rotating -t upload --upload-port COMx
+```
+
+Use the physical port and the [role commands](#flash-and-set-roles) above.
+In `status`, confirm `protocol=6` and `profile=rotating`. With Gateway ID
+1, the default registry contains Client IDs 2–129. For a small rotation
+test, set `ADAPTIVE_LORA_REGISTERED_CLIENTS` in the build environment
+for all boards. IDs 2 and 10 exercise separate groups with the default
+registry. Capture at least two complete sweeps. `GROUP WAIT` with
+`BEACON SYNC` is expected outside a Client's group. `SEARCH` means
+it has stopped receiving Beacons on time. Use synthetic data only.
+The [rotation model](SCHEDULED_LINK.md#rotating-schedule) gives the
+expected schedule, and the capture must measure the actual delivery gap.
+For larger tests, record all delivery events on the Gateway and use the
+capture tool's eight Client ports for a sample of links across groups.
 
 ## Save the results
 

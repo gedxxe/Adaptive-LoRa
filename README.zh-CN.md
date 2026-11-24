@@ -2,46 +2,29 @@
 
 [English](README.md)
 
-Adaptive-LoRa 是使用单颗半双工 SX1262 的遥测调度原型。当前测试配置最多支持八个 Client。
-Gateway 为各 Client 指定 DATA 扩频因子（SF），并按整组节点的空口时间预算限制 SF 调整。
+**研究题目**：面向单射频 LoRa 工业能源监测网络、考虑可靠性的 TDMA 调度与链路自适应。
 
-**八节点测试。** 九块板都烧录默认镜像 `heltec_wifi_lora_32_V3_adaptive`，并确认空口版本为 5。Gateway ID 为 1，
-Client ID 为 2–9。每个 Client 提交 32 字节 ASCII 样本，例如
-`ID=0002|SEQ=0001|MSG=HELLO WORLD`，15 秒超帧按这个长度预留时隙。
-在 Gateway 的 `APP_PAYLOAD` 日志中检查 `bytes=32`。
+**研究主题与目标。** 研究单台半双工网关怎样为链路条件不同的低速遥测节点分配空口时间，并测量节点增加时的交付率、服务间隔和空口占用。
 
-走测时可直接查看任一页顶行。Client 显示的 `TX SF8 CR4/5` 表示最近一次 DATA 发送尝试，
-Gateway 显示最近一次收到的 DATA 的 SF。Gateway 为各 Client 调整 DATA SF7–SF10，按申请的字节数
-分配时隙，并通过 ACK 位图分配重传机会。控制帧固定用 SF9，编码率、带宽、发射功率和帧周期均固定。
-
-Gateway 分别跟踪各 Client 的交付。最近三条有效记录中若有两次丢失，可在空口预算允许时
-试用更高 DATA SF。如果首传接收窗已观测到，后续 ACK 或重传时序异常仍可保留该次丢失记录。
-升档先临时预留空口时间，由有效 Request 中的匹配 ACK 回执确认，试用失败则释放额外预留。
-SNR 用于辅助判断丢包，RSSI 用于现场诊断。
-`SEARCH` 表示在等新的 SF9 Beacon。
-`NO GRANT` 表示已启动 Request，但未收到匹配的 Grant。
-Gateway 还提供两种[基于 SNR 余量的实验规则](docs/zh-CN/SCHEDULED_LINK.md#按丢包情况调整)。
+<img width="570" src="docs/research/figures/project-profile.svg" alt="Heltec V3.4、SX1262、C++17、Python 和 RadioLib 7.8.1">
 
 <a name="烧录与配置"></a>
 
-**[烧录、设置角色并进行八节点测试](docs/zh-CN/BENCH_RUNBOOK.md)** ·
-[协议与公式](docs/zh-CN/SCHEDULED_LINK.md) ·
-[测试结果与研究参考](docs/zh-CN/PROGRESS.md)
+[烧录与配置](docs/zh-CN/BENCH_RUNBOOK.md) · [协议和公式](docs/zh-CN/SCHEDULED_LINK.md) · [结果与研究计划](docs/zh-CN/PROGRESS.md)
 
-![Adaptive-LoRa 架构：统一控制 SF、各 Client 独立 DATA SF](docs/research/figures/adaptive-architecture.svg)
+![网关和客户端共用固定控制参数，DATA 的扩频因子按客户端分配](docs/research/figures/adaptive-architecture.svg)
 
 ## 工作流程
 
-控制帧使用 $\sigma_{\mathrm{ctrl}}$，Client $\iota$ 使用 $\sigma_\iota$ 发送 DATA。
-Gateway 先为整组节点 $\Omega$ 预留时间，再用 $\Xi$ 表示已接收的 DATA，
-用 $\Pi_\jmath$ 表示第 $\jmath$ 轮宣布的重传时隙。重传沿用同一个包 $\Delta_\iota$。
+网关在 SF9 广播信标。客户端申请有效载荷所需的时隙，收到匹配的授权后才发送。网关为每个客户端分配 DATA SF7–SF10，预留重试时隙，并通过 ACK 位图反馈已接收的报文。同一射频在控制阶段和 DATA 阶段之间切换。带宽、编码率和请求发射功率固定。
 
-<img src="docs/research/figures/adaptive-algorithm-gateway.png" alt="Gateway 算法。恢复各节点的 SF、核算空口预算、收发 DATA 与 ACK，并用有效记录评估链路。" width="480">
+![一台网关按空口预算轮换分组，每帧服务一组](docs/research/figures/rotation.svg)
 
-<img src="docs/research/figures/adaptive-algorithm-client.png" alt="Client 算法。等待 SF9 控制帧，在匹配的 Grant 下按指定 SF 发送 DATA，区分未确认和结果未知。" width="480">
+默认配置最多服务八个客户端。可选轮换配置最多登记 128 个 ID，每个 15 秒帧选择一组。DATA 参数越慢，每组能容纳的节点可能越少。参见[服务间隔和认证开销模型](docs/zh-CN/SCHEDULED_LINK.md#rotating-schedule)。报文认证和规模化射频测试仍是发布条件。
 
-[SF 恢复和评估伪代码](docs/zh-CN/SCHEDULED_LINK.md#自适应与恢复) ·
-[LaTeX 源文件](docs/research/figures/adaptive-algorithm.tex)
+## 测试方法
+
+所有板卡烧录同一固件，每个客户端使用不同的 ID。先在串口确认协议版本。示例发送 32 字节样本，在网关查找 `APP_PAYLOAD`，并检查接收字节数、DATA SF、ACK 与重试记录。[设置指南](docs/zh-CN/BENCH_RUNBOOK.md#flash-and-set-roles)包含两种角色的命令。
 
 ## 空口时间预算
 
@@ -56,12 +39,22 @@ Gateway 先为整组节点 $\Omega$ 预留时间，再用 $\Xi$ 表示已接收�
 \end{aligned}
 ```
 
-$\lambda_\iota$ 表示应用载荷，$\eta$ 表示帧开销，$\sigma_\iota$ 为选定 SF，
-$\delta$ 为保护间隔。重传项为 $\varrho$ 轮中耗时最长的可用时隙预留时间。
-[推导过程](docs/zh-CN/SCHEDULED_LINK.md#空口时间和时隙预算)解释各符号、展开控制开销，
-并列出现有固件参数。
+其中 $\lambda_\iota$ 为有效载荷大小，$\eta$ 为帧开销，$\sigma_\iota$ 为 DATA SF，$\delta$ 为保护时间。重试池按最长的合格时隙预留空间。完整假设与公式见[空口时间推导](docs/zh-CN/SCHEDULED_LINK.md#airtime-and-slot-budget)和[卡尔曼估计器](docs/zh-CN/SCHEDULED_LINK.md#loss-cause-aware-adr)。
 
-按每个样本 32 字节计算，其他 Client 均用 SF7 时，15 秒内最多可安排五个 SF9
-或两个 SF10 节点。两个 SF10 的组合在帧尾预留之外还剩 77 毫秒。
-覆盖距离和无线时序仍需实测。
-[容量与 SF10](docs/zh-CN/SCHEDULED_LINK.md#sf10-容量及更高-sf-选项) · [实验结果与 70 节点研究计划](docs/zh-CN/PROGRESS.md)
+<details>
+<summary>网关与客户端伪代码</summary>
+
+<img src="docs/research/figures/adaptive-algorithm-gateway.png" alt="网关服务单个活动组的伪代码" width="480">
+<img src="docs/research/figures/adaptive-algorithm-client.png" alt="客户端匹配授权和 ACK 位图的伪代码" width="480">
+
+[LaTeX 源文件](docs/research/figures/adaptive-algorithm.tex)
+
+</details>
+
+## 常见问题
+
+**这个项目用来做什么？** 在单个 LoRa 射频上为低速遥测安排传输时隙。研究面向能源监测，协议承载通用字节数据。
+
+**怎样借助 AI 接入其他系统？** 使用[集成提示词](docs/zh-CN/SCHEDULED_LINK.md#integration-prompt)，先明确载荷、确认语义、时序和测试，再编写适配层。
+
+项目原创代码采用 [GPL-3.0-only](LICENSE)。参见[第三方条款和发布义务](THIRD_PARTY.md)。

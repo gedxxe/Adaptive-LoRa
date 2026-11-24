@@ -29,6 +29,10 @@ adds the v3 research profile with up to eight clients, variable-length
 application payloads, aggregate feedback and shared retry slots. The v2
 single-client image remains available. The adaptive image uses wire version
 5 with frame-scoped DATA SF7–SF10 grants and fixed SF9 control.
+The opt-in `heltec_wifi_lora_32_V3_rotating` profile uses wire version 6
+and schedules up to eight of 128 registered IDs per frame. Keep its
+results distinct from the unauthenticated wire-v5 field baseline. A
+deployment candidate still requires authenticated control and DATA.
 Historical records retain their original hardware and results.
 
 ## Read before editing
@@ -163,9 +167,11 @@ pio run -e heltec_wifi_lora_32_V3
 pio run -e heltec_wifi_lora_32_V3_research
 pio run -e heltec_wifi_lora_32_V3_multiclient
 pio run -e heltec_wifi_lora_32_V3_adaptive
+pio run -e heltec_wifi_lora_32_V3_rotating
 pio test -e native
 pio test -e native_multiclient
 pio test -e native_adaptive
+pio test -e native_rotating -v
 python -m unittest discover -s tools -p test_capture_bench.py -v
 python -m unittest discover -s tools -p test_tdma_feasibility.py -v
 python -m unittest discover -s tools -p test_adr_shadow.py -v
@@ -205,6 +211,8 @@ PR #11 consolidated the manuals at `5ec1e7e6bf9839320cdd0ea6474b2b29d6d4980d`.
 
 Publish sanitized project files only. Exclude caches, binaries, credentials,
 local configuration, private backups and unlicensed research PDFs. Preserve
-third-party license references. Final report lists changed files and their roles,
+third-party license references. Project-authored code uses [GPL-3.0-only](LICENSE).
+Review the [third-party terms](THIRD_PARTY.md) before distributing firmware.
+Final report lists changed files and their roles,
 actual build/test evidence, behavior/compatibility, unresolved risks, physical
 checks performed, milestone state, next task and publication state.

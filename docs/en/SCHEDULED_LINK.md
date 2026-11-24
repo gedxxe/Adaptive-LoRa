@@ -268,11 +268,11 @@ enter this window.
 ```math
 \begin{aligned}
 \boldsymbol{\xi}^{\mathrm{loss}}_\iota
-  &\gets \operatorname{Tail}_{\nu_{\mathrm{obs}}}
+  &\gets \mathrm{Tail}_{\nu_{\mathrm{obs}}}
   \bigl(\boldsymbol{\xi}^{\mathrm{loss}}_\iota\mathbin{\|}e\bigr),
   & e=1 &\;\land\; \sum_j\xi^{\mathrm{loss}}_{\iota,j}\ge\nu_{\mathrm{up}},\\
 \boldsymbol{\chi}_\iota
-  &\gets \operatorname{Tail}_{\nu_{\mathrm{obs}}}
+  &\gets \mathrm{Tail}_{\nu_{\mathrm{obs}}}
   \bigl(\boldsymbol{\chi}_\iota\mathbin{\|}m_\iota\bigr),
   & m_\iota=1 &\;\land\; \sum_j\chi_{\iota,j}\ge\nu_{\mathrm{up}}.
 \end{aligned}
@@ -332,12 +332,36 @@ software windows. [LaTeX source](../research/figures/adaptive-algorithm.tex) · 
 
 ### Loss-cause-aware ADR
 
-The delivery-window rule is the default. Two build-time options use SNR
-estimates for the ordinary SF decision.
-`MARGIN_EWMA` tracks an exponential mean and variance. `MARGIN_KALMAN`
-tracks level and slope and projects both the level and its uncertainty one
-eligible report ahead. With no SNR in an eligible report, EWMA holds its
-estimate and Kalman predicts without a measurement update.
+#### Kalman estimator
+
+The [implementation](../../src/app/adr_policy.cpp) tracks SNR level $s$ in dB and its trend $\dot{s}$ in dB per eligible report. It prefers the SF9 Request SNR for $y_k$. If only accepted DATA SNR is available, it subtracts the provisional per-SF offset $b_\sigma$ to keep the observation on the Request scale.
+
+```math
+\begin{aligned}
+\boldsymbol{x}_k &= [s_k,\dot{s}_k]^{\mathsf T},
+& F&=\begin{bmatrix}1&1\\0&1\end{bmatrix},
+& H&=\begin{bmatrix}1&0\end{bmatrix},\\
+Q&=\begin{bmatrix}q_s&0\\0&q_{\dot{s}}\end{bmatrix},
+& R&=r,\\
+\boldsymbol{x}_k^- &= F\boldsymbol{x}_{k-1},
+& P_k^-&=FP_{k-1}F^{\mathsf T}+Q,\\
+e_k&=y_k-H\boldsymbol{x}_k^-,
+& \omega_k&=HP_k^-H^{\mathsf T}+R,\\
+K_k&=P_k^-H^{\mathsf T}/\omega_k,
+& \boldsymbol{x}_k&=\boldsymbol{x}_k^-+K_k e_k,\\
+P_k&=(I-K_kH)P_k^-,
+& \widehat{x}&=HF\boldsymbol{x}_k,\\
+\sigma_x^2&=H(FP_kF^{\mathsf T}+Q)H^{\mathsf T},
+& m_\sigma&=\widehat{x}+b_\sigma-\vartheta_\sigma-z\sigma_x .
+\end{aligned}
+```
+
+Here $P$ is the state covariance, $Q$ is the process noise, $R$ is the measurement variance, and $K_k$ weights the innovation $e_k$. The first finite observation initializes the level, zero trend and diagonal covariance $(r,p_{\dot s,0})$. If an eligible report has no finite SNR, use the prior $\boldsymbol{x}_k^-,P_k^-$ without a measurement correction. Absent and excluded reports do not advance the estimator. The implementation bounds slope variance and the forecast variance passed to the square root at zero. There is no explicit outlier rejection.
+
+The one-step forecast is per eligible report, including under rotation. A node outside the active group consumes no filter step. Reboot or idle reset discards the old estimate. The parameters are provisional and have not been calibrated for elapsed seconds. A wall-clock version would need $F_{12}=\Delta t$ in seconds, a matching time-dependent $Q(\Delta t)$, and recalibration against captures. The margin only informs the optional ADR rules. Any change still needs a fitting DATA reservation and must pass the trial and receipt rules. The delivery-window rule remains the default.
+
+`MARGIN_EWMA` tracks an exponential mean and variance. It holds its
+estimate when an eligible report has no finite SNR.
 
 An RSSI reading describes packet strength. A weak reading with good
 delivery can stay at its current SF. A strong reading can still coincide
@@ -395,6 +419,38 @@ threshold remains reachable. Field data are needed to calibrate the
 margins and weights. The [seeded simulator](../../tools/adr_sim.py) can
 shift policy thresholds with `--policy-snr-shift-db` while keeping the
 assumed channel fixed.
+
+## Rotating schedule
+
+Wire v6 is an opt-in, unencrypted research profile. It retains the 28-byte header, 96-byte frame limit, control at SF9 and per-Client DATA at SF7–SF10. The registry names `ADAPTIVE_LORA_REGISTERED_CLIENTS` consecutive usable IDs, skipping the Gateway ID. With Gateway 1 and the default registry of 128, these are IDs 2–129. Only the current roster is on air, with a separate Request and DATA opportunity per selected Client. The tuple (network ID, Gateway boot ID, frame ID) identifies each group and invalidates old Grants when a new Beacon is accepted.
+
+The [selector](../../src/common/protocol/multiclient_protocol.cpp) takes the longest prefix that fits, using the payload ceiling and the larger of the Client's desired and reserved DATA SF. It reserves Beacon, Requests, Grant, primary DATA, the longest eligible retry slots, feedback and guards. When an entry cannot fit, it starts the next group. A sweep ends at the end of the registry and restarts at its first ID. Off-roster Clients retain queued payloads. ADR history is indexed by Client ID, and idle timers and probe deadlines count that Client's own scheduled opportunities. Gateway restart clears this volatile state.
+
+For fixed profiles, a homogeneous group of size $\nu_g$ yields $\tau_{\mathrm{cycle}}=\lceil\nu/\nu_g\rceil\tau_{\mathrm{frame}}$. The table reports one sweep with a fixed 32-byte ceiling and a 15 s frame. These are scheduled opportunities computed with the production airtime functions. Changes in SF can shift the position of a node between sweeps. Delivery gaps can grow with missed Beacons, loss or outages.
+
+| Scheduled population | All SF7 | All SF8 | All SF9 | All SF10 |
+|---:|---:|---:|---:|---:|
+| 70 | 135 s | 135 s | 150 s | 360 s |
+| 84 | 165 s | 165 s | 180 s | 420 s |
+| 128 | 240 s | 240 s | 285 s | 645 s |
+
+### Authentication design and airtime
+
+A secure wire version must authenticate Beacon, Grant, ACK, Request and DATA before the receiver uses them. A shared group secret would let a compromised Client impersonate the Gateway. Two designs worth comparing are a 64-byte Gateway signature per control frame and a 16-byte pairwise tag for each listed Client. Signature verification works on every Client, even outside the current group. Pairwise tags use less space for groups smaller than four but require a verifier to know which tag applies.
+
+The host sensitivity check adds 16 bytes to every Request and DATA, then adds either signature or tag bytes to Beacon, Grant and each reserved bitmap. It keeps the original guard, retries and tail. At 32 bytes and DATA SF7/8/9/10, the signature design fits 8/7/4/2 per frame, while pairwise tags fit 8/6/4/2. Both project 240 s at SF7 and 960 s at SF10 for 128 Clients. These are airtime projections. Extra session traffic, CPU time, key management, actual radio service gaps and RF loss still require tests.
+
+For the secure implementation, encrypt uplink bodies with AES-128-CCM and a 16-byte tag under a unique per-Client key. Keep routing fields visible and authenticate them as associated data. Use a Gateway signing key for group origin and pin its verification key per network. Budget signing and verification latency before choosing the group policy. [NIST CCM specification](https://csrc.nist.gov/pubs/sp/800/38/c/upd1/final).
+
+Bind freshness to an authenticated session with a durable sender epoch, a monotonic frame counter and separate message domains. Commit the next epoch before enabling TX, fail closed on missing credentials or counter failure, bind Grant and ACK to the current session, and replay only identical cached ciphertext for retries. A reset or flash restore must never reuse a key and nonce pair. Credential revocation, provisioning, cold-boot replay, backup rollback and timing on the ESP32-S3 remain open. Wire v6 still permits forged control and data, reveals payloads and offers no cryptographic replay protection.
+
+## Integration prompt
+
+Use this prompt after checking the local code and the target system's license:
+
+> Read this repository's engineering contract, protocol and setup guide. Audit the target firmware and identify where sampled bytes originate and where received bytes are consumed. State the target's Client count, maximum payload length, report interval, acceptable delivery gap, and permitted RF profile. Check these against the active scheduler and the authentication status. Propose a versioned binary payload with explicit length, byte order, units, timestamp and stable sample identity.
+>
+> Keep application dependencies outside the protocol. Use `FirmwareRuntime::submitPayload` and handle `QUEUED`, `BUSY`, `TOO_LARGE`, and `INACTIVE`. The single pending sample is retained between groups. Copy received bytes before the synchronous `PayloadPort::Receiver` returns and decide whether the local application accepted them. An ACK confirms that callback accepted the packet. If downstream storage needs a guarantee, define a separate idempotent acknowledgment. Account for resets, unknown delivery, queue overflow, and version mismatches. Include byte fixtures and host tests for retries and loss. Preserve the comparison firmware, avoid secrets and private data in logs or Git, and separate build, simulation, and physical results in the final report.
 
 ## Board reference
 

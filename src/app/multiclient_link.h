@@ -9,8 +9,13 @@ class MulticlientLink {
 public:
     using BootIdSource = uint32_t (*)(uint32_t);
     MulticlientLink(const DeviceConfig& config, RadioTransport& radio, SerialLogger& log,
+#if defined(ADAPTIVE_LORA_ROTATING)
+                    PayloadPort& payload, BootIdSource bootId, uint16_t registered, uint8_t payloadCeiling,
+                    bool adaptDataSf = multiclient::kAdaptive, AdrRule adrRule = kFirmwareAdrRule);
+#else
                     PayloadPort& payload, BootIdSource bootId, multiclient::Roster roster = {},
                     bool adaptDataSf = multiclient::kAdaptive, AdrRule adrRule = kFirmwareAdrRule);
+#endif
     void update(uint64_t now, const RadioEvent& event, bool allowTx = true);
     MulticlientTelemetry telemetry() const;
     bool safeToRefreshDisplay(uint64_t now, uint32_t stepBudgetUs) const;
@@ -46,6 +51,11 @@ private:
     void invalidatePrimaryRx(uint64_t at);
     bool prepareSf(uint8_t sf, uint64_t now);
     void admitProfiles();
+    size_t adrIndex(uint8_t slot) const;
+    uint32_t opportunity(uint8_t slot) const;
+#if defined(ADAPTIVE_LORA_ROTATING)
+    bool selectGroup();
+#endif
     void logAdrFields(char* buffer, size_t size, uint8_t index, const AdrObservation& obs, const AdrReview& review) const;
 
     DeviceConfig config_;
@@ -58,7 +68,14 @@ private:
     multiclient::Roster roster_;
     multiclient::Plan plan_;
     Received received_[multiclient::kMaxClients]{};
+#if defined(ADAPTIVE_LORA_ROTATING)
+    multiclient::Rotation rotation_;
+    const uint8_t payloadCeiling_;
+    AdrState adr_[multiclient::kPopulationLimit]{};
+    uint32_t opportunities_[multiclient::kPopulationLimit]{};
+#else
     AdrState adr_[multiclient::kAdaptive ? multiclient::kMaxClients : 1]{};
+#endif
     Frame data_{};
     Phase phase_ = Phase::WAIT;
     uint8_t round_ = 0;

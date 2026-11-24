@@ -2462,3 +2462,60 @@ files under `logs/test/`.
   `logs/test/iteration-034-verification.log`. Real RF, persistence and
   retune timing were not measured. Confirm the flashed commit and
   policy revision before the next run and capture both roles.
+
+## Iteration 035 — Group rotation and release assessment, 2026-11-24 to 2026-11-25
+
+- Started `codex/release-candidate-scalable-secure` from
+  `89b7de3289f657b3d1125d3060cf4f1ae0ed29d2`. The firmware remains
+  `0.2.0-alpha.1`. Wire v5 stays the default and wire v6 adds an opt-in
+  rotating schedule. The v1, v2 and v3 comparison profiles remain
+  available. NVS schema 1, 915 MHz PHY, DATA SF7–SF10, SF9 control,
+  CR4/5, 22 dBm TX request and the example sample settings are unchanged.
+- `multiclient_protocol` selects the largest feasible contiguous group.
+  `MulticlientLink` retains state per registered Client and advances ADR
+  timers and retry priority on local service opportunities.
+  `FirmwareRuntime` validates registration before radio startup and
+  reports the new profile. A Client retains pending bytes outside its
+  group and the display reports `GROUP WAIT` while Beacons arrive.
+  `main.cpp` remains a 15-line setup/loop delegate.
+- `pio run -e` for `heltec_wifi_lora_32_V3`, the `_research`,
+  `_multiclient`, `_adaptive`, and `_rotating` variants returned 0.
+  The rotating image used 43,928 B static RAM and 394,668 B flash.
+  Runtime stack/heap were not measured. Rotating `firmware.bin` SHA-256:
+  `a53a253c8543a00b5c11e35f506249bd9656f85301e854a995420d1b7846b5af`.
+  PlatformIO 6.1.19 resolved Espressif32 55.3.311, Arduino ESP32 3.3.11,
+  SDK libs 5.5.5+sha.b774170ff46, Xtensa 14.2.0+20260121, esptool 5.3.0,
+  and RadioLib 7.8.1. See `logs/build/iteration-035-build.log`.
+- `pio test -e native`, `native_multiclient`, `native_adaptive`, and
+  `native_rotating -v` returned 0 for 356, 15, 46 and 8 cases respectively.
+  The rotating suite checks all requested logical population sizes,
+  registry wrap and budget cuts, malformed and v5 schedule rejection,
+  Client 129 waiting, loss of Beacon or ACK, and per-ID ADR isolation.
+  The focused rotating retest returned 0 after changing retry priority.
+  See `logs/test/iteration-035-native.log` and
+  `logs/test/iteration-035-native-rotate-final.log`.
+- Python unittest discovery under `tools` ran `test_capture_bench.py` (15),
+  `test_tdma_feasibility.py` (16), `test_adr_shadow.py` (7),
+  `test_model_multiclient.py` (6), `test_check_consistency.py` (20)
+  and `test_adr_sim.py` (2). The verified run returned 0 for all suites
+  and for `python tools/check_consistency.py`. Local paths were replaced
+  and trailing whitespace trimmed in saved outputs. See
+  `logs/test/iteration-035-python-final.log`.
+- `python tools/adr_sim.py --seed 42` returned 0. Added a paired fixed-SF7
+  reference and first-attempt delivery and attempt counts. Results in
+  `logs/test/iteration-035-model-fixed.log` use 128 trials of 480 frames for
+  each single-Client policy/scenario/rate cell. They assume ideal control
+  and do not evaluate correlated loss under a rotating schedule.
+- Reviewed the private technical critique against the code. It raised
+  rotation, authentication, replay, control airtime and measured
+  baselines. The rotating plan includes all four feedback windows.
+  The model budgets Gateway signatures or pairwise tags and uplink tags.
+  The installed ESP32-S3 SDK includes Mbed TLS CCM and ECDSA symbols.
+  There is no implemented secure wire, key workflow or authenticated
+  reboot recovery in this iteration. No physical measurements or
+  provisioning writes were performed.
+- Rewrote the bilingual README and setup guidance, added original SVGs,
+  fixed GitHub equation syntax and documented Kalman and the generic
+  payload boundary. Added the full GPLv3 text for project-authored code.
+  Verify contributor rights and linked SDK redistribution obligations
+  before distributing firmware binaries.

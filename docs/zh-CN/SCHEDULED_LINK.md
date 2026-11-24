@@ -22,6 +22,8 @@ Grant 空项长度为 `0xFF`，boot ID 和 SF 为零。解码器检查长度、�
 重传使用授权 SF。旧自适应解码器会丢弃包含 SF10 的整个 Grant，因此空口版本 5 要求
 Gateway 和所有 Client 一起升级。
 
+<a name="airtime-and-slot-budget"></a>
+
 ## 空口时间和时隙预算
 
 $\lambda$ 是送入 LoRa 调制器的字节数，不含调制器添加的物理层头和 CRC。
@@ -229,11 +231,11 @@ $m_\iota=1$ 表示此时也没有收到 DATA。符合条件的 DATA 交付记零
 ```math
 \begin{aligned}
 \boldsymbol{\xi}^{\mathrm{loss}}_\iota
-  &\gets \operatorname{Tail}_{\nu_{\mathrm{obs}}}
+  &\gets \mathrm{Tail}_{\nu_{\mathrm{obs}}}
   \bigl(\boldsymbol{\xi}^{\mathrm{loss}}_\iota\mathbin{\|}e\bigr),
   & e=1 &\;\land\; \sum_j\xi^{\mathrm{loss}}_{\iota,j}\ge\nu_{\mathrm{up}},\\
 \boldsymbol{\chi}_\iota
-  &\gets \operatorname{Tail}_{\nu_{\mathrm{obs}}}
+  &\gets \mathrm{Tail}_{\nu_{\mathrm{obs}}}
   \bigl(\boldsymbol{\chi}_\iota\mathbin{\|}m_\iota\bigr),
   & m_\iota=1 &\;\land\; \sum_j\chi_{\iota,j}\ge\nu_{\mathrm{up}}.
 \end{aligned}
@@ -267,11 +269,39 @@ SF，但仍没有 ACK 回执，也可按相同期限和预算试用该 SF。预�
 同步无线调用仍可能
 超出软件时序窗口。[LaTeX 源文件](../research/figures/adaptive-algorithm.tex) · [运行时代码](../../src/app/multiclient_link.cpp) · [已知时序风险](../en/ERROR_LOG.md)
 
+<a name="loss-cause-aware-adr"></a>
+
 ### 按丢包情况调整
 
-默认采用交付窗口规则。两种构建选项使用 SNR 估计做常规 SF 决策。`MARGIN_EWMA` 跟踪指数加权均值与方差。
-`MARGIN_KALMAN` 同时跟踪 SNR 水平与变化趋势，并预测下一条有效记录的 SNR 及不确定度。
-有效记录缺少 SNR 时，EWMA 保留估计值，Kalman 只做预测。
+#### 卡尔曼估计器
+
+[代码](../../src/app/adr_policy.cpp)跟踪 SNR 电平 $s$（dB）及其变化趋势 $\dot{s}$（dB／有效报告）。观测 $y_k$ 优先使用 SF9 Request 的 SNR。只有已接收 DATA 的 SNR 时，减去各 SF 暂定偏移 $b_\sigma$，统一到 Request 的观测尺度。
+
+```math
+\begin{aligned}
+\boldsymbol{x}_k &= [s_k,\dot{s}_k]^{\mathsf T},
+& F&=\begin{bmatrix}1&1\\0&1\end{bmatrix},
+& H&=\begin{bmatrix}1&0\end{bmatrix},\\
+Q&=\begin{bmatrix}q_s&0\\0&q_{\dot{s}}\end{bmatrix},
+& R&=r,\\
+\boldsymbol{x}_k^- &= F\boldsymbol{x}_{k-1},
+& P_k^-&=FP_{k-1}F^{\mathsf T}+Q,\\
+e_k&=y_k-H\boldsymbol{x}_k^-,
+& \omega_k&=HP_k^-H^{\mathsf T}+R,\\
+K_k&=P_k^-H^{\mathsf T}/\omega_k,
+& \boldsymbol{x}_k&=\boldsymbol{x}_k^-+K_k e_k,\\
+P_k&=(I-K_kH)P_k^-,
+& \widehat{x}&=HF\boldsymbol{x}_k,\\
+\sigma_x^2&=H(FP_kF^{\mathsf T}+Q)H^{\mathsf T},
+& m_\sigma&=\widehat{x}+b_\sigma-\vartheta_\sigma-z\sigma_x .
+\end{aligned}
+```
+
+$P$ 为状态协方差，$Q$ 为过程噪声，$R$ 为测量方差，$K_k$ 对新息 $e_k$ 加权。首个有限观测初始化电平、零趋势和对角协方差 $(r,p_{\dot s,0})$。某次有效报告没有有限的 SNR 时，采用先验 $\boldsymbol{x}_k^-,P_k^-$，跳过测量校正。缺席和排除的报告不推进滤波。实现将趋势方差与开方前的预测方差下限设为零。目前没有专门的异常值剔除。
+
+轮换配置也按有效报告预测下一步。活动组以外的节点不消耗滤波步数。重启或空闲重置会丢弃旧估计。参数尚未按实际秒数校准。若改用实际时间，需把 $F_{12}=\Delta t$ 改为秒，配套推导 $Q(\Delta t)$ 并用采集数据重新校准。裕量只用于可选的 ADR 策略，切换仍需通过时隙预算、试探和回执检查。默认继续使用交付窗口策略。
+
+`MARGIN_EWMA` 跟踪指数加权均值与方差。有效报告缺少有限 SNR 时保留估计值。
 
 RSSI 描述接收包的强度。RSSI 低但交付正常时可继续使用当前 SF；RSSI 高也可能同时出现
 低 SNR 和丢包。固件记录 RSSI、SNR 与交付结果供诊断，单个 RSSI 读数无法触发试用。
@@ -311,6 +341,42 @@ RSSI 描述接收包的强度。RSSI 低但交付正常时可继续使用当前 
 编译时检查 $S_{\mathrm{up}}(1-\rho)<w_{\mathrm{loss}}$，确保分数可以达到门限。
 余量与权重仍须现场标定。[定种子模拟器](../../tools/adr_sim.py) 的 `--policy-snr-shift-db`
 可单独调整策略门限，同时保持假定信道不变。
+
+<a name="rotating-schedule"></a>
+
+## 轮换调度
+
+空口 v6 是可选的明文研究配置。它保留 28 字节帧头、96 字节帧长上限、SF9 控制与逐客户端的 DATA SF7–SF10。配置 `ADAPTIVE_LORA_REGISTERED_CLIENTS` 后，登记表依次分配可用 ID，跳过网关 ID。网关为 1 且登记上限为 128 时，客户端 ID 为 2–129。每帧只广播当前名单，为选中的每个客户端分别安排 Request 和 DATA。网络 ID、网关启动 ID 和帧 ID 联合标识当前组。接收新的信标后，旧授权失效。
+
+[选择器](../../src/common/protocol/multiclient_protocol.cpp)取能满足时限的最长连续名单，按载荷上限和期望、预留两者中更高的 DATA SF 计算。预算包含信标、Request、Grant、首轮 DATA、最长的合格重试时隙、反馈和保护时间。放不下的节点排在下一组首位。每轮到达表尾后从头开始。组外客户端保留待发送数据。ADR 状态按客户端 ID 索引，空闲与试探期限按该客户端自己的服务机会计算。网关重启会清空这些易失状态。
+
+参数固定且每组容量为 $\nu_g$ 时，$\tau_{\mathrm{cycle}}=\lceil\nu/\nu_g\rceil\tau_{\mathrm{frame}}$。下表按 32 字节上限与 15 秒帧计算一轮的服务机会，复用固件的空口计算。SF 变化可能改变节点在下轮的位置。漏收信标、丢包和停机会拉长成功交付间隔。
+
+| 登记节点数 | 全部 SF7 | 全部 SF8 | 全部 SF9 | 全部 SF10 |
+|---:|---:|---:|---:|---:|
+| 70 | 135 秒 | 135 秒 | 150 秒 | 360 秒 |
+| 84 | 165 秒 | 165 秒 | 180 秒 | 420 秒 |
+| 128 | 240 秒 | 240 秒 | 285 秒 | 645 秒 |
+
+### 认证设计和空口开销
+
+安全版本需要在使用 Beacon、Grant、ACK、Request 和 DATA 前先认证。共享组密钥会让被攻破的客户端冒充网关。对比两种方案：每条控制帧附 64 字节网关签名，或为名单中每个节点附 16 字节独立认证标签。签名也可由组外客户端验证。分组少于四个节点时，独立标签更短，但验证方需要知道对应的标签位置。
+
+主机模型给每个 Request 和 DATA 增加 16 字节，再给信标、授权与各轮预留位图增加签名或标签开销。保护时间、重试和帧尾保持一致。32 字节、DATA SF7/8/9/10 时，签名方案每帧可容纳 8/7/4/2 个客户端，独立标签为 8/6/4/2。128 节点时，两者在全 SF7 下均计算为 240 秒，全 SF10 为 960 秒。这些是空口时间推算。额外会话流量、CPU 时间、密钥管理、实际调度间隔和射频丢包仍需测试。
+
+安全版本拟采用每客户端独立密钥的 AES-128-CCM，给上行载荷加密并生成 16 字节认证标签。路由字段保持可见并作为附加数据参与认证。组播来源通过网关密钥签名来证明，客户端预置相应公钥。选定方案之前还需测量签名与验证时间。[NIST CCM 标准](https://csrc.nist.gov/pubs/sp/800/38/c/upd1/final)。
+
+将新鲜度绑定到认证会话、持久发送纪元、递增帧计数和独立报文域。发射前先持久化下一纪元，缺少凭据或计数故障时停发，Grant 和 ACK 绑定当前会话，仅重发原缓存密文。复位或恢复备份后不得重用同一密钥和 nonce。凭据吊销、配置、冷启动重放、备份回退和 ESP32-S3 时序仍待验证。空口 v6 的控制与数据可以被伪造，载荷明文可读，缺少密码学重放防护。
+
+<a name="integration-prompt"></a>
+
+## 集成提示词
+
+先核对本地代码和目标系统的许可，再使用以下提示词：
+
+> 阅读本仓库的工程契约、协议和设置指南。审查目标固件，找出样本来源与接收数据的消费点。列出客户端数量、载荷上限、上报间隔、可接受交付间隔和获准使用的射频配置，对照调度与认证状态验证。提出带版本号的二进制载荷，明确长度、字节序、单位、时间戳和稳定样本标识。
+>
+> 应用依赖留在协议之外。用 `FirmwareRuntime::submitPayload` 提交数据并处理 `QUEUED`、`BUSY`、`TOO_LARGE` 和 `INACTIVE`。单份待发样本跨组保留。同步 `PayloadPort::Receiver` 返回前复制所需字节，并返回应用是否接收。ACK 表示回调已接收报文。下游持久化若需要保证，另行定义幂等确认。同时考虑重启、交付未知、队列溢出和版本不匹配。添加字节级样例及重试、丢失的主机测试，保留对照固件，避免在日志或 Git 写入密钥与私有数据，分别报告编译、仿真和实测结果。
 
 ## 板卡参考
 

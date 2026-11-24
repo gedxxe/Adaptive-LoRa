@@ -41,6 +41,8 @@ Get-FileHash -Algorithm SHA256 -LiteralPath (Join-Path $dir 'flash-a.bin'), (Joi
 范围。ESP32 SDK 可能在应用启动前格式化 NVS。保留同板私有恢复计划。
 见[错误记录 ERR-023](../en/ERROR_LOG.md)。
 
+<a name="flash-and-set-roles"></a>
+
 ## 烧录并设置角色
 
 关闭已打开的串口监视器，将 `COMx` 替换为实测端口。各参与板使用同一个自适应镜像。
@@ -89,7 +91,9 @@ Client 2 的首个样本为 `ID=0002|SEQ=0001|MSG=HELLO WORLD`。ID 和序号均
 启动后序号从 1 开始，每次有新样本入队时递增，到 `FFFF` 后回绕。DATA 帧携带恰好 32 字节
 ASCII，不带字符串结束符或换行符。重传沿用相同字节和包标识。
 
-## 双板检查与走测
+<a name="双板检查与走测"></a>
+
+## 检查交付和链路恢复
 
 1. Client 2 与 Gateway 近距运行至少五个完整帧。核对同一帧的 Gateway `APP_PAYLOAD` 和 Client
    `V3_PAYLOAD_RESULT,result=accepted`。检查 Gateway 的 `bytes=32` 和十六进制载荷，再查看
@@ -108,7 +112,7 @@ ASCII，不带字符串结束符或换行符。重传沿用相同字节和包标
 SF9 控制交互是否继续。若未获得 SF10，核对是预算不足（`adr=recovery_budget` 或 `adr=budget_limited`），还是
 控制链路丢失（`SEARCH` 或 Request/Grant 缺失）。这一检查与静态验收分开进行。
 
-**单人走测。** Client 各页顶行的 `TX SF8 CR4/5` 表示最近一次 DATA 已在 SF8
+**在测点读取屏幕。** Client 各页顶行的 `TX SF8 CR4/5` 表示最近一次 DATA 已在 SF8
 启动发送。切回 SF9 收控制帧后仍保留该读数。第二页的 `ACKED DATA SF` 只在收到匹配
 ACK 后更新。到达测点后记下这两个值及第一页的 AGE。Client 的 AGE 从最近一次有效
 Grant 或位图算起，断联后仍会保留上一次的 TX 值。`SEARCH` 表示正在等待新 Beacon。
@@ -142,6 +146,23 @@ cmd /d /c 'set PLATFORMIO_BUILD_SRC_FLAGS=-DADAPTIVE_LORA_FIXED_SF_COMPARISON&&s
 ```powershell
 cmd /d /c 'set PLATFORMIO_BUILD_SRC_FLAGS=-DADAPTIVE_LORA_ADR_RULE=1&&set PLATFORMIO_BUILD_DIR=.pio/adr-ewma&&pio run -e heltec_wifi_lora_32_V3_adaptive -t upload --upload-port COMx'
 ```
+
+## 测试轮换配置
+
+所有网关与客户端使用同一构建。
+
+```sh
+pio run -e heltec_wifi_lora_32_V3_rotating
+pio run -e heltec_wifi_lora_32_V3_rotating -t upload --upload-port COMx
+```
+
+使用实际端口和上文的[角色命令](#flash-and-set-roles)。在 `status` 中确认
+`protocol=6` 与 `profile=rotating`。网关 ID 为 1 时，默认登记的客户端 ID 为 2–129。
+小规模轮换测试可在所有板卡的构建配置中调整 `ADAPTIVE_LORA_REGISTERED_CLIENTS`。
+默认登记表中的 ID 2 和 10 可测试不同组。至少记录两轮。组外显示 `GROUP WAIT` 和
+`BEACON SYNC` 属于正常情况。`SEARCH` 表示未能按时收到信标。仅使用合成数据。
+[轮换模型](SCHEDULED_LINK.md#rotating-schedule)给出预期调度，交付间隔从实际记录测量。
+规模较大时，在网关记录全部交付事件，并用采集工具的八个客户端端口抽查不同组的链路。
 
 ## 保存结果
 

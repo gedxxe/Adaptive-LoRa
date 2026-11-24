@@ -5,17 +5,18 @@
 <!-- current-state:start -->
 | Check | Result |
 |---|---|
-| Firmware / protocol | `0.2.0-alpha.1` / `5` |
+| Firmware / protocol | `0.2.0-alpha.1` / `5` (default) · `6` (rotation) |
 | Board | Heltec WiFi LoRa 32 V3.4, ESP32-S3/SX1262 |
 | Adaptive image | `heltec_wifi_lora_32_V3_adaptive`, ESP32 build passed. Native cases 46/46, including all three ADR rules. |
+| Rotating image | `heltec_wifi_lora_32_V3_rotating`, ESP32 build passed, 8/8 native cases. Authenticated wire and physical tests pending. |
 | Fixed-SF image | `heltec_wifi_lora_32_V3_multiclient`, ESP32 build passed, 15/15 runtime cases |
-| Shared tests | 356/356 native and 65/65 Python cases passed |
+| Shared tests | 356/356 native and 66/66 Python cases passed |
 | Toolchain | PlatformIO 6.1.19, Espressif32 55.3.311, Arduino ESP32 3.3.11, Xtensa 14.2.0+20260121, RadioLib 7.8.1 |
 | Field test | Walk test and radio timing measurements pending |
 <!-- current-state:end -->
 
-The operator reported SF adaptation through SF10 on an earlier one-pair
-walk. The current 32 B profile still needs a field run.
+The operator reported SF adaptation through SF10 in an earlier two-board
+range trial. The current profiles still need field tests with 32 B samples.
 
 | Claim | Verification |
 |---|---|
@@ -48,12 +49,13 @@ per scenario, rate and rule. The model assumes one Client, perfect SF9
 control, independent per-attempt interference and a provisional decode
 curve. Loss is measured after up to four DATA attempts.
 
-| Selected model scenario | Delivery window | EWMA | Kalman |
-|---|---:|---:|---:|
-| 20% independent interference, time above reference SF | 78.54% | 0.06% | 0.06% |
-| Same case, final loss | 0.174% | 0.179% | 0.179% |
-| 9 dB blockage with 10% interference, mean time to reference SF | 59.2 s | 81.1 s | 81.1 s |
-| Same blockage case, final loss | 0.618% | 0.802% | 0.802% |
+| Selected model scenario | Fixed SF7 | Delivery window | EWMA | Kalman |
+|---|---:|---:|---:|---:|
+| 20% independent interference, time above reference SF | 0% | 78.54% | 0.06% | 0.06% |
+| Same case, final loss | 0.179% | 0.174% | 0.179% | 0.179% |
+| 9 dB blockage with 10% interference, mean time to reference SF | Never reached | 59.2 s | 81.1 s | 81.1 s |
+| Same blockage case, final loss | 32.196% | 0.618% | 0.802% | 0.802% |
+| Same blockage case, mean attempts per report | 2.057 | 1.137 | 1.183 | 1.183 |
 
 The reference is the lowest SF that meets the model's provisional 50%
 decode threshold. Each policy starts the synthetic blockage with fresh
@@ -77,6 +79,7 @@ exercise timing faults and peer traffic.
 | Use | PlatformIO environment | Wire version |
 |---|---|---:|
 | Adaptive field test and PlatformIO default | `heltec_wifi_lora_32_V3_adaptive` | 5 |
+| Rotation study with up to 128 registered IDs | `heltec_wifi_lora_32_V3_rotating` | 6 |
 | Earlier fixed-SF comparison | `heltec_wifi_lora_32_V3_multiclient` | 3 |
 | Single-Client TDMA comparison | `heltec_wifi_lora_32_V3_research` | 2 |
 | HELLO/ACK comparison | `heltec_wifi_lora_32_V3` | 1 |
@@ -88,56 +91,18 @@ fixed-SF image also changes the control PHY and frame timing.
 `PROTOCOL_VERSION` tracks the HELLO/ACK image. The other wire versions
 are selected by the build. All images share `VERSION` and NVS schema 1.
 
-## Research target for 70 Clients
+<a name="research-target-for-70-clients"></a>
 
-Test when a single half-duplex radio can keep low-rate telemetry fresh.
-The target is 70 Clients per Gateway with a 2–5 minute reporting interval.
-The running firmware serves a single roster of eight positions. For a
-future rotation at 32 B and 15 s per group, the model gives one scheduled
-opportunity per Client every 135 s with eight SF7 or SF8 positions per group,
-150 s with seven SF9 positions, and 360 s with three SF10 positions.
-Mixed groups depend on their SF reservations. Loss, retry contention,
-outages, and sample generation can increase the gap between fresh readings.
+## Extended Client capacity
 
-```math
-\tau_{\mathrm{cycle}}=\left\lceil\frac{\nu}{\nu_{\mathrm{group}}}\right\rceil\tau_{\mathrm{frame}},
-\qquad
-\Delta_{\iota,\jmath}=\tau^{\mathrm{rx}}_{\iota,\jmath}-\tau^{\mathrm{rx}}_{\iota,\jmath-1}.
-```
+The wire-v6 scheduler supports a registry of 128 Clients. One radio serves up to eight per frame and may select fewer when DATA uses more airtime. At a 32-byte ceiling, the production selector schedules 70, 84 and 128 homogeneous nodes across the periods in the [capacity table](SCHEDULED_LINK.md#rotating-schedule). Security adds overhead. For example, the modeled 128-node case at SF10 goes from 645 s to 960 s once authenticated framing is budgeted. The secure framing is still a design.
 
-$\nu$ is the population, $\nu_{\mathrm{group}}$ the active group limit,
-and $\Delta_{\iota,\jmath}$ the gap between accepted readings for Client
-$\iota$. A candidate also has to meet the allowed Gateway transmit airtime
-over the applicable interval. Rotating unchanged frames spreads access
-across Clients while the Gateway still pays control airtime per group.
-With modeled SF10 control, homogeneous DATA SF9 and SF10 groups shrink to
-four and two respectively. Rotation stretches to 270 s and 525 s in those
-cases, before losses. This reinforces keeping SF9 control for the current profile.
+The 5–10 minute objective is a service interval for suitable SF distributions. A delivered report additionally requires SF9 control coverage, successful DATA and the relevant feedback. Measure the longest gap for each node and report the conditions behind any missed deadline.
 
-1. Measure timing, first-pass and final delivery, retry count, and the
-   per-Client gap between accepted readings on 1, 4, then 8 boards plus
-   the Gateway. Use multiple independent runs and report the worst node
-   as well as run-level intervals. Add synchronized sample timestamps
-   before reporting age of information.
-2. Model group rotation with per-Client SF and payload limits. Test
-   off-roster waiting, state preservation across groups, fairness, and
-   recovery before changing the protocol. Validate 70 logical identities
-   separately from 70 independent RF links. Evaluate SF11–SF12 with LDRO
-   only with revised airtime and measured transition budgets.
-3. Compare matched single-radio fixed-SF TDMA and contention baselines on
-   the same Heltec hardware. Isolate the admission policy, retry pool and
-   the cost of per-frame Request/Grant against persistent slots. Treat
-   concentrator results as simulations unless a physical comparator is run.
-
-Before an unattended pilot, design authenticated frames and replay
-protection, watchdog recovery with fault injection, and application-level
-deduplication and buffered telemetry. CRC and boot/frame IDs do not
-authenticate traffic. A single radio and one channel leave common-mode
-outage and external interference. Antenna orientation and placement, loss
-across shifts, SF probe thresholds and the delivery cost of the 28 B header
-need field data. The current profile is for controlled
-testing under an authorized RF setup. Set publication claims after the
-measurements and match venue scope and disclosure rules at submission.
+1. Capture repeated runs with 1, 4 and 8 physical Clients and one Gateway. Record first-attempt and final delivery, retransmissions, shared-retry use, SF changes, timing faults, reset recovery and per-Client arrival gaps. Keep sampling timestamps if reporting age of information.
+2. Compare fixed SF7, the delivery-window policy, EWMA and Kalman using the same traffic, loss, control and airtime assumptions. The existing model uses one Client and ideal control. Extend it to correlated losses, blocked links and group rotation before drawing conclusions at 70–128 nodes.
+3. Prototype authenticated control and encrypted DATA, then remeasure frame margins and Gateway transmit airtime. Test credential provisioning, restart, replay, RF interference and backup restoration before a deployment decision. Treat a single Gateway failure as a network outage.
+4. Compare against matched scheduling and contention baselines before making a capacity claim. Record the antenna pattern and traffic assumptions. Directional coverage from a Moxon and concurrent reception on a concentrator describe different deployment conditions.
 
 ## Past work
 

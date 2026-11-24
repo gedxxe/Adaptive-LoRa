@@ -51,7 +51,7 @@ struct BitmapTelemetry {
     uint8_t retries = 0;
 };
 
-enum class ClientScheduleIssue : uint8_t { NONE, REQUEST_TX, NO_GRANT, NO_DATA_TX };
+enum class ClientScheduleIssue : uint8_t { NONE, REQUEST_TX, NO_GRANT, NO_DATA_TX, GROUP_WAIT };
 
 struct MulticlientTelemetry {
     LastReception peer;

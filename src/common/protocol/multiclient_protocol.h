@@ -10,7 +10,12 @@ constexpr bool kAdaptive = true;
 constexpr bool kAdaptive = false;
 #endif
 // Earlier adaptive clients discard the entire Grant if it has an SF10 entry.
+#if defined(ADAPTIVE_LORA_ROTATING)
+static_assert(kAdaptive, "Rotating schedules require the adaptive profile");
+constexpr uint8_t kWireVersion = 6;
+#else
 constexpr uint8_t kWireVersion = kAdaptive ? 5 : kVersion;
+#endif
 constexpr uint8_t kBaseSf = phy::dataSf;
 constexpr uint8_t kControlSf = kAdaptive ? phy::controlSf : kBaseSf;
 constexpr uint8_t kMaxClients = 8;
@@ -89,6 +94,27 @@ constexpr uint32_t requestStart(uint8_t index) {
 constexpr uint32_t grantStart(uint8_t count) { return requestStart(count) + kSlotGuardUs; }
 uint32_t reservationUs(const Plan& plan);
 uint32_t requiredPeriodUs(const Roster& roster);
+
+#if defined(ADAPTIVE_LORA_ROTATING)
+constexpr uint16_t kPopulationLimit = 128;
+// Map a stable registry position to a unicast ID, leaving out the Gateway ID.
+constexpr uint16_t registeredId(uint16_t position, uint16_t gateway) {
+    return position + (position + 1 >= gateway ? 2 : 1);
+}
+constexpr uint16_t registryPosition(uint16_t id, uint16_t gateway) {
+    return id - (id > gateway ? 2 : 1);
+}
+constexpr bool registeredClient(uint16_t id, uint16_t gateway, uint16_t count) {
+    return id && id != gateway && registryPosition(id, gateway) < count;
+}
+
+struct Rotation {
+    uint16_t count;
+    uint16_t next = 0;
+
+    Roster select(uint16_t gateway, uint8_t budget, const uint8_t* profiles);
+};
+#endif
 uint8_t retryMask(uint8_t eligible, uint8_t count, uint32_t frame, uint8_t round);
 bool launchWindow(uint64_t now, uint64_t start);
 bool receiveWindow(uint64_t now, uint64_t start, uint32_t air);

@@ -5,6 +5,13 @@ changes. It is not a substitute for the append-only build memory.
 
 ## Unreleased
 
+### Registered Client rotation
+
+- Added opt-in wire v6 scheduling for up to 128 registered IDs and up to eight active Clients per 15 s frame.
+- The Gateway retains per-ID ADR state across groups. A Client keeps its pending sample and shows `GROUP WAIT` until selected.
+- Added production-scheduler capacity checks and an authentication airtime study. Wire v6 still carries plaintext and the default firmware remains wire v5.
+- Added GPLv3 for project-authored code, updated both manuals, and corrected GitHub math rendering.
+
 ### Temporary airtime reservations for all DATA SF increases
 
 - Release the extra airtime on failed, denied, or expired SF trials.

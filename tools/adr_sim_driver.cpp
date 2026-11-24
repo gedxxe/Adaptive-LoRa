@@ -21,13 +21,17 @@ static_assert(sizeof(channelSnr50Db) / sizeof(float) == phy::maxDataSf - phy::da
 
 struct Counts {
     unsigned above = 0;
+    unsigned first = 0;
+    unsigned attempts = 0;
     unsigned lost = 0;
     unsigned changes = 0;
     unsigned reactions = 0;
     unsigned reactionFrames = 0;
 };
 
-void run(Counts& counts, uint32_t seed, AdrRule rule, unsigned frames, float interference, bool blockage,
+struct Profile { bool adaptive; AdrRule rule; };
+
+void run(Counts& counts, uint32_t seed, Profile profile, unsigned frames, float interference, bool blockage,
          const AdrParams& params) {
     std::mt19937 generator(seed);
     std::uniform_real_distribution<float> chance(0.0f, 1.0f);
@@ -63,16 +67,19 @@ void run(Counts& counts, uint32_t seed, AdrRule rule, unsigned frames, float int
         const float margin = trueSnr - channelSnr50Db[sf - phy::dataSf];
         const float decodeChance = 1.0f / (1.0f + std::exp(-margin / decodeTransitionDb));
         unsigned success = kAttempts;
-        // Draw every attempt to keep the same random stream across all three policies.
+        // Draw every attempt to keep the same random stream across policies.
         for (unsigned attempt = 0; attempt < kAttempts; ++attempt) {
             const float overlap = chance(generator);
             const float decode = chance(generator);
             if (success == kAttempts && overlap >= interference && decode < decodeChance) success = attempt;
         }
         const bool delivered = success < kAttempts;
+        counts.first += success == 0;
+        counts.attempts += std::min(success + 1, unsigned(kAttempts));
         counts.lost += !delivered;
-        reviewAdr(state, rule, sf, frame + 1, {classifyAdr(true, true, delivered, success != 0),
-                                             requestSnr, delivered ? dataSnr : kAdrMissingSnr}, params);
+        if (profile.adaptive)
+            reviewAdr(state, profile.rule, sf, frame + 1, {classifyAdr(true, true, delivered, success != 0),
+                                                         requestSnr, delivered ? dataSnr : kAdrMissingSnr}, params);
         if (delivered) {
             state.deliveredFrame = frame + 1;
             state.deliveredSf = sf;
@@ -92,18 +99,21 @@ int main(int argc, char** argv) {
     if (!trials || frames < 6 || !validAdrParams(params)) return 2;
     const auto observations = double(frames) * trials;
     std::cout << "scenario,attempt_loss_pct,rule,above_required_pct,final_loss_pct,"
-                 "mean_reaction_s,reacted_trials,sf_changes_per_hour\n";
+                 "mean_reaction_s,reacted_trials,sf_changes_per_hour,first_delivery_pct,mean_attempts\n";
+    constexpr Profile profiles[]{{false, AdrRule::LEGACY}, {true, AdrRule::LEGACY},
+                                 {true, AdrRule::MARGIN_EWMA}, {true, AdrRule::MARGIN_KALMAN}};
     for (bool blockage : {false, true}) {
         for (unsigned rate : {1, 3, 5, 10, 20}) {
-            for (AdrRule rule : {AdrRule::LEGACY, AdrRule::MARGIN_EWMA, AdrRule::MARGIN_KALMAN}) {
+            for (const auto profile : profiles) {
                 Counts counts;
                 for (unsigned trial = 0; trial < trials; ++trial)
-                    run(counts, seed + trial, rule, frames, rate / 100.0f, blockage, params);
-                std::cout << (blockage ? "blockage" : "interference") << ',' << rate << ',' << adrRuleName(rule)
+                    run(counts, seed + trial, profile, frames, rate / 100.0f, blockage, params);
+                std::cout << (blockage ? "blockage" : "interference") << ',' << rate << ','
+                          << (profile.adaptive ? adrRuleName(profile.rule) : "FIXED_SF7")
                           << ',' << 100 * counts.above / observations << ',' << 100 * counts.lost / observations << ',';
                 if (counts.reactions) std::cout << secondsPerFrame * counts.reactionFrames / counts.reactions;
                 std::cout << ',' << counts.reactions << ',' << 3600 * counts.changes / (secondsPerFrame * observations)
-                          << '\n';
+                          << ',' << 100 * counts.first / observations << ',' << counts.attempts / observations << '\n';
             }
         }
     }
