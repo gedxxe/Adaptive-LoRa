@@ -111,6 +111,16 @@ void resumeAdrAfterIdle(AdrState& state, uint32_t frame, const AdrParams& p) {
     startRecoveryProbe(state, state.deliveredSf, frame, p);
 }
 
+bool applyAdrReceipt(AdrState& state, uint32_t receipt) {
+    state.acknowledgedSf = receipt && receipt == state.deliveredFrame ? state.deliveredSf : 0;
+    // A higher acknowledged SF is safe to remember. Lowering the hint requires a lock.
+    state.recoverySf = std::max(state.recoverySf, state.acknowledgedSf);
+    if (!probingHigher(state) || state.acknowledgedSf != state.desired || receipt < state.probeStartedFrame)
+        return false;
+    clearProbe(state);
+    return true;
+}
+
 bool expireAdrProbe(AdrState& state, uint32_t frame, const AdrParams& p) {
     if (!state.probeReturn || frame - state.probeStartedFrame <= p.probeReceiptLimit) return false;
     rollbackProbe(state, frame, p);
@@ -143,20 +153,18 @@ AdrReview reviewAdr(AdrState& state, AdrRule rule, uint8_t sf, uint32_t frame,
         const float weight = first || unconfirmedLoss ? 0.0f : lost ? p.lostWeight : p.rescuedWeight;
         state.score = p.decay * state.score + weight;
     }
-    if (probingHigher(state)) {
+    const bool higherTrial = probingHigher(state);
+    if (higherTrial) {
         const bool admitted = sf == state.desired;
-        if (admitted && clientConfirmed) {
-            clearProbe(state);
-            return {"recovery_confirmed"};
-        }
         if (!admitted || frame - state.probeStartedFrame >= p.probeReceiptLimit ||
             (lost && sf == phy::maxDataSf)) {
             rollbackProbe(state, frame, p);
             return {admitted ? "recovery_failed" : "recovery_budget", AdrDecision::ROLLBACK};
         }
-        if (!lost) return {"recovery_wait_ack"};
-        ++state.desired;
-        return {"recovery_next", AdrDecision::UP};
+        if (lost) {
+            ++state.desired;
+            return {"recovery_next", AdrDecision::UP};
+        }
     }
     if (sf != state.desired) {
         if (!first) state.consecutiveFirst = 0;
@@ -171,7 +179,7 @@ AdrReview reviewAdr(AdrState& state, AdrRule rule, uint8_t sf, uint32_t frame,
         }
         return {"budget_limited"};
     }
-    if (state.probeReturn && (!first ||
+    if (!higherTrial && state.probeReturn && (!first ||
         (!clientConfirmed && frame - state.probeStartedFrame >= p.probeReceiptLimit))) {
         const float score = state.score;
         rollbackProbe(state, frame, p);
@@ -183,22 +191,23 @@ AdrReview reviewAdr(AdrState& state, AdrRule rule, uint8_t sf, uint32_t frame,
     state.missedHistory = uint8_t(((state.missedHistory << 1) | lost) & mask);
     if (!first) {
         state.consecutiveFirst = 0;
+        if (higherTrial) return {"recovery_wait_ack"};
         const bool weak = !unconfirmedLoss && (legacy ? countMisses(state.degradedHistory) >= p.legacyMisses :
             state.score >= p.upScore && state.estimate.margin(rule, sf, p) < p.upMarginDb);
-        if (!weak) {
-            // Missing DATA alone only permits a bounded search. A receipt commits the result.
-            if (lost && countMisses(state.missedHistory) >= p.legacyMisses &&
-                startRecoveryProbe(state, uint8_t(sf + 1), frame, p))
-                return {"recovery_probe", AdrDecision::UP};
-            if (primaryMiss) return {"primary_loss"};
-            return {unconfirmedLoss ? "loss_unconfirmed" : "observe"};
+        const bool missing = lost && countMisses(state.missedHistory) >= p.legacyMisses;
+        if (weak || missing) {
+            const float score = state.score;
+            if (sf == phy::maxDataSf) {
+                state.locked = false;
+                clearEvidence(state);
+                return {"ceiling", AdrDecision::HOLD, score};
+            }
+            if (startRecoveryProbe(state, uint8_t(sf + 1), frame, p))
+                return {weak ? "step_up" : "recovery_probe", AdrDecision::UP, score};
+            return {"recovery_cooldown"};
         }
-        const float score = state.score;
-        state.locked = false;
-        clearEvidence(state);
-        if (state.desired == phy::maxDataSf) return {"ceiling", AdrDecision::HOLD, score};
-        ++state.desired;
-        return {"step_up", AdrDecision::UP, score};
+        if (primaryMiss) return {"primary_loss"};
+        return {unconfirmedLoss ? "loss_unconfirmed" : "observe"};
     }
 
     if (legacy && std::isfinite(obs.dataSnr)) {
@@ -206,6 +215,7 @@ AdrReview reviewAdr(AdrState& state, AdrRule rule, uint8_t sf, uint32_t frame,
             (1 - p.alpha) * state.filteredSnr + p.alpha * obs.dataSnr : obs.dataSnr;
     }
     if (state.consecutiveFirst < p.firstBeforeProbe) ++state.consecutiveFirst;
+    if (higherTrial) return {"recovery_wait_ack"};
     const char* action = "observe";
     if (state.consecutiveFirst >= p.confirmations && !state.locked && clientConfirmed) {
         clearProbe(state);

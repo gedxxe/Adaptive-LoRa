@@ -30,8 +30,9 @@ for testing that policy.
 - The [Gateway ADR policy](../../src/app/adr_policy.cpp) uses Request
   margin for normal SF increases and keeps an independent receive miss
   window per Client. An observed primary miss can still inform the
-  budgeted search during a frame timing fault. An ACK receipt confirms
-  the trial. The default uses a short delivery window. EWMA and Kalman also
+  budgeted search during a frame timing fault. All increases have a
+  deadline and use extra airtime temporarily until a valid Request
+  echoes a matching ACK. The default uses a short delivery window. EWMA and Kalman also
   model forecast margin and decayed loss evidence. The
   [seeded model](../../tools/adr_sim.py) shares their decision code and
   keeps its provisional decode curve independent of the policy threshold.

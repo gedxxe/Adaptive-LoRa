@@ -506,3 +506,18 @@ This allows intermittent degradation to open a trial without a special
 per-Client override. Keep grants within the full-roster reservation and
 require the existing matching ACK receipt to confirm a trial. Label the
 policy as parameter revision 4.
+
+## ADR-042 — Give every DATA upshift a temporary reservation
+
+2026-11-24. Open the same bounded SF trial after a qualified normal
+upshift or the primary miss window. Advance one SF after an observed
+miss at the admitted candidate. When denied, expired, or still missing
+at the ceiling, return to the pre-trial SF and release the extra airtime.
+Reuse the existing full-roster fit check, frame deadline, and cooldown.
+
+Confirm a trial while validating the Request, using the last accepted
+DATA frame and candidate SF in the same Client session. The receipt
+must refer to a delivery from the trial. An unrelated later timing
+fault cannot reverse that confirmation. Record as policy revision 5.
+Use RSSI for field diagnosis and keep the existing SNR and delivery
+criteria without adding a fixed RSSI trigger.

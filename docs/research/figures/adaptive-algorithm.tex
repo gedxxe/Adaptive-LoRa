@@ -107,7 +107,11 @@
   \Step{\textbf{if} session changed \textbf{then} reset state to $\sigma_{\min}$}
   \Block{\textbf{if} $\phi_{\mathrm{ack}}=\phi^{\mathrm{del}}_\iota\ne 0$ in this session \textbf{then}}{%
     \Step{$\sigma^{\mathrm{mem}}_\iota\gets
-      \max(\sigma^{\mathrm{mem}}_\iota,\sigma^{\mathrm{del}}_\iota)$}%
+      \max(\sigma^{\mathrm{mem}}_\iota,\sigma^{\mathrm{del}}_\iota)$}
+    \Step{\textbf{if} higher-SF trial and
+      $\sigma^{\mathrm{del}}_\iota=\sigma^{\mathrm{want}}_\iota$
+      and $\phi_{\mathrm{ack}}\ge\phi_{\mathrm{probe}}$}
+    \Step{\hspace{1em}\textbf{then} confirm $\sigma^{\mathrm{want}}_\iota$ and clear the trial}%
   }
   \Block{\textbf{if} $\phi^{\mathrm{req}}_\iota\ne0$ and $\phi-\phi^{\mathrm{req}}_\iota\ge\nu_{\mathrm{idle}}$ \textbf{then}}{%
     \Step{$\sigma^{\mathrm{res}}_\iota\gets\sigma_{\min}$ and clear the sample history}%
@@ -129,11 +133,11 @@
     \Step{$S\gets\rho S+w$, where $w=0$ if $\neg e$}%
   }
   \Block{\textbf{if} higher-SF trial \textbf{then}}{%
-    \Step{$a\gets(\sigma_\iota=\sigma^{\mathrm{want}}_\iota)$}
-    \Step{\textbf{if} $a\land\alpha_\iota$ \textbf{then} keep $\sigma_\iota$ and clear trial}
-    \Step{\textbf{else if} $\neg a\lor(\phi-\phi_{\mathrm{probe}}\ge\nu_{\mathrm{ack}})
+    \Step{\textbf{if} $\sigma_\iota\ne\sigma^{\mathrm{want}}_\iota
+      \lor(\phi-\phi_{\mathrm{probe}}\ge\nu_{\mathrm{ack}})
       \lor(m_\iota\land\sigma_\iota=\sigma_{\max})$ \textbf{then} roll back}
     \Step{\textbf{else if} $m_\iota$ \textbf{then} $\sigma^{\mathrm{want}}_\iota\gets\sigma_\iota+1$}
+    \Step{\textbf{else} record delivery evidence and await a receipt}
     \Step{\textbf{return}}%
   }
   \Block{\textbf{if} $\sigma_\iota<\sigma^{\mathrm{want}}_\iota$ \textbf{then}}{%
@@ -158,12 +162,12 @@
   }
   \Step{$\boldsymbol{\chi}_\iota\gets\Tail_{\nu_{\mathrm{obs}}}(\boldsymbol{\chi}_\iota,m_\iota)$}
   \Block{\textbf{if} $\epsilon_\iota^{\mathrm{fail}}$ \textbf{then}}{%
-    \Block{\textbf{if} $e\land u$ \textbf{then}}{%
-      \Step{$\sigma^{\mathrm{want}}_\iota\gets\min(\sigma_\iota+1,\sigma_{\max})$}
-      \Step{Unlock and clear the loss history}%
-    }
-    \Step{\textbf{else if} $m_\iota\land\left(\sum_j\chi_{\iota,j}\ge\nu_{\mathrm{up}}\right)$ and cooldown has elapsed
-      \textbf{then} try $\sigma_\iota+1$ if $\sigma_\iota<\sigma_{\max}$}
+    \Step{$\beta_\iota\gets(e\land u)\lor
+      \left(m_\iota\land\sum_j\chi_{\iota,j}\ge\nu_{\mathrm{up}}\right)$}
+    \Block{\textbf{if} $\beta_\iota$ and $\sigma_\iota<\sigma_{\max}$ and cooldown has elapsed
+      \textbf{then}}{%
+      \Step{$\Probe(\sigma_\iota+1)$ and $\phi_{\mathrm{probe}}\gets\phi$}%
+    }%
     \Step{\textbf{return}}%
   }
   \Step{\textbf{if} unlocked and $\nu^{\mathrm{first}}_\iota\ge\nu_{\mathrm{lock}}\land\alpha_\iota$

@@ -2415,3 +2415,50 @@ files under `logs/test/`.
   `logs/test/iteration-033-verification.log`. RF, NVS persistence and
   retune timing remain unmeasured for this revision. Repeat the field
   route with one moving Client and one fixed Client, matching both logs.
+
+## Iteration 034 — Bounded SF reservations and timely confirmation, 2026-11-24
+
+- Branch `codex/iteration-034-bounded-sf-reservations` from fetched main
+  `d97b6d75f7fe667ed658eb2d081b16701b7b9ec0`. Reproduced two adaptive
+  failures, including reservation starvation on the eight-Client,
+  32 B roster and rollback despite a valid receipt. See ERR-066–068.
+- `adr_policy.cpp` and its header give all SF increases a temporary
+  reservation and validate candidate receipts from the active trial.
+  `multiclient_link.cpp` and its header apply that receipt during Request
+  processing. `adr_sim_driver.cpp` uses the same receipt handling in the
+  ideal-control model. Existing SNR thresholds, frame counts and
+  retry budgets still apply. RSSI is logged without a fixed SF trigger.
+  See ADR-042 and parameter revision 5.
+- `pio test -e native`, `-e native_multiclient` and `-e native_adaptive`
+  exited 0 with 356, 15 and 46 passing cases, with no skipped cases.
+  Tests cover two failed reservations with a recoverable third node,
+  confirmation beyond the deadline despite a last-ACK timing fault,
+  mismatched and pre-trial receipts, low RSSI with good delivery, and
+  protected peer deliveries. The eight-Client mixed-SF baseline
+  delivered four packets per SF9 Client in seven frames, with the
+  SF7 peers delivering in all seven.
+- `pio run -e heltec_wifi_lora_32_V3`, `-e heltec_wifi_lora_32_V3_research`,
+  `-e heltec_wifi_lora_32_V3_multiclient` and `-e heltec_wifi_lora_32_V3_adaptive`
+  exited 0. The adaptive image uses 35,216 B static RAM and 393,540 B
+  program storage. Resolved versions were PlatformIO Core 6.1.19,
+  Espressif32 55.3.311, Arduino ESP32 3.3.11, Xtensa 14.2.0+20260121,
+  and RadioLib 7.8.1.
+- `python -m unittest discover -s tools -p test_<suite>.py -v` passed
+  capture (15), airtime (16), ADR parser (7), multiclient model (6),
+  documentation (19) and ADR simulator (2). `python tools/check_consistency.py`
+  exited 0. All three `python tools/adr_sim.py --seed 42` runs (nominal
+  and policy threshold shifts of −2.5 and +2.5 dB) exited 0 with 30
+  model cases per run. The model retains independent channel thresholds.
+- Synchronized the active English and Chinese manuals, field diagnostics,
+  research summary and change log. The updated ADR pseudocode was rendered
+  from LaTeX and MathJax checked 118 distinct expressions. No broken active
+  link was found among 90 Markdown files. Two existing links in frozen
+  snapshots were left as recorded.
+- Wire v5, NVS schema 1, SF9 control, SF7–SF10 DATA, CR4/5,
+  application payload length, frame period, and the thin `main.cpp`
+  entry retain their existing contracts. Raw build and test output,
+  with workstation paths replaced and trailing whitespace trimmed, is in
+  `logs/build/iteration-034-verification.log` and
+  `logs/test/iteration-034-verification.log`. Real RF, persistence and
+  retune timing were not measured. Confirm the flashed commit and
+  policy revision before the next run and capture both roles.

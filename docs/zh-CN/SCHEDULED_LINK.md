@@ -239,9 +239,10 @@ $m_\iota=1$ 表示此时也没有收到 DATA。符合条件的 DATA 交付记零
 \end{aligned}
 ```
 
-第一行给出优先处理的常规升档规则。常规规则保持原 SF 时，第二行可触发高一级 SF 试用。下一次 Grant
-核对完整名单的空口预算。已获授权的候选 SF 若首传丢失且最终仍未收到 DATA，则再升一级。收到 DATA 后等
-Request 回报匹配的 ACK。预算不足、最高 SF 仍全丢或回执超时均会回退并释放额外预留。
+第一行给出常规升档规则。常规规则保持原 SF 时，第二行也可申请升档。两种触发条件都进入
+同一个限时试用流程。下一次 Grant 核对完整名单的空口预算。已获授权的候选 SF 若首传丢失
+且最终仍未收到 DATA，则再升一级。有效 Request 的回执若匹配试用开始后在候选 SF 接收的 DATA，
+处理 Request 时即确认试用，后续帧时序故障不影响该确认。预算不足、最高 SF 仍全丢或回执超时均会回退并释放额外预留。
 当 $\phi-\phi_{\mathrm{failed}}\ge\nu_{\mathrm{ack}}$ 时可再次尝试。周期为 15 秒时，连续
 两次有效丢失对应约 30 秒后首次获得高一级 SF 的机会。窗口中间若有一次成功则再等一帧。
 即使后来没有有效记录，回执期限仍有效。
@@ -272,7 +273,10 @@ SF，但仍没有 ACK 回执，也可按相同期限和预算试用该 SF。预�
 `MARGIN_KALMAN` 同时跟踪 SNR 水平与变化趋势，并预测下一条有效记录的 SNR 及不确定度。
 有效记录缺少 SNR 时，EWMA 保留估计值，Kalman 只做预测。
 
-优先使用已验证的 SF9 Request SNR，缺失时使用已接受的 DATA SNR。
+RSSI 描述接收包的强度。RSSI 低但交付正常时可继续使用当前 SF；RSSI 高也可能同时出现
+低 SNR 和丢包。固件记录 RSSI、SNR 与交付结果供诊断，单个 RSSI 读数无法触发试用。
+
+余量估计优先使用已验证的 SF9 Request SNR，缺失时使用已接受的 DATA SNR。
 [AdrParams](../../src/app/adr_policy.h) 中每个 SF 的偏移量定义为 DATA SNR 减去 Request SNR，
 初值为零。估计器使用统一的 Request SNR 尺度，切换 SF 时保留状态，更换会话或离线状态到期后重新估计。
 同时保存两种 SNR 以便后续标定偏移。
@@ -289,11 +293,12 @@ SF，但仍没有 ACK 回执，也可按相同期限和预算试用该 SF。预�
 `V3_LINK_SAMPLE` 保留旧采集字段，并在自适应 Gateway 上增加 `node_id`、`class`、`snr_req`、
 `snr_data`、`level`、`slope`、`sigma`、`margin`、`score`、`decision`、`rule` 和
 `params_version`。余量对应已分配的 SF，升档分数在清空前记录，缺失值为 `N/A`。
-`LOST_ALL` 表示已分配机会均未成功交付。`params_version=4` 下，`PRIMARY_MISS`
+`LOST_ALL` 表示已分配机会均未成功交付。`params_version=5` 下，`PRIMARY_MISS`
 表示首传窗已观测且未收到 DATA，但整体时序无法支持全丢分类。`adr=loss_unconfirmed`
-表示没有收到 DATA，且 Request 余量未满足条件。`recovery_probe` 和 `recovery_next` 申请试用
-SF，`recovery_wait_ack` 表示已收到 DATA 并等待回执，`recovery_confirmed` 表示回执匹配。
-`recovery_budget` 与 `recovery_failed` 表示回退。`ADR_PROBE` 的 `result=expired`
+表示没有收到 DATA，且 Request 余量未满足条件。`step_up` 和 `recovery_probe` 开始试用，
+`recovery_next` 请求下一候选 SF。`recovery_wait_ack` 表示已收到 DATA 并等待匹配回执，
+`recovery_confirmed` 表示回执验证成功。`recovery_budget` 与 `recovery_failed` 表示回退，
+`recovery_cooldown` 表示失败后的等待期。`ADR_PROBE` 的 `result=expired`
 表示试用在两次评估之间达到帧编号期限。`ABSENT` 表示在已监听的请求阶段未收到有效 Request。
 `EXCLUDED` 对应本地时序问题或应用拒收。这两类均不更新估计器或分数。
 另外两类为 `OK_FIRST` 和 `RESCUED_SAME_SF`。离线解析器兼容旧日志，并跳过时序无效、应用拒收和缺席记录。

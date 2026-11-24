@@ -16,7 +16,8 @@ Gateway 显示最近一次收到的 DATA 的 SF。Gateway 为各 Client 调整 D
 
 Gateway 分别跟踪各 Client 的交付。最近三条有效记录中若有两次丢失，可在空口预算允许时
 试用更高 DATA SF。如果首传接收窗已观测到，后续 ACK 或重传时序异常仍可保留该次丢失记录。
-试用结果以 ACK 回执确认。同一会话断联后重入，只要预算允许，即可恢复已确认的 SF。
+升档先临时预留空口时间，由有效 Request 中的匹配 ACK 回执确认，试用失败则释放额外预留。
+SNR 用于辅助判断丢包，RSSI 用于现场诊断。
 `SEARCH` 表示在等新的 SF9 Beacon。
 `NO GRANT` 表示已启动 Request，但未收到匹配的 Grant。
 Gateway 还提供两种[基于 SNR 余量的实验规则](docs/zh-CN/SCHEDULED_LINK.md#按丢包情况调整)。

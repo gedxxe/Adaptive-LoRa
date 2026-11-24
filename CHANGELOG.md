@@ -5,6 +5,14 @@ changes. It is not a substitute for the append-only build memory.
 
 ## Unreleased
 
+### Temporary airtime reservations for all DATA SF increases
+
+- Release the extra airtime on failed, denied, or expired SF trials.
+  The normal margin decision and the delivery recovery window use
+  the same deadline and cooldown.
+- Commit a trial when a valid Request echoes a matching DATA ACK from
+  the trial. Later timing faults leave that confirmation intact.
+
 ### Per-Client receive evidence for SF recovery
 
 - Keep an observed primary DATA miss available to the SF search when a

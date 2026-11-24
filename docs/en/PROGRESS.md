@@ -7,7 +7,7 @@
 |---|---|
 | Firmware / protocol | `0.2.0-alpha.1` / `5` |
 | Board | Heltec WiFi LoRa 32 V3.4, ESP32-S3/SX1262 |
-| Adaptive image | `heltec_wifi_lora_32_V3_adaptive`, ESP32 build passed. Native cases 43/43, including all three ADR rules. |
+| Adaptive image | `heltec_wifi_lora_32_V3_adaptive`, ESP32 build passed. Native cases 46/46, including all three ADR rules. |
 | Fixed-SF image | `heltec_wifi_lora_32_V3_multiclient`, ESP32 build passed, 15/15 runtime cases |
 | Shared tests | 356/356 native and 65/65 Python cases passed |
 | Toolchain | PlatformIO 6.1.19, Espressif32 55.3.311, Arduino ESP32 3.3.11, Xtensa 14.2.0+20260121, RadioLib 7.8.1 |
@@ -34,6 +34,9 @@ walk. The current 32 B profile still needs a field run.
 | An observed primary miss still guides recovery after the last ACK has a timing fault | Tests run the production state machines on a fake radio with two and eight Clients. One Client reaches SF10 and every stationary peer delivers each frame. |
 | A local primary RX error cannot train that Client's policy or erase a peer's primary miss | Fault injection. The affected Client stays at SF7 and the peer reaches SF8. |
 | A successful delivery between two misses allows a higher-SF trial | A miss–success–miss fixture with strong Request SNR reaches SF8 at the next Grant. |
+| Failed SF trials release airtime while the Clients still send Requests | Eight-Client fault injection. Two Clients fail at every DATA SF. A third reaches SF10, and the other five deliver in every frame. |
+| A confirmed SF survives the last ACK timing fault beyond the trial deadline | Native runs with two and eight Clients continue delivery after the normal deadline. A separate check rejects mismatched and pre-trial frame receipts. |
+| Low RSSI with good delivery can stay at SF7 | A paired fixture keeps a reliably delivering weak-RSSI Client at SF7 while its peer with stronger RSSI and DATA loss reaches SF10. |
 | The capture tool records nine streams with separate timestamps and hashes | Simulated serial ports. |
 
 [Capacity matrix](SCHEDULED_LINK.md#capacity-at-15-seconds) · [Build and test records](BUILD_MEMORY.md)
@@ -47,10 +50,10 @@ curve. Loss is measured after up to four DATA attempts.
 
 | Selected model scenario | Delivery window | EWMA | Kalman |
 |---|---:|---:|---:|
-| 20% independent interference, time above reference SF | 78.39% | 0.06% | 0.06% |
+| 20% independent interference, time above reference SF | 78.54% | 0.06% | 0.06% |
 | Same case, final loss | 0.174% | 0.179% | 0.179% |
-| 9 dB blockage with 10% interference, mean time to reference SF | 67.9 s | 96.0 s | 96.0 s |
-| Same blockage case, final loss | 0.672% | 0.897% | 0.897% |
+| 9 dB blockage with 10% interference, mean time to reference SF | 59.2 s | 81.1 s | 81.1 s |
+| Same blockage case, final loss | 0.618% | 0.802% | 0.802% |
 
 The reference is the lowest SF that meets the model's provisional 50%
 decode threshold. Each policy starts the synthetic blockage with fresh
@@ -60,8 +63,8 @@ the reference SF and reached it later after blockage. Calibrating the
 Request-to-DATA SNR offsets requires matched field runs.
 
 In the same blockage case, lowering only the policy thresholds by 2.5 dB
-raised the mean response to 77.7 s for the delivery window, 105.7 s for
-EWMA and 105.6 s for Kalman. All 128 trials per rule reached the reference
+raised the mean response to 63.3 s for the delivery window, 92.2 s for
+EWMA and 92.1 s for Kalman. All 128 trials per rule reached the reference
 SF. The shift equals one step between the provisional SF thresholds.
 The model assumes ideal control. The native fault tests above separately
 exercise timing faults and peer traffic.

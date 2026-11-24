@@ -82,7 +82,8 @@ config save
 新版 Client 不会发送 Request。串口配置中的间隔控制 Client 提交样本的时间，空口周期取自 Beacon。
 Gateway 的 `SCHEDULE_CONFIG` 应显示 `period_us=15000000`、`roster_count=8`
 和 `bench_payload_ceiling_bytes=32`。
-走测前核对 `data_sf_policy=adaptive`。Gateway 的链路样本应显示 `params_version=4`。
+走测前核对 `data_sf_policy=adaptive`。Gateway 的链路样本应显示 `params_version=5`。
+出发前记录各板烧录的 Git 提交。
 
 Client 2 的首个样本为 `ID=0002|SEQ=0001|MSG=HELLO WORLD`。ID 和序号均为四位十六进制。
 启动后序号从 1 开始，每次有新样本入队时递增，到 `FFFF` 后回绕。DATA 帧携带恰好 32 字节
@@ -104,7 +105,7 @@ ASCII，不带字符串结束符或换行符。重传沿用相同字节和包标
    `ADR_TIMING`。
 
 单独检查 SF10 时，先看 Client 是否显示 `TX SF10`，再核对 `ACKED DATA SF10` 和
-SF9 控制交互是否继续。若未获得 SF10，核对是预算不足（`adr=budget_limited`），还是
+SF9 控制交互是否继续。若未获得 SF10，核对是预算不足（`adr=recovery_budget` 或 `adr=budget_limited`），还是
 控制链路丢失（`SEARCH` 或 Request/Grant 缺失）。这一检查与静态验收分开进行。
 
 **单人走测。** Client 各页顶行的 `TX SF8 CR4/5` 表示最近一次 DATA 已在 SF8
@@ -185,9 +186,11 @@ run_id,gateway_boot,frame_id,node_id,client_boot,grant_seen,payload_bytes,data_s
 即便帧内其他时序存在异常。Gateway 可用该记录启动限时 SF 试用。
 `adr=loss_unconfirmed` 表示 Gateway 未收到 DATA，且本次
 Request 未显示余量偏低。按会话、帧编号和节点匹配 Client 的 `V3_DATA_TX` 与 Gateway 的样本，
-再判断丢失原因。`recovery_probe` 和 `recovery_next` 表示申请试用 SF，应与相应
-`V3_DATA_TX` 核对。`recovery_confirmed` 表示回执匹配，`recovery_budget` 表示预算不足，
-`ADR_PROBE` 的 `result=expired` 表示试用未确认且已到期限。
+再判断丢失原因。`step_up` 和 `recovery_probe` 开始临时试用，`recovery_next`
+申请下一候选 SF。将 Grant 与 Client 的 `V3_DATA_TX` 匹配，确认实际发射的 SF。
+`recovery_confirmed` 表示处理 Request 时匹配了回执，`recovery_budget` 表示预算不足，
+`recovery_cooldown` 表示回退后的等待期，`ADR_PROBE` 的 `result=expired` 表示试用未确认且已到期限。
+怀疑有干扰时同时记录 RSSI、SNR 和交付结果。
 
 用高阻探头观察 DIO1、NSS、BUSY 和 SCL。每种测试使用的 SF 切换方向至少记录 30 次，包含
 回到控制 SF 的切换，核对延迟尾部和最大值能否满足 20 毫秒切换提前量及 40 毫秒接收半窗。

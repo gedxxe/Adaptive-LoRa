@@ -22,9 +22,10 @@ rate, bandwidth, TX power and frame period stay fixed.
 The Gateway tracks delivery separately for each Client. Two misses in
 three eligible reports can start an airtime-checked trial at a higher
 DATA SF, including when later ACK or retry timing is uncertain but the
-primary receive window was observed. An ACK receipt confirms the trial.
-After an outage, the same Client session can resume a confirmed SF if it
-still fits the schedule.
+primary receive window was observed. Each increase starts with a
+temporary reservation. A matching ACK receipt in a valid Request
+confirms it, and a failed trial releases the extra airtime. SNR helps
+interpret packet loss. RSSI is logged for field diagnosis.
 `SEARCH` means the Client is waiting for a fresh SF9 Beacon. `NO GRANT`
 means its Request started but a matching Grant did not arrive.
 The Gateway also has two [experimental SNR-margin rules](docs/en/SCHEDULED_LINK.md#loss-cause-aware-adr).
