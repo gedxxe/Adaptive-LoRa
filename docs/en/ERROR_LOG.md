@@ -1017,3 +1017,99 @@ capacity assertions for bounded denial and earlier delivery. Fully drain
 one fake serial endpoint before the next to avoid splitting an extended
 Gateway sample with another node's log. The final suite passed.
 See `logs/test/iteration-034-verification.log`.
+
+## ERR-069 — Rotating build and Windows test launcher
+
+- `pio run -e heltec_wifi_lora_32_V3_rotating` inside the managed
+  sandbox could not create the installed PlatformIO `platforms.lock`.
+  Run with access to the installed SDK. The same command then built.
+- The first `pio test -e native_rotating` failed because
+  `multiclient_link.cpp` used `std::max` without including
+  `<algorithm>`. Added the direct include. The native suite then passed.
+- The sandboxed `python -m unittest discover -s tools -p test_adr_sim.py -v`
+  could not start MinGW with Windows error 623. The retry using the installed
+  compiler outside the sandbox passed both cases. The failed and successful
+  outputs are in `logs/test/iteration-035-python.log` and
+  `logs/test/iteration-035-python-verified.log`.
+- The local PDF extractor also failed to read its registry configuration in
+  the sandbox. The bundled Python `pypdf` read all 14 pages without using
+  that installation. Review material remains local.
+
+## ERR-070 — Unsupported operator macro on GitHub
+
+The two scheduled link documents used `\operatorname{Tail}` in the
+ADR loss-window equation. GitHub reported the macro as disallowed.
+Both now use `\mathrm{Tail}`. The documentation regression rejects
+the original macro in a display-math block and checks that both
+language editions use the same equations.
+
+## ERR-071 — Compatibility table checker expected only four firmware profiles
+
+After adding the wire-v6 row, `python tools/check_consistency.py` reported
+a comparison version mismatch for both languages. The checker now reads
+the rotating version from the protocol header and requires the matching
+PlatformIO environment and table row.
+
+## ERR-072 — Unconfirmed epoch could clear delivery telemetry
+
+The wire-v7 prototype changed the Client's confirmed link state as soon
+as it accepted a valid signed Beacon from a different epoch. A recorded
+Beacon could clear the last delivery and retire the live Gateway before
+the Client saw a fresh Grant. Reproduced with
+`pio test -e native_secure -v` in
+`logs/test/iteration-036-tentative-repro.log`, exit 1. Keep the candidate
+separate, preserve the live epoch and update confirmed state only after
+the signed Grant echoes the current Request challenge. An old Beacon can
+still elicit a tentative Request after loss of synchronization.
+
+## ERR-073 — Secure build and provisioning tool integration
+
+- Secure ESP32 linking first failed on `mbedtls_ct_memcmp` because the
+  header did not declare C linkage for C++ callers. Corrected the include
+  linkage. A subsequent timed SetTx build needed the direct project
+  configuration include for the timeout constant.
+- Native Mbed TLS initially used `cc` and a relative configuration include
+  path. Explicitly selected GCC, added an absolute test include path and
+  enabled the required Windows platform module. The older MinGW headers
+  lack the Windows secure-zero inline. Used the library's native-only
+  platform hook and added the config header as an object dependency to
+  prevent stale definitions.
+- The launch-deadline fixture initially called update while the radio
+  was still retuning. It now arms control RX first. The earlier failing
+  run is saved as `logs/test/iteration-036-secure.log`.
+- The installed SDK's NVS generator script is a wrapper and its Python
+  package was missing. The failed check is in
+  `logs/test/iteration-036-python-final.log`. The offline procedure uses
+  the pinned Espressif module 0.2.0 directly.
+- The installed MinGW compiler did not resolve an ASan or UBSan runtime.
+  Native malformed-length, byte-mutation and auth tests remain enabled.
+
+## ERR-021 and ERR-023 — Iteration 036 scope
+
+The secure profile stages TX through RadioLib and issues a timed SetTx
+without entering the extra unbounded PA-ramp loop. The Native adapter
+test verifies the command arguments and error propagation. Command
+BUSY timing, SPI locks and actual stuck-BUSY recovery still require a
+board. Plaintext comparison profiles retain their original path.
+
+Arduino startup can still format default NVS before the application.
+Secure roles use a separate namespace and the radio remains disabled
+without valid bound credentials and startup entropy. Host tests exercise
+absence, short reads, mismatch and failed seeding. Physical NVS erasure
+and rollback prevention were not measured. Restoring a valid older image
+can restore revoked keys. Reprovision with a new generation after restore.
+
+## ERR-074 — Algorithm references and figure review
+
+The protocol pages referred to unnamed listings, and the research map
+linked to a retired 70-Client heading. The listings also omitted the
+wire-v7 checks. The current pages link to the numbered listings and to
+the active capacity section. English and Chinese links reach the
+corresponding headings. The local link audit also caught and verified a
+missing Chinese capacity anchor while adding those links.
+
+After pdfLaTeX and the two PNG exports passed, the optional command
+`pdftotext -layout .pio/adaptive-algorithm.pdf .pio/adaptive-algorithm.txt`
+resolved to MiKTeX and could not access its Windows registry keys
+(shell exit `-1073740791`). The generated images were inspected directly.
+The final pdfLaTeX and Poppler commands returned 0.

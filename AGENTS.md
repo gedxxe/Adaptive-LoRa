@@ -18,9 +18,10 @@ PlatformIO defaults to `heltec_wifi_lora_32_V3_adaptive` for the eight-Client
 field test. `heltec_wifi_lora_32_V3_multiclient` is the earlier fixed-SF comparison.
 Both use Arduino/C++17, `jgromes/RadioLib@7.8.1`, Firmware `0.2.0-alpha.1`
 and NVS schema `1`. See the [wire version table](docs/en/PROGRESS.md#papers-and-comparison-runs).
-Authoritative versions/settings are VERSION, PROTOCOL_VERSION,
-include/project_config.h and platformio.ini; resolved package versions and
-actual test results belong in [PROGRESS.md](docs/en/PROGRESS.md).
+VERSION records the firmware version. PROTOCOL_VERSION records the v1
+HELLO/ACK wire version. The scheduled wire versions are defined in the
+protocol headers and selected by platformio.ini. Resolved package versions
+and test results belong in [PROGRESS.md](docs/en/PROGRESS.md).
 
 The fixed-PHY M0–M2 HELLO/ACK firmware exists and has host/build evidence.
 **M0–M2 physical acceptance is IN PROGRESS.** Confirm the physical SKU,
@@ -29,6 +30,13 @@ adds the v3 research profile with up to eight clients, variable-length
 application payloads, aggregate feedback and shared retry slots. The v2
 single-client image remains available. The adaptive image uses wire version
 5 with frame-scoped DATA SF7–SF10 grants and fixed SF9 control.
+The opt-in `heltec_wifi_lora_32_V3_rotating` profile uses wire version 6
+and schedules up to eight of 128 registered IDs per frame. Keep its
+results distinct from the unauthenticated wire-v5 field baseline. A
+deployment candidate uses the opt-in `heltec_wifi_lora_32_V3_secure`
+wire-v7 image with authenticated control and encrypted DATA. Keep its
+credential provisioning, field results and readiness separate from the
+plaintext comparison profiles.
 Historical records retain their original hardware and results.
 
 ## Read before editing
@@ -62,8 +70,10 @@ preamble 8, explicit header, CRC, sync 0x12, 22 dBm requested TX power,
 140 mA SX1262 PA OCP and 1 MHz SPI. The adaptive DATA range is SF7–SF10/BW125.
 The matched comparison freezes Gateway DATA grants at SF7 on the same wire format.
 SF11–SF12 remain scenarios in the host capacity tool.
-Keep the published LaTeX algorithms aligned with the production loss window,
-recovery hint, airtime admission and rollback rules when ADR changes.
+Keep [Algorithm 1 (Gateway scheduling)](README.md#algorithm-1-gateway-scheduling),
+[Algorithm 2 (Client delivery)](README.md#algorithm-2-client-delivery) and
+the [SF recovery listing](docs/en/SCHEDULED_LINK.md#adaptation-and-recovery)
+aligned with scheduling, authentication and ADR policy.
 Treat a higher-SF reservation as temporary until a validated Request
 confirms a delivery from the trial. Release the extra reservation on
 rollback. Keep RSSI in the capture diagnostics without a fixed SF trigger.
@@ -98,6 +108,7 @@ per-packet telemetry to NVS.
 | GatewayApp / ClientApp | Actual role state machines through RadioTransport |
 | ScheduledLink | Opt-in v2 role state machines and one-client schedule through RadioTransport |
 | MulticlientLink / PayloadPort | Exact-length grants, per-Client DATA SF, shared retries and bounded payload delivery |
+| SecureLink / secure_crypto | Wire-v7 envelopes, session freshness, retransmission cache and Mbed TLS calls |
 | RadioDriver | Sole radio state/deadline/error policy through RadioHardware |
 | Sx1262Hardware | Owns SX1262, SPI and GPIO, and latches radio IRQ timestamps |
 | NvsConfigStore | Load/save/verify policy through non-owning ConfigStorage |
@@ -116,6 +127,10 @@ and a general event API remain open.
 Keep fixed buffers, explicit little-endian serialization, 28-byte header,
 96-byte frame limit and nine-byte ACK payload. Preserve protocol v1 HELLO/ACK,
 error classifications and NVS namespace/key/schema/blob compatibility.
+The v7 inner codec retains the 96 B limit. Its security envelope can
+reach 237 B. The secure role and credentials use separate NVS namespaces.
+Never fall back to a plaintext role or log credential or payload bytes
+from the secure profile. See the [v7 wire contract](docs/en/SCHEDULED_LINK.md#secure-wire-v7).
 ACK must match the outstanding client source/boot/sequence and deadline.
 The default reporting interval is 3 s and M2 ACK timeout is 1 s. Persisted
 intervals remain active until changed. The v3 superframe targets 1 s and
@@ -163,18 +178,28 @@ pio run -e heltec_wifi_lora_32_V3
 pio run -e heltec_wifi_lora_32_V3_research
 pio run -e heltec_wifi_lora_32_V3_multiclient
 pio run -e heltec_wifi_lora_32_V3_adaptive
+pio run -e heltec_wifi_lora_32_V3_rotating
+pio run -e heltec_wifi_lora_32_V3_secure
 pio test -e native
 pio test -e native_multiclient
 pio test -e native_adaptive
+pio test -e native_rotating -v
+pio test -e native_secure -v
 python -m unittest discover -s tools -p test_capture_bench.py -v
 python -m unittest discover -s tools -p test_tdma_feasibility.py -v
 python -m unittest discover -s tools -p test_adr_shadow.py -v
 python -m unittest discover -s tools -p test_model_multiclient.py -v
 python -m unittest discover -s tools -p test_check_consistency.py -v
+python -m unittest discover -s tools -p test_adr_sim.py -v
+python -m unittest discover -s tools -p test_secure_provision.py -v
 python tools/check_consistency.py
 ```
 
-Use installed PlatformIO Python for host tools. Inspect the complete diff
+Use installed PlatformIO Python for host tools.
+For `native_secure`, use the installed Mbed TLS 3.6.6 sources or set
+`ADAPTIVE_LORA_MBEDTLS_DIR`. Provisioning tests also require Python
+`cryptography` and `esp-idf-nvs-partition-gen==0.2.0`.
+Inspect the complete diff
 and thin main, then review every staged diff and `git diff --cached --check`.
 Report exact commands, cases/counts, skipped cases, versions and limitations.
 A compile, native test, analytical model and physical measurement are distinct
@@ -205,6 +230,8 @@ PR #11 consolidated the manuals at `5ec1e7e6bf9839320cdd0ea6474b2b29d6d4980d`.
 
 Publish sanitized project files only. Exclude caches, binaries, credentials,
 local configuration, private backups and unlicensed research PDFs. Preserve
-third-party license references. Final report lists changed files and their roles,
+third-party license references. Project-authored code uses [GPL-3.0-only](LICENSE).
+Review the [third-party terms](THIRD_PARTY.md) before distributing firmware.
+Final report lists changed files and their roles,
 actual build/test evidence, behavior/compatibility, unresolved risks, physical
 checks performed, milestone state, next task and publication state.

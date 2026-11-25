@@ -103,7 +103,9 @@ boot, advances when a new sample enters the queue and wraps after `FFFF`.
 The DATA frame carries exactly 32 ASCII bytes, with no terminator or newline.
 A retry sends the same bytes and packet identity.
 
-## Check the pair and walk the route
+<a name="check-the-pair-and-walk-the-route"></a>
+
+## Verify delivery and link recovery
 
 1. Run Client 2 close to the Gateway for at least five complete frames. Match
    Gateway `APP_PAYLOAD` with Client `V3_PAYLOAD_RESULT,result=accepted`
@@ -128,7 +130,7 @@ A retry sends the same bytes and packet identity.
    An SF shown under `ACKED DATA SF` belongs to the last confirmed packet.
    Read `ADR_TIMING` with `status` before and after the run.
 
-**Walking without a laptop.** On every Client page, `TX SF8 CR4/5` means
+**Reading the display at a test point.** On every Client page, `TX SF8 CR4/5` means
 the last DATA transmission started at SF8. It survives the switch back to
 SF9 for control. On page 2, `ACKED DATA SF` changes only after a matching
 ACK. At a stop, read both values and the AGE on page 1. Client AGE measures
@@ -171,6 +173,40 @@ same Clients, route and offered load. The rule does not need provisioning.
 ```powershell
 cmd /d /c 'set PLATFORMIO_BUILD_SRC_FLAGS=-DADAPTIVE_LORA_ADR_RULE=1&&set PLATFORMIO_BUILD_DIR=.pio/adr-ewma&&pio run -e heltec_wifi_lora_32_V3_adaptive -t upload --upload-port COMx'
 ```
+
+## Test the rotating profile
+
+Use the same build on the Gateway and all Clients.
+
+```sh
+pio run -e heltec_wifi_lora_32_V3_rotating
+pio run -e heltec_wifi_lora_32_V3_rotating -t upload --upload-port COMx
+```
+
+Use the physical port and the [role commands](#flash-and-set-roles) above.
+In `status`, confirm `protocol=6` and `profile=rotating`. With Gateway ID
+1, the default registry contains Client IDs 2–129. For a small rotation
+test, set `ADAPTIVE_LORA_REGISTERED_CLIENTS` in the build environment
+for all boards. IDs 2 and 10 exercise separate groups with the default
+registry. Capture at least two complete sweeps. `GROUP WAIT` with
+`BEACON SYNC` is expected outside a Client's group. `SEARCH` means
+it has stopped receiving Beacons on time. Use synthetic data only.
+The [rotation model](SCHEDULED_LINK.md#rotating-schedule) gives the
+expected schedule, and the capture must measure the actual delivery gap.
+For larger tests, record all delivery events on the Gateway and use the
+capture tool's eight Client ports for a sample of links across groups.
+
+## Test the secure candidate
+
+Use synthetic samples and an authorized RF setup. The secure image keeps 915.0 MHz, BW125, SF9 control, CR4/5 and a 22 dBm TX request. Confirm the permitted frequency, antenna gain, EIRP and airtime for the actual setup before radiating.
+
+1. Back up each board and confirm its flash layout and security state using the [procedure above](#back-up-a-board-that-has-firmware-or-settings-to-keep). Work on provisionable test boards. The secure role uses a new NVS namespace, so saved plaintext roles do not migrate.
+2. On a trusted offline machine with Python `cryptography`, run `python tools/secure_provision.py --out PRIVATE_NEW_DIRECTORY --network 1 --gateway 1 --clients 1`. Use 4 or 8 for later runs. Each invocation creates a new trust generation. Store the files outside the checkout with restricted permissions. Never send the Gateway CSV to a Client.
+3. In the offline Python environment install `esp-idf-nvs-partition-gen==0.2.0`. Run `python -m esp_idf_nvs_partition_gen generate DEVICE.csv DEVICE.bin 0x5000` if the verified NVS partition is 20 KiB. The image contains the role and credentials for one board and replaces that board's NVS partition. Verify the file, board, offset and size before writing. The SDK default 8 MB layout uses `0x9000` for NVS. If encryption, security settings or layout differ, use the board's approved provisioning path.
+4. Build both roles with `pio run -e heltec_wifi_lora_32_V3_secure`. For a synthetic 32 B test, set `PLATFORMIO_BUILD_SRC_FLAGS=-DADAPTIVE_LORA_SECURE_DEMO=1` and a separate `PLATFORMIO_BUILD_DIR` before building and uploading. The standard image expects the application to submit payloads. Install the matching private NVS image via the verified port using esptool `write-flash` at the verified NVS offset. At boot check `protocol=7`, `profile=secure`, role, node ID, and `registered_count` in `SCHEDULE_CONFIG`. For a security error, expect `CONFIG_INVALID` followed by `PROVISIONING` with `result=radio_disabled`. Use offline provisioning to replace v7 credentials.
+5. Run 1, 4 and 8 Clients plus the Gateway. Capture two or more full sweeps, then test Client restart, Gateway restart, simultaneous restart and restored signal after loss. Test loss of SF9 control separately from DATA loss at SF10. Record worst and percentile delivery gaps, `SECURITY_TIMING`, `SECURITY_MEMORY`, radio retune timing, resets, retries and Gateway TX airtime. Exercise missing credentials and stuck BUSY on a controlled fixture with an RF load and record the exact outcome.
+
+To replace or revoke a credential, create a new generation with `--revoke ID` as needed, then install only that generation across the active fleet. Revoked positions have no usable key and still occupy registry positions. Reprovision all active boards after recovering from a flash backup. A valid old flash snapshot can restore old credentials without a hardware rollback control. The secure build never falls back to v6. Do not flash a plaintext profile on a provisioned production board.
 
 ## Save the results
 

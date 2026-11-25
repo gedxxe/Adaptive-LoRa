@@ -115,7 +115,12 @@ bool applyAdrReceipt(AdrState& state, uint32_t receipt) {
     state.acknowledgedSf = receipt && receipt == state.deliveredFrame ? state.deliveredSf : 0;
     // A higher acknowledged SF is safe to remember. Lowering the hint requires a lock.
     state.recoverySf = std::max(state.recoverySf, state.acknowledgedSf);
-    if (!probingHigher(state) || state.acknowledgedSf != state.desired || receipt < state.probeStartedFrame)
+#if defined(ADAPTIVE_LORA_ROTATING)
+    const auto deliveredOpportunity = state.deliveredOpportunity;
+#else
+    const auto deliveredOpportunity = receipt;
+#endif
+    if (!probingHigher(state) || state.acknowledgedSf != state.desired || deliveredOpportunity < state.probeStartedFrame)
         return false;
     clearProbe(state);
     return true;

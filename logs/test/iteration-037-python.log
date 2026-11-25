@@ -1,0 +1,128 @@
+$ python -m unittest discover -s tools -p test_capture_bench.py -v
+test_disconnect_preserves_partial_bytes_and_error (test_capture_bench.CaptureTests.test_disconnect_preserves_partial_bytes_and_error) ... ok
+test_distinct_port_check_understands_win32_alias (test_capture_bench.CaptureTests.test_distinct_port_check_understands_win32_alias) ... ok
+test_existing_directory_is_not_overwritten (test_capture_bench.CaptureTests.test_existing_directory_is_not_overwritten) ... ok
+test_final_metadata_failure_leaves_running_marker (test_capture_bench.CaptureTests.test_final_metadata_failure_leaves_running_marker) ... ok
+test_gateway_and_eight_clients_keep_independent_streams (test_capture_bench.CaptureTests.test_gateway_and_eight_clients_keep_independent_streams) ... ok
+test_group_rejects_duplicate_clients_and_more_than_eight (test_capture_bench.CaptureTests.test_group_rejects_duplicate_clients_and_more_than_eight) ... ok
+test_initial_metadata_failure_never_opens_ports (test_capture_bench.CaptureTests.test_initial_metadata_failure_never_opens_ports) ... ok
+test_interrupt_is_incomplete_exit130 (test_capture_bench.CaptureTests.test_interrupt_is_incomplete_exit130) ... ok
+test_long_partial_line_is_streamed_with_4096_byte_reads (test_capture_bench.CaptureTests.test_long_partial_line_is_streamed_with_4096_byte_reads) ... ok
+test_missing_port_stops_pair_with_error (test_capture_bench.CaptureTests.test_missing_port_stops_pair_with_error) ... ok
+test_operator_metadata_is_bounded_and_validated (test_capture_bench.CaptureTests.test_operator_metadata_is_bounded_and_validated) ... ok
+test_pair_raw_timestamps_hashes_and_preopen_modem_lines (test_capture_bench.CaptureTests.test_pair_raw_timestamps_hashes_and_preopen_modem_lines) ... ok
+test_short_status_write_is_error (test_capture_bench.CaptureTests.test_short_status_write_is_error) ... ok
+test_single_board_passive_sends_no_bytes (test_capture_bench.CaptureTests.test_single_board_passive_sends_no_bytes) ... ok
+test_unjoined_reader_is_incomplete_not_success (test_capture_bench.CaptureTests.test_unjoined_reader_is_incomplete_not_success) ... ok
+
+----------------------------------------------------------------------
+Ran 15 tests in 0.621s
+
+OK
+Exit code: 0
+
+$ python -m unittest discover -s tools -p test_tdma_feasibility.py -v
+test_hand_calculated_packet_vectors (test_tdma_feasibility.AirtimeTests.test_hand_calculated_packet_vectors) ... ok
+test_header_crc_coding_and_preamble_terms (test_tdma_feasibility.AirtimeTests.test_header_crc_coding_and_preamble_terms) ... ok
+test_low_data_rate_optimization_and_override (test_tdma_feasibility.AirtimeTests.test_low_data_rate_optimization_and_override) ... ok
+test_rejects_unsupported_or_invalid_phy (test_tdma_feasibility.AirtimeTests.test_rejects_unsupported_or_invalid_phy) ... ok
+test_zero_and_phy_maximum_lengths (test_tdma_feasibility.AirtimeTests.test_zero_and_phy_maximum_lengths) ... ok
+test_airtime_floor_can_disprove_fit_with_unknown_timings (test_tdma_feasibility.ScheduleTests.test_airtime_floor_can_disprove_fit_with_unknown_timings) ... ok
+test_application_header_and_heterogeneous_payloads (test_tdma_feasibility.ScheduleTests.test_application_header_and_heterogeneous_payloads) ... ok
+test_cli_rejects_invalid_client_count_before_allocating (test_tdma_feasibility.ScheduleTests.test_cli_rejects_invalid_client_count_before_allocating) ... ok
+test_cli_writes_parseable_report (test_tdma_feasibility.ScheduleTests.test_cli_writes_parseable_report) ... ok
+test_complete_bitmap_size_and_control_phy (test_tdma_feasibility.ScheduleTests.test_complete_bitmap_size_and_control_phy) ... ok
+test_exact_superframe_boundary_and_one_microsecond_over (test_tdma_feasibility.ScheduleTests.test_exact_superframe_boundary_and_one_microsecond_over) ... ok
+test_explicit_hypothetical_costs_are_all_charged (test_tdma_feasibility.ScheduleTests.test_explicit_hypothetical_costs_are_all_charged) ... ok
+test_rejects_invalid_schedule_inputs (test_tdma_feasibility.ScheduleTests.test_rejects_invalid_schedule_inputs) ... ok
+test_retry_budget_includes_ack_each_round (test_tdma_feasibility.ScheduleTests.test_retry_budget_includes_ack_each_round) ... ok
+test_scenario_grid_is_complete_and_deterministic (test_tdma_feasibility.ScheduleTests.test_scenario_grid_is_complete_and_deterministic) ... ok
+test_unknown_is_not_zero_or_a_fit_claim (test_tdma_feasibility.ScheduleTests.test_unknown_is_not_zero_or_a_fit_claim) ... ok
+
+----------------------------------------------------------------------
+Ran 16 tests in 0.192s
+
+OK
+Exit code: 0
+
+$ python -m unittest discover -s tools -p test_adr_shadow.py -v
+test_clients_and_reboot_sessions_keep_separate_windows (test_adr_shadow.AdrShadowTests.test_clients_and_reboot_sessions_keep_separate_windows) ... ok
+test_invalid_metrics_and_conflicting_observations_are_rejected (test_adr_shadow.AdrShadowTests.test_invalid_metrics_and_conflicting_observations_are_rejected) ... ok
+test_local_timing_faults_and_application_refusals_do_not_train_adr (test_adr_shadow.AdrShadowTests.test_local_timing_faults_and_application_refusals_do_not_train_adr) ... ok
+test_low_snr_counts_even_when_all_data_arrive (test_adr_shadow.AdrShadowTests.test_low_snr_counts_even_when_all_data_arrive) ... ok
+test_missing_capture_lines_do_not_imply_packet_loss (test_adr_shadow.AdrShadowTests.test_missing_capture_lines_do_not_imply_packet_loss) ... ok
+test_request_metrics_and_absent_rows_preserve_the_legacy_parser (test_adr_shadow.AdrShadowTests.test_request_metrics_and_absent_rows_preserve_the_legacy_parser) ... ok
+test_weak_windows_raise_then_healthy_windows_clear_the_candidate (test_adr_shadow.AdrShadowTests.test_weak_windows_raise_then_healthy_windows_clear_the_candidate) ... ok
+
+----------------------------------------------------------------------
+Ran 7 tests in 0.001s
+
+OK
+Exit code: 0
+
+$ python -m unittest discover -s tools -p test_model_multiclient.py -v
+test_adaptive_matrix_and_bench_headroom (test_model_multiclient.MulticlientBudgetTests.test_adaptive_matrix_and_bench_headroom) ... ok
+test_adaptive_no_extrapolation_past_wire_limit (test_model_multiclient.MulticlientBudgetTests.test_adaptive_no_extrapolation_past_wire_limit) ... ok
+test_bench_roster_matches_firmware_reservation (test_model_multiclient.MulticlientBudgetTests.test_bench_roster_matches_firmware_reservation) ... ok
+test_extended_sf_includes_ldro_and_shared_retries (test_model_multiclient.MulticlientBudgetTests.test_extended_sf_includes_ldro_and_shared_retries) ... ok
+test_extrapolation_does_not_admit_large_rosters (test_model_multiclient.MulticlientBudgetTests.test_extrapolation_does_not_admit_large_rosters) ... ok
+test_guard_and_payload_sweep (test_model_multiclient.MulticlientBudgetTests.test_guard_and_payload_sweep) ... ok
+
+----------------------------------------------------------------------
+Ran 6 tests in 0.043s
+
+OK
+Exit code: 0
+
+$ python -m unittest discover -s tools -p test_check_consistency.py -v
+test_algorithm_requires_a_png (test_check_consistency.ConsistencyTests.test_algorithm_requires_a_png) ... ok
+test_archived_body_is_preserved_but_notice_is_required (test_check_consistency.ConsistencyTests.test_archived_body_is_preserved_but_notice_is_required) ... ok
+test_bad_build_environment_is_reported (test_check_consistency.ConsistencyTests.test_bad_build_environment_is_reported) ... ok
+test_bad_current_region_markers_are_rejected (test_check_consistency.ConsistencyTests.test_bad_current_region_markers_are_rejected) ... ok
+test_bench_ceiling_and_capacity_rows_must_match (test_check_consistency.ConsistencyTests.test_bench_ceiling_and_capacity_rows_must_match) ... ok
+test_both_protocol_guides_show_the_sf_recovery_algorithm (test_check_consistency.ConsistencyTests.test_both_protocol_guides_show_the_sf_recovery_algorithm) ... ok
+test_broken_current_link_is_reported (test_check_consistency.ConsistencyTests.test_broken_current_link_is_reported) ... ok
+test_client_example_requires_distinct_node_id (test_check_consistency.ConsistencyTests.test_client_example_requires_distinct_node_id) ... ok
+test_current_repository_passes (test_check_consistency.ConsistencyTests.test_current_repository_passes) ... ok
+test_default_build_requires_display (test_check_consistency.ConsistencyTests.test_default_build_requires_display) ... ok
+test_extended_capacity_and_matched_comparison_in_both_languages (test_check_consistency.ConsistencyTests.test_extended_capacity_and_matched_comparison_in_both_languages) ... ok
+test_history_cannot_hide_wrong_current_version (test_check_consistency.ConsistencyTests.test_history_cannot_hide_wrong_current_version) ... ok
+test_phy_and_chinese_provisioning_regressions (test_check_consistency.ConsistencyTests.test_phy_and_chinese_provisioning_regressions) ... ok
+test_physical_pass_claim_is_rejected (test_check_consistency.ConsistencyTests.test_physical_pass_claim_is_rejected) ... ok
+test_protocol_pages_share_the_symbolic_reservation (test_check_consistency.ConsistencyTests.test_protocol_pages_share_the_symbolic_reservation) ... ok
+test_readmes_share_the_same_figures (test_check_consistency.ConsistencyTests.test_readmes_share_the_same_figures) ... ok
+test_readmes_share_the_two_role_algorithm (test_check_consistency.ConsistencyTests.test_readmes_share_the_two_role_algorithm) ... ok
+test_rejects_github_incompatible_operator_macro (test_check_consistency.ConsistencyTests.test_rejects_github_incompatible_operator_macro) ... ok
+test_timing_constants_are_independent (test_check_consistency.ConsistencyTests.test_timing_constants_are_independent) ... ok
+test_walk_test_serial_status_must_match_wire_version (test_check_consistency.ConsistencyTests.test_walk_test_serial_status_must_match_wire_version) ... ok
+
+----------------------------------------------------------------------
+Ran 20 tests in 6.063s
+
+OK
+Exit code: 0
+
+$ python -m unittest discover -s tools -p test_adr_sim.py -v
+test_policy_shift_does_not_change_the_channel_reference (test_adr_sim.AdrSimTests.test_policy_shift_does_not_change_the_channel_reference) ... ok
+test_seeded_reports_cover_the_full_sweep (test_adr_sim.AdrSimTests.test_seeded_reports_cover_the_full_sweep) ... ok
+
+----------------------------------------------------------------------
+Ran 2 tests in 1.305s
+
+OK
+Exit code: 0
+
+$ python -m unittest discover -s tools -p test_secure_provision.py -v
+test_invalid_inputs_fail_before_creation (test_secure_provision.SecureProvisionTests.test_invalid_inputs_fail_before_creation) ... ok
+test_matching_credentials_bound_to_role_and_revocation (test_secure_provision.SecureProvisionTests.test_matching_credentials_bound_to_role_and_revocation) ... ok
+test_sdk_builds_nvs_image_with_full_registry_record (test_secure_provision.SecureProvisionTests.test_sdk_builds_nvs_image_with_full_registry_record) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.352s
+
+OK
+Exit code: 0
+
+$ python tools/check_consistency.py
+PASS: selected current-document consistency (0 errors)
+Exit code: 0

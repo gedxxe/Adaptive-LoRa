@@ -6,6 +6,11 @@
 
 ![Order of control, DATA and retry slots on the single radio](../research/figures/adaptive-frame.svg)
 
+This table describes the default adaptive wire-v5 profile. The rotating
+profiles use the same phases with a [wire-v6 group selector](#rotating-schedule)
+or a [wire-v7 security envelope](#secure-wire-v7). Use a single wire version
+for the Gateway and all Clients.
+
 Protocol 5 uses little-endian fields in a 28-byte header and a 96-byte
 maximum frame. The header carries the network, source, destination,
 sender boot ID, frame ID, sequence and schedule version. The Gateway
@@ -74,7 +79,7 @@ $\Theta^\star$ contains up to $\varkappa$ of the longest slots in $\Theta$.
 
 ```math
 \begin{aligned}
-\eta &= \eta_{\mathrm{header}}+\eta_{\mathrm{session}},\\
+\eta &= \eta_{\mathrm{header}}+\eta_{\mathrm{session}}+\eta_{\mathrm{tag}},\\
 \tau_{\mathrm{slot},\iota}
    &=\tau_{\mathrm{air}}(\lambda_\iota+\eta,\sigma_\iota)+\delta,\\
 \tau_{\mathrm{data}}&=\sum_{\iota\in\Theta}\tau_{\mathrm{slot},\iota},\\
@@ -101,8 +106,9 @@ $\Theta^\star$ contains up to $\varkappa$ of the longest slots in $\Theta$.
 
 $\tau_{\mathrm{B}}$, $\tau_{\mathrm{R}}$, $\tau_{\mathrm{G}}$ and
 $\tau_{\mathrm{A}}$ are the airtimes of one Beacon, Request, Grant and
-bitmap at $\sigma_{\mathrm{ctrl}}$. Their encoded lengths come from the
-wire table plus the common header. $\tau_{\mathrm{requests}}$ includes
+bitmap at $\sigma_{\mathrm{ctrl}}$. Use the complete packet sizes for the
+chosen profile, including the common header and any v7 security fields.
+$\tau_{\mathrm{requests}}$ includes
 the Request windows and the gaps before those windows and the Grant.
 $\tau_{\mathrm{bitmaps}}$ covers all feedback frames, the gap before the
 first DATA round, the gaps around the retry rounds, the gap before
@@ -110,14 +116,16 @@ the final bitmap and the closing guard. Each of these gaps uses $\delta$.
 The Gateway uses the inequality before accepting a higher-SF
 reservation. Lower-SF trials retain the previous reservation.
 
-| Symbol | Meaning | Current adaptive image |
+| Symbol | Meaning | Default adaptive image (wire v5) |
 |---|---|---|
 | $\eta_{\mathrm{header}}$, $\eta_{\mathrm{session}}$ | Frame header and Gateway boot ID in DATA | 28 B, 4 B |
+| $\eta_{\mathrm{tag}}$ | DATA authentication tag | 0 B in v5, 16 B in v7 |
 | $\nu_\Omega$, $\lambda_\iota$ | Bench roster and per-Client payload ceiling | 8 Clients, 32 B. The wire format allows 64 B. |
 | $\varrho$, $\varkappa$ | Retry rounds and shared retry slots per round | 3 rounds, up to 4 slots |
 | $\delta$, $\tau_{\mathrm{tail}}$, $\tau_{\mathrm{frame}}$ | Slot guard, end reserve, superframe period | 80 ms, 300 ms, 15 s |
 
-The retune lead and transmit launch window are one quarter of the guard.
+In v5 the retune lead and transmit launch window are one quarter of the guard.
+The [v7 budget](#secure-schedule-capacity) accounts for processing separately.
 The receive window is half a guard on either side of the expected packet
 completion. The implementation measures from packet-completion
 timestamps. It skips a transmit slot if software reaches it too late.
@@ -203,14 +211,23 @@ The figure shows the shared SF policy and the three build-time rules.
 
 <img src="../research/figures/adaptive-algorithm-adr.png" alt="Gateway SF policy showing session recovery, the recent loss window, lower-SF trial rollback and confirmation." width="480">
 
-In the README algorithms, $\phi$ is the frame ID, $\phi_{\mathrm{ack}}$ is
-the last ACKed frame in the same Gateway session, and $\Gamma$ is a valid
-Grant. Round $\jmath=0$ is the first DATA attempt. $\Theta_\jmath$ is the set
+[Algorithm 1 (Gateway scheduling)](../../README.md#algorithm-1-gateway-scheduling)
+shows how the Gateway selects and serves a group. In
+[Algorithm 2 (Client delivery)](../../README.md#algorithm-2-client-delivery),
+the Client follows the matching Grant and feedback. In both listings,
+$\phi$ is the frame ID, $\phi_{\mathrm{ack}}$ is the last ACKed frame
+in the same Gateway session, and $\Gamma$ is a valid Grant. $\Omega$ is
+the active roster, $\nu_\iota$ counts Client $\iota$'s opportunities
+(the frame ID in a fixed roster), and $\iota_0$ is the first roster
+position. $\kappa_\iota$ is the v7 Request challenge. Round $\jmath=0$ is
+the first DATA attempt. $\Theta_\jmath$ is the set
 of authorized Clients, $\Xi$ accumulates accepted Clients, and $\Pi_\jmath$
 selects up to $\varkappa$ granted Clients whose DATA has yet to arrive.
 $\epsilon_\jmath$ records the local Client's permission to send. An invalid
-or absent bitmap provides empty sets. The Gateway checks frame and session
-identity, declared payload length, and timing before accepting DATA.
+or absent bitmap provides empty sets. A retry requires missing DATA for an
+active Grant. The Gateway excludes packets refused by the application.
+The Gateway checks frame and session identity, declared payload length,
+and timing before accepting DATA. In v7 it also verifies the CCM tag.
 
 For current time $\tau$, scheduled TX start $\tau_{\iota,\jmath}$, expected
 packet completion $\widehat{\tau}$ and observed completion $\tau_{\mathrm{rx}}$,
@@ -268,11 +285,11 @@ enter this window.
 ```math
 \begin{aligned}
 \boldsymbol{\xi}^{\mathrm{loss}}_\iota
-  &\gets \operatorname{Tail}_{\nu_{\mathrm{obs}}}
+  &\gets \mathrm{Tail}_{\nu_{\mathrm{obs}}}
   \bigl(\boldsymbol{\xi}^{\mathrm{loss}}_\iota\mathbin{\|}e\bigr),
   & e=1 &\;\land\; \sum_j\xi^{\mathrm{loss}}_{\iota,j}\ge\nu_{\mathrm{up}},\\
 \boldsymbol{\chi}_\iota
-  &\gets \operatorname{Tail}_{\nu_{\mathrm{obs}}}
+  &\gets \mathrm{Tail}_{\nu_{\mathrm{obs}}}
   \bigl(\boldsymbol{\chi}_\iota\mathbin{\|}m_\iota\bigr),
   & m_\iota=1 &\;\land\; \sum_j\chi_{\iota,j}\ge\nu_{\mathrm{up}}.
 \end{aligned}
@@ -332,12 +349,36 @@ software windows. [LaTeX source](../research/figures/adaptive-algorithm.tex) · 
 
 ### Loss-cause-aware ADR
 
-The delivery-window rule is the default. Two build-time options use SNR
-estimates for the ordinary SF decision.
-`MARGIN_EWMA` tracks an exponential mean and variance. `MARGIN_KALMAN`
-tracks level and slope and projects both the level and its uncertainty one
-eligible report ahead. With no SNR in an eligible report, EWMA holds its
-estimate and Kalman predicts without a measurement update.
+#### Kalman estimator
+
+The [implementation](../../src/app/adr_policy.cpp) tracks SNR level $s$ in dB and its trend $\dot{s}$ in dB per eligible report. It prefers the SF9 Request SNR for $y_k$. If only accepted DATA SNR is available, it subtracts the provisional per-SF offset $b_\sigma$ to keep the observation on the Request scale.
+
+```math
+\begin{aligned}
+\boldsymbol{x}_k &= [s_k,\dot{s}_k]^{\mathsf T},
+& F&=\begin{bmatrix}1&1\\0&1\end{bmatrix},
+& H&=\begin{bmatrix}1&0\end{bmatrix},\\
+Q&=\begin{bmatrix}q_s&0\\0&q_{\dot{s}}\end{bmatrix},
+& R&=r,\\
+\boldsymbol{x}_k^- &= F\boldsymbol{x}_{k-1},
+& P_k^-&=FP_{k-1}F^{\mathsf T}+Q,\\
+e_k&=y_k-H\boldsymbol{x}_k^-,
+& \omega_k&=HP_k^-H^{\mathsf T}+R,\\
+K_k&=P_k^-H^{\mathsf T}/\omega_k,
+& \boldsymbol{x}_k&=\boldsymbol{x}_k^-+K_k e_k,\\
+P_k&=(I-K_kH)P_k^-,
+& \widehat{x}&=HF\boldsymbol{x}_k,\\
+\sigma_x^2&=H(FP_kF^{\mathsf T}+Q)H^{\mathsf T},
+& m_\sigma&=\widehat{x}+b_\sigma-\vartheta_\sigma-z\sigma_x .
+\end{aligned}
+```
+
+Here $P$ is the state covariance, $Q$ is the process noise, $R$ is the measurement variance, and $K_k$ weights the innovation $e_k$. The first finite observation initializes the level, zero trend and diagonal covariance $(r,p_{\dot s,0})$. If an eligible report has no finite SNR, use the prior $\boldsymbol{x}_k^-,P_k^-$ without a measurement correction. Absent and excluded reports do not advance the estimator. The implementation bounds slope variance and the forecast variance passed to the square root at zero. There is no explicit outlier rejection.
+
+The one-step forecast is per eligible report, including under rotation. A node outside the active group consumes no filter step. Reboot or idle reset discards the old estimate. The parameters are provisional and have not been calibrated for elapsed seconds. A wall-clock version would need $F_{12}=\Delta t$ in seconds, a matching time-dependent $Q(\Delta t)$, and recalibration against captures. The margin only informs the optional ADR rules. Any change still needs a fitting DATA reservation and must pass the trial and receipt rules. The delivery-window rule remains the default.
+
+`MARGIN_EWMA` tracks an exponential mean and variance. It holds its
+estimate when an eligible report has no finite SNR.
 
 An RSSI reading describes packet strength. A weak reading with good
 delivery can stay at its current SF. A strong reading can still coincide
@@ -395,6 +436,80 @@ threshold remains reachable. Field data are needed to calibrate the
 margins and weights. The [seeded simulator](../../tools/adr_sim.py) can
 shift policy thresholds with `--policy-snr-shift-db` while keeping the
 assumed channel fixed.
+
+## Rotating schedule
+
+Wire v6 is an opt-in, unencrypted research profile. It retains the 28-byte header, 96-byte frame limit, control at SF9 and per-Client DATA at SF7–SF10. The registry names `ADAPTIVE_LORA_REGISTERED_CLIENTS` consecutive usable IDs, skipping the Gateway ID. With Gateway 1 and the default registry of 128, these are IDs 2–129. Only the current roster is on air, with a separate Request and DATA opportunity per selected Client. The tuple (network ID, Gateway boot ID, frame ID) identifies each group and invalidates old Grants when a new Beacon is accepted.
+
+The [selector](../../src/common/protocol/multiclient_protocol.cpp) takes the longest prefix that fits, using the payload ceiling and the larger of the Client's desired and reserved DATA SF. It reserves Beacon, Requests, Grant, primary DATA, the longest eligible retry slots, feedback and guards. When an entry cannot fit, it starts the next group. A sweep ends at the end of the registry and restarts at its first ID. Off-roster Clients retain queued payloads. ADR history is indexed by Client ID, and idle timers and probe deadlines count that Client's own scheduled opportunities. Gateway restart clears this volatile state.
+
+For fixed profiles, a homogeneous group of size $\nu_g$ yields $\tau_{\mathrm{cycle}}=\lceil\nu/\nu_g\rceil\tau_{\mathrm{frame}}$. The table reports one sweep with a fixed 32-byte ceiling and a 15 s frame. These are scheduled opportunities computed with the production airtime functions. Changes in SF can shift the position of a node between sweeps. Delivery gaps can grow with missed Beacons, loss or outages.
+
+| Scheduled population | All SF7 | All SF8 | All SF9 | All SF10 |
+|---:|---:|---:|---:|---:|
+| 70 | 135 s | 135 s | 150 s | 360 s |
+| 84 | 165 s | 165 s | 180 s | 420 s |
+| 128 | 240 s | 240 s | 285 s | 645 s |
+
+### Earlier authentication estimates
+
+A secure wire version must authenticate Beacon, Grant, ACK, Request and DATA before the receiver uses them. A shared group secret would let a compromised Client impersonate the Gateway. Two designs worth comparing are a 64-byte Gateway signature per control frame and a 16-byte pairwise tag for each listed Client. Signature verification works on every Client, even outside the current group. Pairwise tags use less space for groups smaller than four but require a verifier to know which tag applies.
+
+The host sensitivity check adds 16 bytes to every Request and DATA, then adds either signature or tag bytes to Beacon, Grant and each reserved bitmap. It keeps the original guard, retries and tail. At 32 bytes and DATA SF7/8/9/10, the signature design fits 8/7/4/2 per frame, while pairwise tags fit 8/6/4/2. Both project 240 s at SF7 and 960 s at SF10 for 128 Clients. These are airtime projections. Extra session traffic, CPU time, key management, actual radio service gaps and RF loss still require tests.
+
+Those estimates omitted the freshness exchange and the extra processing guard. The [v7 implementation](#secure-wire-v7) uses signatures and a challenge echo. The v6 comparison still uses plaintext.
+
+## Secure wire v7
+
+Build `heltec_wifi_lora_32_V3_secure` for both roles. It accepts only v7. The existing v1, v2, v3, v5 and v6 images remain comparison profiles. The secure radio buffer allows 237 B. The 28 B inner header and 96 B inner codec limit are unchanged. The inner length byte counts the body before the security trailer.
+
+| Packet | Complete on-air bytes | Protection |
+|---|---:|---|
+| Beacon | $113+3n$ | P-256 signature and 128-bit Gateway boot epoch |
+| Request | 69 | 128-bit Client challenge and HMAC-SHA-256 truncated to 128 bits |
+| Grant | $93+18n$ | P-256 signature and 96-bit challenge echo per roster position |
+| DATA | $48+\lambda$ | AES-128-CCM with a 128-bit tag |
+| ACK bitmap | $95+4n$ | P-256 signature |
+
+Here $n$ is the roster count and $\lambda$ is the application payload size. The compile-time maximum is a 237 B Grant at $n=8$. The 32 B profile selects smaller groups when the reserved airtime requires it. ACKs still confirm the registered receive callback. They do not confirm database persistence.
+
+The Gateway verifies a per-Client MAC before saving a Request. Clients verify Gateway signatures using the network's provisioned public key. The signed bytes include the visible routing header, message type, schedule, frame, role-specific boot ID and payload, plus the credential generation and full Gateway epoch. A Client key allows that Client to submit records under its own ID. It cannot sign Gateway messages or submit as another Client.
+
+A verified Beacon from a new epoch gives the Client a tentative schedule. The Client generates a new 128-bit challenge for each Request. A valid, timely Grant must echo 96 bits of that challenge and match the frame, Client boot ID and requested size before the Client can confirm the epoch or send DATA. Until then, the Client retains the previous confirmed delivery state. A recorded Beacon can elicit a Request after loss of synchronization. A recorded Grant lacks the fresh challenge echo. The Client verifies feedback for the current session, frame and round after it has started a DATA transmission. Duplicate authenticated DATA calls the application at most once in that transaction.
+
+The devices seed Mbed TLS CTR-DRBG using the ESP32-S3 startup entropy source before enabling the radio. Each Gateway boot and frame-counter rollover generates a new 128-bit epoch. HKDF-SHA-256 derives a Request MAC key by credential generation and a DATA key by generation, Gateway epoch and full Client challenge. It uses separate labels for Request and DATA. DATA authenticates the inner header as associated data. Its 13-byte nonce uses bytes 12–23 (sender boot, frame, sequence and reserved configuration fields), followed by the v7 domain byte. A new frame changes the nonce under the same key. A new handshake changes the key, assuming the startup entropy source and HKDF are sound. Once sealed, every retry copies exactly the cached ciphertext and tag. No packet advances a flash counter. [CCM](https://csrc.nist.gov/pubs/sp/800/38/c/upd1/final) · [HKDF](https://datatracker.ietf.org/doc/html/rfc5869)
+
+The operator provisions the private trust material offline. Runtime never installs, repairs, or generates persistent credentials. The secure role record and key record live in separate namespaces from the plaintext role. Missing, unreadable, inconsistent or unseedable state keeps the radio off, including after default NVS formatting. Restoring the same valid credentials renews session keys through fresh handshakes. Flash rollback can still restore revoked trust material. Recovery after a restore therefore requires new credentials and a new generation for all active boards. Secure Boot, flash/NVS encryption and rollback controls need a separate board acceptance step. RF interference, traffic metadata and a compromised Gateway remain outside these protections.
+
+### Secure schedule capacity
+
+The secure planner includes every security byte, all four feedback windows, the 300 ms end reserve, and a 160 ms slot guard. The guard adds a provisional 40 ms allowance per side to the existing 80 ms radio guard. The post-crypto launch limit is 60 ms from the slot start. Late packets are withheld. The secure adapter uses SX1262 SetTx with a chip timeout and skips RadioLib's later unbounded PA-ramp wait. SPI locks and command timing still need physical validation.
+
+| Registered Clients | All SF7 | All SF8 | All SF9 | All SF10 | Repeating SF7–SF10 |
+|---:|---:|---:|---:|---:|---:|
+| 1 | 15 s | 15 s | 15 s | 15 s | 15 s |
+| 4 | 15 s | 15 s | 30 s | 30 s | 30 s |
+| 8 | 30 s | 30 s | 45 s | 60 s | 45 s |
+| 16 | 60 s | 60 s | 90 s | 120 s | 90 s |
+| 32 | 105 s | 120 s | 165 s | 240 s | 180 s |
+| 63 | 195 s | 240 s | 315 s | 480 s | 360 s |
+| 64 | 195 s | 240 s | 330 s | 480 s | 360 s |
+| 70 | 210 s | 270 s | 360 s | 525 s | 390 s |
+| 84 | 255 s | 315 s | 420 s | 630 s | 480 s |
+| 96 | 300 s | 360 s | 480 s | 720 s | 540 s |
+| 128 | 390 s | 480 s | 645 s | 960 s | 720 s |
+
+These are sweep times for a fixed 32-byte ceiling and uninterrupted scheduling. A successful report additionally needs SF9 control in both directions and a successful DATA slot. SF10 DATA does not extend SF9 control coverage. The [model results](PROGRESS.md#secure-rotation-experiment) show delivery gaps under shared interference. For RF tests use the setup and authorization limits in the [secure test procedure](BENCH_RUNBOOK.md#test-the-secure-candidate).
+
+## Integration prompt
+
+Use this prompt after checking the local code and the target system's license:
+
+> Read this repository's engineering contract, protocol and setup guide. Audit the target firmware and identify where sampled bytes originate and where received bytes are consumed. State the target's Client count, maximum payload length, report interval, acceptable delivery gap, and permitted RF profile. Check these against the active scheduler and the authentication status. Propose a versioned binary payload with explicit length, byte order, units, timestamp and stable sample identity.
+>
+> Keep application dependencies outside the protocol. Use `FirmwareRuntime::submitPayload` and handle `QUEUED`, `BUSY`, `TOO_LARGE`, and `INACTIVE`. The single pending sample is retained between groups. Copy received bytes before the synchronous `PayloadPort::Receiver` returns and decide whether the local application accepted them. An ACK confirms that callback accepted the packet. If downstream storage needs a guarantee, define a separate idempotent acknowledgment. Account for resets, unknown delivery, queue overflow, and version mismatches. Include byte fixtures and host tests for retries and loss. Preserve the comparison firmware, avoid secrets and private data in logs or Git, and separate build, simulation, and physical results in the final report.
+
+**Sampling and persistence.** Capture each measurement at its scheduled timestamp. Assign a stable sample ID before submitting it to LoRa. Keep that ID and the original timestamp in the binary payload on retries and after application restart. The transport owns a copy of one queued payload per Client, so the consuming application must keep its own bounded durable queue across outages if the measurement cannot be lost. Submit on the cooperative runtime loop via a synchronized handoff from any sampling task. On `BUSY` retain the sample in that queue. Set a queue limit and report overflow, oldest pending age and lost samples. After `MISSING`, `UNKNOWN` or reset, retry using the same application sample ID. The Gateway consumer deduplicates on authenticated Client identity plus sample ID across radio sessions. A receive callback must remain within the radio timing budget. A separate application acknowledgment is required for a durable sink guarantee.
 
 ## Board reference
 

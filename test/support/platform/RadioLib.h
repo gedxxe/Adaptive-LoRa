@@ -15,13 +15,24 @@ constexpr uint32_t RADIOLIB_SX126X_IRQ_CRC_ERR = 0x40, RADIOLIB_SX126X_IRQ_TIMEO
 constexpr uint32_t RADIOLIB_SX126X_RX_TIMEOUT_INF = 0xFFFFFF;
 // Generic IRQ positions in pinned 7.8.1: RX_DONE, HEADER_VALID/ERR, CRC_ERR, TIMEOUT.
 constexpr uint32_t RADIOLIB_IRQ_RX_DEFAULT_FLAGS = (1u << 1) | (1u << 4) | (1u << 5) | (1u << 6) | (1u << 9);
+constexpr uint16_t RADIOLIB_SX126X_CMD_SET_TX = 0x83;
+constexpr uint8_t RADIOLIB_RADIO_MODE_TX = 1;
+struct RadioModeConfig_t { struct { const uint8_t* data; size_t len; uint8_t addr; } transmit; };
 
 class Module {
 public:
+    static constexpr uint8_t MODE_TX = 2;
     Module(int cs, int dio, int reset, int busy, HostSPI&, SPISettings settings) {
         auto& s = host_adapter::state();
         s.cs = cs; s.dio = dio; s.reset = reset; s.busy = busy;
         s.spiHz = settings.hz; s.bitOrder = settings.order; s.mode = settings.mode;
+    }
+    void setRfSwitchState(uint8_t mode) { host_adapter::state().rfMode = mode; }
+    int16_t SPIwriteStream(uint16_t command, const uint8_t* bytes, size_t size) {
+        auto& s = host_adapter::state();
+        s.spiCommand = command;
+        if (size == 3) s.hardwareTxTicks = uint32_t(bytes[0]) << 16 | uint32_t(bytes[1]) << 8 | bytes[2];
+        return s.record(host_adapter::SET_TX);
     }
 };
 class SX1262 {
@@ -61,6 +72,9 @@ public:
         if (length <= sizeof(s.txBytes)) std::memcpy(s.txBytes, bytes, length);
         else s.overflow = true;
         return s.record(host_adapter::TX);
+    }
+    int16_t stageMode(uint8_t, RadioModeConfig_t* config) {
+        return startTransmit(config->transmit.data, config->transmit.len); // Record staging arguments.
     }
     int16_t finishTransmit() { return host_adapter::state().record(host_adapter::FINISH_TX); }
     int16_t finishReceive() { return host_adapter::state().record(host_adapter::FINISH_RX); }

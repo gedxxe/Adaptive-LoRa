@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 570 38" role="img" aria-label="Heltec V3.4, SX1262, C++17 and Python, RadioLib 7.8.1">
+  <g font-family="system-ui,sans-serif" font-size="15" font-weight="600" text-anchor="middle">
+    <rect x="0" y="1" width="124" height="36" rx="8" fill="#1e3a5f"/>
+    <text x="62" y="24" fill="#fff">Heltec V3.4</text>
+    <rect x="133" y="1" width="105" height="36" rx="8" fill="#24536c"/>
+    <text x="185" y="24" fill="#fff">SX1262</text>
+    <rect x="247" y="1" width="153" height="36" rx="8" fill="#145a59"/>
+    <text x="323" y="24" fill="#fff">C++17 · Python</text>
+    <rect x="409" y="1" width="160" height="36" rx="8" fill="#37445f"/>
+    <text x="489" y="24" fill="#fff">RadioLib 7.8.1</text>
+  </g>
+</svg>

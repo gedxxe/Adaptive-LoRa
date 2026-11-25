@@ -1,0 +1,242 @@
+$ pio test -e native_rotating -v
+Collected 17 tests (test_adaptive_link, test_app_integration, test_config_store, test_firmware_runtime, test_frame_codec, test_multiclient_link, test_multiclient_runtime, test_oled_telemetry, test_provisioning_console, test_radio_driver, test_role_config, test_rotating_link, test_runtime_reliability, test_scheduled_link, test_sequence_tracker, test_serial_logger, test_sx1262_adapter)
+
+Processing test_rotating_link in native_rotating environment
+--------------------------------------------------------------------------------
+Building...
+
+
+Testing...
+CAPACITY,n=1,sf=7,frames=1,period_s=15
+CAPACITY,n=1,sf=8,frames=1,period_s=15
+CAPACITY,n=1,sf=9,frames=1,period_s=15
+CAPACITY,n=1,sf=10,frames=1,period_s=15
+CAPACITY,n=4,sf=7,frames=1,period_s=15
+CAPACITY,n=4,sf=8,frames=1,period_s=15
+CAPACITY,n=4,sf=9,frames=1,period_s=15
+CAPACITY,n=4,sf=10,frames=2,period_s=30
+CAPACITY,n=8,sf=7,frames=1,period_s=15
+CAPACITY,n=8,sf=8,frames=1,period_s=15
+CAPACITY,n=8,sf=9,frames=2,period_s=30
+CAPACITY,n=8,sf=10,frames=3,period_s=45
+CAPACITY,n=16,sf=7,frames=2,period_s=30
+CAPACITY,n=16,sf=8,frames=2,period_s=30
+CAPACITY,n=16,sf=9,frames=3,period_s=45
+CAPACITY,n=16,sf=10,frames=6,period_s=90
+CAPACITY,n=32,sf=7,frames=4,period_s=60
+CAPACITY,n=32,sf=8,frames=4,period_s=60
+CAPACITY,n=32,sf=9,frames=5,period_s=75
+CAPACITY,n=32,sf=10,frames=11,period_s=165
+CAPACITY,n=64,sf=7,frames=8,period_s=120
+CAPACITY,n=64,sf=8,frames=8,period_s=120
+CAPACITY,n=64,sf=9,frames=10,period_s=150
+CAPACITY,n=64,sf=10,frames=22,period_s=330
+CAPACITY,n=70,sf=7,frames=9,period_s=135
+CAPACITY,n=70,sf=8,frames=9,period_s=135
+CAPACITY,n=70,sf=9,frames=10,period_s=150
+CAPACITY,n=70,sf=10,frames=24,period_s=360
+CAPACITY,n=84,sf=7,frames=11,period_s=165
+CAPACITY,n=84,sf=8,frames=11,period_s=165
+CAPACITY,n=84,sf=9,frames=12,period_s=180
+CAPACITY,n=84,sf=10,frames=28,period_s=420
+CAPACITY,n=128,sf=7,frames=16,period_s=240
+CAPACITY,n=128,sf=8,frames=16,period_s=240
+CAPACITY,n=128,sf=9,frames=19,period_s=285
+CAPACITY,n=128,sf=10,frames=43,period_s=645
+test\test_rotating_link\test_main.cpp:281:rotation_covers_each_population_once_at_each_sf:PASS
+test\test_rotating_link\test_main.cpp:282:expensive_group_leaves_next_client_at_cursor:PASS
+AUTH_PROJECTION,mechanism=per_client_tag16,bytes=8,sf=7,group=8
+AUTH_PROJECTION,mechanism=per_client_tag16,bytes=8,sf=8,group=7
+AUTH_PROJECTION,mechanism=per_client_tag16,bytes=8,sf=9,group=5
+AUTH_PROJECTION,mechanism=per_client_tag16,bytes=8,sf=10,group=3
+AUTH_PROJECTION,mechanism=per_client_tag16,bytes=32,sf=7,group=8
+AUTH_PROJECTION,mechanism=per_client_tag16,bytes=32,sf=8,group=6
+AUTH_PROJECTION,mechanism=per_client_tag16,bytes=32,sf=9,group=4
+AUTH_PROJECTION,mechanism=per_client_tag16,bytes=32,sf=10,group=2
+AUTH_PROJECTION,mechanism=per_client_tag16,bytes=64,sf=7,group=7
+AUTH_PROJECTION,mechanism=per_client_tag16,bytes=64,sf=8,group=5
+AUTH_PROJECTION,mechanism=per_client_tag16,bytes=64,sf=9,group=3
+AUTH_PROJECTION,mechanism=per_client_tag16,bytes=64,sf=10,group=2
+AUTH_PROJECTION,mechanism=signature64,bytes=8,sf=7,group=8
+AUTH_PROJECTION,mechanism=signature64,bytes=8,sf=8,group=8
+AUTH_PROJECTION,mechanism=signature64,bytes=8,sf=9,group=5
+AUTH_PROJECTION,mechanism=signature64,bytes=8,sf=10,group=3
+AUTH_PROJECTION,mechanism=signature64,bytes=32,sf=7,group=8
+AUTH_PROJECTION,mechanism=signature64,bytes=32,sf=8,group=7
+AUTH_PROJECTION,mechanism=signature64,bytes=32,sf=9,group=4
+AUTH_PROJECTION,mechanism=signature64,bytes=32,sf=10,group=2
+AUTH_PROJECTION,mechanism=signature64,bytes=64,sf=7,group=8
+AUTH_PROJECTION,mechanism=signature64,bytes=64,sf=8,group=6
+AUTH_PROJECTION,mechanism=signature64,bytes=64,sf=9,group=3
+AUTH_PROJECTION,mechanism=signature64,bytes=64,sf=10,group=2
+test\test_rotating_link\test_main.cpp:283:estimate_authenticated_airtime_with_full_retry_reserve:PASS
+test\test_rotating_link\test_main.cpp:284:registered_client_129_queues_until_its_slot:PASS
+test\test_rotating_link\test_main.cpp:285:rejects_noncontiguous_groups_and_incompatible_wire_version:PASS
+test\test_rotating_link\test_main.cpp:286:missed_group_beacon_recovers_next_sweep:PASS
+test\test_rotating_link\test_main.cpp:287:retry_after_lost_ack_is_not_delivered_twice:PASS
+test\test_rotating_link\test_main.cpp:288:adr_state_survives_other_groups_without_affecting_peers:PASS
+
+-----------------------
+8 Tests 0 Failures 0 Ignored
+OK
+
+-------- native_rotating:test_rotating_link [PASSED] Took 15.36 seconds --------
+
+=================================== SUMMARY ===================================
+Environment                         Test                       Status    Duration
+----------------------------------  -------------------------  --------  ------------
+heltec_wifi_lora_32_V3              test_adaptive_link         SKIPPED
+heltec_wifi_lora_32_V3              test_app_integration       SKIPPED
+heltec_wifi_lora_32_V3              test_config_store          SKIPPED
+heltec_wifi_lora_32_V3              test_firmware_runtime      SKIPPED
+heltec_wifi_lora_32_V3              test_frame_codec           SKIPPED
+heltec_wifi_lora_32_V3              test_multiclient_link      SKIPPED
+heltec_wifi_lora_32_V3              test_multiclient_runtime   SKIPPED
+heltec_wifi_lora_32_V3              test_oled_telemetry        SKIPPED
+heltec_wifi_lora_32_V3              test_provisioning_console  SKIPPED
+heltec_wifi_lora_32_V3              test_radio_driver          SKIPPED
+heltec_wifi_lora_32_V3              test_role_config           SKIPPED
+heltec_wifi_lora_32_V3              test_rotating_link         SKIPPED
+heltec_wifi_lora_32_V3              test_runtime_reliability   SKIPPED
+heltec_wifi_lora_32_V3              test_scheduled_link        SKIPPED
+heltec_wifi_lora_32_V3              test_sequence_tracker      SKIPPED
+heltec_wifi_lora_32_V3              test_serial_logger         SKIPPED
+heltec_wifi_lora_32_V3              test_sx1262_adapter        SKIPPED
+heltec_wifi_lora_32_V3_research     test_adaptive_link         SKIPPED
+heltec_wifi_lora_32_V3_research     test_app_integration       SKIPPED
+heltec_wifi_lora_32_V3_research     test_config_store          SKIPPED
+heltec_wifi_lora_32_V3_research     test_firmware_runtime      SKIPPED
+heltec_wifi_lora_32_V3_research     test_frame_codec           SKIPPED
+heltec_wifi_lora_32_V3_research     test_multiclient_link      SKIPPED
+heltec_wifi_lora_32_V3_research     test_multiclient_runtime   SKIPPED
+heltec_wifi_lora_32_V3_research     test_oled_telemetry        SKIPPED
+heltec_wifi_lora_32_V3_research     test_provisioning_console  SKIPPED
+heltec_wifi_lora_32_V3_research     test_radio_driver          SKIPPED
+heltec_wifi_lora_32_V3_research     test_role_config           SKIPPED
+heltec_wifi_lora_32_V3_research     test_rotating_link         SKIPPED
+heltec_wifi_lora_32_V3_research     test_runtime_reliability   SKIPPED
+heltec_wifi_lora_32_V3_research     test_scheduled_link        SKIPPED
+heltec_wifi_lora_32_V3_research     test_sequence_tracker      SKIPPED
+heltec_wifi_lora_32_V3_research     test_serial_logger         SKIPPED
+heltec_wifi_lora_32_V3_research     test_sx1262_adapter        SKIPPED
+heltec_wifi_lora_32_V3_multiclient  test_adaptive_link         SKIPPED
+heltec_wifi_lora_32_V3_multiclient  test_app_integration       SKIPPED
+heltec_wifi_lora_32_V3_multiclient  test_config_store          SKIPPED
+heltec_wifi_lora_32_V3_multiclient  test_firmware_runtime      SKIPPED
+heltec_wifi_lora_32_V3_multiclient  test_frame_codec           SKIPPED
+heltec_wifi_lora_32_V3_multiclient  test_multiclient_link      SKIPPED
+heltec_wifi_lora_32_V3_multiclient  test_multiclient_runtime   SKIPPED
+heltec_wifi_lora_32_V3_multiclient  test_oled_telemetry        SKIPPED
+heltec_wifi_lora_32_V3_multiclient  test_provisioning_console  SKIPPED
+heltec_wifi_lora_32_V3_multiclient  test_radio_driver          SKIPPED
+heltec_wifi_lora_32_V3_multiclient  test_role_config           SKIPPED
+heltec_wifi_lora_32_V3_multiclient  test_rotating_link         SKIPPED
+heltec_wifi_lora_32_V3_multiclient  test_runtime_reliability   SKIPPED
+heltec_wifi_lora_32_V3_multiclient  test_scheduled_link        SKIPPED
+heltec_wifi_lora_32_V3_multiclient  test_sequence_tracker      SKIPPED
+heltec_wifi_lora_32_V3_multiclient  test_serial_logger         SKIPPED
+heltec_wifi_lora_32_V3_multiclient  test_sx1262_adapter        SKIPPED
+heltec_wifi_lora_32_V3_adaptive     test_adaptive_link         SKIPPED
+heltec_wifi_lora_32_V3_adaptive     test_app_integration       SKIPPED
+heltec_wifi_lora_32_V3_adaptive     test_config_store          SKIPPED
+heltec_wifi_lora_32_V3_adaptive     test_firmware_runtime      SKIPPED
+heltec_wifi_lora_32_V3_adaptive     test_frame_codec           SKIPPED
+heltec_wifi_lora_32_V3_adaptive     test_multiclient_link      SKIPPED
+heltec_wifi_lora_32_V3_adaptive     test_multiclient_runtime   SKIPPED
+heltec_wifi_lora_32_V3_adaptive     test_oled_telemetry        SKIPPED
+heltec_wifi_lora_32_V3_adaptive     test_provisioning_console  SKIPPED
+heltec_wifi_lora_32_V3_adaptive     test_radio_driver          SKIPPED
+heltec_wifi_lora_32_V3_adaptive     test_role_config           SKIPPED
+heltec_wifi_lora_32_V3_adaptive     test_rotating_link         SKIPPED
+heltec_wifi_lora_32_V3_adaptive     test_runtime_reliability   SKIPPED
+heltec_wifi_lora_32_V3_adaptive     test_scheduled_link        SKIPPED
+heltec_wifi_lora_32_V3_adaptive     test_sequence_tracker      SKIPPED
+heltec_wifi_lora_32_V3_adaptive     test_serial_logger         SKIPPED
+heltec_wifi_lora_32_V3_adaptive     test_sx1262_adapter        SKIPPED
+heltec_wifi_lora_32_V3_rotating     test_adaptive_link         SKIPPED
+heltec_wifi_lora_32_V3_rotating     test_app_integration       SKIPPED
+heltec_wifi_lora_32_V3_rotating     test_config_store          SKIPPED
+heltec_wifi_lora_32_V3_rotating     test_firmware_runtime      SKIPPED
+heltec_wifi_lora_32_V3_rotating     test_frame_codec           SKIPPED
+heltec_wifi_lora_32_V3_rotating     test_multiclient_link      SKIPPED
+heltec_wifi_lora_32_V3_rotating     test_multiclient_runtime   SKIPPED
+heltec_wifi_lora_32_V3_rotating     test_oled_telemetry        SKIPPED
+heltec_wifi_lora_32_V3_rotating     test_provisioning_console  SKIPPED
+heltec_wifi_lora_32_V3_rotating     test_radio_driver          SKIPPED
+heltec_wifi_lora_32_V3_rotating     test_role_config           SKIPPED
+heltec_wifi_lora_32_V3_rotating     test_rotating_link         SKIPPED
+heltec_wifi_lora_32_V3_rotating     test_runtime_reliability   SKIPPED
+heltec_wifi_lora_32_V3_rotating     test_scheduled_link        SKIPPED
+heltec_wifi_lora_32_V3_rotating     test_sequence_tracker      SKIPPED
+heltec_wifi_lora_32_V3_rotating     test_serial_logger         SKIPPED
+heltec_wifi_lora_32_V3_rotating     test_sx1262_adapter        SKIPPED
+native                              test_adaptive_link         SKIPPED
+native                              test_app_integration       SKIPPED
+native                              test_config_store          SKIPPED
+native                              test_firmware_runtime      SKIPPED
+native                              test_frame_codec           SKIPPED
+native                              test_multiclient_link      SKIPPED
+native                              test_multiclient_runtime   SKIPPED
+native                              test_oled_telemetry        SKIPPED
+native                              test_provisioning_console  SKIPPED
+native                              test_radio_driver          SKIPPED
+native                              test_role_config           SKIPPED
+native                              test_rotating_link         SKIPPED
+native                              test_runtime_reliability   SKIPPED
+native                              test_scheduled_link        SKIPPED
+native                              test_sequence_tracker      SKIPPED
+native                              test_serial_logger         SKIPPED
+native                              test_sx1262_adapter        SKIPPED
+native_multiclient                  test_adaptive_link         SKIPPED
+native_multiclient                  test_app_integration       SKIPPED
+native_multiclient                  test_config_store          SKIPPED
+native_multiclient                  test_firmware_runtime      SKIPPED
+native_multiclient                  test_frame_codec           SKIPPED
+native_multiclient                  test_multiclient_link      SKIPPED
+native_multiclient                  test_multiclient_runtime   SKIPPED
+native_multiclient                  test_oled_telemetry        SKIPPED
+native_multiclient                  test_provisioning_console  SKIPPED
+native_multiclient                  test_radio_driver          SKIPPED
+native_multiclient                  test_role_config           SKIPPED
+native_multiclient                  test_rotating_link         SKIPPED
+native_multiclient                  test_runtime_reliability   SKIPPED
+native_multiclient                  test_scheduled_link        SKIPPED
+native_multiclient                  test_sequence_tracker      SKIPPED
+native_multiclient                  test_serial_logger         SKIPPED
+native_multiclient                  test_sx1262_adapter        SKIPPED
+native_adaptive                     test_adaptive_link         SKIPPED
+native_adaptive                     test_app_integration       SKIPPED
+native_adaptive                     test_config_store          SKIPPED
+native_adaptive                     test_firmware_runtime      SKIPPED
+native_adaptive                     test_frame_codec           SKIPPED
+native_adaptive                     test_multiclient_link      SKIPPED
+native_adaptive                     test_multiclient_runtime   SKIPPED
+native_adaptive                     test_oled_telemetry        SKIPPED
+native_adaptive                     test_provisioning_console  SKIPPED
+native_adaptive                     test_radio_driver          SKIPPED
+native_adaptive                     test_role_config           SKIPPED
+native_adaptive                     test_rotating_link         SKIPPED
+native_adaptive                     test_runtime_reliability   SKIPPED
+native_adaptive                     test_scheduled_link        SKIPPED
+native_adaptive                     test_sequence_tracker      SKIPPED
+native_adaptive                     test_serial_logger         SKIPPED
+native_adaptive                     test_sx1262_adapter        SKIPPED
+native_rotating                     test_adaptive_link         SKIPPED
+native_rotating                     test_app_integration       SKIPPED
+native_rotating                     test_config_store          SKIPPED
+native_rotating                     test_firmware_runtime      SKIPPED
+native_rotating                     test_frame_codec           SKIPPED
+native_rotating                     test_multiclient_link      SKIPPED
+native_rotating                     test_multiclient_runtime   SKIPPED
+native_rotating                     test_oled_telemetry        SKIPPED
+native_rotating                     test_provisioning_console  SKIPPED
+native_rotating                     test_radio_driver          SKIPPED
+native_rotating                     test_role_config           SKIPPED
+native_rotating                     test_rotating_link         PASSED    00:00:15.355
+native_rotating                     test_runtime_reliability   SKIPPED
+native_rotating                     test_scheduled_link        SKIPPED
+native_rotating                     test_sequence_tracker      SKIPPED
+native_rotating                     test_serial_logger         SKIPPED
+native_rotating                     test_sx1262_adapter        SKIPPED
+================== 8 test cases: 8 succeeded in 00:00:15.355 ==================
+Exit code: 0

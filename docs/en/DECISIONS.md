@@ -521,3 +521,44 @@ must refer to a delivery from the trial. An unrelated later timing
 fault cannot reverse that confirmation. Record as policy revision 5.
 Use RSSI for field diagnosis and keep the existing SNR and delivery
 criteria without adding a fixed RSSI trigger.
+
+## ADR-043 — Rotate the registry through feasible groups
+
+Status: Implemented in the opt-in wire-v6 research profile.
+
+Keep the 8-bit bitmap and eight-entry active group. The Gateway advances a
+cursor through at most 128 deterministic IDs, taking the longest prefix
+that fits full payload ceilings and planned DATA SF reservations. If the
+next ID cannot fit the current group, it starts the next one. The
+registry cursor and wire frame advance on an attempted Beacon even if its
+TX fails. Fixed profiles with a stable group size get one opportunity per
+sweep under normal radio service. Missed Beacons and DATA can delay delivery.
+
+Index Gateway ADR state by registered ID and count timeouts in each
+Client's service opportunities. Keep wire receipt identities on the
+Gateway frame counter. Use the first active Client's opportunity for
+retry priority so a fixed sweep length cannot repeat the same initial
+retry mask on every visit. Retain wire v5 as the default test baseline.
+
+Security is a separate release gate. Compare signed Gateway control
+with per-Client tags using the same frame budget, and reserve a new wire
+version once credential lifecycle, authenticated freshness and cryptographic
+timing are verified. Wire v6 uses plaintext. See the
+[security and capacity study](SCHEDULED_LINK.md#rotating-schedule).
+
+## ADR-044 — Sign secure control and confirm freshness in the Grant
+
+Select P-256 signatures for Gateway control and unique Client secrets
+for HMAC Requests and AES-CCM DATA. Separate the HKDF labels and bind the
+DATA key to a fresh Gateway epoch and full Client challenge. The signed
+96-bit echo confirms a pending transaction before DATA. Cache ciphertext
+for retries. Retain the 96 B inner codec and budget the 237 B envelope.
+
+Use an offline credential generation and a separate secure role
+namespace. A new handshake restores packet freshness after reboot.
+Reprovision every active board after backup restoration to revoke
+old trust material. Hardware rollback, timing and RF remain open.
+
+In v7, stage the TX packet through RadioLib and use timed SetTx to avoid
+the separate unbounded PA-ramp wait. Keep the existing SPI transaction
+and Heltec RF switch configuration.

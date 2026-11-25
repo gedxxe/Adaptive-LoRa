@@ -6,9 +6,14 @@ project drawings based on the adaptive implementation. The example SFs
 and packet positions illustrate how the code works. They are not
 measurements. The antenna symbol is also original.
 
-The [Gateway](../research/figures/adaptive-algorithm-gateway.png) and
-[Client](../research/figures/adaptive-algorithm-client.png) listings describe
-the [adaptive runtime](../../src/app/multiclient_link.cpp). Both come from
+The [group rotation](../research/figures/rotation.svg) and [profile badges](../research/figures/project-profile.svg)
+are original project SVGs. The rotation figure explains the registry cursor and
+the frame phases. The badges name the hardware and tools in plain text.
+
+The listings for [Algorithm 1 (Gateway scheduling)](../../README.md#algorithm-1-gateway-scheduling)
+and [Algorithm 2 (Client delivery)](../../README.md#algorithm-2-client-delivery)
+describe the [adaptive runtime](../../src/app/multiclient_link.cpp)
+and its [wire-v7 authentication checks](../../src/app/secure_link.cpp). Both come from
 one [LaTeX source](../research/figures/adaptive-algorithm.tex). To rebuild
 them from the repository root, use pdfLaTeX with `standalone` and AMS packages,
 and Poppler. This assumes `.pio` exists.

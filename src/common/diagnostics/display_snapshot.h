@@ -51,9 +51,15 @@ struct BitmapTelemetry {
     uint8_t retries = 0;
 };
 
-enum class ClientScheduleIssue : uint8_t { NONE, REQUEST_TX, NO_GRANT, NO_DATA_TX };
+enum class ClientScheduleIssue : uint8_t { NONE, REQUEST_TX, NO_GRANT, NO_DATA_TX, GROUP_WAIT };
 
 struct MulticlientTelemetry {
+#if defined(ADAPTIVE_LORA_SECURE)
+    uint32_t authDrops = 0;
+    uint32_t cryptoLate = 0;
+    uint32_t worstCryptoTxUs = 0;
+    uint32_t worstCryptoRxUs = 0;
+#endif
     LastReception peer;
     uint32_t peerPeriodUs = 0;
     uint32_t frame = 0;

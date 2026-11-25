@@ -5,6 +5,21 @@ changes. It is not a substitute for the append-only build memory.
 
 ## Unreleased
 
+### Secure rotating candidate
+
+- Added wire v7 with P-256 Gateway signatures, authenticated Requests and AES-128-CCM DATA. Retries use the original ciphertext.
+- Added offline per-board provisioning, a separate secure role namespace, reboot challenge confirmation and fail-closed credential checks.
+- Accounted for the full security envelope and processing guard in admission. The secure radio adapter uses a timed SetTx and exposes timing and memory diagnostics.
+- Kept plaintext comparison profiles and added a seeded shared-channel ADR model. The secure image requires physical timing, recovery and RF acceptance.
+- Updated the English and Chinese setup guides, airtime notation, and numbered Gateway and Client listings for the secure image.
+
+### Registered Client rotation
+
+- Added opt-in wire v6 scheduling for up to 128 registered IDs and up to eight active Clients per 15 s frame.
+- The Gateway retains per-ID ADR state across groups. A Client keeps its pending sample and shows `GROUP WAIT` until selected.
+- Added production-scheduler capacity checks and an authentication airtime study. Wire v6 still carries plaintext and the default firmware remains wire v5.
+- Added GPLv3 for project-authored code, updated both manuals, and corrected GitHub math rendering.
+
 ### Temporary airtime reservations for all DATA SF increases
 
 - Release the extra airtime on failed, denied, or expired SF trials.

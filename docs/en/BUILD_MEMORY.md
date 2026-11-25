@@ -2462,3 +2462,148 @@ files under `logs/test/`.
   `logs/test/iteration-034-verification.log`. Real RF, persistence and
   retune timing were not measured. Confirm the flashed commit and
   policy revision before the next run and capture both roles.
+
+## Iteration 035 — Group rotation and release assessment, 2026-11-24 to 2026-11-25
+
+- Started `codex/release-candidate-scalable-secure` from
+  `89b7de3289f657b3d1125d3060cf4f1ae0ed29d2`. The firmware remains
+  `0.2.0-alpha.1`. Wire v5 stays the default and wire v6 adds an opt-in
+  rotating schedule. The v1, v2 and v3 comparison profiles remain
+  available. NVS schema 1, 915 MHz PHY, DATA SF7–SF10, SF9 control,
+  CR4/5, 22 dBm TX request and the example sample settings are unchanged.
+- `multiclient_protocol` selects the largest feasible contiguous group.
+  `MulticlientLink` retains state per registered Client and advances ADR
+  timers and retry priority on local service opportunities.
+  `FirmwareRuntime` validates registration before radio startup and
+  reports the new profile. A Client retains pending bytes outside its
+  group and the display reports `GROUP WAIT` while Beacons arrive.
+  `main.cpp` remains a 15-line setup/loop delegate.
+- `pio run -e` for `heltec_wifi_lora_32_V3`, the `_research`,
+  `_multiclient`, `_adaptive`, and `_rotating` variants returned 0.
+  The rotating image used 43,928 B static RAM and 394,668 B flash.
+  Runtime stack/heap were not measured. Rotating `firmware.bin` SHA-256:
+  `a53a253c8543a00b5c11e35f506249bd9656f85301e854a995420d1b7846b5af`.
+  PlatformIO 6.1.19 resolved Espressif32 55.3.311, Arduino ESP32 3.3.11,
+  SDK libs 5.5.5+sha.b774170ff46, Xtensa 14.2.0+20260121, esptool 5.3.0,
+  and RadioLib 7.8.1. See `logs/build/iteration-035-build.log`.
+- `pio test -e native`, `native_multiclient`, `native_adaptive`, and
+  `native_rotating -v` returned 0 for 356, 15, 46 and 8 cases respectively.
+  The rotating suite checks all requested logical population sizes,
+  registry wrap and budget cuts, malformed and v5 schedule rejection,
+  Client 129 waiting, loss of Beacon or ACK, and per-ID ADR isolation.
+  The focused rotating retest returned 0 after changing retry priority.
+  See `logs/test/iteration-035-native.log` and
+  `logs/test/iteration-035-native-rotate-final.log`.
+- Python unittest discovery under `tools` ran `test_capture_bench.py` (15),
+  `test_tdma_feasibility.py` (16), `test_adr_shadow.py` (7),
+  `test_model_multiclient.py` (6), `test_check_consistency.py` (20)
+  and `test_adr_sim.py` (2). The verified run returned 0 for all suites
+  and for `python tools/check_consistency.py`. Local paths were replaced
+  and trailing whitespace trimmed in saved outputs. See
+  `logs/test/iteration-035-python-final.log`.
+- `python tools/adr_sim.py --seed 42` returned 0. Added a paired fixed-SF7
+  reference and first-attempt delivery and attempt counts. Results in
+  `logs/test/iteration-035-model-fixed.log` use 128 trials of 480 frames for
+  each single-Client policy/scenario/rate cell. They assume ideal control
+  and do not evaluate correlated loss under a rotating schedule.
+- Reviewed the private technical critique against the code. It raised
+  rotation, authentication, replay, control airtime and measured
+  baselines. The rotating plan includes all four feedback windows.
+  The model budgets Gateway signatures or pairwise tags and uplink tags.
+  The installed ESP32-S3 SDK includes Mbed TLS CCM and ECDSA symbols.
+  There is no implemented secure wire, key workflow or authenticated
+  reboot recovery in this iteration. No physical measurements or
+  provisioning writes were performed.
+- Rewrote the bilingual README and setup guidance, added original SVGs,
+  fixed GitHub equation syntax and documented Kalman and the generic
+  payload boundary. Added the full GPLv3 text for project-authored code.
+  Verify contributor rights and linked SDK redistribution obligations
+  before distributing firmware binaries.
+
+## Iteration 036 — Secure wire v7 and production hardening, 2026-11-25
+
+- Started from `41ceb9833af58ff6250f702b65c37221064f24cd` on
+  `codex/release-candidate-scalable-secure`. Re-ran the unchanged baseline
+  before editing: five ESP32 builds, 425 native and 66 Python cases passed.
+  Retained v1, v2, v3, v5 and v6 builds, version `0.2.0-alpha.1`, and the
+  default delivery-window policy. The secure build keeps fixed SF9 control,
+  adaptive DATA SF7–SF10, 915 MHz and the 15 s period.
+- `secure_crypto` wraps Mbed TLS. `secure_link` verifies credentials,
+  authenticates controls, derives keys and caches DATA ciphertext.
+  `MulticlientLink` separates tentative Beacon state from Grant-confirmed
+  state. The scheduler accounts for the 237 B envelope and 160 ms guard.
+  `FirmwareRuntime` fails closed on missing secure state and reports
+  timing and memory. `Sx1262Hardware` stages TX and uses a timed SetTx.
+  `main.cpp` remains a thin setup/loop delegate.
+- `pio run -e` for `heltec_wifi_lora_32_V3` and the `_research`,
+  `_multiclient`, `_adaptive`, `_rotating`, and `_secure` variants
+  returned 0. The secure build uses 46,904 B static RAM and 450,448 B
+  flash. The 463,152 B `firmware.bin` SHA-256 is
+  `844d0dcbdcab42902da22ed1ebf6cacf1cb5ae4a98c112138d86bb7440d5e30f`.
+  Resolved PlatformIO 6.1.19, Espressif32 55.3.311, Arduino 3.3.11,
+  ESP-IDF libs 5.5.5+sha.b774170ff46, Xtensa 14.2.0+20260121,
+  esptool 5.3.0, RadioLib 7.8.1 and Mbed TLS 3.6.6.
+- `pio test -e native`, `native_multiclient`, `native_adaptive`,
+  `native_rotating -v`, and `native_secure -v` returned 0 for 356,
+  15, 46, 8 and 15 native cases. The secure suite runs RFC 3610 CCM
+  and RFC 5869 HKDF vectors in the real library, plus authenticated
+  control and DATA, every one-byte mutation and truncation of a test DATA
+  packet, wrong and revoked keys, missing NVS, simultaneous reboot,
+  historical Beacon and Grant handling, 128-ID rotation and launch timing.
+- Python unittest discovery under `tools` returned 0 for
+  `test_capture_bench.py` (15), `test_tdma_feasibility.py` (16),
+  `test_adr_shadow.py` (7), `test_model_multiclient.py` (6),
+  `test_check_consistency.py` (20), `test_adr_sim.py` (2), and
+  `test_secure_provision.py` (3). `python tools/check_consistency.py`
+  returned 0. The ESP-IDF generator 0.2.0 produced offline 20 KiB
+  NVS fixture images. The fixture keys were temporary and were not
+  included in results or publication.
+- Recorded `python tools/secure_rotation_model.py --seed 42 --frames 5760`
+  (exit 0). The 128-Client mixed-SF schedule takes 720 s for a sweep with
+  fixed profiles. At the same size, the separate shared-channel model
+  produced a 2,130 s delivery gap at the 95th percentile for the default
+  ADR. No synthetic result is an RF capacity or regulatory measurement.
+- Raw findings and resolutions are in ERR-072 and ERR-073. Sanitized
+  outputs in `logs/build/iteration-036-build-final.log`,
+  `logs/test/iteration-036-native-final.log`,
+  `logs/test/iteration-036-python-complete.log` and
+  `logs/test/iteration-036-rotation-model.log` replace workstation paths
+  and trim trailing whitespace. `pio device list` returned 0 and listed
+  Bluetooth serial ports only. Private enumeration identifiers remain
+  local. No board was flashed; runtime heap, stack, crypto latency, RF,
+  NVS fault recovery and actual BUSY behavior are NOT MEASURED.
+
+## Iteration 037 — Documentation sync and main integration, 2026-11-25
+
+- Reviewed draft PR #16 from branch `codex/release-candidate-scalable-secure`
+  at `dd8975cc070b580209269a64fa9fa4b6cb5f9015` against main at
+  `89b7de3289f657b3d1125d3060cf4f1ae0ed29d2`. The branch contained both
+  rotating and secure profiles and had no changes from main to reconcile.
+- Synchronized both READMEs, the English and Chinese protocol, setup and
+  results pages, and the engineering contract, traceability and figure
+  register. Numbered the Gateway and Client listings, added the v7
+  authentication steps, and regenerated the two PNGs from their shared
+  LaTeX source. Matched the airtime notation to the selected wire profile.
+  Clarified that v7 requires offline provisioning and enables the sample
+  generator only for the separate demo build.
+- Verified 19 current Markdown files, 64 local fragments and 11 SVGs.
+  `pdflatex -interaction=nonstopmode -halt-on-error -output-directory=.pio docs/research/figures/adaptive-algorithm.tex`
+  and both 288 DPI Poppler exports in the figure register returned 0.
+  Reviewed both rendered PNGs. See ERR-074 for corrected links and the
+  optional extraction tool failure.
+- Re-ran `pio run -e` for `heltec_wifi_lora_32_V3` and the
+  `_research`, `_multiclient`, `_adaptive`, `_rotating`, and `_secure`
+  variants. All six returned 0. Re-ran `pio test -e native`,
+  `native_multiclient`, `native_adaptive`, `native_rotating -v`, and
+  `native_secure -v`. All returned 0 for 356, 15, 46, 8 and 15 cases.
+  The seven Python suites passed all 69 cases, and
+  `python tools/check_consistency.py` returned 0.
+- Exact commands and sanitized outputs are in
+  `logs/build/iteration-037-build.log`,
+  `logs/test/iteration-037-native.log`, and
+  `logs/test/iteration-037-python.log`. The toolchain matches Iteration 036.
+  The secure binary SHA-256 still matches Iteration 036, with 46,904 B
+  static RAM and 450,448 B flash in the build report. No firmware source,
+  PHY, version, or NVS format changed in the documentation follow-up.
+  No v7 board measurements were taken. The next check is the provisioned
+  two-board link, followed by four and eight Clients.

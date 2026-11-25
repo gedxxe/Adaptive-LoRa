@@ -31,7 +31,7 @@ int16_t RadioDriver::receive() {
     return code;
 }
 int16_t RadioDriver::transmit(const uint8_t* bytes, size_t length, uint32_t now) {
-    if (!initialized_ || transmitting() || !bytes || length < kHeaderSize || length > kMaxFrameSize)
+    if (!initialized_ || transmitting() || !bytes || length < kHeaderSize || length > kRadioPacketLimit)
         return radio_status::packetTooLong;
     int16_t code = hardware_.standby();
     if (code == radio_status::none) {

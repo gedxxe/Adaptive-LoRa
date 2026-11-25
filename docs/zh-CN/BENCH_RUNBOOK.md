@@ -41,6 +41,8 @@ Get-FileHash -Algorithm SHA256 -LiteralPath (Join-Path $dir 'flash-a.bin'), (Joi
 范围。ESP32 SDK 可能在应用启动前格式化 NVS。保留同板私有恢复计划。
 见[错误记录 ERR-023](../en/ERROR_LOG.md)。
 
+<a name="flash-and-set-roles"></a>
+
 ## 烧录并设置角色
 
 关闭已打开的串口监视器，将 `COMx` 替换为实测端口。各参与板使用同一个自适应镜像。
@@ -89,7 +91,9 @@ Client 2 的首个样本为 `ID=0002|SEQ=0001|MSG=HELLO WORLD`。ID 和序号均
 启动后序号从 1 开始，每次有新样本入队时递增，到 `FFFF` 后回绕。DATA 帧携带恰好 32 字节
 ASCII，不带字符串结束符或换行符。重传沿用相同字节和包标识。
 
-## 双板检查与走测
+<a name="双板检查与走测"></a>
+
+## 检查交付和链路恢复
 
 1. Client 2 与 Gateway 近距运行至少五个完整帧。核对同一帧的 Gateway `APP_PAYLOAD` 和 Client
    `V3_PAYLOAD_RESULT,result=accepted`。检查 Gateway 的 `bytes=32` 和十六进制载荷，再查看
@@ -108,7 +112,7 @@ ASCII，不带字符串结束符或换行符。重传沿用相同字节和包标
 SF9 控制交互是否继续。若未获得 SF10，核对是预算不足（`adr=recovery_budget` 或 `adr=budget_limited`），还是
 控制链路丢失（`SEARCH` 或 Request/Grant 缺失）。这一检查与静态验收分开进行。
 
-**单人走测。** Client 各页顶行的 `TX SF8 CR4/5` 表示最近一次 DATA 已在 SF8
+**在测点读取屏幕。** Client 各页顶行的 `TX SF8 CR4/5` 表示最近一次 DATA 已在 SF8
 启动发送。切回 SF9 收控制帧后仍保留该读数。第二页的 `ACKED DATA SF` 只在收到匹配
 ACK 后更新。到达测点后记下这两个值及第一页的 AGE。Client 的 AGE 从最近一次有效
 Grant 或位图算起，断联后仍会保留上一次的 TX 值。`SEARCH` 表示正在等待新 Beacon。
@@ -142,6 +146,37 @@ cmd /d /c 'set PLATFORMIO_BUILD_SRC_FLAGS=-DADAPTIVE_LORA_FIXED_SF_COMPARISON&&s
 ```powershell
 cmd /d /c 'set PLATFORMIO_BUILD_SRC_FLAGS=-DADAPTIVE_LORA_ADR_RULE=1&&set PLATFORMIO_BUILD_DIR=.pio/adr-ewma&&pio run -e heltec_wifi_lora_32_V3_adaptive -t upload --upload-port COMx'
 ```
+
+## 测试轮换配置
+
+所有网关与客户端使用同一构建。
+
+```sh
+pio run -e heltec_wifi_lora_32_V3_rotating
+pio run -e heltec_wifi_lora_32_V3_rotating -t upload --upload-port COMx
+```
+
+使用实际端口和上文的[角色命令](#flash-and-set-roles)。在 `status` 中确认
+`protocol=6` 与 `profile=rotating`。网关 ID 为 1 时，默认登记的客户端 ID 为 2–129。
+小规模轮换测试可在所有板卡的构建配置中调整 `ADAPTIVE_LORA_REGISTERED_CLIENTS`。
+默认登记表中的 ID 2 和 10 可测试不同组。至少记录两轮。组外显示 `GROUP WAIT` 和
+`BEACON SYNC` 属于正常情况。`SEARCH` 表示未能按时收到信标。仅使用合成数据。
+[轮换模型](SCHEDULED_LINK.md#rotating-schedule)给出预期调度，交付间隔从实际记录测量。
+规模较大时，在网关记录全部交付事件，并用采集工具的八个客户端端口抽查不同组的链路。
+
+<a name="test-the-secure-candidate"></a>
+
+## 测试安全候选版
+
+使用合成样本并在获准的射频环境测试。安全版保留 915.0 MHz、BW125、SF9 控制、CR4/5 和 22 dBm 发射请求。辐射测试前核对实际允许的频率、天线增益、EIRP 和空口占用。
+
+1. 按前文步骤备份各板，并核对实际闪存布局与安全状态。安全角色使用新的 NVS 命名空间，明文角色配置不会迁移。
+2. 在可信离线机器上使用安装了 `cryptography` 的 Python，运行 `python tools/secure_provision.py --out PRIVATE_NEW_DIRECTORY --network 1 --gateway 1 --clients 1`。后续改为 4 或 8。每次生成新的信任代次。输出放在仓库外受限目录，网关 CSV 不得分配给客户端。
+3. 在离线 Python 环境安装 `esp-idf-nvs-partition-gen==0.2.0`。已核实 NVS 为 20 KiB 时，运行 `python -m esp_idf_nvs_partition_gen generate DEVICE.csv DEVICE.bin 0x5000`。每份镜像包含一块板的角色和凭据，并替换其 NVS 分区。写入前核对文件、板卡、偏移和大小。SDK 默认 8 MB 布局的 NVS 偏移为 `0x9000`。若布局、加密或安全设置不同，使用该设备获准的配置流程。
+4. 两种角色均使用 `pio run -e heltec_wifi_lora_32_V3_secure` 构建。测试 32 B 合成样本时，在构建和上传前设置 `PLATFORMIO_BUILD_SRC_FLAGS=-DADAPTIVE_LORA_SECURE_DEMO=1` 和独立的 `PLATFORMIO_BUILD_DIR`。常规镜像由应用提交载荷。通过核实的端口，使用 esptool `write-flash` 将对应的私有 NVS 镜像写到核实的偏移。启动时核对 `protocol=7`、`profile=secure`、角色、节点 ID 和 `SCHEDULE_CONFIG` 中的 `registered_count`。凭据错误时应先看到 `CONFIG_INVALID`，随后 `PROVISIONING` 显示 `result=radio_disabled`。更换 v7 凭据使用离线配置。
+5. 使用 1、4 和 8 个客户端加网关测试。至少记录两轮，再测试客户端重启、网关重启、同时重启和信号恢复。分开测试 SF9 控制丢失和 SF10 DATA 丢失。记录交付间隔的最大值与百分位数、`SECURITY_TIMING`、`SECURITY_MEMORY`、射频切换时间、复位、重试与网关发射空口时间。在受控带负载的测试装置上检查凭据缺失和 BUSY 故障。
+
+更换或撤销凭据时生成新代次，按需使用 `--revoke ID`，再为全部活动板安装同一新代次。撤销的位置仍在登记表中，没有可用密钥。恢复闪存备份后重新配置全部活动板，因为没有硬件回退控制时，完整旧快照可能恢复已撤销的凭据。安全版不会降级到 v6。部署板应只使用安全版。
 
 ## 保存结果
 

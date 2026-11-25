@@ -13,7 +13,13 @@ for testing that policy.
 | **ATS-LoRa**, §III | Comparative study of autonomous frame sizing and geographic groups. | Context for future comparison. Geographic grouping and autonomous frame sizing are absent from the firmware. |
 | **Soy**, §§3–4 | Choose an SF sufficient for link quality. | The paper uses local downlink RSSI. The Gateway uses uplink observations and limits each SF probe by the airtime reservation. |
 
-[Architecture](figures/adaptive-architecture.svg) · [Frame sequence](figures/adaptive-frame.svg)
+[Architecture](figures/adaptive-architecture.svg) · [Frame sequence](figures/adaptive-frame.svg) · [Group rotation](figures/rotation.svg)
+
+[Algorithm 1 (Gateway scheduling)](../../README.md#algorithm-1-gateway-scheduling)
+and [Algorithm 2 (Client delivery)](../../README.md#algorithm-2-client-delivery)
+show where wire v7 checks authentication in the shared exchange. The
+[secure link](../../src/app/secure_link.cpp) implements the checks and
+caches ciphertext for retries.
 
 ## Check the results
 
@@ -23,6 +29,12 @@ for testing that policy.
   mixed-SF traffic, interleaved first-attempt loss, same-session recovery,
   ACK receipts across an idle gap, rollback and peer delivery in simulation.
 - [Progress](../en/PROGRESS.md) lists build, host and physical test status.
+- [Rotation tests](../../test/test_rotating_link/test_main.cpp) run the production
+  selector across 1–128 logical IDs and exercise off-roster waiting and ADR
+  through the actual Client and Gateway state machines over fake radio.
+- [Wire v7 tests](../../test/test_secure_link/test_main.cpp) exercise signed
+  control, the Request challenge, encrypted DATA, replay, and launch deadlines
+  with the production state machines and Mbed TLS.
 - [Protocol reference](../en/SCHEDULED_LINK.md) contains the wire layout,
   slot calculation, retries and the live [SF review](../en/SCHEDULED_LINK.md#adaptation-and-recovery).
   The [offline evaluator](../../tools/adr_shadow.py) uses its own window
@@ -51,10 +63,19 @@ for testing that policy.
    radio. Quantify control overhead against persistent slots for periodic
    traffic. Report delivery gaps and uncertainty by Client and test run.
 
-For the [70-Client study](../en/PROGRESS.md#research-target-for-70-clients),
-measure a physical subset and model grouped traffic. These experiments
-can support a claim about where one radio is sufficient. They do not yet
-establish a throughput or coverage advantage over a concentrator.
+For the [extended capacity study](../en/PROGRESS.md#extended-client-capacity),
+measure a physical subset and model grouped traffic. The research question
+is where one serial radio meets a specified delivery interval, including
+control, authentication overhead and retries.
+The model charges all four feedback windows. A shorter exchange would
+have to preserve recovery after a missed bitmap before it could claim
+those saved slots. Measure Gateway TX airtime separately from the full
+frame reservation when comparing regulatory limits or energy.
+
+The [secure rotation experiment](../en/PROGRESS.md#secure-rotation-experiment)
+applies common channel draws across policies. It includes control losses,
+shared interference and heterogeneous SNR. Use it to compare simulated
+delivery gaps alongside the airtime-only sweep times.
 
 The [Iteration 019 audit](ITERATION_019_AUDIT.md) records the earlier
 single-Client work. The [figure register](../references/FIGURE_SOURCE_REGISTER.md)

@@ -21,8 +21,8 @@ class ConsistencyTests(unittest.TestCase):
                     target.parent.mkdir(parents=True, exist_ok=True)
                     target.touch()
         names = set(LINK_DOCS) | set(APPROVED_SETTINGS) | set(ALGORITHM_FIGURES) | {ADR_FIGURE, "CODEX_START_PROMPT.md", "VERSION", "PROTOCOL_VERSION",
-                "platformio.ini", "THIRD_PARTY.md", "CHANGELOG.md", "include/project_config.h", "include/research_roster.h",
-                "src/common/radio/sx1262_hardware.h", "src/app/esp32_firmware.h",
+                "platformio.ini", "LICENSE", "THIRD_PARTY.md", "CHANGELOG.md", "include/project_config.h", "include/research_roster.h",
+                "src/common/radio/sx1262_hardware.h", "src/common/protocol/secure_wire.h", "src/app/esp32_firmware.h",
                 "logs/README.md", "logs/test/RUN_RECORD_TEMPLATE.md"}
         for name in names:
             target = self.root / name
@@ -60,7 +60,7 @@ class ConsistencyTests(unittest.TestCase):
         self.assertTrue(any("broken relative link" in e for e in check(self.root)))
 
     def test_physical_pass_claim_is_rejected(self):
-        self.mutate("docs/en/PROGRESS.md", "| Field test | Walk test and radio timing measurements pending |",
+        self.mutate("docs/en/PROGRESS.md", "| Field test | Radio range and timing measurements pending |",
                     "| Field test | PASS |")
         self.assertTrue(any("field test and timing" in e for e in check(self.root)))
 
@@ -113,6 +113,10 @@ class ConsistencyTests(unittest.TestCase):
     def test_protocol_pages_share_the_symbolic_reservation(self):
         self.mutate("docs/zh-CN/SCHEDULED_LINK.md", r"\le \tau_{\mathrm{frame}}", r"\le 15")
         self.assertTrue(any("same airtime equations" in e for e in check(self.root)))
+
+    def test_rejects_github_incompatible_operator_macro(self):
+        self.mutate("docs/en/SCHEDULED_LINK.md", r"\mathrm{Tail}", r"\operatorname{Tail}")
+        self.assertTrue(any("GitHub-compatible math macros" in e for e in check(self.root)))
 
     def test_walk_test_serial_status_must_match_wire_version(self):
         self.mutate("docs/zh-CN/BENCH_RUNBOOK.md", "protocol=5", "protocol=4")

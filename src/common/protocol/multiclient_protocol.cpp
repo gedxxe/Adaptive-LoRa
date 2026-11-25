@@ -64,7 +64,7 @@ uint32_t Plan::retrySpan() const {
 
 uint32_t Plan::roundStart(uint8_t round) const {
     if (!round) return kSlotGuardUs;
-    const uint32_t control = payloadAir(feedbackBytes(count)) + 2 * kSlotGuardUs;
+    const uint32_t control = feedbackAir(count) + 2 * kSlotGuardUs;
     return kSlotGuardUs + dataSpan() + control + (round - 1) * (retrySpan() + control);
 }
 
@@ -79,8 +79,8 @@ uint32_t Plan::dataStart(uint8_t round, uint8_t index, uint8_t mask) const {
 }
 
 uint32_t reservationUs(const Plan& plan) {
-    return payloadAir(rosterBytes(plan.count)) + grantStart(plan.count) + payloadAir(grantBytes(plan.count)) +
-           plan.feedbackStart(kAttempts - 1) + payloadAir(feedbackBytes(plan.count)) + kSlotGuardUs;
+    return beaconAir(plan.count) + grantStart(plan.count) + grantAir(plan.count) +
+           plan.feedbackStart(kAttempts - 1) + feedbackAir(plan.count) + kSlotGuardUs;
 }
 
 uint32_t requiredPeriodUs(const Roster& roster) {
@@ -91,6 +91,33 @@ uint32_t requiredPeriodUs(const Roster& roster) {
     const uint32_t rounded = (reservationUs(max) + (kAdaptive ? kAdaptiveTailUs : 0) + 999) / 1000 * 1000;
     return rounded < kTargetPeriodUs ? kTargetPeriodUs : rounded;
 }
+
+#if defined(ADAPTIVE_LORA_ROTATING)
+Roster Rotation::select(uint16_t gateway, uint8_t budget, const uint8_t* profiles) {
+    Roster roster{kAdaptivePeriodUs};
+    if (count == 0 || count > kPopulationLimit || next >= count || !profiles ||
+        !unicast(gateway) || budget > kMaxData)
+        return {};
+
+    Plan ceiling;
+    // Finish the sweep before wrapping, so each registry position appears
+    // exactly once even if SF changes alter the next group's size.
+    for (uint16_t position = next; position < count && roster.count < kMaxClients; ++position) {
+        const auto index = roster.count;
+        const auto sf = profiles[position];
+        if (!validDataSf(sf)) return {};
+        ceiling.slots[index] = {1, budget, sf};
+        ceiling.count = index + 1;
+        if (reservationUs(ceiling) + kAdaptiveTailUs > roster.periodUs) break;
+        roster.nodes[index] = {registeredId(position, gateway), budget};
+        ++roster.count;
+    }
+    if (!roster.count) return {};
+    next += roster.count;
+    if (next == count) next = 0;
+    return roster;
+}
+#endif
 
 uint8_t retryMask(uint8_t eligible, uint8_t count, uint32_t frame, uint8_t round) {
     uint8_t assigned = 0;

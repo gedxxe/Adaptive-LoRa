@@ -18,6 +18,8 @@ struct PayloadDelivery {
 
 class PayloadPort {
 public:
+    // Call on the runtime's cooperative loop. An application sampling task
+    // must hand off immutable bytes through its own synchronized queue.
     // Called synchronously once per accepted wire identity. Copy bytes before
     // returning if the application needs them later. Return false to refuse.
     using Receiver = bool (*)(void*, const PayloadDelivery&);

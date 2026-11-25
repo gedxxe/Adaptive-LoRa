@@ -2,60 +2,36 @@
 
 [简体中文](README.zh-CN.md)
 
-Adaptive-LoRa is a research prototype for scheduled telemetry on one
-half-duplex SX1262. The current test profile serves up to eight Clients.
-The Gateway grants a DATA spreading factor (SF) per Client and limits
-each new SF to the airtime available to the full roster.
+**Research topic** — Reliability-aware TDMA scheduling and link adaptation for single-radio LoRa industrial energy monitoring networks. The project studies how delivery gaps and airtime change as one half-duplex Gateway serves more Clients with different link qualities.
 
-**Eight-Client test.** Build the default `heltec_wifi_lora_32_V3_adaptive`
-image for all nine boards. Verify wire version 5 after flashing. Use Gateway
-ID 1 and Client IDs 2–9. Each Client queues a 32-byte ASCII sample such as
-`ID=0002|SEQ=0001|MSG=HELLO WORLD`. The 15 s frame reserves that size
-per Client. Check `APP_PAYLOAD` for `bytes=32` on the Gateway.
-
-During a walk, read the top line on any page. `TX SF8 CR4/5` on the Client
-identifies its last DATA attempt. The Gateway shows the last received DATA SF.
-The Gateway adjusts DATA SF7–SF10 per Client, sizes slots to the requested
-bytes and grants retries from the ACK bitmap. Control stays at SF9. Coding
-rate, bandwidth, TX power and frame period stay fixed.
-
-The Gateway tracks delivery separately for each Client. Two misses in
-three eligible reports can start an airtime-checked trial at a higher
-DATA SF, including when later ACK or retry timing is uncertain but the
-primary receive window was observed. Each increase starts with a
-temporary reservation. A matching ACK receipt in a valid Request
-confirms it, and a failed trial releases the extra airtime. SNR helps
-interpret packet loss. RSSI is logged for field diagnosis.
-`SEARCH` means the Client is waiting for a fresh SF9 Beacon. `NO GRANT`
-means its Request started but a matching Grant did not arrive.
-The Gateway also has two [experimental SNR-margin rules](docs/en/SCHEDULED_LINK.md#loss-cause-aware-adr).
+<img width="570" src="docs/research/figures/project-profile.svg" alt="Heltec V3.4, SX1262, C++17, Python and RadioLib 7.8.1">
 
 <a name="flash-and-configure"></a>
 
-**[Flash, set roles and run the eight-Client test](docs/en/BENCH_RUNBOOK.md)** ·
-[Protocol and equations](docs/en/SCHEDULED_LINK.md) ·
-[Results and research references](docs/en/PROGRESS.md)
+[Flash and configure](docs/en/BENCH_RUNBOOK.md) · [Protocol and equations](docs/en/SCHEDULED_LINK.md) · [Results and research plan](docs/en/PROGRESS.md)
 
-![Adaptive-LoRa architecture with common control and per-Client DATA profiles](docs/research/figures/adaptive-architecture.svg)
+![Gateway and Clients share a fixed control PHY and use per-Client DATA spreading factors](docs/research/figures/adaptive-architecture.svg)
 
 ## How it works
 
-Control uses $\sigma_{\mathrm{ctrl}}$ and each Client $\iota$ sends DATA at
-$\sigma_\iota$. The Gateway fits the full roster $\Omega$ into the frame
-budget, then uses $\Xi$ for accepted DATA and $\Pi_\jmath$ for retry slots
-announced in round $\jmath$. A retry reuses the same packet $\Delta_\iota$.
+The Gateway sends a Beacon at SF9. Clients request space for their payload and transmit only after a matching Grant. The Gateway sets DATA SF7–SF10 per Client, reserves slots for retries, and reports which packets it accepted through an ACK bitmap. The same radio switches between control and DATA phases. Bandwidth, coding rate, and requested TX power stay fixed.
 
-<img src="docs/research/figures/adaptive-algorithm-gateway.png" alt="Gateway algorithm. Recover each Client's SF, check the airtime budget, exchange DATA and ACKs, then review eligible link reports." width="480">
+![One Gateway rotates through airtime-feasible groups, each using one frame](docs/research/figures/rotation.svg)
 
-<img src="docs/research/figures/adaptive-algorithm-client.png" alt="Client algorithm. Wait for SF9 control, require a matching Grant, send DATA at its assigned SF, and distinguish missing or unknown delivery." width="480">
+The default wire-v5 profile serves a fixed roster of up to eight Clients. The opt-in wire-v7 candidate selects an airtime-feasible group from up to 128 registered IDs every 15 s. It signs Gateway control, authenticates Requests, and encrypts DATA with keys derived from each Client's credentials. The configured registry size tells you how many Clients can take turns. Delivery gaps depend on how often each Client can complete the exchange. [Wire v7 and capacity](docs/en/SCHEDULED_LINK.md#secure-wire-v7) · [Modeled delivery gaps](docs/en/PROGRESS.md#secure-rotation-experiment)
 
-[SF recovery and review pseudocode](docs/en/SCHEDULED_LINK.md#adaptation-and-recovery) ·
-[LaTeX source](docs/research/figures/adaptive-algorithm.tex)
+## Testing method
+
+Use the same profile on the Gateway and every Client. Give each Client a unique ID and confirm the wire version in serial status.
+
+- **Wire v5** generates a 32-byte sample for the fixed-roster test. [Flash and set roles](docs/en/BENCH_RUNBOOK.md#flash-and-set-roles)
+- **Wire v7** requires per-board provisioning. Enable the sample generator for a radio test, or submit bytes through `FirmwareRuntime::submitPayload`. Check `APP_PAYLOAD` for received byte counts and capture DATA SF, ACKs, and retries. Hardware timing, coverage, and recovery are still pending. [Provision and test v7](docs/en/BENCH_RUNBOOK.md#test-the-secure-candidate)
 
 ## Airtime budget
 
 ```math
 \begin{aligned}
+\eta &= \eta_{\mathrm{header}} + \eta_{\mathrm{session}} + \eta_{\mathrm{tag}},\\
 \tau_{\mathrm{slot},\iota}
   &= \tau_{\mathrm{air}}(\lambda_\iota+\eta,\sigma_\iota)+\delta,\\
 \tau_{\mathrm{used}}
@@ -65,15 +41,24 @@ announced in round $\jmath$. A retry reuses the same packet $\Delta_\iota$.
 \end{aligned}
 ```
 
-Here $\lambda_\iota$ is the application payload, $\eta$ adds the frame
-overhead, $\sigma_\iota$ is the selected SF, and $\delta$ is the guard time.
-The retry term covers $\varrho$ rounds of the longest eligible slots.
-The [derivation](docs/en/SCHEDULED_LINK.md#airtime-and-slot-budget) defines
-each symbol, expands the control overhead and lists the settings used
-by the current firmware.
+Here $\lambda_\iota$ is the application payload size, $\sigma_\iota$ the DATA SF, and $\delta$ the slot guard. DATA overhead $\eta$ includes the header, session field, and, for v7, the authentication tag. $\tau_{\mathrm{ctrl}}$ includes each feedback window and uses the encoded control packet sizes for the selected profile. The retry pool reserves the longest eligible slots. [Airtime derivation](docs/en/SCHEDULED_LINK.md#airtime-and-slot-budget) · [Kalman estimator](docs/en/SCHEDULED_LINK.md#loss-cause-aware-adr)
 
-With 32-byte samples and the other Clients at SF7, the 15 s model fits up
-to five Clients at SF9 or two at SF10. The two-SF10 case leaves 77 ms beyond
-the scheduled end reserve. Coverage and timing still need field measurements.
-[Capacity and SF10](docs/en/SCHEDULED_LINK.md#sf10-capacity-and-higher-sf-options) ·
-[Results and the 70-Client research plan](docs/en/PROGRESS.md)
+## Gateway and Client algorithms
+
+The listings show the shared schedule and the additional checks in wire v7. [LaTeX source](docs/research/figures/adaptive-algorithm.tex)
+
+### Algorithm 1 (Gateway scheduling)
+
+<img src="docs/research/figures/adaptive-algorithm-gateway.png" alt="Algorithm 1. Select a group, verify Requests and DATA, and schedule retries and feedback." width="520">
+
+### Algorithm 2 (Client delivery)
+
+<img src="docs/research/figures/adaptive-algorithm-client.png" alt="Algorithm 2. Verify the Beacon, match the Grant to the current Request, send DATA, and check feedback." width="520">
+
+## Q&A
+
+**What is this for?** Low-rate telemetry with scheduled access on one LoRa radio. Energy monitoring is the research application. The protocol carries generic byte payloads.
+
+**How do I integrate it into another system with AI?** Use the [integration prompt](docs/en/SCHEDULED_LINK.md#integration-prompt) to define your payload, acknowledgment semantics, timing, and tests before writing adapters.
+
+Project-authored code is offered under [GPL-3.0-only](LICENSE). See [third-party terms and release obligations](THIRD_PARTY.md).

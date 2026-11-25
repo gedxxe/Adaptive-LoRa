@@ -18,7 +18,7 @@ public:
     bool takeIrqTimestampUs(uint64_t& timestamp) override;
     int16_t standby() override { return radio_.standby(); }
     int16_t startReceive() override;
-    int16_t startTransmit(const uint8_t* bytes, size_t length) override { return radio_.startTransmit(bytes, length); }
+    int16_t startTransmit(const uint8_t* bytes, size_t length) override;
     int16_t finishTransmit() override { return radio_.finishTransmit(); }
     int16_t finishReceive() override { return radio_.finishReceive(); }
     uint32_t getIrqFlags() override { return radio_.getIrqFlags(); }
