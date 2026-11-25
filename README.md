@@ -25,7 +25,7 @@ The default wire-v5 profile serves a fixed roster of up to eight Clients. The op
 Use the same profile on the Gateway and every Client. Give each Client a unique ID and confirm the wire version in serial status.
 
 - **Wire v5** generates a 32-byte sample for the fixed-roster test. [Flash and set roles](docs/en/BENCH_RUNBOOK.md#flash-and-set-roles)
-- **Wire v7** requires per-board provisioning. Enable the sample generator for a radio test, or submit bytes through `FirmwareRuntime::submitPayload`. Check `APP_PAYLOAD` for received byte counts and capture DATA SF, ACKs, and retries. Hardware timing, coverage, and recovery are still pending. [Provision and test v7](docs/en/BENCH_RUNBOOK.md#test-the-secure-candidate)
+- **Wire v7** requires per-board provisioning and matching schedule revisions. Update both roles to revision 2 and keep existing v7 credentials. Enable the sample generator for a radio test, or submit bytes through `FirmwareRuntime::submitPayload`. Check `APP_PAYLOAD` for received byte counts and capture DATA SF, ACKs, and retries. [Provision and test v7](docs/en/BENCH_RUNBOOK.md#test-the-secure-candidate)
 
 ## Airtime budget
 

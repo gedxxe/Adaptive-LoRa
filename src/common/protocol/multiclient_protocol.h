@@ -24,7 +24,11 @@ constexpr uint8_t kControlSf = kAdaptive ? phy::controlSf : kBaseSf;
 constexpr uint8_t kMaxClients = 8;
 constexpr uint8_t kRetrySlots = 4;
 constexpr uint8_t kAttempts = 4;
+#if defined(ADAPTIVE_LORA_SECURE)
+constexpr uint16_t kScheduleVersion = 2;
+#else
 constexpr uint16_t kScheduleVersion = 1;
+#endif
 constexpr uint16_t kGroup = 0xFFFF;
 constexpr uint8_t kAbsent = 0xFF;
 constexpr uint8_t kPayloadPrefix = 4;
@@ -37,14 +41,24 @@ constexpr uint32_t kAdaptivePeriodUs = 15000000;
 constexpr uint32_t kAdaptiveTailUs = 300000;
 constexpr uint32_t kCalendarLimitUs = kAdaptive ? kAdaptivePeriodUs : kMaxPeriodUs;
 constexpr uint32_t kRadioGuardUs = kAdaptive ? 80000 : kGuardUs;
+constexpr uint32_t kRetuneLeadUs = kRadioGuardUs / 4;
 #if defined(ADAPTIVE_LORA_SECURE)
 constexpr uint32_t kSlotGuardUs = kRadioGuardUs + 2 * secure::cryptoTxBudgetUs;
-constexpr uint32_t kLaunchUs = kRadioGuardUs / 4 + secure::cryptoTxBudgetUs;
+constexpr uint32_t kLaunchUs = kRetuneLeadUs + secure::cryptoTxBudgetUs;
+constexpr uint32_t kControlLaunchUs = kRetuneLeadUs + secure::signingBudgetUs;
+constexpr uint32_t kSignedDelayUs = kControlLaunchUs + kRetuneLeadUs;
+constexpr uint32_t kAfterControlUs = secure::verificationBudgetUs + kRadioGuardUs / 2;
 #else
 constexpr uint32_t kSlotGuardUs = kRadioGuardUs;
-constexpr uint32_t kLaunchUs = kSlotGuardUs / 4;
+constexpr uint32_t kLaunchUs = kRetuneLeadUs;
+constexpr uint32_t kControlLaunchUs = kLaunchUs;
+constexpr uint32_t kSignedDelayUs = 0;
+constexpr uint32_t kAfterControlUs = kSlotGuardUs;
 #endif
-constexpr uint32_t kRetuneLeadUs = kRadioGuardUs / 4;
+// Request and first DATA are anchored to actual Beacon and Grant completion.
+// Retry rounds are anchored to the nominal ACK completion and need both bounds.
+constexpr uint32_t kAfterFeedbackUs = kAfterControlUs + kSignedDelayUs;
+constexpr uint32_t kControlRxLateUs = kSignedDelayUs ? kSignedDelayUs : kSlotGuardUs / 2;
 
 using scheduled::airtimeUs;
 constexpr uint8_t slotBit(uint8_t index) { return uint8_t(1u << index); }
@@ -130,7 +144,7 @@ struct Plan {
 };
 
 constexpr uint32_t requestStart(uint8_t index) {
-    return kSlotGuardUs + index * (requestAir() + kSlotGuardUs);
+    return kAfterControlUs + index * (requestAir() + kSlotGuardUs);
 }
 constexpr uint32_t grantStart(uint8_t count) { return requestStart(count) + kSlotGuardUs; }
 uint32_t reservationUs(const Plan& plan);
@@ -157,8 +171,8 @@ struct Rotation {
 };
 #endif
 uint8_t retryMask(uint8_t eligible, uint8_t count, uint32_t frame, uint8_t round);
-bool launchWindow(uint64_t now, uint64_t start);
-bool receiveWindow(uint64_t now, uint64_t start, uint32_t air);
+bool launchWindow(uint64_t now, uint64_t start, uint32_t late = kLaunchUs);
+bool receiveWindow(uint64_t now, uint64_t start, uint32_t air, uint32_t late = kSlotGuardUs / 2);
 
 void writeRoster(Frame& frame, const Roster& roster);
 bool readRoster(const Frame& frame, Roster& roster);

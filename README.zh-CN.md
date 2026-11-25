@@ -25,7 +25,7 @@
 网关与所有客户端使用同一配置。为各客户端分配唯一 ID，并在串口确认空口版本。
 
 - **空口 v5** 为固定名单测试生成 32 字节样本。[烧录与设置角色](docs/zh-CN/BENCH_RUNBOOK.md#flash-and-set-roles)
-- **空口 v7** 需要逐板配置凭据。链路测试可启用样本生成器，也可通过 `FirmwareRuntime::submitPayload` 提交数据。在网关查看 `APP_PAYLOAD` 的接收字节数，记录 DATA SF、ACK 和重试。设备上的无线时序、覆盖和恢复仍待实测。[配置并测试 v7](docs/zh-CN/BENCH_RUNBOOK.md#test-the-secure-candidate)
+- **空口 v7** 需要逐板配置凭据并使用相同调度修订版。两种角色须同时更新到修订版 2，可沿用已有 v7 凭据。链路测试可启用样本生成器，也可通过 `FirmwareRuntime::submitPayload` 提交数据。在网关查看 `APP_PAYLOAD` 的接收字节数，记录 DATA SF、ACK 和重试。[配置并测试 v7](docs/zh-CN/BENCH_RUNBOOK.md#test-the-secure-candidate)
 
 ## 空口时间预算
 

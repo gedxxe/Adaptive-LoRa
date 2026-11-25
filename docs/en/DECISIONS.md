@@ -562,3 +562,14 @@ old trust material. Hardware rollback, timing and RF remain open.
 In v7, stage the TX packet through RadioLib and use timed SetTx to avoid
 the separate unbounded PA-ramp wait. Keep the existing SPI transaction
 and Heltec RF switch configuration.
+
+## ADR-045 — Budget signed control separately
+
+The observed Gateway signing latency exceeded the symmetric launch window.
+Use a 220 ms signed-control launch limit and reserve 240 ms of completion
+slip for Beacon and Grant. Allow 340 ms for Client processing after their
+actual completion. Retry timing uses nominal ACK completion, so reserve
+580 ms to cover both slip and processing. Keep the 60 ms Request/DATA
+launch limit. Revise the authenticated schedule field to 2 so mixed
+calendars fail closed. Both roles use the new schedule with the existing
+packet layout, PHY and NVS credentials.

@@ -7,6 +7,7 @@ changes. It is not a substitute for the append-only build memory.
 
 ### Secure rotating candidate
 
+- Fixed Gateway Beacon, Grant and ACK timing on ESP32-S3 with a separate signed control budget. Wire v7 schedule revision 2 requires both roles to update and uses the existing credentials.
 - Added wire v7 with P-256 Gateway signatures, authenticated Requests and AES-128-CCM DATA. Retries use the original ciphertext.
 - Added offline per-board provisioning, a separate secure role namespace, reboot challenge confirmation and fail-closed credential checks.
 - Accounted for the full security envelope and processing guard in admission. The secure radio adapter uses a timed SetTx and exposes timing and memory diagnostics.

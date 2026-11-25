@@ -34,7 +34,8 @@ The opt-in `heltec_wifi_lora_32_V3_rotating` profile uses wire version 6
 and schedules up to eight of 128 registered IDs per frame. Keep its
 results distinct from the unauthenticated wire-v5 field baseline. A
 deployment candidate uses the opt-in `heltec_wifi_lora_32_V3_secure`
-wire-v7 image with authenticated control and encrypted DATA. Keep its
+wire-v7 image with authenticated control and encrypted DATA. Update both
+roles to the same authenticated schedule revision. Keep its
 credential provisioning, field results and readiness separate from the
 plaintext comparison profiles.
 Historical records retain their original hardware and results.

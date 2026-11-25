@@ -81,12 +81,12 @@ $\lambda_\iota$ 为授权长度。$\Theta^\star$ 由 $\Theta$ 内最多 $\varkap
 
 ```math
 \begin{aligned}
-\tau_{\mathrm{requests}} &= \delta+\nu_\Omega(\tau_{\mathrm{R}}+\delta)+\delta,\\
+\tau_{\mathrm{requests}} &= \delta_{\mathrm{request}}+\nu_\Omega(\tau_{\mathrm{R}}+\delta)+\delta,\\
 \tau_{\mathrm{bitmaps}} &= (\varrho+1)\tau_{\mathrm{A}} + \delta_{\mathrm{first}}
     +\varrho(\delta_{\mathrm{before}}+\delta_{\mathrm{after}})\\
     &\quad+\delta_{\mathrm{last}}+\delta_{\mathrm{close}},\\
 \tau_{\mathrm{ctrl}} &= \tau_{\mathrm{B}}+\tau_{\mathrm{requests}}
-    +\tau_{\mathrm{G}}+\tau_{\mathrm{bitmaps}}.
+    +\tau_{\mathrm{G}}+\tau_{\mathrm{bitmaps}}+2\delta_{\mathrm{signed}}.
 \end{aligned}
 ```
 
@@ -101,7 +101,8 @@ $\tau_{\mathrm{B}}$、$\tau_{\mathrm{R}}$、$\tau_{\mathrm{G}}$、$\tau_{\mathrm
 按所选配置的完整帧长度计算，包括公共帧头和 v7 的安全字段。
 $\tau_{\mathrm{requests}}$ 包含请求窗口及它们与 Grant 前的间隔。
 $\tau_{\mathrm{bitmaps}}$ 包含所有反馈帧、首次 DATA 前的间隔、重传轮次前后的间隔、最后
-一帧反馈前的间隔及尾部保护时间。各间隔均取 $\delta$。
+一帧反馈前的间隔及尾部保护时间。v5 和 v6 的间隔（含 $\delta_{\mathrm{request}}$）
+均取 $\delta$，且 $\delta_{\mathrm{signed}}=0$。[v7 时序预算](#secure-schedule-capacity)另行定义。
 Gateway 先核对不等式再预留更高 SF，试用较低 SF 时保留此前的额度。
 
 | 符号 | 含义 | 默认自适应镜像（空口 v5） |
@@ -383,7 +384,7 @@ RSSI 描述接收包的强度。RSSI 低但交付正常时可继续使用当前 
 
 ## 安全空口 v7
 
-两种角色都使用 `heltec_wifi_lora_32_V3_secure`，仅接收 v7。保留 v1、v2、v3、v5 和 v6 作为对照。安全配置的射频缓冲区上限为 237 B，内层仍使用 28 B 帧头和 96 B 总长限制。内层长度字段只计入安全尾部之前的报文体。
+两种角色都使用 `heltec_wifi_lora_32_V3_secure`。当前 v7 要求认证帧头中的 `schedule_version=2`。网关和全部客户端须同时更新固件，原有 v7 凭据可继续使用。保留 v1、v2、v3、v5 和 v6 作为对照。安全配置的射频缓冲区上限为 237 B，内层仍使用 28 B 帧头和 96 B 总长限制。内层长度字段只计入安全尾部之前的报文体。
 
 | 报文 | 完整空口字节数 | 保护方式 |
 |---|---:|---|
@@ -407,21 +408,34 @@ $n$ 为名单节点数，$\lambda$ 为应用载荷字节数。$n=8$ 时 Grant �
 
 ### 安全调度容量
 
-调度计入完整认证帧、四个反馈时段和 300 毫秒帧尾预留。时隙保护为 160 毫秒，在原 80 毫秒上暂加两侧各 40 毫秒的密码处理预算。编码后超过时隙起点 60 毫秒便取消发送。安全适配器直接使用带硬件超时的 SX1262 SetTx，跳过 RadioLib 独立的无界 PA 等待。SPI 锁和命令耗时仍需实测。
+更新前，Heltec 网关对 Beacon 的封装耗时实测为 121.595 毫秒，超过原 60 毫秒发射窗口。签名预算在实测值上加 50% 余量，再按 40 毫秒向上取整为 200 毫秒。客户端验签预算为 300 毫秒，超过两倍实测签名时间，仍需实板验证。
+
+| 时序参数 | 安全调度修订版 2 |
+|---|---:|
+| Request 与 DATA 发射窗口 | 60 毫秒 |
+| Request 与 DATA 时隙保护 $\delta$ | 160 毫秒 |
+| 签名 Beacon、Grant 和 ACK 发射窗口 | 220 毫秒 |
+| 预算中签名帧完成的最大延迟 $\delta_{\mathrm{signed}}$ | 240 毫秒 |
+| Beacon 或 Grant 实际完成后 $\delta_{\mathrm{request}}$ 与 $\delta_{\mathrm{first}}$ | 340 毫秒 |
+| ACK 预计完成后 $\delta_{\mathrm{after}}$ 与 $\delta_{\mathrm{close}}$ | 580 毫秒 |
+| 位图前保护 $\delta_{\mathrm{before}}$ 与 $\delta_{\mathrm{last}}$ | 160 毫秒 |
+| 帧尾预留 $\tau_{\mathrm{tail}}$ | 300 毫秒 |
+
+Request 与首次 DATA 时隙以 Beacon 或 Grant 的实际完成时间为基准。重试采用固定的 ACK 调度，必须同时预留 ACK 延迟、客户端验签和换频时间。准入计算包含完整时序及四个反馈窗口。错过发射窗口的报文取消发送，SX1262 另有硬件发射超时。
 
 | 登记节点数 | 全部 SF7 | 全部 SF8 | 全部 SF9 | 全部 SF10 | 依次混合 SF7–SF10 |
 |---:|---:|---:|---:|---:|---:|
 | 1 | 15 秒 | 15 秒 | 15 秒 | 15 秒 | 15 秒 |
-| 4 | 15 秒 | 15 秒 | 30 秒 | 30 秒 | 30 秒 |
-| 8 | 30 秒 | 30 秒 | 45 秒 | 60 秒 | 45 秒 |
-| 16 | 60 秒 | 60 秒 | 90 秒 | 120 秒 | 90 秒 |
-| 32 | 105 秒 | 120 秒 | 165 秒 | 240 秒 | 180 秒 |
-| 63 | 195 秒 | 240 秒 | 315 秒 | 480 秒 | 360 秒 |
-| 64 | 195 秒 | 240 秒 | 330 秒 | 480 秒 | 360 秒 |
-| 70 | 210 秒 | 270 秒 | 360 秒 | 525 秒 | 390 秒 |
-| 84 | 255 秒 | 315 秒 | 420 秒 | 630 秒 | 480 秒 |
-| 96 | 300 秒 | 360 秒 | 480 秒 | 720 秒 | 540 秒 |
-| 128 | 390 秒 | 480 秒 | 645 秒 | 960 秒 | 720 秒 |
+| 4 | 30 秒 | 30 秒 | 30 秒 | 60 秒 | 45 秒 |
+| 8 | 45 秒 | 60 秒 | 60 秒 | 120 秒 | 75 秒 |
+| 16 | 90 秒 | 120 秒 | 120 秒 | 240 秒 | 135 秒 |
+| 32 | 165 秒 | 240 秒 | 240 秒 | 480 秒 | 255 秒 |
+| 63 | 315 秒 | 480 秒 | 480 秒 | 945 秒 | 480 秒 |
+| 64 | 330 秒 | 480 秒 | 480 秒 | 960 秒 | 495 秒 |
+| 70 | 360 秒 | 525 秒 | 525 秒 | 1,050 秒 | 540 秒 |
+| 84 | 420 秒 | 630 秒 | 630 秒 | 1,260 秒 | 645 秒 |
+| 96 | 480 秒 | 720 秒 | 720 秒 | 1,440 秒 | 735 秒 |
+| 128 | 645 秒 | 960 秒 | 960 秒 | 1,920 秒 | 975 秒 |
 
 计算采用 32 B 载荷与连续调度。成功交付还需双向 SF9 控制以及成功的 DATA 时隙。SF10 DATA 无法扩大 SF9 控制链路的覆盖。[模型结果](PROGRESS.md#secure-rotation-experiment)给出共享干扰下的交付间隔，现场测试要求见[安全配置测试](BENCH_RUNBOOK.md#test-the-secure-candidate)。
 

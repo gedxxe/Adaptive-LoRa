@@ -1113,3 +1113,27 @@ After pdfLaTeX and the two PNG exports passed, the optional command
 resolved to MiKTeX and could not access its Windows registry keys
 (shell exit `-1073740791`). The generated images were inspected directly.
 The final pdfLaTeX and Poppler commands returned 0.
+
+## ERR-075 — Signed control missed the launch window
+
+On the provisioned Heltec Gateway, the revision-1 v7 image reported
+`tx_us_max=121595` and `late_tx=5`. Frame 6 reported
+`V3_BEACON_TX,result=security_launch_late`. The 60 ms window applied
+the Request and DATA timing budget to P-256 work. The native test that
+injects the measured signing delay reproduced the failure before the fix
+(`logs/test/iteration-038-secure-repro.log`, exit 1).
+
+Schedule revision 2 separates the signed control and symmetric windows.
+The regression uses real cryptography and injects signing and verification
+delays, loses primary DATA, and verifies the scheduled retry and ACK.
+On the same Gateway with its existing v7 credentials, a 46-second capture
+reported `tx_us_max=121653`, `late_tx=0` and three consecutive
+SF9 Beacon TX starts. The log shows driver launch. A paired
+authenticated exchange requires a separate capture.
+[Gateway output](../../logs/test/iteration-038-gateway.log)
+
+## ERR-076 — Host model compiler blocked by Windows sandbox
+
+The seeded model command failed with `WinError 623` while launching
+MinGW from the sandbox. The same command outside the sandbox returned
+0. Both outputs are retained under `logs/test/iteration-038-rotation-model*.log`.

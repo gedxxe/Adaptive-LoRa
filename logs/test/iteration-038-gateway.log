@@ -1,0 +1,7 @@
+event=CONFIG,scope=loaded,role=GATEWAY,network_id=1,node_id=1,gateway_id=1,schema=1,validity=valid,hello_interval_ms=3000
+event=STATUS,mode=GATEWAY,radio=ready,chip=SX1262_driver_id_not_exposed,fw=0.2.0-alpha.1,protocol=7,build_id=m0-m2-source-001,reset_reason=1,log_dropped=0,profile=secure
+event=SCHEDULE_CONFIG,period_us=15000000,registered_count=1,max_group=8,payload_ceiling_bytes=32,adr_rule=LEGACY
+event=SECURITY_TIMING,auth_drops=0,tx_us_max=121653,rx_us_max=0,late_tx=0
+uptime_us=75200944,role=GATEWAY,network_id=1,node_id=1,event=V3_BEACON_TX,source_id=1,destination_id=65535,sequence=0,boot_id=3592419177,frame_id=6,config_version=0,schedule_version=2,sf=9,bw_khz=125,freq_mhz=915.000,rssi_dbm=N/A,snr_db=N/A,toa_us=615424,code=0,result=started
+uptime_us=90200998,role=GATEWAY,network_id=1,node_id=1,event=V3_BEACON_TX,source_id=1,destination_id=65535,sequence=0,boot_id=3592419177,frame_id=7,config_version=0,schedule_version=2,sf=9,bw_khz=125,freq_mhz=915.000,rssi_dbm=N/A,snr_db=N/A,toa_us=615424,code=0,result=started
+uptime_us=105201049,role=GATEWAY,network_id=1,node_id=1,event=V3_BEACON_TX,source_id=1,destination_id=65535,sequence=0,boot_id=3592419177,frame_id=8,config_version=0,schedule_version=2,sf=9,bw_khz=125,freq_mhz=915.000,rssi_dbm=N/A,snr_db=N/A,toa_us=615424,code=0,result=started

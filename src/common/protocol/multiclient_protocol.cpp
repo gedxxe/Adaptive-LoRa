@@ -63,9 +63,9 @@ uint32_t Plan::retrySpan() const {
 }
 
 uint32_t Plan::roundStart(uint8_t round) const {
-    if (!round) return kSlotGuardUs;
-    const uint32_t control = feedbackAir(count) + 2 * kSlotGuardUs;
-    return kSlotGuardUs + dataSpan() + control + (round - 1) * (retrySpan() + control);
+    if (!round) return kAfterControlUs;
+    const uint32_t control = feedbackAir(count) + kSlotGuardUs + kAfterFeedbackUs;
+    return kAfterControlUs + dataSpan() + control + (round - 1) * (retrySpan() + control);
 }
 
 uint32_t Plan::feedbackStart(uint8_t round) const {
@@ -79,8 +79,9 @@ uint32_t Plan::dataStart(uint8_t round, uint8_t index, uint8_t mask) const {
 }
 
 uint32_t reservationUs(const Plan& plan) {
-    return beaconAir(plan.count) + grantStart(plan.count) + grantAir(plan.count) +
-           plan.feedbackStart(kAttempts - 1) + feedbackAir(plan.count) + kSlotGuardUs;
+    return kSignedDelayUs + beaconAir(plan.count) + grantStart(plan.count) +
+           kSignedDelayUs + grantAir(plan.count) + plan.feedbackStart(kAttempts - 1) +
+           feedbackAir(plan.count) + kAfterFeedbackUs;
 }
 
 uint32_t requiredPeriodUs(const Roster& roster) {
@@ -129,10 +130,10 @@ uint8_t retryMask(uint8_t eligible, uint8_t count, uint32_t frame, uint8_t round
     return assigned;
 }
 
-bool launchWindow(uint64_t now, uint64_t start) { return now >= start && now - start < kLaunchUs; }
-bool receiveWindow(uint64_t now, uint64_t start, uint32_t air) {
+bool launchWindow(uint64_t now, uint64_t start, uint32_t late) { return now >= start && now - start < late; }
+bool receiveWindow(uint64_t now, uint64_t start, uint32_t air, uint32_t late) {
     const uint64_t end = start + air;
-    return now >= end - kSlotGuardUs / 2 && now < end + kSlotGuardUs / 2;
+    return now + kSlotGuardUs / 2 >= end && now < end + late;
 }
 
 void writeRoster(Frame& f, const Roster& roster) {
