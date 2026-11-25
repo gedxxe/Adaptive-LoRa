@@ -29,6 +29,9 @@
 \DeclareMathOperator{\ObservePrimary}{ObservePrimary}
 \DeclareMathOperator{\ValidGrant}{ValidGrant}
 \DeclareMathOperator{\ValidACK}{ValidACK}
+\DeclareMathOperator{\Group}{SelectGroup}
+\DeclareMathOperator{\ValidDATA}{ValidDATA}
+\DeclareMathOperator{\Seal}{SealOnce}
 \newcommand{\ctrl}{\sigma_{\mathrm{ctrl}}}
 \newcommand{\Tx}[2]{\mathsf{TX}_{#1}(#2)}
 \newcommand{\Rx}[2]{\mathsf{RX}_{#1}(#2)}
@@ -42,9 +45,12 @@
 
 \begin{document}
 \begin{algorithm}{1}{Gateway scheduling}
-  \Step{$\Expire_\iota(\phi)$ for each roster position $\iota$}
+  \Step{In v7, sign Gateway control and verify DATA tags.}
+  \Step{For a rotating profile, $\Omega\gets\Group(\tau_{\mathrm{frame}})$}
+  \Step{$\Expire_\iota(\nu_\iota)$ for each $\iota\in\Omega$}
   \Step{$\Tx{\ctrl}{\mathrm{Beacon}(\phi,\Omega)}$}
-  \Step{$(\Theta_0,\boldsymbol{\phi}_{\mathrm{ack}}) \gets \Requests(\phi,\Omega)$}
+  \Step{$(\Theta_0,\boldsymbol{\phi}_{\mathrm{ack}},\boldsymbol{\kappa}) \gets \Requests(\phi,\Omega)$}
+  \Step{In v7, $\Requests$ verifies each Request MAC.}
   \Step{\textbf{if} $\Theta_0=\varnothing$ \textbf{then return}}
   \Step{$(\boldsymbol{\sigma}^{\mathrm{want}},\boldsymbol{\sigma}^{\mathrm{res}})
     \gets \Recover(\phi,\Omega,\Theta_0,\boldsymbol{\phi}_{\mathrm{ack}})$}
@@ -52,6 +58,7 @@
     \Reserve(\Omega,\boldsymbol{\sigma}^{\mathrm{want}},\boldsymbol{\sigma}^{\mathrm{res}})$}
   \Step{\hspace{1em}subject to $\tau_{\mathrm{used}}(\Omega,\boldsymbol{\sigma}^{\mathrm{res}})\le\tau_{\mathrm{frame}}$}
   \Step{$\sigma_\iota\gets\min(\sigma_\iota^{\mathrm{want}},\sigma_\iota^{\mathrm{res}}),\quad \iota\in\Theta_0$}
+  \Step{In v7, include a signed echo of $\kappa_\iota$ in the Grant}
   \Step{$\Tx{\ctrl}{\mathrm{Grant}(\phi,\Theta_0,\boldsymbol{\lambda},\boldsymbol{\sigma})}$}
   \Step{\textbf{if} $\neg\OnTime(\mathrm{Grant})$ \textbf{then return}}
   \Step{$\Xi\gets\varnothing$}
@@ -59,10 +66,10 @@
     \Block{\textbf{for} $\iota\in\Theta_\jmath$ in slot order \textbf{do}}{%
       \Step{$\Delta_\iota\gets\Rx{\sigma_\iota}{\phi,\jmath,\iota}$}
       \Step{\textbf{if} $\jmath=0$ \textbf{then} $q_\iota\gets\ObservePrimary(\phi,\iota)$}
-      \Step{$\Xi\gets\Xi\cup\Deliver(\Delta_\iota)$}%
+      \Step{\textbf{if} $\ValidDATA(\Delta_\iota)$ \textbf{then} $\Xi\gets\Xi\cup\Deliver(\Delta_\iota)$}%
     }
     \Step{$\Pi_\jmath\gets\begin{cases}
-      \Pick_{\varkappa}(\Missing(\Theta_0),\phi,\jmath), & \jmath<\varrho\\
+      \Pick_{\varkappa}(\Missing(\Theta_0),\nu_{\iota_0},\jmath), & \jmath<\varrho\\
       \varnothing, & \jmath=\varrho
     \end{cases}$}
     \Step{$\Tx{\ctrl}{\mathrm{ACK}(\phi,\jmath,\Xi,\Pi_\jmath)}$}
@@ -71,21 +78,26 @@
       \varnothing, & \text{otherwise}
     \end{cases}$}%
   }
-  \Step{$\Review_\iota(\phi,q_\iota)$ for each $\iota\in\Theta_0$ satisfying $\Eligible_\iota(\phi)$}
+  \Step{$\Review_\iota(\nu_\iota,q_\iota),\quad \iota\in\Theta_0,\ \Eligible_\iota(\phi)$}
 \end{algorithm}
 
 \begin{algorithm}{2}{Client delivery}
+  \Step{In v7, verify signatures on Gateway control.}
   \Step{$(\phi,\Omega)\gets\Rx{\ctrl}{\mathrm{Beacon}}$}
-  \Step{\textbf{if} $\neg\mathrm{Fresh}(\phi)$ \textbf{then return} \textsc{search}}
-  \Step{\textbf{if} $\Delta_\iota=\bot$ \textbf{then return}}
+  \Step{\textbf{if} $\neg\mathrm{ValidBeacon}(\phi,\Omega)$ \textbf{then return} \textsc{search}}
+  \Step{\textbf{if} $\iota\notin\Omega$ or $\Delta_\iota=\bot$ \textbf{then return}}
+  \Step{In v7, add a fresh $\kappa_\iota$ and a Request MAC.}
   \Step{$\Tx{\ctrl}{\mathrm{Request}(\phi,\lambda_\iota,\phi_{\mathrm{ack}})}$}
   \Step{\textbf{if} Request TX did not start \textbf{then return} \textsc{req fail}}
+  \Step{In v7, $\ValidGrant$ checks the echo of $\kappa_\iota$.}
   \Step{$\Gamma\gets\ValidGrant_\iota(\phi,\lambda_\iota)$}
   \Step{\textbf{if} $\Gamma=\bot$ \textbf{then return} \textsc{no grant}}
   \Step{$\sigma_\iota\gets\Gamma.\sigma_\iota,\quad \epsilon_0\gets\mathrm{true}$}
+  \Step{$\Delta_\iota^{\mathrm{tx}}\gets\Delta_\iota$ in plaintext profiles}
   \Block{\textbf{for} $\jmath=0,\ldots,\varrho$ \textbf{while} $\mathrm{Fresh}(\phi)$}{%
     \Block{\textbf{if} $\epsilon_\jmath\land(0\le\tau-\tau_{\iota,\jmath}<\delta_{\mathrm{tx}})$ \textbf{then}}{%
-      \Step{$\Tx{\sigma_\iota}{\Delta_\iota}$}%
+      \Step{In v7, $\Delta_\iota^{\mathrm{tx}}\gets\Seal(\Delta_\iota,\Gamma,\kappa_\iota)$}%
+      \Step{$\Tx{\sigma_\iota}{\Delta_\iota^{\mathrm{tx}}}$ within the launch window}%
     }
     \Step{$(\Xi_\jmath,\Pi_\jmath)\gets\ValidACK_{\ctrl}(\phi,\jmath)$}
     \Block{\textbf{if} $\mathrm{Sent}(\Delta_\iota)\land\iota\in\Xi_\jmath$ \textbf{then}}{%

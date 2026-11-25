@@ -60,7 +60,7 @@ class ConsistencyTests(unittest.TestCase):
         self.assertTrue(any("broken relative link" in e for e in check(self.root)))
 
     def test_physical_pass_claim_is_rejected(self):
-        self.mutate("docs/en/PROGRESS.md", "| Field test | Walk test and radio timing measurements pending |",
+        self.mutate("docs/en/PROGRESS.md", "| Field test | Radio range and timing measurements pending |",
                     "| Field test | PASS |")
         self.assertTrue(any("field test and timing" in e for e in check(self.root)))
 

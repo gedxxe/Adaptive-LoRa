@@ -6,6 +6,10 @@
 
 ![单射频上的控制帧、DATA 与重传顺序](../research/figures/adaptive-frame.svg)
 
+下表说明默认自适应空口 v5。轮换配置沿用这些阶段，分别使用
+[空口 v6 分组选择器](#rotating-schedule)和[空口 v7 安全封装](#secure-wire-v7)。
+网关和所有客户端须使用同一空口版本。
+
 协议 5 使用小端编码，帧头 28 字节，整帧最多 96 字节。帧头包含网络、源地址、目的地址、
 发送方 boot ID、帧号、序号及调度版本。Gateway 广播控制帧，Client 向 Gateway 发送 Request 和 DATA。
 
@@ -67,7 +71,7 @@ $\lambda_\iota$ 为授权长度。$\Theta^\star$ 由 $\Theta$ 内最多 $\varkap
 
 ```math
 \begin{aligned}
-\eta &= \eta_{\mathrm{header}}+\eta_{\mathrm{session}},\\
+\eta &= \eta_{\mathrm{header}}+\eta_{\mathrm{session}}+\eta_{\mathrm{tag}},\\
 \tau_{\mathrm{slot},\iota}
    &=\tau_{\mathrm{air}}(\lambda_\iota+\eta,\sigma_\iota)+\delta,\\
 \tau_{\mathrm{data}}&=\sum_{\iota\in\Theta}\tau_{\mathrm{slot},\iota},\\
@@ -93,20 +97,23 @@ $\lambda_\iota$ 为授权长度。$\Theta^\star$ 由 $\Theta$ 内最多 $\varkap
 ```
 
 $\tau_{\mathrm{B}}$、$\tau_{\mathrm{R}}$、$\tau_{\mathrm{G}}$、$\tau_{\mathrm{A}}$
-分别为控制 SF 下的 Beacon、Request、Grant 和位图空口时间，字节数为帧头加上表中字段。
+分别为控制 SF 下的 Beacon、Request、Grant 和位图空口时间。
+按所选配置的完整帧长度计算，包括公共帧头和 v7 的安全字段。
 $\tau_{\mathrm{requests}}$ 包含请求窗口及它们与 Grant 前的间隔。
 $\tau_{\mathrm{bitmaps}}$ 包含所有反馈帧、首次 DATA 前的间隔、重传轮次前后的间隔、最后
 一帧反馈前的间隔及尾部保护时间。各间隔均取 $\delta$。
 Gateway 先核对不等式再预留更高 SF，试用较低 SF 时保留此前的额度。
 
-| 符号 | 含义 | 当前自适应镜像 |
+| 符号 | 含义 | 默认自适应镜像（空口 v5） |
 |---|---|---|
 | $\eta_{\mathrm{header}}$、$\eta_{\mathrm{session}}$ | DATA 帧头、Gateway boot ID 字节数 | 28 B、4 B |
+| $\eta_{\mathrm{tag}}$ | DATA 认证标签 | v5 为 0 B，v7 为 16 B |
 | $\nu_\Omega$、$\lambda_\iota$ | 测试名单数、单节点载荷上限 | 8 个、32 B。空口格式上限为 64 B。 |
 | $\varrho$、$\varkappa$ | 重传轮数、每轮共享重传槽 | 3 轮、最多 4 槽 |
 | $\delta$、$\tau_{\mathrm{tail}}$、$\tau_{\mathrm{frame}}$ | 时隙保护、帧尾预留、超帧周期 | 80 ms、300 ms、15 s |
 
-切换提前量和发射窗口均为保护间隔的四分之一。接收窗口在预期完成时刻的前后各半个保护
+v5 的切换提前量和发射窗口均为保护间隔的四分之一。[v7 预算](#secure-schedule-capacity)
+另计处理耗时。接收窗口在预期完成时刻的前后各半个保护
 间隔。调度以无线完成时间戳为基准，发射时隙过晚则跳过。实际切换时间和时钟漂移仍待测量。
 [无线设置](../../include/radio_config.h) · [空口时间与长度](../../src/common/protocol/multiclient_protocol.h) ·
 [时隙安排](../../src/common/protocol/multiclient_protocol.cpp)
@@ -178,12 +185,18 @@ BW125 下 SF10 符号时长为 8.192 毫秒，无需 LDRO。96 字节包在 SF10
 
 <img src="../research/figures/adaptive-algorithm-adr.png" alt="Gateway SF 策略，包括会话恢复、近期丢包窗口、降档失败回退和确认。" width="480">
 
-README 算法中的 $\phi$ 为帧 ID，$\phi_{\mathrm{ack}}$ 是同一 Gateway 会话中
-最后收到 ACK 的帧，$\Gamma$ 为有效 Grant。第 $\jmath=0$ 轮为首传。
+[算法 1（网关调度）](../../README.zh-CN.md#algorithm-1-gateway-scheduling)
+说明网关如何选择并服务分组。[算法 2（客户端交付）](../../README.zh-CN.md#algorithm-2-client-delivery)
+展示客户端如何按匹配的 Grant 和反馈发送数据。两份算法中，$\phi$ 为帧 ID，
+$\phi_{\mathrm{ack}}$ 为同一网关会话中最后收到 ACK 的帧，$\Gamma$ 为有效
+Grant。$\Omega$ 为当前名单，$\nu_\iota$ 为客户端 $\iota$ 已获调度机会的计数
+（固定名单时为帧 ID），$\iota_0$ 为名单中的首个位置。$\kappa_\iota$ 为 v7
+Request 挑战值。第 $\jmath=0$ 轮为首传。
 $\Theta_\jmath$ 是本轮有权发送的 Client 集合，$\Xi$ 累计记录已接受的 Client，
 $\Pi_\jmath$ 从已获授权但 DATA 仍未到达的 Client 中选出最多 $\varkappa$ 个。
 $\epsilon_\jmath$ 表示本地 Client 有权发送。位图缺失或无效时，两集合为空。
-Gateway 接收 DATA 时检查帧、会话、载荷长度和时序。
+只有已获授权但 DATA 未到达时才安排重试。应用拒收的报文不进入重试集合。
+网关接收 DATA 时检查帧、会话、载荷长度和时序，v7 还验证 CCM 标签。
 
 设当前时刻为 $\tau$，计划发射时刻为 $\tau_{\iota,\jmath}$，预计完成时刻为
 $\widehat{\tau}$，实际接收完成时刻为 $\tau_{\mathrm{rx}}$。发送和接收窗口以及
@@ -384,11 +397,13 @@ $n$ 为名单节点数，$\lambda$ 为应用载荷字节数。$n=8$ 时 Grant �
 
 网关在记录 Request 前验证逐客户端 MAC。客户端用预置网关公钥验证控制帧。签名覆盖可见路由帧头、类型、调度、帧编号、发送方启动 ID 与载荷，并绑定凭据代次和完整网关纪元。被攻破的客户端可以冒充自身，但无法签署网关报文或冒充其他客户端。
 
-验签通过的 Beacon 提供待确认的调度。客户端每次发送 Request 前生成 128 位挑战值。只有及时收到匹配帧、启动 ID、载荷大小并回显 96 位挑战的 Grant 才发送 DATA。重启后旧信标可能引发一次待确认的 Request，历史 Grant 无法授权本次 DATA。ACK 必须匹配当前授权、帧和轮次。同一事务中的重放不会重复调用应用回调。
+客户端验签后将新纪元的 Beacon 作为待确认调度。每次发送 Request 前生成 128 位挑战值。只有及时收到匹配帧、客户端启动 ID、请求载荷大小并回显 96 位挑战的有效 Grant 才确认新纪元并发送 DATA，此前会保留已确认的交付状态。失去同步后，录制的旧 Beacon 可能引发 Request，录制的 Grant 缺少本次挑战回显。客户端开始发送 DATA 后才检查当前会话、帧和轮次的反馈。同一事务中的重复认证 DATA 最多调用一次应用回调。
 
 启用无线前，用 ESP32-S3 启动熵源为 Mbed TLS CTR-DRBG 播种。网关每次启动或帧计数回绕时生成新的 128 位纪元。HKDF-SHA-256 用凭据代次派生请求 MAC 密钥，用凭据代次、网关纪元和完整挑战值派生 DATA 密钥，两种用途的标签不同。DATA 的内层帧头作为认证附加数据。13 字节 nonce 使用帧头第 12–23 字节及 v7 域字节。新帧改变 nonce，新握手在熵源和 HKDF 正常的条件下产生新密钥。重传复用缓存的密文和标签，报文收发无需写入闪存更新计数器。
 
 管理员离线导入凭据。运行时不写入或修复持久凭据。安全角色和密钥使用独立于明文角色的命名空间。记录缺失、读取故障、配置不一致、熵源失败或 NVS 被格式化时，射频保持关闭。恢复有效旧凭据后通过新握手更新会话密钥，但完整闪存回退可能恢复已撤销的信任材料，因此恢复后应给所有活动板重新分配凭据及代次。Secure Boot、闪存／NVS 加密及回退控制仍需单独验收。射频干扰、流量元数据和网关被攻破属于剩余风险。
+
+<a name="secure-schedule-capacity"></a>
 
 ### 安全调度容量
 

@@ -41,7 +41,7 @@
   <use href="#radioIcon" x="72" y="365" color="#185785"/>
   <text x="121" y="387" class="detail">One radio listens or transmits</text>
 
-  <text x="750" y="59" class="label">Up to eight Clients</text>
+  <text x="750" y="59" class="label">Active Client group</text>
   <rect x="750" y="78" width="254" height="85" rx="9" class="card"/>
   <text x="773" y="111" class="label">Client 2</text>
   <text x="773" y="138" class="detail">Example DATA SF7</text>

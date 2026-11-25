@@ -2,9 +2,7 @@
 
 [简体中文](README.zh-CN.md)
 
-**Research topic** — Reliability-aware TDMA scheduling and link adaptation for single-radio LoRa industrial energy monitoring networks.
-
-**Theme and objective.** Study how a single half-duplex Gateway can share airtime among low-rate telemetry Clients with different link qualities. Measure delivery, time between service opportunities, and airtime as the population grows.
+**Research topic** — Reliability-aware TDMA scheduling and link adaptation for single-radio LoRa industrial energy monitoring networks. The project studies how delivery gaps and airtime change as one half-duplex Gateway serves more Clients with different link qualities.
 
 <img width="570" src="docs/research/figures/project-profile.svg" alt="Heltec V3.4, SX1262, C++17, Python and RadioLib 7.8.1">
 
@@ -20,16 +18,20 @@ The Gateway sends a Beacon at SF9. Clients request space for their payload and t
 
 ![One Gateway rotates through airtime-feasible groups, each using one frame](docs/research/figures/rotation.svg)
 
-The default profile serves up to eight Clients. The wire-v7 candidate selects a group from up to 128 registered IDs every 15 s. It signs Gateway messages and encrypts DATA with a key unique to each Client. See the [secure protocol and capacity](docs/en/SCHEDULED_LINK.md#secure-wire-v7) and the [provisioning procedure](docs/en/BENCH_RUNBOOK.md#test-the-secure-candidate). Physical timing, coverage and recovery still need measurements.
+The default wire-v5 profile serves a fixed roster of up to eight Clients. The opt-in wire-v7 candidate selects an airtime-feasible group from up to 128 registered IDs every 15 s. It signs Gateway control, authenticates Requests, and encrypts DATA with keys derived from each Client's credentials. The configured registry size tells you how many Clients can take turns. Delivery gaps depend on how often each Client can complete the exchange. [Wire v7 and capacity](docs/en/SCHEDULED_LINK.md#secure-wire-v7) · [Modeled delivery gaps](docs/en/PROGRESS.md#secure-rotation-experiment)
 
 ## Testing method
 
-Build the same image for every board and assign each Client a unique ID. Confirm the wire version in serial status before testing. The example sends a 32-byte sample. Look for `APP_PAYLOAD` on the Gateway and check received bytes, DATA SF, ACKs, and retries in the capture. The [setup guide](docs/en/BENCH_RUNBOOK.md#flash-and-set-roles) gives the commands for both roles.
+Use the same profile on the Gateway and every Client. Give each Client a unique ID and confirm the wire version in serial status.
+
+- **Wire v5** generates a 32-byte sample for the fixed-roster test. [Flash and set roles](docs/en/BENCH_RUNBOOK.md#flash-and-set-roles)
+- **Wire v7** requires per-board provisioning. Enable the sample generator for a radio test, or submit bytes through `FirmwareRuntime::submitPayload`. Check `APP_PAYLOAD` for received byte counts and capture DATA SF, ACKs, and retries. Hardware timing, coverage, and recovery are still pending. [Provision and test v7](docs/en/BENCH_RUNBOOK.md#test-the-secure-candidate)
 
 ## Airtime budget
 
 ```math
 \begin{aligned}
+\eta &= \eta_{\mathrm{header}} + \eta_{\mathrm{session}} + \eta_{\mathrm{tag}},\\
 \tau_{\mathrm{slot},\iota}
   &= \tau_{\mathrm{air}}(\lambda_\iota+\eta,\sigma_\iota)+\delta,\\
 \tau_{\mathrm{used}}
@@ -39,17 +41,19 @@ Build the same image for every board and assign each Client a unique ID. Confirm
 \end{aligned}
 ```
 
-Here $\lambda_\iota$ is the payload size, $\eta$ the frame overhead, $\sigma_\iota$ the DATA SF, and $\delta$ the guard time. The retry pool reserves the longest eligible slots. See the [airtime derivation](docs/en/SCHEDULED_LINK.md#airtime-and-slot-budget) and [Kalman estimator](docs/en/SCHEDULED_LINK.md#loss-cause-aware-adr) for the assumptions and equations.
+Here $\lambda_\iota$ is the application payload size, $\sigma_\iota$ the DATA SF, and $\delta$ the slot guard. DATA overhead $\eta$ includes the header, session field, and, for v7, the authentication tag. $\tau_{\mathrm{ctrl}}$ includes each feedback window and uses the encoded control packet sizes for the selected profile. The retry pool reserves the longest eligible slots. [Airtime derivation](docs/en/SCHEDULED_LINK.md#airtime-and-slot-budget) · [Kalman estimator](docs/en/SCHEDULED_LINK.md#loss-cause-aware-adr)
 
-<details>
-<summary>Gateway and Client pseudocode</summary>
+## Gateway and Client algorithms
 
-<img src="docs/research/figures/adaptive-algorithm-gateway.png" alt="Gateway pseudocode for one active group" width="480">
-<img src="docs/research/figures/adaptive-algorithm-client.png" alt="Client pseudocode for a matching Grant and ACK bitmap" width="480">
+The listings show the shared schedule and the additional checks in wire v7. [LaTeX source](docs/research/figures/adaptive-algorithm.tex)
 
-[LaTeX source](docs/research/figures/adaptive-algorithm.tex)
+### Algorithm 1 (Gateway scheduling)
 
-</details>
+<img src="docs/research/figures/adaptive-algorithm-gateway.png" alt="Algorithm 1. Select a group, verify Requests and DATA, and schedule retries and feedback." width="520">
+
+### Algorithm 2 (Client delivery)
+
+<img src="docs/research/figures/adaptive-algorithm-client.png" alt="Algorithm 2. Verify the Beacon, match the Grant to the current Request, send DATA, and check feedback." width="520">
 
 ## Q&A
 

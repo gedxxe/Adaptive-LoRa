@@ -2,9 +2,7 @@
 
 [English](README.md)
 
-**研究题目**：面向单射频 LoRa 工业能源监测网络、考虑可靠性的 TDMA 调度与链路自适应。
-
-**研究主题与目标。** 研究单台半双工网关怎样为链路条件不同的低速遥测节点分配空口时间，并测量节点增加时的交付率、服务间隔和空口占用。
+**研究题目**：面向单射频 LoRa 工业能源监测网络、考虑可靠性的 TDMA 调度与链路自适应。研究单台半双工网关服务更多链路条件各异的客户端时，交付间隔和空口占用如何变化。
 
 <img width="570" src="docs/research/figures/project-profile.svg" alt="Heltec V3.4、SX1262、C++17、Python 和 RadioLib 7.8.1">
 
@@ -20,16 +18,20 @@
 
 ![一台网关按空口预算轮换分组，每帧服务一组](docs/research/figures/rotation.svg)
 
-默认配置最多服务八个客户端。空口 v7 候选版最多登记 128 个节点，每个 15 秒帧选择一组，对网关报文签名，并使用逐客户端密钥加密 DATA。见[安全协议与容量](docs/zh-CN/SCHEDULED_LINK.md#secure-wire-v7)和[配置步骤](docs/zh-CN/BENCH_RUNBOOK.md#test-the-secure-candidate)。无线时序、覆盖和恢复仍待实测。
+默认的空口 v5 配置使用固定名单，最多服务八个客户端。可选的空口 v7 候选版最多登记 128 个 ID，每个 15 秒帧选择一组符合空口预算的客户端。它对网关控制报文签名，验证 Request，并使用各客户端凭据派生的密钥加密 DATA。登记数量决定多少客户端可以轮流发送，实际交付间隔取决于各客户端完成报文交换的频率。[空口 v7 与容量](docs/zh-CN/SCHEDULED_LINK.md#secure-wire-v7) · [交付间隔模型](docs/zh-CN/PROGRESS.md#secure-rotation-experiment)
 
 ## 测试方法
 
-所有板卡烧录同一固件，每个客户端使用不同的 ID。先在串口确认协议版本。示例发送 32 字节样本，在网关查找 `APP_PAYLOAD`，并检查接收字节数、DATA SF、ACK 与重试记录。[设置指南](docs/zh-CN/BENCH_RUNBOOK.md#flash-and-set-roles)包含两种角色的命令。
+网关与所有客户端使用同一配置。为各客户端分配唯一 ID，并在串口确认空口版本。
+
+- **空口 v5** 为固定名单测试生成 32 字节样本。[烧录与设置角色](docs/zh-CN/BENCH_RUNBOOK.md#flash-and-set-roles)
+- **空口 v7** 需要逐板配置凭据。链路测试可启用样本生成器，也可通过 `FirmwareRuntime::submitPayload` 提交数据。在网关查看 `APP_PAYLOAD` 的接收字节数，记录 DATA SF、ACK 和重试。设备上的无线时序、覆盖和恢复仍待实测。[配置并测试 v7](docs/zh-CN/BENCH_RUNBOOK.md#test-the-secure-candidate)
 
 ## 空口时间预算
 
 ```math
 \begin{aligned}
+\eta &= \eta_{\mathrm{header}} + \eta_{\mathrm{session}} + \eta_{\mathrm{tag}},\\
 \tau_{\mathrm{slot},\iota}
   &= \tau_{\mathrm{air}}(\lambda_\iota+\eta,\sigma_\iota)+\delta,\\
 \tau_{\mathrm{used}}
@@ -39,17 +41,23 @@
 \end{aligned}
 ```
 
-其中 $\lambda_\iota$ 为有效载荷大小，$\eta$ 为帧开销，$\sigma_\iota$ 为 DATA SF，$\delta$ 为保护时间。重试池按最长的合格时隙预留空间。完整假设与公式见[空口时间推导](docs/zh-CN/SCHEDULED_LINK.md#airtime-and-slot-budget)和[卡尔曼估计器](docs/zh-CN/SCHEDULED_LINK.md#loss-cause-aware-adr)。
+其中 $\lambda_\iota$ 为应用载荷大小，$\sigma_\iota$ 为 DATA SF，$\delta$ 为时隙保护时间。DATA 开销 $\eta$ 包括帧头、会话字段及 v7 的认证标签。$\tau_{\mathrm{ctrl}}$ 包含所有反馈窗口，并按所选配置的实际控制帧长度计算。重试池为最长的可用时隙预留时间。[空口时间推导](docs/zh-CN/SCHEDULED_LINK.md#airtime-and-slot-budget) · [卡尔曼估计器](docs/zh-CN/SCHEDULED_LINK.md#loss-cause-aware-adr)
 
-<details>
-<summary>网关与客户端伪代码</summary>
+## 网关与客户端算法
 
-<img src="docs/research/figures/adaptive-algorithm-gateway.png" alt="网关服务单个活动组的伪代码" width="480">
-<img src="docs/research/figures/adaptive-algorithm-client.png" alt="客户端匹配授权和 ACK 位图的伪代码" width="480">
+下列算法展示通用调度流程以及空口 v7 增加的检查。[LaTeX 源文件](docs/research/figures/adaptive-algorithm.tex)
 
-[LaTeX 源文件](docs/research/figures/adaptive-algorithm.tex)
+<a name="algorithm-1-gateway-scheduling"></a>
 
-</details>
+### 算法 1（网关调度）
+
+<img src="docs/research/figures/adaptive-algorithm-gateway.png" alt="算法 1。选择分组，验证 Request 和 DATA，安排反馈及重试。" width="520">
+
+<a name="algorithm-2-client-delivery"></a>
+
+### 算法 2（客户端交付）
+
+<img src="docs/research/figures/adaptive-algorithm-client.png" alt="算法 2。验证信标，检查 Grant 与当前请求是否匹配，发送 DATA 并检查反馈。" width="520">
 
 ## 常见问题
 

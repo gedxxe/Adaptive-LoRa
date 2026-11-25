@@ -6,6 +6,11 @@
 
 ![Order of control, DATA and retry slots on the single radio](../research/figures/adaptive-frame.svg)
 
+This table describes the default adaptive wire-v5 profile. The rotating
+profiles use the same phases with a [wire-v6 group selector](#rotating-schedule)
+or a [wire-v7 security envelope](#secure-wire-v7). Use a single wire version
+for the Gateway and all Clients.
+
 Protocol 5 uses little-endian fields in a 28-byte header and a 96-byte
 maximum frame. The header carries the network, source, destination,
 sender boot ID, frame ID, sequence and schedule version. The Gateway
@@ -74,7 +79,7 @@ $\Theta^\star$ contains up to $\varkappa$ of the longest slots in $\Theta$.
 
 ```math
 \begin{aligned}
-\eta &= \eta_{\mathrm{header}}+\eta_{\mathrm{session}},\\
+\eta &= \eta_{\mathrm{header}}+\eta_{\mathrm{session}}+\eta_{\mathrm{tag}},\\
 \tau_{\mathrm{slot},\iota}
    &=\tau_{\mathrm{air}}(\lambda_\iota+\eta,\sigma_\iota)+\delta,\\
 \tau_{\mathrm{data}}&=\sum_{\iota\in\Theta}\tau_{\mathrm{slot},\iota},\\
@@ -101,8 +106,9 @@ $\Theta^\star$ contains up to $\varkappa$ of the longest slots in $\Theta$.
 
 $\tau_{\mathrm{B}}$, $\tau_{\mathrm{R}}$, $\tau_{\mathrm{G}}$ and
 $\tau_{\mathrm{A}}$ are the airtimes of one Beacon, Request, Grant and
-bitmap at $\sigma_{\mathrm{ctrl}}$. Their encoded lengths come from the
-wire table plus the common header. $\tau_{\mathrm{requests}}$ includes
+bitmap at $\sigma_{\mathrm{ctrl}}$. Use the complete packet sizes for the
+chosen profile, including the common header and any v7 security fields.
+$\tau_{\mathrm{requests}}$ includes
 the Request windows and the gaps before those windows and the Grant.
 $\tau_{\mathrm{bitmaps}}$ covers all feedback frames, the gap before the
 first DATA round, the gaps around the retry rounds, the gap before
@@ -110,14 +116,16 @@ the final bitmap and the closing guard. Each of these gaps uses $\delta$.
 The Gateway uses the inequality before accepting a higher-SF
 reservation. Lower-SF trials retain the previous reservation.
 
-| Symbol | Meaning | Current adaptive image |
+| Symbol | Meaning | Default adaptive image (wire v5) |
 |---|---|---|
 | $\eta_{\mathrm{header}}$, $\eta_{\mathrm{session}}$ | Frame header and Gateway boot ID in DATA | 28 B, 4 B |
+| $\eta_{\mathrm{tag}}$ | DATA authentication tag | 0 B in v5, 16 B in v7 |
 | $\nu_\Omega$, $\lambda_\iota$ | Bench roster and per-Client payload ceiling | 8 Clients, 32 B. The wire format allows 64 B. |
 | $\varrho$, $\varkappa$ | Retry rounds and shared retry slots per round | 3 rounds, up to 4 slots |
 | $\delta$, $\tau_{\mathrm{tail}}$, $\tau_{\mathrm{frame}}$ | Slot guard, end reserve, superframe period | 80 ms, 300 ms, 15 s |
 
-The retune lead and transmit launch window are one quarter of the guard.
+In v5 the retune lead and transmit launch window are one quarter of the guard.
+The [v7 budget](#secure-schedule-capacity) accounts for processing separately.
 The receive window is half a guard on either side of the expected packet
 completion. The implementation measures from packet-completion
 timestamps. It skips a transmit slot if software reaches it too late.
@@ -203,14 +211,23 @@ The figure shows the shared SF policy and the three build-time rules.
 
 <img src="../research/figures/adaptive-algorithm-adr.png" alt="Gateway SF policy showing session recovery, the recent loss window, lower-SF trial rollback and confirmation." width="480">
 
-In the README algorithms, $\phi$ is the frame ID, $\phi_{\mathrm{ack}}$ is
-the last ACKed frame in the same Gateway session, and $\Gamma$ is a valid
-Grant. Round $\jmath=0$ is the first DATA attempt. $\Theta_\jmath$ is the set
+[Algorithm 1 (Gateway scheduling)](../../README.md#algorithm-1-gateway-scheduling)
+shows how the Gateway selects and serves a group. In
+[Algorithm 2 (Client delivery)](../../README.md#algorithm-2-client-delivery),
+the Client follows the matching Grant and feedback. In both listings,
+$\phi$ is the frame ID, $\phi_{\mathrm{ack}}$ is the last ACKed frame
+in the same Gateway session, and $\Gamma$ is a valid Grant. $\Omega$ is
+the active roster, $\nu_\iota$ counts Client $\iota$'s opportunities
+(the frame ID in a fixed roster), and $\iota_0$ is the first roster
+position. $\kappa_\iota$ is the v7 Request challenge. Round $\jmath=0$ is
+the first DATA attempt. $\Theta_\jmath$ is the set
 of authorized Clients, $\Xi$ accumulates accepted Clients, and $\Pi_\jmath$
 selects up to $\varkappa$ granted Clients whose DATA has yet to arrive.
 $\epsilon_\jmath$ records the local Client's permission to send. An invalid
-or absent bitmap provides empty sets. The Gateway checks frame and session
-identity, declared payload length, and timing before accepting DATA.
+or absent bitmap provides empty sets. A retry requires missing DATA for an
+active Grant. The Gateway excludes packets refused by the application.
+The Gateway checks frame and session identity, declared payload length,
+and timing before accepting DATA. In v7 it also verifies the CCM tag.
 
 For current time $\tau$, scheduled TX start $\tau_{\iota,\jmath}$, expected
 packet completion $\widehat{\tau}$ and observed completion $\tau_{\mathrm{rx}}$,
@@ -458,7 +475,7 @@ Here $n$ is the roster count and $\lambda$ is the application payload size. The 
 
 The Gateway verifies a per-Client MAC before saving a Request. Clients verify Gateway signatures using the network's provisioned public key. The signed bytes include the visible routing header, message type, schedule, frame, role-specific boot ID and payload, plus the credential generation and full Gateway epoch. A Client key allows that Client to submit records under its own ID. It cannot sign Gateway messages or submit as another Client.
 
-A verified Beacon is a tentative schedule. The Client generates a new 128-bit challenge for each Request. It launches DATA only when a valid, timely Grant echoes 96 bits of that challenge and the frame, Client boot ID and size all match. An old signed Beacon can therefore induce a tentative Request after a restart, but its recorded Grant cannot authorize DATA. An accepted ACK must match the current signed Grant, frame and round. Replay of a valid DATA packet in the same transaction cannot call the application twice.
+A verified Beacon from a new epoch gives the Client a tentative schedule. The Client generates a new 128-bit challenge for each Request. A valid, timely Grant must echo 96 bits of that challenge and match the frame, Client boot ID and requested size before the Client can confirm the epoch or send DATA. Until then, the Client retains the previous confirmed delivery state. A recorded Beacon can elicit a Request after loss of synchronization. A recorded Grant lacks the fresh challenge echo. The Client verifies feedback for the current session, frame and round after it has started a DATA transmission. Duplicate authenticated DATA calls the application at most once in that transaction.
 
 The devices seed Mbed TLS CTR-DRBG using the ESP32-S3 startup entropy source before enabling the radio. Each Gateway boot and frame-counter rollover generates a new 128-bit epoch. HKDF-SHA-256 derives a Request MAC key by credential generation and a DATA key by generation, Gateway epoch and full Client challenge. It uses separate labels for Request and DATA. DATA authenticates the inner header as associated data. Its 13-byte nonce uses bytes 12–23 (sender boot, frame, sequence and reserved configuration fields), followed by the v7 domain byte. A new frame changes the nonce under the same key. A new handshake changes the key, assuming the startup entropy source and HKDF are sound. Once sealed, every retry copies exactly the cached ciphertext and tag. No packet advances a flash counter. [CCM](https://csrc.nist.gov/pubs/sp/800/38/c/upd1/final) · [HKDF](https://datatracker.ietf.org/doc/html/rfc5869)
 

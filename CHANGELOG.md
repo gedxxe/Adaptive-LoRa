@@ -11,6 +11,7 @@ changes. It is not a substitute for the append-only build memory.
 - Added offline per-board provisioning, a separate secure role namespace, reboot challenge confirmation and fail-closed credential checks.
 - Accounted for the full security envelope and processing guard in admission. The secure radio adapter uses a timed SetTx and exposes timing and memory diagnostics.
 - Kept plaintext comparison profiles and added a seeded shared-channel ADR model. The secure image requires physical timing, recovery and RF acceptance.
+- Updated the English and Chinese setup guides, airtime notation, and numbered Gateway and Client listings for the secure image.
 
 ### Registered Client rotation
 

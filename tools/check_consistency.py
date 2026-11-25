@@ -206,8 +206,8 @@ def check(root):
                 secure_env: secure_version.group(1),
             }:
                 errors.append(f"{name}: comparison wire versions differ from firmware")
-            field_status = ("| 现场试验 | 走测和无线时序仍待实测 |" if "/zh-CN/" in name
-                            else "| Field test | Walk test and radio timing measurements pending |")
+            field_status = ("| 现场试验 | 覆盖距离与无线时序仍待实测 |" if "/zh-CN/" in name
+                            else "| Field test | Radio range and timing measurements pending |")
             if field_status not in text:
                 errors.append(f"{name}: field test and timing measurements must remain pending")
     for name in LINK_DOCS:

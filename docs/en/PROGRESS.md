@@ -11,13 +11,13 @@
 | Rotating image | `heltec_wifi_lora_32_V3_rotating`, 8/8 native cases |
 | Secure candidate | `heltec_wifi_lora_32_V3_secure`, ESP32 build and 15/15 native cases passed |
 | Fixed-SF image | `heltec_wifi_lora_32_V3_multiclient`, ESP32 build passed, 15/15 runtime cases |
-| Shared tests | 356/356 native and 69/69 Python cases passed |
+| Regression totals | 6 ESP32 builds, 440/440 native cases and 69/69 Python cases passed |
 | Toolchain | PlatformIO 6.1.19, Espressif32 55.3.311, Arduino ESP32 3.3.11, Xtensa 14.2.0+20260121, RadioLib 7.8.1 |
-| Field test | Walk test and radio timing measurements pending |
+| Field test | Radio range and timing measurements pending |
 <!-- current-state:end -->
 
-**SOFTWARE VERIFIED / HARDWARE VALIDATION PENDING.** The v7 secure
-candidate has not been flashed or exercised on a board in this iteration.
+**SOFTWARE VERIFIED / HARDWARE VALIDATION PENDING.** No v7 device
+measurements are recorded.
 Measure cryptographic timing, runtime stack and heap, radio turnaround,
 coverage, power-loss recovery, NVS fault behavior and actual Gateway
 transmit airtime before arranging a controlled pilot. Confirm the on-site

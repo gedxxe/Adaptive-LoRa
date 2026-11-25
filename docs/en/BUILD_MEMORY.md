@@ -2572,3 +2572,38 @@ files under `logs/test/`.
   Bluetooth serial ports only. Private enumeration identifiers remain
   local. No board was flashed; runtime heap, stack, crypto latency, RF,
   NVS fault recovery and actual BUSY behavior are NOT MEASURED.
+
+## Iteration 037 — Documentation sync and main integration, 2026-11-25
+
+- Reviewed draft PR #16 from branch `codex/release-candidate-scalable-secure`
+  at `dd8975cc070b580209269a64fa9fa4b6cb5f9015` against main at
+  `89b7de3289f657b3d1125d3060cf4f1ae0ed29d2`. The branch contained both
+  rotating and secure profiles and had no changes from main to reconcile.
+- Synchronized both READMEs, the English and Chinese protocol, setup and
+  results pages, and the engineering contract, traceability and figure
+  register. Numbered the Gateway and Client listings, added the v7
+  authentication steps, and regenerated the two PNGs from their shared
+  LaTeX source. Matched the airtime notation to the selected wire profile.
+  Clarified that v7 requires offline provisioning and enables the sample
+  generator only for the separate demo build.
+- Verified 19 current Markdown files, 64 local fragments and 11 SVGs.
+  `pdflatex -interaction=nonstopmode -halt-on-error -output-directory=.pio docs/research/figures/adaptive-algorithm.tex`
+  and both 288 DPI Poppler exports in the figure register returned 0.
+  Reviewed both rendered PNGs. See ERR-074 for corrected links and the
+  optional extraction tool failure.
+- Re-ran `pio run -e` for `heltec_wifi_lora_32_V3` and the
+  `_research`, `_multiclient`, `_adaptive`, `_rotating`, and `_secure`
+  variants. All six returned 0. Re-ran `pio test -e native`,
+  `native_multiclient`, `native_adaptive`, `native_rotating -v`, and
+  `native_secure -v`. All returned 0 for 356, 15, 46, 8 and 15 cases.
+  The seven Python suites passed all 69 cases, and
+  `python tools/check_consistency.py` returned 0.
+- Exact commands and sanitized outputs are in
+  `logs/build/iteration-037-build.log`,
+  `logs/test/iteration-037-native.log`, and
+  `logs/test/iteration-037-python.log`. The toolchain matches Iteration 036.
+  The secure binary SHA-256 still matches Iteration 036, with 46,904 B
+  static RAM and 450,448 B flash in the build report. No firmware source,
+  PHY, version, or NVS format changed in the documentation follow-up.
+  No v7 board measurements were taken. The next check is the provisioned
+  two-board link, followed by four and eight Clients.

@@ -1098,3 +1098,18 @@ without valid bound credentials and startup entropy. Host tests exercise
 absence, short reads, mismatch and failed seeding. Physical NVS erasure
 and rollback prevention were not measured. Restoring a valid older image
 can restore revoked keys. Reprovision with a new generation after restore.
+
+## ERR-074 — Algorithm references and figure review
+
+The protocol pages referred to unnamed listings, and the research map
+linked to a retired 70-Client heading. The listings also omitted the
+wire-v7 checks. The current pages link to the numbered listings and to
+the active capacity section. English and Chinese links reach the
+corresponding headings. The local link audit also caught and verified a
+missing Chinese capacity anchor while adding those links.
+
+After pdfLaTeX and the two PNG exports passed, the optional command
+`pdftotext -layout .pio/adaptive-algorithm.pdf .pio/adaptive-algorithm.txt`
+resolved to MiKTeX and could not access its Windows registry keys
+(shell exit `-1073740791`). The generated images were inspected directly.
+The final pdfLaTeX and Poppler commands returned 0.

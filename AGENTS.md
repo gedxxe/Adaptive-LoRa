@@ -18,9 +18,10 @@ PlatformIO defaults to `heltec_wifi_lora_32_V3_adaptive` for the eight-Client
 field test. `heltec_wifi_lora_32_V3_multiclient` is the earlier fixed-SF comparison.
 Both use Arduino/C++17, `jgromes/RadioLib@7.8.1`, Firmware `0.2.0-alpha.1`
 and NVS schema `1`. See the [wire version table](docs/en/PROGRESS.md#papers-and-comparison-runs).
-Authoritative versions/settings are VERSION, PROTOCOL_VERSION,
-include/project_config.h and platformio.ini; resolved package versions and
-actual test results belong in [PROGRESS.md](docs/en/PROGRESS.md).
+VERSION records the firmware version. PROTOCOL_VERSION records the v1
+HELLO/ACK wire version. The scheduled wire versions are defined in the
+protocol headers and selected by platformio.ini. Resolved package versions
+and test results belong in [PROGRESS.md](docs/en/PROGRESS.md).
 
 The fixed-PHY M0–M2 HELLO/ACK firmware exists and has host/build evidence.
 **M0–M2 physical acceptance is IN PROGRESS.** Confirm the physical SKU,
@@ -69,8 +70,10 @@ preamble 8, explicit header, CRC, sync 0x12, 22 dBm requested TX power,
 140 mA SX1262 PA OCP and 1 MHz SPI. The adaptive DATA range is SF7–SF10/BW125.
 The matched comparison freezes Gateway DATA grants at SF7 on the same wire format.
 SF11–SF12 remain scenarios in the host capacity tool.
-Keep the published LaTeX algorithms aligned with the production loss window,
-recovery hint, airtime admission and rollback rules when ADR changes.
+Keep [Algorithm 1 (Gateway scheduling)](README.md#algorithm-1-gateway-scheduling),
+[Algorithm 2 (Client delivery)](README.md#algorithm-2-client-delivery) and
+the [SF recovery listing](docs/en/SCHEDULED_LINK.md#adaptation-and-recovery)
+aligned with scheduling, authentication and ADR policy.
 Treat a higher-SF reservation as temporary until a validated Request
 confirms a delivery from the trial. Release the extra reservation on
 rollback. Keep RSSI in the capture diagnostics without a fixed SF trigger.
@@ -105,6 +108,7 @@ per-packet telemetry to NVS.
 | GatewayApp / ClientApp | Actual role state machines through RadioTransport |
 | ScheduledLink | Opt-in v2 role state machines and one-client schedule through RadioTransport |
 | MulticlientLink / PayloadPort | Exact-length grants, per-Client DATA SF, shared retries and bounded payload delivery |
+| SecureLink / secure_crypto | Wire-v7 envelopes, session freshness, retransmission cache and Mbed TLS calls |
 | RadioDriver | Sole radio state/deadline/error policy through RadioHardware |
 | Sx1262Hardware | Owns SX1262, SPI and GPIO, and latches radio IRQ timestamps |
 | NvsConfigStore | Load/save/verify policy through non-owning ConfigStorage |
