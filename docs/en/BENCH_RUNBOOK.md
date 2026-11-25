@@ -198,6 +198,12 @@ capture tool's eight Client ports for a sample of links across groups.
 
 ## Test the secure candidate
 
+For an already provisioned v7 pair, upload the current `heltec_wifi_lora_32_V3_secure`
+image to both boards. Keep the existing NVS images and credentials. The current
+firmware uses schedule revision 2 and rejects revision 1. Confirm
+`V3_BEACON_TX` with `schedule_version=2` and `result=started` on the Gateway.
+Then check Client verification and DATA/ACK on both serial outputs.
+
 Use synthetic samples and an authorized RF setup. The secure image keeps 915.0 MHz, BW125, SF9 control, CR4/5 and a 22 dBm TX request. Confirm the permitted frequency, antenna gain, EIRP and airtime for the actual setup before radiating.
 
 1. Back up each board and confirm its flash layout and security state using the [procedure above](#back-up-a-board-that-has-firmware-or-settings-to-keep). Work on provisionable test boards. The secure role uses a new NVS namespace, so saved plaintext roles do not migrate.

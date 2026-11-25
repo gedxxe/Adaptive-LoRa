@@ -9,16 +9,18 @@
 | Board | Heltec WiFi LoRa 32 V3.4, ESP32-S3/SX1262 |
 | Adaptive image | `heltec_wifi_lora_32_V3_adaptive`, ESP32 build passed. Native cases 46/46, including all three ADR rules. |
 | Rotating image | `heltec_wifi_lora_32_V3_rotating`, 8/8 native cases |
-| Secure candidate | `heltec_wifi_lora_32_V3_secure`, ESP32 build and 15/15 native cases passed |
+| Secure candidate | `heltec_wifi_lora_32_V3_secure`, schedule revision 2 and 16/16 secure native cases passed |
 | Fixed-SF image | `heltec_wifi_lora_32_V3_multiclient`, ESP32 build passed, 15/15 runtime cases |
-| Regression totals | 6 ESP32 builds, 440/440 native cases and 69/69 Python cases passed |
+| Regression totals | 6 ESP32 builds, 441/441 native cases and 69/69 Python cases passed |
 | Toolchain | PlatformIO 6.1.19, Espressif32 55.3.311, Arduino ESP32 3.3.11, Xtensa 14.2.0+20260121, RadioLib 7.8.1 |
 | Field test | Radio range and timing measurements pending |
 <!-- current-state:end -->
 
-**SOFTWARE VERIFIED / HARDWARE VALIDATION PENDING.** No v7 device
-measurements are recorded.
-Measure cryptographic timing, runtime stack and heap, radio turnaround,
+**SOFTWARE VERIFIED / HARDWARE VALIDATION PENDING.** Both v7 roles
+loaded their provisioned credentials. The Gateway reproduced the original
+Beacon deadline failure. See ERR-075 for the physical retest after the
+fix. A complete two-board authenticated exchange remains to be measured.
+Measure Client verification, runtime stack and heap, radio turnaround,
 coverage, power-loss recovery, NVS fault behavior and actual Gateway
 transmit airtime before arranging a controlled pilot. Confirm the on-site
 RF profile and verify protection against restoring revoked credentials.
@@ -104,7 +106,7 @@ are selected by the build. All images share `VERSION` and NVS schema 1.
 
 ## Extended Client capacity
 
-The wire-v7 scheduler supports 128 registered Clients. At a 32 B ceiling the secure image serves at most five per frame at DATA SF7, four at SF8, three at SF9 and two at SF10. The [v7 capacity table](SCHEDULED_LINK.md#secure-schedule-capacity) includes the signed control frames, challenge echo, tags and a provisional timing guard.
+The wire-v7 scheduler supports 128 registered Clients. With a 32 B ceiling and schedule revision 2, a frame fits three Clients at DATA SF7, two at SF8 or SF9, or one at SF10 in homogeneous groups. The [v7 capacity table](SCHEDULED_LINK.md#secure-schedule-capacity) includes signing, verification and the security fields.
 
 The 5–10 minute objective is a service interval for suitable SF distributions. A delivered report additionally requires SF9 control coverage, successful DATA and the relevant feedback. Measure the longest gap for each node and report the conditions behind any missed deadline.
 
@@ -119,15 +121,15 @@ The 5–10 minute objective is a service interval for suitable SF distributions.
 
 | 128-Client case | Maximum service gap | Median delivery gap | 95th percentile | Maximum observed delivery gap |
 |---|---:|---:|---:|---:|
-| Fixed SF7 | 390 s | 390 s | 1,560 s | 48,750 s |
-| Delivery window | 795 s | 720 s | 2,130 s | 7,665 s |
-| EWMA | 675 s | 585 s | 1,755 s | 6,945 s |
-| Kalman | 645 s | 585 s | 1,725 s | 5,700 s |
+| Fixed SF7 | 645 s | 645 s | 2,580 s | 51,600 s |
+| Delivery window | 1,110 s | 1,050 s | 2,895 s | 9,930 s |
+| EWMA | 930 s | 870 s | 2,565 s | 9,120 s |
+| Kalman | 900 s | 855 s | 2,565 s | 9,120 s |
 
 The gaps above are between Gateway deliveries on the same Client. The
-[raw model output](../../logs/test/iteration-036-rotation-model.log)
+[raw model output](../../logs/test/iteration-038-rotation-model-final.log)
 also reports unfinished gaps and TX airtime. The 128-Client
-delivery-window case uses about 22.4% modeled Gateway TX occupancy over
+delivery-window case uses about 20.9% modeled Gateway TX occupancy over
 the 24-hour run. This is not a regulatory or physical result. Keep the
 delivery-window default until field data support a change.
 

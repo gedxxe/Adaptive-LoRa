@@ -89,12 +89,12 @@ $\Theta^\star$ contains up to $\varkappa$ of the longest slots in $\Theta$.
 
 ```math
 \begin{aligned}
-\tau_{\mathrm{requests}} &= \delta+\nu_\Omega(\tau_{\mathrm{R}}+\delta)+\delta,\\
+\tau_{\mathrm{requests}} &= \delta_{\mathrm{request}}+\nu_\Omega(\tau_{\mathrm{R}}+\delta)+\delta,\\
 \tau_{\mathrm{bitmaps}} &= (\varrho+1)\tau_{\mathrm{A}} + \delta_{\mathrm{first}}
     +\varrho(\delta_{\mathrm{before}}+\delta_{\mathrm{after}})\\
     &\quad+\delta_{\mathrm{last}}+\delta_{\mathrm{close}},\\
 \tau_{\mathrm{ctrl}} &= \tau_{\mathrm{B}}+\tau_{\mathrm{requests}}
-    +\tau_{\mathrm{G}}+\tau_{\mathrm{bitmaps}}.
+    +\tau_{\mathrm{G}}+\tau_{\mathrm{bitmaps}}+2\delta_{\mathrm{signed}}.
 \end{aligned}
 ```
 
@@ -112,7 +112,9 @@ $\tau_{\mathrm{requests}}$ includes
 the Request windows and the gaps before those windows and the Grant.
 $\tau_{\mathrm{bitmaps}}$ covers all feedback frames, the gap before the
 first DATA round, the gaps around the retry rounds, the gap before
-the final bitmap and the closing guard. Each of these gaps uses $\delta$.
+the final bitmap and the closing guard. For v5 and v6 each gap uses
+$\delta$, including $\delta_{\mathrm{request}}$, and $\delta_{\mathrm{signed}}=0$.
+The v7 schedule defines these terms in its [timing budget](#secure-schedule-capacity).
 The Gateway uses the inequality before accepting a higher-SF
 reservation. Lower-SF trials retain the previous reservation.
 
@@ -461,7 +463,7 @@ Those estimates omitted the freshness exchange and the extra processing guard. T
 
 ## Secure wire v7
 
-Build `heltec_wifi_lora_32_V3_secure` for both roles. It accepts only v7. The existing v1, v2, v3, v5 and v6 images remain comparison profiles. The secure radio buffer allows 237 B. The 28 B inner header and 96 B inner codec limit are unchanged. The inner length byte counts the body before the security trailer.
+Build `heltec_wifi_lora_32_V3_secure` for both roles. The current v7 firmware requires `schedule_version=2` in the authenticated header. Upgrade the Gateway and every Client together. Existing v7 credentials stay valid after firmware upload. The existing v1, v2, v3, v5 and v6 images remain comparison profiles. The secure radio buffer allows 237 B. The 28 B inner header and 96 B inner codec limit are unchanged. The inner length byte counts the body before the security trailer.
 
 | Packet | Complete on-air bytes | Protection |
 |---|---:|---|
@@ -483,21 +485,34 @@ The operator provisions the private trust material offline. Runtime never instal
 
 ### Secure schedule capacity
 
-The secure planner includes every security byte, all four feedback windows, the 300 ms end reserve, and a 160 ms slot guard. The guard adds a provisional 40 ms allowance per side to the existing 80 ms radio guard. The post-crypto launch limit is 60 ms from the slot start. Late packets are withheld. The secure adapter uses SX1262 SetTx with a chip timeout and skips RadioLib's later unbounded PA-ramp wait. SPI locks and command timing still need physical validation.
+The Gateway measured 121.595 ms to seal a Beacon on the Heltec before this update. The former 60 ms launch window canceled it. The 200 ms signing allowance rounds that measurement plus 50% headroom up to the next 40 ms. The 300 ms Client verification allowance covers twice the measured signing time with headroom and still needs physical verification.
+
+| Timing term | Secure schedule revision 2 |
+|---|---:|
+| Request and DATA launch window | 60 ms |
+| Request and DATA slot guard $\delta$ | 160 ms |
+| Signed Beacon, Grant and ACK launch window | 220 ms |
+| Maximum signed completion slip $\delta_{\mathrm{signed}}$ used for reservation | 240 ms |
+| After actual Beacon or Grant completion, $\delta_{\mathrm{request}}$ and $\delta_{\mathrm{first}}$ | 340 ms |
+| After nominal ACK completion, $\delta_{\mathrm{after}}$ and $\delta_{\mathrm{close}}$ | 580 ms |
+| Gap before a bitmap, $\delta_{\mathrm{before}}$ and $\delta_{\mathrm{last}}$ | 160 ms |
+| Frame end reserve $\tau_{\mathrm{tail}}$ | 300 ms |
+
+Request and first DATA windows start from measured Beacon and Grant completion. Retries use the fixed ACK calendar, so their guard includes both the possible late ACK and time to verify it before retuning. Admission reserves the full timeline, including all four feedback windows. Late packets are withheld and the SX1262 has a separate TX hardware timeout.
 
 | Registered Clients | All SF7 | All SF8 | All SF9 | All SF10 | Repeating SF7–SF10 |
 |---:|---:|---:|---:|---:|---:|
 | 1 | 15 s | 15 s | 15 s | 15 s | 15 s |
-| 4 | 15 s | 15 s | 30 s | 30 s | 30 s |
-| 8 | 30 s | 30 s | 45 s | 60 s | 45 s |
-| 16 | 60 s | 60 s | 90 s | 120 s | 90 s |
-| 32 | 105 s | 120 s | 165 s | 240 s | 180 s |
-| 63 | 195 s | 240 s | 315 s | 480 s | 360 s |
-| 64 | 195 s | 240 s | 330 s | 480 s | 360 s |
-| 70 | 210 s | 270 s | 360 s | 525 s | 390 s |
-| 84 | 255 s | 315 s | 420 s | 630 s | 480 s |
-| 96 | 300 s | 360 s | 480 s | 720 s | 540 s |
-| 128 | 390 s | 480 s | 645 s | 960 s | 720 s |
+| 4 | 30 s | 30 s | 30 s | 60 s | 45 s |
+| 8 | 45 s | 60 s | 60 s | 120 s | 75 s |
+| 16 | 90 s | 120 s | 120 s | 240 s | 135 s |
+| 32 | 165 s | 240 s | 240 s | 480 s | 255 s |
+| 63 | 315 s | 480 s | 480 s | 945 s | 480 s |
+| 64 | 330 s | 480 s | 480 s | 960 s | 495 s |
+| 70 | 360 s | 525 s | 525 s | 1,050 s | 540 s |
+| 84 | 420 s | 630 s | 630 s | 1,260 s | 645 s |
+| 96 | 480 s | 720 s | 720 s | 1,440 s | 735 s |
+| 128 | 645 s | 960 s | 960 s | 1,920 s | 975 s |
 
 These are sweep times for a fixed 32-byte ceiling and uninterrupted scheduling. A successful report additionally needs SF9 control in both directions and a successful DATA slot. SF10 DATA does not extend SF9 control coverage. The [model results](PROGRESS.md#secure-rotation-experiment) show delivery gaps under shared interference. For RF tests use the setup and authorization limits in the [secure test procedure](BENCH_RUNBOOK.md#test-the-secure-candidate).
 

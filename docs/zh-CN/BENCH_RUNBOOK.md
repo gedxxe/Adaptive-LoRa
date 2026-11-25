@@ -168,6 +168,11 @@ pio run -e heltec_wifi_lora_32_V3_rotating -t upload --upload-port COMx
 
 ## 测试安全候选版
 
+已配置的 v7 板卡须同时更新为当前 `heltec_wifi_lora_32_V3_secure` 固件，保留现有
+NVS 镜像和凭据。当前固件使用调度修订版 2，拒绝修订版 1。先在网关确认
+`V3_BEACON_TX` 报告 `schedule_version=2` 和 `result=started`，再通过两侧串口
+检查客户端验签，以及 DATA 和 ACK 交换。
+
 使用合成样本并在获准的射频环境测试。安全版保留 915.0 MHz、BW125、SF9 控制、CR4/5 和 22 dBm 发射请求。辐射测试前核对实际允许的频率、天线增益、EIRP 和空口占用。
 
 1. 按前文步骤备份各板，并核对实际闪存布局与安全状态。安全角色使用新的 NVS 命名空间，明文角色配置不会迁移。

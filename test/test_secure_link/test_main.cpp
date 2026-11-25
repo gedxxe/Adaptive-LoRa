@@ -147,6 +147,9 @@ struct Network {
     unsigned dataAttempts = 0;
     uint64_t now = 0;
     uint64_t txEnd = 0;
+    uint64_t clientFreeAt = 0;
+    uint32_t signingDelay = 0;
+    uint32_t verificationDelay = 0;
     Peer* sender = nullptr;
     static bool accept(void* context, const PayloadDelivery& data) {
         TEST_ASSERT_EQUAL_UINT8(4, data.size);
@@ -174,15 +177,25 @@ struct Network {
             for (auto& event : events) { event.hasCompletionTime = true; event.completionUs = txEnd; }
             sender = nullptr;
         }
+        // Gateway time advances while sealing. The Client has its own clock.
+        if (events[0].type != RadioEventType::RX_DONE) host_clock::delayAfterNextRead(signingDelay);
         gateway.link.update(now, events[0]);
-        client.link.update(now, events[1]);
+        if (now >= clientFreeAt) {
+            host_clock::set(now);
+            host_clock::delayAfterNextRead(events[1].type == RadioEventType::RX_DONE ? verificationDelay : 0);
+            client.link.update(now, events[1]);
+            clientFreeAt = host_clock::value();
+        } else {
+            TEST_ASSERT_EQUAL_INT(int(RadioEventType::NONE), int(events[1].type));
+        }
+        host_clock::delayAfterNextRead(0);
         for (auto* peer : {&gateway, &client}) {
             while (!peer->log.empty()) peer->log.drain();
             if (!peer->radio.transmitting() || peer == sender) continue;
             TEST_ASSERT_NULL(sender);
             sender = peer;
             const auto& packet = peer->radio.lastTx;
-            txEnd = now + airAtSf(packet.length, peer->radio.sf);
+            txEnd = peer->radio.lastTxStartedAt + airAtSf(packet.length, peer->radio.sf);
             switch (MessageType(packet.bytes[3])) {
                 case MessageType::BEACON: beacon = packet; break;
                 case MessageType::SLOT_GRANT: grant = packet; break;
@@ -216,6 +229,23 @@ void secure_exchange_and_retry_reuse_ciphertext() {
     TEST_ASSERT_EQUAL_INT(int(PayloadResult::ACCEPTED), int(net.client.payload.result()));
     TEST_ASSERT_EQUAL_UINT(kHeaderSize + kPayloadPrefix + 4 + tagBytes, net.data.length);
     TEST_ASSERT_NOT_EQUAL(0, std::memcmp(net.data.bytes + kHeaderSize + kPayloadPrefix, "\x42\x61\x74\x61", 4));
+}
+
+void measured_signing_delay_allows_signed_control_and_retries() {
+    for (const auto delay : {uint32_t(121595), signingBudgetUs}) {
+        Network net;
+        net.signingDelay = delay;
+        net.verificationDelay = verificationBudgetUs;
+        net.losePrimary = true;
+        net.submit();
+        net.frame();
+        TEST_ASSERT_EQUAL_UINT(1, net.deliveries);
+        TEST_ASSERT_EQUAL_UINT(2, net.dataAttempts);
+        TEST_ASSERT_EQUAL_INT(int(PayloadResult::ACCEPTED), int(net.client.payload.result()));
+        TEST_ASSERT_EQUAL_UINT(0, net.gateway.link.telemetry().cryptoLate);
+        TEST_ASSERT_EQUAL_UINT(net.signingDelay, net.gateway.link.telemetry().worstCryptoTxUs);
+        TEST_ASSERT_EQUAL_UINT(net.verificationDelay, net.client.link.telemetry().worstCryptoRxUs);
+    }
 }
 
 void altered_beacon_request_grant_ack_and_data_are_rejected() {
@@ -299,6 +329,11 @@ void wire_shape_and_gateway_restart_reject_old_requests() {
     net.request.bytes[2] = 6;
     TEST_ASSERT_FALSE(net.gateway.security.open(net.request.bytes, net.request.length, group, 0, decoded, auxiliary));
     net.request.bytes[2] = original;
+    TEST_ASSERT_EQUAL_UINT16(kScheduleVersion, get16(net.request.bytes + 24));
+    put16(net.request.bytes + 24, 1);
+    TEST_ASSERT_EQUAL_INT(int(CodecResult::RESERVED),
+        int(decode(net.request.bytes, kHeaderSize + kRequestSize, 1, 1, decoded)));
+    put16(net.request.bytes + 24, kScheduleVersion);
     net.request.bytes[12] ^= 1;
     TEST_ASSERT_FALSE(net.gateway.security.open(net.request.bytes, net.request.length, group, 0, decoded, auxiliary));
     net.request.bytes[12] ^= 1;
@@ -422,7 +457,7 @@ void missed_crypto_deadline_does_not_start_radio_tx() {
     Peer gateway(1);
     host_clock::set(0);
     gateway.link.update(0, {}); // Let the adapter retune to control SF first.
-    host_clock::set(kLaunchUs);
+    host_clock::delayAfterNextRead(kControlLaunchUs);
     gateway.link.update(0, {});
     TEST_ASSERT_EQUAL_UINT(0, gateway.radio.successfulTxStarts);
     TEST_ASSERT_EQUAL_UINT(1, gateway.link.telemetry().cryptoLate);
@@ -487,6 +522,7 @@ int main() {
     RUN_TEST(rfc3610_ccm_known_answer);
     RUN_TEST(rfc5869_hkdf_known_answer);
     RUN_TEST(secure_exchange_and_retry_reuse_ciphertext);
+    RUN_TEST(measured_signing_delay_allows_signed_control_and_retries);
     RUN_TEST(altered_beacon_request_grant_ack_and_data_are_rejected);
     RUN_TEST(failed_read_and_invalid_provisioning_keep_radio_off);
     RUN_TEST(old_grant_cannot_activate_a_restarted_client);

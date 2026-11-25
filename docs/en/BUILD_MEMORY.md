@@ -2607,3 +2607,43 @@ files under `logs/test/`.
   PHY, version, or NVS format changed in the documentation follow-up.
   No v7 board measurements were taken. The next check is the provisioned
   two-board link, followed by four and eight Clients.
+
+## Iteration 038 — Signed control timing on ESP32-S3, 2026-11-25
+
+- Based on [7d1c1fb](https://github.com/gedxxe/Adaptive-LoRa/commit/7d1c1fb9681b890628df6be0fcebe8de8cc1e4e8)
+  on branch `codex/v7-control-timing`. Provisioned the physical pair at
+  network 1, Gateway 1 and Client 2 with one trust generation. Both roles
+  loaded their own NVS records. The revision-1 Gateway canceled a Beacon
+  after signing took 121.595 ms against a 60 ms deadline. See ERR-075.
+- `secure_wire` defines separate signing and verification allowances.
+  `multiclient_protocol` reserves them in control, retry and close timing.
+  `MulticlientLink` enforces the corresponding windows and rejects
+  obsolete authenticated schedule revisions. Wire remains v7 with schedule
+  revision 2. NVS schema and credentials are reused on both roles.
+- `pio test -e native_secure -v` reproduced the Beacon failure (exit 1)
+  and passed once the scheduler changed. Real Mbed TLS runs in the
+  regression, with controlled timing injected through the native clock.
+  Tests cover the observed signing delay, the configured processing
+  allowances, a lost primary DATA with a retry, and withholding a packet
+  after the deadline. Logs include `logs/test/iteration-038-secure-repro.log`
+  and `logs/test/iteration-038-secure-fixed.log`.
+- `pio run -e heltec_wifi_lora_32_V3_secure -t upload --upload-port COM8`
+  returned 0. The Gateway retained its NVS role and credentials. A 46-second
+  capture in `logs/test/iteration-038-gateway.log` reported 121.653 ms
+  maximum sealing time, zero late starts and three consecutive SF9
+  Beacon launches at 15 s intervals. Client receipt, Grant and DATA/ACK
+  were not measured in that capture.
+- The secure application binary is 463,168 B, SHA-256
+  `58ce695bde64ea4db54e61761b737bcd74a2cf9c8dd2d80f4de014ac77210b13`.
+  The build reports 46,904 B static RAM and 450,476 B flash. Resolved
+  versions match Iteration 036. Six ESP32 builds, 441 native cases,
+  69 Python cases and the standalone consistency check passed (exit 0).
+  Exact matrix commands and results
+  are in `logs/build/iteration-038-build.log`,
+  `logs/test/iteration-038-native.log` and `logs/test/iteration-038-python.log`.
+  Logs strip workstation paths and trailing whitespace.
+- `python tools/secure_rotation_model.py --seed 42 --frames 5760` returned
+  0 outside the Windows sandbox after ERR-076. A modeled sweep with 32 B
+  reports and repeating SF7–SF10 takes 75 s for 8 Clients, 540 s for 70 and
+  975 s for 128. The 128-Client delivery-window result has a modeled p95
+  gap of 2,895 s. No field delivery gap is inferred from the model.

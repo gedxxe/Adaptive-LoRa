@@ -1,0 +1,20 @@
+$ python tools/secure_rotation_model.py --seed 42 --frames 5760
+Traceback (most recent call last):
+  File "<WORKSPACE>\tools\secure_rotation_model.py", line 30, in <module>
+    main()
+  File "<WORKSPACE>\tools\secure_rotation_model.py", line 21, in main
+    subprocess.run([
+  File "<PLATFORMIO_HOME>\python3\Lib\subprocess.py", line 548, in run
+    with Popen(*popenargs, **kwargs) as process:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<PLATFORMIO_HOME>\python3\Lib\subprocess.py", line 1026, in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+  File "<PLATFORMIO_HOME>\python3\Lib\subprocess.py", line 1538, in _execute_child
+    hp, ht, pid, tid = _winapi.CreateProcess(executable, args,
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+OSError: [WinError 623] {Illegal System DLL Relocation}
+
+The system DLL %hs was relocated in memory. The application will not run properly.
+
+The relocation occurred because the DLL %hs occupied an address range reserved for Windows system DLLs. The vendor supplying the DLL should be contacted for a new DLL
+Exit code: 1

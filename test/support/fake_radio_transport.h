@@ -24,6 +24,7 @@ public:
     unsigned successfulTxStarts = 0;
     unsigned dropped = 0;
     unsigned contractViolations = 0;
+    uint32_t lastTxStartedAt = 0;
     CapturedPacket lastTx;
 
     int16_t receive() override {
@@ -37,7 +38,7 @@ public:
         mode = Mode::RX;
         return 0;
     }
-    int16_t transmit(const uint8_t* bytes, size_t length, uint32_t) override {
+    int16_t transmit(const uint8_t* bytes, size_t length, uint32_t now) override {
         ++txCalls;
         if (!bytes || length < kHeaderSize || length > kRadioPacketLimit || transmitting() || !healthy()) {
             ++contractViolations;
@@ -46,6 +47,7 @@ public:
         lastTx.length = length;
         std::memcpy(lastTx.bytes, bytes, length);
         if (failNextTx) { failNextTx = false; mode = Mode::FAULT; return -904; }
+        lastTxStartedAt = now;
         ++successfulTxStarts;
         mode = Mode::TX;
         return 0;
