@@ -1049,3 +1049,52 @@ After adding the wire-v6 row, `python tools/check_consistency.py` reported
 a comparison version mismatch for both languages. The checker now reads
 the rotating version from the protocol header and requires the matching
 PlatformIO environment and table row.
+
+## ERR-072 — Unconfirmed epoch could clear delivery telemetry
+
+The wire-v7 prototype changed the Client's confirmed link state as soon
+as it accepted a valid signed Beacon from a different epoch. A recorded
+Beacon could clear the last delivery and retire the live Gateway before
+the Client saw a fresh Grant. Reproduced with
+`pio test -e native_secure -v` in
+`logs/test/iteration-036-tentative-repro.log`, exit 1. Keep the candidate
+separate, preserve the live epoch and update confirmed state only after
+the signed Grant echoes the current Request challenge. An old Beacon can
+still elicit a tentative Request after loss of synchronization.
+
+## ERR-073 — Secure build and provisioning tool integration
+
+- Secure ESP32 linking first failed on `mbedtls_ct_memcmp` because the
+  header did not declare C linkage for C++ callers. Corrected the include
+  linkage. A subsequent timed SetTx build needed the direct project
+  configuration include for the timeout constant.
+- Native Mbed TLS initially used `cc` and a relative configuration include
+  path. Explicitly selected GCC, added an absolute test include path and
+  enabled the required Windows platform module. The older MinGW headers
+  lack the Windows secure-zero inline. Used the library's native-only
+  platform hook and added the config header as an object dependency to
+  prevent stale definitions.
+- The launch-deadline fixture initially called update while the radio
+  was still retuning. It now arms control RX first. The earlier failing
+  run is saved as `logs/test/iteration-036-secure.log`.
+- The installed SDK's NVS generator script is a wrapper and its Python
+  package was missing. The failed check is in
+  `logs/test/iteration-036-python-final.log`. The offline procedure uses
+  the pinned Espressif module 0.2.0 directly.
+- The installed MinGW compiler did not resolve an ASan or UBSan runtime.
+  Native malformed-length, byte-mutation and auth tests remain enabled.
+
+## ERR-021 and ERR-023 — Iteration 036 scope
+
+The secure profile stages TX through RadioLib and issues a timed SetTx
+without entering the extra unbounded PA-ramp loop. The Native adapter
+test verifies the command arguments and error propagation. Command
+BUSY timing, SPI locks and actual stuck-BUSY recovery still require a
+board. Plaintext comparison profiles retain their original path.
+
+Arduino startup can still format default NVS before the application.
+Secure roles use a separate namespace and the radio remains disabled
+without valid bound credentials and startup entropy. Host tests exercise
+absence, short reads, mismatch and failed seeding. Physical NVS erasure
+and rollback prevention were not measured. Restoring a valid older image
+can restore revoked keys. Reprovision with a new generation after restore.

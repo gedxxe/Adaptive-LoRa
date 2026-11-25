@@ -2519,3 +2519,56 @@ files under `logs/test/`.
   payload boundary. Added the full GPLv3 text for project-authored code.
   Verify contributor rights and linked SDK redistribution obligations
   before distributing firmware binaries.
+
+## Iteration 036 — Secure wire v7 and production hardening, 2026-11-25
+
+- Started from `41ceb9833af58ff6250f702b65c37221064f24cd` on
+  `codex/release-candidate-scalable-secure`. Re-ran the unchanged baseline
+  before editing: five ESP32 builds, 425 native and 66 Python cases passed.
+  Retained v1, v2, v3, v5 and v6 builds, version `0.2.0-alpha.1`, and the
+  default delivery-window policy. The secure build keeps fixed SF9 control,
+  adaptive DATA SF7–SF10, 915 MHz and the 15 s period.
+- `secure_crypto` wraps Mbed TLS. `secure_link` verifies credentials,
+  authenticates controls, derives keys and caches DATA ciphertext.
+  `MulticlientLink` separates tentative Beacon state from Grant-confirmed
+  state. The scheduler accounts for the 237 B envelope and 160 ms guard.
+  `FirmwareRuntime` fails closed on missing secure state and reports
+  timing and memory. `Sx1262Hardware` stages TX and uses a timed SetTx.
+  `main.cpp` remains a thin setup/loop delegate.
+- `pio run -e` for `heltec_wifi_lora_32_V3` and the `_research`,
+  `_multiclient`, `_adaptive`, `_rotating`, and `_secure` variants
+  returned 0. The secure build uses 46,904 B static RAM and 450,448 B
+  flash. The 463,152 B `firmware.bin` SHA-256 is
+  `844d0dcbdcab42902da22ed1ebf6cacf1cb5ae4a98c112138d86bb7440d5e30f`.
+  Resolved PlatformIO 6.1.19, Espressif32 55.3.311, Arduino 3.3.11,
+  ESP-IDF libs 5.5.5+sha.b774170ff46, Xtensa 14.2.0+20260121,
+  esptool 5.3.0, RadioLib 7.8.1 and Mbed TLS 3.6.6.
+- `pio test -e native`, `native_multiclient`, `native_adaptive`,
+  `native_rotating -v`, and `native_secure -v` returned 0 for 356,
+  15, 46, 8 and 15 native cases. The secure suite runs RFC 3610 CCM
+  and RFC 5869 HKDF vectors in the real library, plus authenticated
+  control and DATA, every one-byte mutation and truncation of a test DATA
+  packet, wrong and revoked keys, missing NVS, simultaneous reboot,
+  historical Beacon and Grant handling, 128-ID rotation and launch timing.
+- Python unittest discovery under `tools` returned 0 for
+  `test_capture_bench.py` (15), `test_tdma_feasibility.py` (16),
+  `test_adr_shadow.py` (7), `test_model_multiclient.py` (6),
+  `test_check_consistency.py` (20), `test_adr_sim.py` (2), and
+  `test_secure_provision.py` (3). `python tools/check_consistency.py`
+  returned 0. The ESP-IDF generator 0.2.0 produced offline 20 KiB
+  NVS fixture images. The fixture keys were temporary and were not
+  included in results or publication.
+- Recorded `python tools/secure_rotation_model.py --seed 42 --frames 5760`
+  (exit 0). The 128-Client mixed-SF schedule takes 720 s for a sweep with
+  fixed profiles. At the same size, the separate shared-channel model
+  produced a 2,130 s delivery gap at the 95th percentile for the default
+  ADR. No synthetic result is an RF capacity or regulatory measurement.
+- Raw findings and resolutions are in ERR-072 and ERR-073. Sanitized
+  outputs in `logs/build/iteration-036-build-final.log`,
+  `logs/test/iteration-036-native-final.log`,
+  `logs/test/iteration-036-python-complete.log` and
+  `logs/test/iteration-036-rotation-model.log` replace workstation paths
+  and trim trailing whitespace. `pio device list` returned 0 and listed
+  Bluetooth serial ports only. Private enumeration identifiers remain
+  local. No board was flashed; runtime heap, stack, crypto latency, RF,
+  NVS fault recovery and actual BUSY behavior are NOT MEASURED.

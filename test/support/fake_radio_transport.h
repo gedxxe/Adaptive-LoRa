@@ -5,7 +5,7 @@
 namespace adaptive_lora::test {
 struct CapturedPacket {
     size_t length = 0;
-    uint8_t bytes[kMaxFrameSize]{};
+    uint8_t bytes[kRadioPacketLimit]{};
 };
 
 // One operation and one captured packet per endpoint. Delivery is explicit:
@@ -39,7 +39,7 @@ public:
     }
     int16_t transmit(const uint8_t* bytes, size_t length, uint32_t) override {
         ++txCalls;
-        if (!bytes || length < kHeaderSize || length > kMaxFrameSize || transmitting() || !healthy()) {
+        if (!bytes || length < kHeaderSize || length > kRadioPacketLimit || transmitting() || !healthy()) {
             ++contractViolations;
             return -903;
         }
@@ -71,7 +71,7 @@ public:
     }
     RadioEvent deliver(const CapturedPacket& packet) {
         if (!receiving() || !ready) { ++dropped; return {}; }
-        if (packet.length > kMaxFrameSize) { ++contractViolations; return {}; }
+        if (packet.length > kRadioPacketLimit) { ++contractViolations; return {}; }
         mode = Mode::IDLE;
         RadioEvent event;
         event.type = RadioEventType::RX_DONE;

@@ -9,7 +9,7 @@ struct RadioEvent {
     RadioEventType type = RadioEventType::NONE;
     int16_t code = 0;
     size_t length = 0;
-    uint8_t bytes[kMaxFrameSize]{};
+    uint8_t bytes[kRadioPacketLimit]{};
     float rssi = 0;
     float snr = 0;
     bool metrics = false;

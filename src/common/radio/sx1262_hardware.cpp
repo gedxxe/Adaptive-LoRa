@@ -2,6 +2,7 @@
 #include <SPI.h>
 #include <esp_timer.h>
 #include "board_pins.h"
+#include "project_config.h"
 #include "radio_config.h"
 
 namespace adaptive_lora {
@@ -76,5 +77,25 @@ int16_t Sx1262Hardware::startReceive() {
     // Preserve the full default RX mask, including CRC/header/timeout signals.
     return radio_.startReceive(RADIOLIB_SX126X_RX_TIMEOUT_INF,
         RADIOLIB_IRQ_RX_DEFAULT_FLAGS, RADIOLIB_IRQ_RX_DEFAULT_FLAGS, 0);
+}
+int16_t Sx1262Hardware::startTransmit(const uint8_t* bytes, size_t length) {
+#if defined(ADAPTIVE_LORA_SECURE)
+    RadioModeConfig_t cfg{};
+    cfg.transmit.data = bytes;
+    cfg.transmit.len = length;
+    const int16_t staged = radio_.stageMode(RADIOLIB_RADIO_MODE_TX, &cfg);
+    if (staged != RADIOLIB_ERR_NONE) return staged;
+    // Heltec uses DIO2 for the RF switch. Preserve the standard TX mode for
+    // the module and use the pinned library's timed SPI transaction.
+    module_.setRfSwitchState(Module::MODE_TX);
+    // The chip uses 64 timeout ticks per millisecond. Start TX without
+    // entering RadioLib's separate unbounded wait for the PA ramp.
+    constexpr uint32_t ticks = kTxTimeoutUs * uint64_t(64) / 1000;
+    static_assert(ticks > 0 && ticks < 0xFFFFFF);
+    const uint8_t timeout[]{uint8_t(ticks >> 16), uint8_t(ticks >> 8), uint8_t(ticks)};
+    return module_.SPIwriteStream(RADIOLIB_SX126X_CMD_SET_TX, timeout, sizeof(timeout));
+#else
+    return radio_.startTransmit(bytes, length);
+#endif
 }
 }  // namespace adaptive_lora

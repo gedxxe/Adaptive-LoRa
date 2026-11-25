@@ -1,0 +1,387 @@
+$ pio run -e heltec_wifi_lora_32_V3
+Processing heltec_wifi_lora_32_V3 (platform: espressif32; board: heltec_wifi_lora_32_V3; framework: arduino)
+--------------------------------------------------------------------------------
+Verbose mode can be enabled via `-v, --verbose` option
+CONFIGURATION: https://docs.platformio.org/page/boards/espressif32/heltec_wifi_lora_32_V3.html
+PLATFORM: Espressif 32 (55.3.311) > Heltec WiFi LoRa 32 (V3)
+HARDWARE: ESP32S3 240MHz, 320KB RAM, 8MB Flash
+DEBUG: Current (cmsis-dap) External (cmsis-dap, esp-bridge, esp-builtin, esp-prog, esp-prog-2, iot-bus-jtag, jlink, minimodule, olimex-arm-usb-ocd, olimex-arm-usb-ocd-h, olimex-arm-usb-tiny-h, olimex-jtag-tiny, tumpa)
+PACKAGES:
+ - contrib-piohome @ 3.4.4
+ - framework-arduinoespressif32 @ 3.3.11
+ - framework-arduinoespressif32-libs @ 5.5.5+sha.b774170ff46
+ - tool-esp-rom-elfs @ 2024.10.11
+ - tool-esptoolpy @ 5.3.0
+ - tool-openocd-esp32 @ 2.1200.20260424 (12.0)
+ - tool-xtensa-esp-elf-gdb @ 17.1.0+20260402
+ - toolchain-xtensa-esp-elf @ 14.2.0+20260121
+LDF: Library Dependency Finder -> https://bit.ly/configure-pio-ldf
+LDF Modes: Finder ~ chain, Compatibility ~ soft
+Found 45 compatible libraries
+Scanning dependencies...
+Dependency Graph
+|-- RadioLib @ 7.8.1
+|-- Wire @ 3.3.11
+|-- SPI @ 3.3.11
+|-- Preferences @ 3.3.11
+Building in release mode
+Compiling .pio\build\heltec_wifi_lora_32_V3\src\app\firmware_runtime.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\src\app\multiclient_link.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\src\app\secure_link.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3\src\main.cpp.o
+Linking .pio\build\heltec_wifi_lora_32_V3\firmware.elf
+                            Memory Type Usage Summary
+┌─────────────────────┬──────────────┬──────────┬────────────────┬───────────────┐
+│ Memory Type/Section │ Used [bytes] │ Used [%] │ Remain [bytes] │ Total [bytes] │
+├─────────────────────┼──────────────┼──────────┼────────────────┼───────────────┤
+│ Flash Code          │       223324 │          │                │               │
+│    .text            │       223324 │          │                │               │
+│ Flash Data          │        87496 │          │                │               │
+│    .rodata          │        76036 │          │                │               │
+│    .eh_frame        │        11204 │          │                │               │
+│    .appdesc         │          256 │          │                │               │
+│ DIRAM               │        81276 │    23.78 │         260484 │        341760 │
+│    .text            │        47303 │    13.84 │                │               │
+│    .bss             │        19144 │      5.6 │                │               │
+│    .data            │        14829 │     4.34 │                │               │
+│ IRAM                │        16384 │    100.0 │              0 │         16384 │
+│    .text            │        15356 │    93.73 │                │               │
+│    .vectors         │         1028 │     6.27 │                │               │
+└─────────────────────┴──────────────┴──────────┴────────────────┴───────────────┘
+Total image size: 389336 bytes (.bin may be padded larger)
+Note: The reported total sizes may be smaller than those in the technical reference manual due to reserved memory and application configuration. The total flash size available for the application is not included by default, as it cannot be reliably determined due to the presence of other data like the bootloader, partition table, and application partition size. The total external RAM size is not included either, because the amount of RAM connected to the chip is detected at boot and is not known during the build.
+Retrieving maximum program size .pio\build\heltec_wifi_lora_32_V3\firmware.elf
+Checking size .pio\build\heltec_wifi_lora_32_V3\firmware.elf
+Advanced Memory Usage is available via "PlatformIO Home > Project Inspect"
+RAM:   [=         ]  10.4% (used 33976 bytes from 327680 bytes)
+Flash: [=         ]  11.3% (used 377876 bytes from 3342336 bytes)
+Building .pio\build\heltec_wifi_lora_32_V3\firmware.bin
+esptool v5.3.0
+Creating ESP32-S3 image...
+Merged 3 ELF sections.
+Successfully created ESP32-S3 image.
+Creating binary "firmware.factory.bin" with:
+    Offset   | File
+ -  0x0000   | bootloader.bin
+ -  0x8000   | partitions.bin
+ -  0xe000   | boot_app0.bin
+ -  0x10000  | firmware.bin
+Successfully created combined binary image.
+========================= [SUCCESS] Took 20.80 seconds =========================
+
+Environment             Status    Duration
+----------------------  --------  ------------
+heltec_wifi_lora_32_V3  SUCCESS   00:00:20.804
+========================= 1 succeeded in 00:00:20.804 =========================
+Exit code: 0
+
+$ pio run -e heltec_wifi_lora_32_V3_research
+Processing heltec_wifi_lora_32_V3_research (platform: espressif32; board: heltec_wifi_lora_32_V3; framework: arduino)
+--------------------------------------------------------------------------------
+Verbose mode can be enabled via `-v, --verbose` option
+CONFIGURATION: https://docs.platformio.org/page/boards/espressif32/heltec_wifi_lora_32_V3.html
+PLATFORM: Espressif 32 (55.3.311) > Heltec WiFi LoRa 32 (V3)
+HARDWARE: ESP32S3 240MHz, 320KB RAM, 8MB Flash
+DEBUG: Current (cmsis-dap) External (cmsis-dap, esp-bridge, esp-builtin, esp-prog, esp-prog-2, iot-bus-jtag, jlink, minimodule, olimex-arm-usb-ocd, olimex-arm-usb-ocd-h, olimex-arm-usb-tiny-h, olimex-jtag-tiny, tumpa)
+PACKAGES:
+ - contrib-piohome @ 3.4.4
+ - framework-arduinoespressif32 @ 3.3.11
+ - framework-arduinoespressif32-libs @ 5.5.5+sha.b774170ff46
+ - tool-esp-rom-elfs @ 2024.10.11
+ - tool-esptoolpy @ 5.3.0
+ - tool-openocd-esp32 @ 2.1200.20260424 (12.0)
+ - tool-xtensa-esp-elf-gdb @ 17.1.0+20260402
+ - toolchain-xtensa-esp-elf @ 14.2.0+20260121
+LDF: Library Dependency Finder -> https://bit.ly/configure-pio-ldf
+LDF Modes: Finder ~ chain, Compatibility ~ soft
+Found 44 compatible libraries
+Scanning dependencies...
+Dependency Graph
+|-- RadioLib @ 7.8.1
+|-- SPI @ 3.3.11
+|-- Preferences @ 3.3.11
+Building in release mode
+Compiling .pio\build\heltec_wifi_lora_32_V3_research\src\app\firmware_runtime.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_research\src\app\multiclient_link.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_research\src\app\secure_link.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_research\src\main.cpp.o
+Linking .pio\build\heltec_wifi_lora_32_V3_research\firmware.elf
+                            Memory Type Usage Summary
+┌─────────────────────┬──────────────┬──────────┬────────────────┬───────────────┐
+│ Memory Type/Section │ Used [bytes] │ Used [%] │ Remain [bytes] │ Total [bytes] │
+├─────────────────────┼──────────────┼──────────┼────────────────┼───────────────┤
+│ Flash Code          │       197640 │          │                │               │
+│    .text            │       197640 │          │                │               │
+│ Flash Data          │        78352 │          │                │               │
+│    .rodata          │        67808 │          │                │               │
+│    .eh_frame        │        10288 │          │                │               │
+│    .appdesc         │          256 │          │                │               │
+│ DIRAM               │        78000 │    22.82 │         263760 │        341760 │
+│    .text            │        46235 │    13.53 │                │               │
+│    .bss             │        17032 │     4.98 │                │               │
+│    .data            │        14733 │     4.31 │                │               │
+│ IRAM                │        16384 │    100.0 │              0 │         16384 │
+│    .text            │        15356 │    93.73 │                │               │
+│    .vectors         │         1028 │     6.27 │                │               │
+└─────────────────────┴──────────────┴──────────┴────────────────┴───────────────┘
+Total image size: 353344 bytes (.bin may be padded larger)
+Note: The reported total sizes may be smaller than those in the technical reference manual due to reserved memory and application configuration. The total flash size available for the application is not included by default, as it cannot be reliably determined due to the presence of other data like the bootloader, partition table, and application partition size. The total external RAM size is not included either, because the amount of RAM connected to the chip is detected at boot and is not known during the build.
+Retrieving maximum program size .pio\build\heltec_wifi_lora_32_V3_research\firmware.elf
+Checking size .pio\build\heltec_wifi_lora_32_V3_research\firmware.elf
+Advanced Memory Usage is available via "PlatformIO Home > Project Inspect"
+RAM:   [=         ]   9.7% (used 31768 bytes from 327680 bytes)
+Flash: [=         ]  10.3% (used 342800 bytes from 3342336 bytes)
+Building .pio\build\heltec_wifi_lora_32_V3_research\firmware.bin
+esptool v5.3.0
+Creating ESP32-S3 image...
+Merged 3 ELF sections.
+Successfully created ESP32-S3 image.
+Creating binary "firmware.factory.bin" with:
+    Offset   | File
+ -  0x0000   | bootloader.bin
+ -  0x8000   | partitions.bin
+ -  0xe000   | boot_app0.bin
+ -  0x10000  | firmware.bin
+Successfully created combined binary image.
+========================= [SUCCESS] Took 20.60 seconds =========================
+
+Environment                      Status    Duration
+-------------------------------  --------  ------------
+heltec_wifi_lora_32_V3_research  SUCCESS   00:00:20.604
+========================= 1 succeeded in 00:00:20.604 =========================
+Exit code: 0
+
+$ pio run -e heltec_wifi_lora_32_V3_multiclient
+Processing heltec_wifi_lora_32_V3_multiclient (platform: espressif32; board: heltec_wifi_lora_32_V3; framework: arduino)
+--------------------------------------------------------------------------------
+Verbose mode can be enabled via `-v, --verbose` option
+CONFIGURATION: https://docs.platformio.org/page/boards/espressif32/heltec_wifi_lora_32_V3.html
+PLATFORM: Espressif 32 (55.3.311) > Heltec WiFi LoRa 32 (V3)
+HARDWARE: ESP32S3 240MHz, 320KB RAM, 8MB Flash
+DEBUG: Current (cmsis-dap) External (cmsis-dap, esp-bridge, esp-builtin, esp-prog, esp-prog-2, iot-bus-jtag, jlink, minimodule, olimex-arm-usb-ocd, olimex-arm-usb-ocd-h, olimex-arm-usb-tiny-h, olimex-jtag-tiny, tumpa)
+PACKAGES:
+ - contrib-piohome @ 3.4.4
+ - framework-arduinoespressif32 @ 3.3.11
+ - framework-arduinoespressif32-libs @ 5.5.5+sha.b774170ff46
+ - tool-esp-rom-elfs @ 2024.10.11
+ - tool-esptoolpy @ 5.3.0
+ - tool-openocd-esp32 @ 2.1200.20260424 (12.0)
+ - tool-xtensa-esp-elf-gdb @ 17.1.0+20260402
+ - toolchain-xtensa-esp-elf @ 14.2.0+20260121
+LDF: Library Dependency Finder -> https://bit.ly/configure-pio-ldf
+LDF Modes: Finder ~ chain, Compatibility ~ soft
+Found 45 compatible libraries
+Scanning dependencies...
+Dependency Graph
+|-- RadioLib @ 7.8.1
+|-- Wire @ 3.3.11
+|-- SPI @ 3.3.11
+|-- Preferences @ 3.3.11
+Building in release mode
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\src\app\firmware_runtime.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\src\app\multiclient_link.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\src\app\secure_link.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_multiclient\src\main.cpp.o
+Linking .pio\build\heltec_wifi_lora_32_V3_multiclient\firmware.elf
+                            Memory Type Usage Summary
+┌─────────────────────┬──────────────┬──────────┬────────────────┬───────────────┐
+│ Memory Type/Section │ Used [bytes] │ Used [%] │ Remain [bytes] │ Total [bytes] │
+├─────────────────────┼──────────────┼──────────┼────────────────┼───────────────┤
+│ Flash Code          │       234308 │          │                │               │
+│    .text            │       234308 │          │                │               │
+│ Flash Data          │        89328 │          │                │               │
+│    .rodata          │        77556 │          │                │               │
+│    .eh_frame        │        11516 │          │                │               │
+│    .appdesc         │          256 │          │                │               │
+│ DIRAM               │        82068 │    24.01 │         259692 │        341760 │
+│    .text            │        47303 │    13.84 │                │               │
+│    .bss             │        19936 │     5.83 │                │               │
+│    .data            │        14829 │     4.34 │                │               │
+│ IRAM                │        16384 │    100.0 │              0 │         16384 │
+│    .text            │        15356 │    93.73 │                │               │
+│    .vectors         │         1028 │     6.27 │                │               │
+└─────────────────────┴──────────────┴──────────┴────────────────┴───────────────┘
+Total image size: 402152 bytes (.bin may be padded larger)
+Note: The reported total sizes may be smaller than those in the technical reference manual due to reserved memory and application configuration. The total flash size available for the application is not included by default, as it cannot be reliably determined due to the presence of other data like the bootloader, partition table, and application partition size. The total external RAM size is not included either, because the amount of RAM connected to the chip is detected at boot and is not known during the build.
+Retrieving maximum program size .pio\build\heltec_wifi_lora_32_V3_multiclient\firmware.elf
+Checking size .pio\build\heltec_wifi_lora_32_V3_multiclient\firmware.elf
+Advanced Memory Usage is available via "PlatformIO Home > Project Inspect"
+RAM:   [=         ]  10.6% (used 34768 bytes from 327680 bytes)
+Flash: [=         ]  11.7% (used 390380 bytes from 3342336 bytes)
+Building .pio\build\heltec_wifi_lora_32_V3_multiclient\firmware.bin
+esptool v5.3.0
+Creating ESP32-S3 image...
+Merged 3 ELF sections.
+Successfully created ESP32-S3 image.
+Creating binary "firmware.factory.bin" with:
+    Offset   | File
+ -  0x0000   | bootloader.bin
+ -  0x8000   | partitions.bin
+ -  0xe000   | boot_app0.bin
+ -  0x10000  | firmware.bin
+Successfully created combined binary image.
+========================= [SUCCESS] Took 20.68 seconds =========================
+
+Environment                         Status    Duration
+----------------------------------  --------  ------------
+heltec_wifi_lora_32_V3_multiclient  SUCCESS   00:00:20.683
+========================= 1 succeeded in 00:00:20.683 =========================
+Exit code: 0
+
+$ pio run -e heltec_wifi_lora_32_V3_adaptive
+Processing heltec_wifi_lora_32_V3_adaptive (platform: espressif32; board: heltec_wifi_lora_32_V3; framework: arduino)
+--------------------------------------------------------------------------------
+Verbose mode can be enabled via `-v, --verbose` option
+CONFIGURATION: https://docs.platformio.org/page/boards/espressif32/heltec_wifi_lora_32_V3.html
+PLATFORM: Espressif 32 (55.3.311) > Heltec WiFi LoRa 32 (V3)
+HARDWARE: ESP32S3 240MHz, 320KB RAM, 8MB Flash
+DEBUG: Current (cmsis-dap) External (cmsis-dap, esp-bridge, esp-builtin, esp-prog, esp-prog-2, iot-bus-jtag, jlink, minimodule, olimex-arm-usb-ocd, olimex-arm-usb-ocd-h, olimex-arm-usb-tiny-h, olimex-jtag-tiny, tumpa)
+PACKAGES:
+ - contrib-piohome @ 3.4.4
+ - framework-arduinoespressif32 @ 3.3.11
+ - framework-arduinoespressif32-libs @ 5.5.5+sha.b774170ff46
+ - tool-esp-rom-elfs @ 2024.10.11
+ - tool-esptoolpy @ 5.3.0
+ - tool-openocd-esp32 @ 2.1200.20260424 (12.0)
+ - tool-xtensa-esp-elf-gdb @ 17.1.0+20260402
+ - toolchain-xtensa-esp-elf @ 14.2.0+20260121
+LDF: Library Dependency Finder -> https://bit.ly/configure-pio-ldf
+LDF Modes: Finder ~ chain, Compatibility ~ soft
+Found 45 compatible libraries
+Scanning dependencies...
+Dependency Graph
+|-- RadioLib @ 7.8.1
+|-- Wire @ 3.3.11
+|-- SPI @ 3.3.11
+|-- Preferences @ 3.3.11
+Building in release mode
+Compiling .pio\build\heltec_wifi_lora_32_V3_adaptive\src\app\firmware_runtime.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_adaptive\src\app\multiclient_link.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_adaptive\src\app\secure_link.cpp.o
+Compiling .pio\build\heltec_wifi_lora_32_V3_adaptive\src\main.cpp.o
+Linking .pio\build\heltec_wifi_lora_32_V3_adaptive\firmware.elf
+                            Memory Type Usage Summary
+┌─────────────────────┬──────────────┬──────────┬────────────────┬───────────────┐
+│ Memory Type/Section │ Used [bytes] │ Used [%] │ Remain [bytes] │ Total [bytes] │
+├─────────────────────┼──────────────┼──────────┼────────────────┼───────────────┤
+│ Flash Code          │       237016 │          │                │               │
+│    .text            │       237016 │          │                │               │
+│ Flash Data          │        90016 │          │                │               │
+│    .rodata          │        78196 │          │                │               │
+│    .eh_frame        │        11564 │          │                │               │
+│    .appdesc         │          256 │          │                │               │
+│ DIRAM               │        82516 │    24.14 │         259244 │        341760 │
+│    .text            │        47303 │    13.84 │                │               │
+│    .bss             │        20384 │     5.96 │                │               │
+│    .data            │        14829 │     4.34 │                │               │
+│ IRAM                │        16384 │    100.0 │              0 │         16384 │
+│    .text            │        15356 │    93.73 │                │               │
+│    .vectors         │         1028 │     6.27 │                │               │
+└─────────────────────┴──────────────┴──────────┴────────────────┴───────────────┘
+Total image size: 405548 bytes (.bin may be padded larger)
+Note: The reported total sizes may be smaller than those in the technical reference manual due to reserved memory and application configuration. The total flash size available for the application is not included by default, as it cannot be reliably determined due to the presence of other data like the bootloader, partition table, and application partition size. The total external RAM size is not included either, because the amount of RAM connected to the chip is detected at boot and is not known during the build.
+Retrieving maximum program size .pio\build\heltec_wifi_lora_32_V3_adaptive\firmware.elf
+Checking size .pio\build\heltec_wifi_lora_32_V3_adaptive\firmware.elf
+Advanced Memory Usage is available via "PlatformIO Home > Project Inspect"
+RAM:   [=         ]  10.7% (used 35216 bytes from 327680 bytes)
+Flash: [=         ]  11.8% (used 393728 bytes from 3342336 bytes)
+Building .pio\build\heltec_wifi_lora_32_V3_adaptive\firmware.bin
+esptool v5.3.0
+Creating ESP32-S3 image...
+Merged 3 ELF sections.
+Successfully created ESP32-S3 image.
+Creating binary "firmware.factory.bin" with:
+    Offset   | File
+ -  0x0000   | bootloader.bin
+ -  0x8000   | partitions.bin
+ -  0xe000   | boot_app0.bin
+ -  0x10000  | firmware.bin
+Successfully created combined binary image.
+========================= [SUCCESS] Took 20.69 seconds =========================
+
+Environment                      Status    Duration
+-------------------------------  --------  ------------
+heltec_wifi_lora_32_V3_adaptive  SUCCESS   00:00:20.695
+========================= 1 succeeded in 00:00:20.695 =========================
+Exit code: 0
+
+$ pio run -e heltec_wifi_lora_32_V3_rotating
+Processing heltec_wifi_lora_32_V3_rotating (platform: espressif32; board: heltec_wifi_lora_32_V3; framework: arduino)
+--------------------------------------------------------------------------------
+Verbose mode can be enabled via `-v, --verbose` option
+CONFIGURATION: https://docs.platformio.org/page/boards/espressif32/heltec_wifi_lora_32_V3.html
+PLATFORM: Espressif 32 (55.3.311) > Heltec WiFi LoRa 32 (V3)
+HARDWARE: ESP32S3 240MHz, 320KB RAM, 8MB Flash
+DEBUG: Current (cmsis-dap) External (cmsis-dap, esp-bridge, esp-builtin, esp-prog, esp-prog-2, iot-bus-jtag, jlink, minimodule, olimex-arm-usb-ocd, olimex-arm-usb-ocd-h, olimex-arm-usb-tiny-h, olimex-jtag-tiny, tumpa)
+PACKAGES:
+ - contrib-piohome @ 3.4.4
+ - framework-arduinoespressif32 @ 3.3.11
+ - framework-arduinoespressif32-libs @ 5.5.5+sha.b774170ff46
+ - tool-esp-rom-elfs @ 2024.10.11
+ - tool-esptoolpy @ 5.3.0
+ - tool-openocd-esp32 @ 2.1200.20260424 (12.0)
+ - tool-xtensa-esp-elf-gdb @ 17.1.0+20260402
+ - toolchain-xtensa-esp-elf @ 14.2.0+20260121
+LDF: Library Dependency Finder -> https://bit.ly/configure-pio-ldf
+LDF Modes: Finder ~ chain, Compatibility ~ soft
+Found 45 compatible libraries
+Scanning dependencies...
+Dependency Graph
+|-- RadioLib @ 7.8.1
+|-- Wire @ 3.3.11
+|-- SPI @ 3.3.11
+|-- Preferences @ 3.3.11
+Building in release mode
+Retrieving maximum program size .pio\build\heltec_wifi_lora_32_V3_rotating\firmware.elf
+Checking size .pio\build\heltec_wifi_lora_32_V3_rotating\firmware.elf
+Advanced Memory Usage is available via "PlatformIO Home > Project Inspect"
+RAM:   [=         ]  13.4% (used 43928 bytes from 327680 bytes)
+Flash: [=         ]  11.8% (used 394724 bytes from 3342336 bytes)
+========================= [SUCCESS] Took 14.50 seconds =========================
+
+Environment                      Status    Duration
+-------------------------------  --------  ------------
+heltec_wifi_lora_32_V3_rotating  SUCCESS   00:00:14.501
+========================= 1 succeeded in 00:00:14.501 =========================
+Exit code: 0
+
+$ pio run -e heltec_wifi_lora_32_V3_secure
+Processing heltec_wifi_lora_32_V3_secure (platform: espressif32; board: heltec_wifi_lora_32_V3; framework: arduino)
+--------------------------------------------------------------------------------
+Verbose mode can be enabled via `-v, --verbose` option
+CONFIGURATION: https://docs.platformio.org/page/boards/espressif32/heltec_wifi_lora_32_V3.html
+PLATFORM: Espressif 32 (55.3.311) > Heltec WiFi LoRa 32 (V3)
+HARDWARE: ESP32S3 240MHz, 320KB RAM, 8MB Flash
+DEBUG: Current (cmsis-dap) External (cmsis-dap, esp-bridge, esp-builtin, esp-prog, esp-prog-2, iot-bus-jtag, jlink, minimodule, olimex-arm-usb-ocd, olimex-arm-usb-ocd-h, olimex-arm-usb-tiny-h, olimex-jtag-tiny, tumpa)
+PACKAGES:
+ - contrib-piohome @ 3.4.4
+ - framework-arduinoespressif32 @ 3.3.11
+ - framework-arduinoespressif32-libs @ 5.5.5+sha.b774170ff46
+ - tool-esp-rom-elfs @ 2024.10.11
+ - tool-esptoolpy @ 5.3.0
+ - tool-openocd-esp32 @ 2.1200.20260424 (12.0)
+ - tool-xtensa-esp-elf-gdb @ 17.1.0+20260402
+ - toolchain-xtensa-esp-elf @ 14.2.0+20260121
+LDF: Library Dependency Finder -> https://bit.ly/configure-pio-ldf
+LDF Modes: Finder ~ chain, Compatibility ~ soft
+Found 45 compatible libraries
+Scanning dependencies...
+Dependency Graph
+|-- RadioLib @ 7.8.1
+|-- Wire @ 3.3.11
+|-- SPI @ 3.3.11
+|-- Preferences @ 3.3.11
+Building in release mode
+Compiling .pio\build\heltec_wifi_lora_32_V3_secure\src\app\secure_link.cpp.o
+Retrieving maximum program size .pio\build\heltec_wifi_lora_32_V3_secure\firmware.elf
+Checking size .pio\build\heltec_wifi_lora_32_V3_secure\firmware.elf
+Advanced Memory Usage is available via "PlatformIO Home > Project Inspect"
+RAM:   [=         ]  14.3% (used 46904 bytes from 327680 bytes)
+Flash: [=         ]  13.5% (used 450448 bytes from 3342336 bytes)
+========================= [SUCCESS] Took 14.71 seconds =========================
+
+Environment                    Status    Duration
+-----------------------------  --------  ------------
+heltec_wifi_lora_32_V3_secure  SUCCESS   00:00:14.709
+========================= 1 succeeded in 00:00:14.709 =========================
+Exit code: 0

@@ -32,8 +32,16 @@ public:
 #if defined(ADAPTIVE_LORA_MULTICLIENT)
     FirmwareRuntime(ConfigStorage& storage, RadioHardware& hardware, bool example = false,
                     PayloadPort::Receiver receiver = nullptr, void* context = nullptr,
-                    OledStatusDisplay* display = nullptr)
-        : store_(storage), radio_(hardware), payload_(receiver ? receiver : receivePayload,
+                    OledStatusDisplay* display = nullptr
+#if defined(ADAPTIVE_LORA_SECURE)
+                    , secure::Entropy entropy = nullptr
+#endif
+                    )
+        :
+#if defined(ADAPTIVE_LORA_SECURE)
+          credentialStorage_(storage), entropy_(entropy),
+#endif
+          store_(storage), radio_(hardware), payload_(receiver ? receiver : receivePayload,
                                                      receiver ? context : this), example_(example), display_(display) {}
     SubmitResult submitPayload(const uint8_t* bytes, size_t length);
     PayloadResult payloadResult() const { return payload_.result(); }
@@ -53,6 +61,11 @@ private:
     void status();
     DeviceConfig loaded_{};
     const char* loadError_ = "not_loaded";
+#if defined(ADAPTIVE_LORA_SECURE)
+    ConfigStorage& credentialStorage_;
+    secure::Entropy entropy_;
+    SecureLink security_;
+#endif
     NvsConfigStore store_;
     ProvisioningConsole console_;
     RadioDriver radio_;

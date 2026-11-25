@@ -22,7 +22,7 @@ class ConsistencyTests(unittest.TestCase):
                     target.touch()
         names = set(LINK_DOCS) | set(APPROVED_SETTINGS) | set(ALGORITHM_FIGURES) | {ADR_FIGURE, "CODEX_START_PROMPT.md", "VERSION", "PROTOCOL_VERSION",
                 "platformio.ini", "LICENSE", "THIRD_PARTY.md", "CHANGELOG.md", "include/project_config.h", "include/research_roster.h",
-                "src/common/radio/sx1262_hardware.h", "src/app/esp32_firmware.h",
+                "src/common/radio/sx1262_hardware.h", "src/common/protocol/secure_wire.h", "src/app/esp32_firmware.h",
                 "logs/README.md", "logs/test/RUN_RECORD_TEMPLATE.md"}
         for name in names:
             target = self.root / name

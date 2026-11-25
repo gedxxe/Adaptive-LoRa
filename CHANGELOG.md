@@ -5,6 +5,13 @@ changes. It is not a substitute for the append-only build memory.
 
 ## Unreleased
 
+### Secure rotating candidate
+
+- Added wire v7 with P-256 Gateway signatures, authenticated Requests and AES-128-CCM DATA. Retries use the original ciphertext.
+- Added offline per-board provisioning, a separate secure role namespace, reboot challenge confirmation and fail-closed credential checks.
+- Accounted for the full security envelope and processing guard in admission. The secure radio adapter uses a timed SetTx and exposes timing and memory diagnostics.
+- Kept plaintext comparison profiles and added a seeded shared-channel ADR model. The secure image requires physical timing, recovery and RF acceptance.
+
 ### Registered Client rotation
 
 - Added opt-in wire v6 scheduling for up to 128 registered IDs and up to eight active Clients per 15 s frame.

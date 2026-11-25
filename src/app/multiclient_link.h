@@ -3,6 +3,9 @@
 #include "payload_port.h"
 #include "common/diagnostics/serial_logger.h"
 #include "common/diagnostics/display_snapshot.h"
+#if defined(ADAPTIVE_LORA_SECURE)
+#include "secure_link.h"
+#endif
 
 namespace adaptive_lora {
 class MulticlientLink {
@@ -11,6 +14,9 @@ public:
     MulticlientLink(const DeviceConfig& config, RadioTransport& radio, SerialLogger& log,
 #if defined(ADAPTIVE_LORA_ROTATING)
                     PayloadPort& payload, BootIdSource bootId, uint16_t registered, uint8_t payloadCeiling,
+#if defined(ADAPTIVE_LORA_SECURE)
+                    SecureLink& security,
+#endif
                     bool adaptDataSf = multiclient::kAdaptive, AdrRule adrRule = kFirmwareAdrRule);
 #else
                     PayloadPort& payload, BootIdSource bootId, multiclient::Roster roster = {},
@@ -38,12 +44,13 @@ private:
         bool recoveryConfirmed = false;
     };
     Frame frame(MessageType type, uint16_t sequence) const;
-    bool send(const Frame& frame, uint64_t now, const char* event);
+    bool send(const Frame& frame, uint64_t now, const char* event, uint64_t slotStart);
     void gateway(uint64_t now, const RadioEvent& event, const Frame* incoming);
     void gatewayRequest(uint64_t now, uint64_t receivedAt, const Frame* incoming, const RadioEvent& event);
     void gatewayData(uint64_t now, const Frame* incoming, const RadioEvent& event);
     void client(uint64_t now, const Frame* incoming, const RadioEvent& event);
     void acceptBeacon(uint64_t now, const Frame& beacon);
+    void resetClientPeer();
     void acceptFeedback(uint64_t now, const Frame& ack, const RadioEvent& event);
     void clientFinish(PayloadResult result);
     void observePeer(uint64_t now, uint16_t peer, const RadioEvent& event);
@@ -55,6 +62,11 @@ private:
     uint32_t opportunity(uint8_t slot) const;
 #if defined(ADAPTIVE_LORA_ROTATING)
     bool selectGroup();
+#endif
+#if defined(ADAPTIVE_LORA_SECURE)
+    bool expectedSecurePacket(const RadioEvent& event, uint64_t receivedAt) const;
+    SecureLink& security_;
+    uint8_t secureAuxiliary_[secure::challengeBytes]{};
 #endif
     void logAdrFields(char* buffer, size_t size, uint8_t index, const AdrObservation& obs, const AdrReview& review) const;
 

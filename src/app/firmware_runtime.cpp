@@ -1,4 +1,9 @@
 #include "firmware_runtime.h"
+#if defined(ADAPTIVE_LORA_SECURE) && !defined(ADAPTIVE_LORA_NATIVE_TEST)
+#include <esp_heap_caps.h>
+#include <freertos/FreeRTOS.h>
+#include <freertos/task.h>
+#endif
 #include <Arduino.h>
 #include <esp_system.h>
 #include <esp_random.h>
@@ -19,7 +24,9 @@ constexpr bool adaptDataSf = false;
 #else
 constexpr bool adaptDataSf = multiclient::kAdaptive;
 #endif
-#if defined(ADAPTIVE_LORA_ROTATING)
+#if defined(ADAPTIVE_LORA_SECURE)
+constexpr const char* profile = "secure";
+#elif defined(ADAPTIVE_LORA_ROTATING)
 constexpr const char* profile = "rotating";
 #else
 constexpr const char* profile = multiclient::kAdaptive ? "adaptive" : "multiclient";
@@ -79,7 +86,12 @@ void FirmwareRuntime::status() {
 #if defined(ADAPTIVE_LORA_ROTATING)
         std::snprintf(line, sizeof(line), "event=SCHEDULE_CONFIG,period_us=%" PRIu32
                       ",registered_count=%u,max_group=%u,payload_ceiling_bytes=%u,adr_rule=%s",
-                      multiclient::kAdaptivePeriodUs, unsigned(multiclient::kRegisteredCount),
+                      multiclient::kAdaptivePeriodUs,
+#if defined(ADAPTIVE_LORA_SECURE)
+                      unsigned(security_.population()),
+#else
+                      unsigned(multiclient::kRegisteredCount),
+#endif
                       unsigned(multiclient::kMaxClients), unsigned(multiclient::kBenchPayloadBytes),
                       adaptDataSf ? adrRuleName(kFirmwareAdrRule) : "FIXED_SF");
 #else
@@ -105,6 +117,20 @@ void FirmwareRuntime::status() {
                 snapshot.frame, loaded_.role == DeviceRole::CLIENT ?
                     (multicli_->searchingForBeacon(now) ? "search" : "synced") : "n/a");
             log_.text(line);
+#if defined(ADAPTIVE_LORA_SECURE)
+            std::snprintf(line, sizeof(line), "event=SECURITY_TIMING,auth_drops=%" PRIu32
+                ",tx_us_max=%" PRIu32 ",rx_us_max=%" PRIu32 ",late_tx=%" PRIu32,
+                snapshot.authDrops, snapshot.worstCryptoTxUs, snapshot.worstCryptoRxUs, snapshot.cryptoLate);
+            log_.text(line);
+#if !defined(ADAPTIVE_LORA_NATIVE_TEST)
+            std::snprintf(line, sizeof(line), "event=SECURITY_MEMORY,heap_free_bytes=%lu"
+                ",heap_min_bytes=%lu,loop_stack_min_free_bytes=%lu",
+                static_cast<unsigned long>(heap_caps_get_free_size(MALLOC_CAP_8BIT)),
+                static_cast<unsigned long>(heap_caps_get_minimum_free_size(MALLOC_CAP_8BIT)),
+                static_cast<unsigned long>(uxTaskGetStackHighWaterMark(nullptr)));
+            log_.text(line);
+#endif
+#endif
             if (multiclient::kAdaptive) {
                 std::snprintf(line, sizeof(line), "event=ADR_TIMING,guard_us=%" PRIu32
                     ",retune_lead_us=%" PRIu32 ",retunes=%" PRIu32 ",worst_phy_ready_us=%" PRIu32
@@ -131,7 +157,9 @@ void FirmwareRuntime::status() {
 void FirmwareRuntime::setup() {
     Serial.begin(kSerialBaud);
     loadError_ = store_.load(loaded_);
-#if defined(ADAPTIVE_LORA_ROTATING)
+#if defined(ADAPTIVE_LORA_SECURE)
+    if (!loadError_) loadError_ = security_.load(credentialStorage_, loaded_, entropy_);
+#elif defined(ADAPTIVE_LORA_ROTATING)
     if (!loadError_ && loaded_.role == DeviceRole::CLIENT &&
         !multiclient::registeredClient(loaded_.nodeId, loaded_.gatewayId, multiclient::kRegisteredCount))
         loadError_ = "client_outside_registry";
@@ -157,7 +185,10 @@ void FirmwareRuntime::setup() {
     log_.event("RADIO_INIT", code ? "failed" : radio_.chip(), nullptr, nullptr, code);
     if (!code) {
 #if defined(ADAPTIVE_LORA_MULTICLIENT)
-#if defined(ADAPTIVE_LORA_ROTATING)
+#if defined(ADAPTIVE_LORA_SECURE)
+        multicli_.emplace(loaded_, radio_, log_, payload_, freshBootId, security_.population(),
+                          multiclient::kBenchPayloadBytes, security_, adaptDataSf);
+#elif defined(ADAPTIVE_LORA_ROTATING)
         multicli_.emplace(loaded_, radio_, log_, payload_, freshBootId, multiclient::kRegisteredCount,
                           multiclient::kBenchPayloadBytes, adaptDataSf);
 #else
@@ -199,9 +230,12 @@ void FirmwareRuntime::command(ConsoleAction action) {
         }
         case ConsoleAction::SAVE: {
             const char* error = nullptr;
+#if defined(ADAPTIVE_LORA_SECURE)
+            if (radio_.initialized()) error = "secure_config_install_offline";
+#endif
 #if defined(ADAPTIVE_LORA_ROTATING)
             const auto& staging = console_.staging();
-            if (!validateConfig(staging) && staging.role == DeviceRole::CLIENT &&
+            if (!error && !validateConfig(staging) && staging.role == DeviceRole::CLIENT &&
                 !multiclient::registeredClient(staging.nodeId, staging.gatewayId, multiclient::kRegisteredCount))
                 error = "client_outside_registry";
 #elif defined(ADAPTIVE_LORA_MULTICLIENT)
@@ -236,6 +270,12 @@ SubmitResult FirmwareRuntime::submitPayload(const uint8_t* bytes, size_t length)
 bool FirmwareRuntime::receivePayload(void* context, const PayloadDelivery& packet) {
     auto& log = static_cast<FirmwareRuntime*>(context)->log_;
     char line[256];
+#if defined(ADAPTIVE_LORA_SECURE)
+    const int written = std::snprintf(line, sizeof(line),
+        "event=APP_PAYLOAD,source_id=%u,boot_id=%" PRIu32 ",frame_id=%" PRIu32 ",bytes=%u",
+        packet.source, packet.clientBoot, packet.frame, packet.size);
+    if (written < 0 || size_t(written) >= sizeof(line)) return false;
+#else
     const int prefix = std::snprintf(line, sizeof(line),
         "event=APP_PAYLOAD,source_id=%u,boot_id=%" PRIu32 ",frame_id=%" PRIu32 ",bytes=%u,hex=",
         packet.source, packet.clientBoot, packet.frame, packet.size);
@@ -247,6 +287,7 @@ bool FirmwareRuntime::receivePayload(void* context, const PayloadDelivery& packe
         line[end++] = digits[packet.bytes[i] & 15];
     }
     line[end] = '\0';
+#endif
     const auto drops = log.dropped();
     log.text(line);
     return log.dropped() == drops;

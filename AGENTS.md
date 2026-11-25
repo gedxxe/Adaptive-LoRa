@@ -32,7 +32,10 @@ single-client image remains available. The adaptive image uses wire version
 The opt-in `heltec_wifi_lora_32_V3_rotating` profile uses wire version 6
 and schedules up to eight of 128 registered IDs per frame. Keep its
 results distinct from the unauthenticated wire-v5 field baseline. A
-deployment candidate still requires authenticated control and DATA.
+deployment candidate uses the opt-in `heltec_wifi_lora_32_V3_secure`
+wire-v7 image with authenticated control and encrypted DATA. Keep its
+credential provisioning, field results and readiness separate from the
+plaintext comparison profiles.
 Historical records retain their original hardware and results.
 
 ## Read before editing
@@ -120,6 +123,10 @@ and a general event API remain open.
 Keep fixed buffers, explicit little-endian serialization, 28-byte header,
 96-byte frame limit and nine-byte ACK payload. Preserve protocol v1 HELLO/ACK,
 error classifications and NVS namespace/key/schema/blob compatibility.
+The v7 inner codec retains the 96 B limit. Its security envelope can
+reach 237 B. The secure role and credentials use separate NVS namespaces.
+Never fall back to a plaintext role or log credential or payload bytes
+from the secure profile. See the [v7 wire contract](docs/en/SCHEDULED_LINK.md#secure-wire-v7).
 ACK must match the outstanding client source/boot/sequence and deadline.
 The default reporting interval is 3 s and M2 ACK timeout is 1 s. Persisted
 intervals remain active until changed. The v3 superframe targets 1 s and
@@ -168,19 +175,27 @@ pio run -e heltec_wifi_lora_32_V3_research
 pio run -e heltec_wifi_lora_32_V3_multiclient
 pio run -e heltec_wifi_lora_32_V3_adaptive
 pio run -e heltec_wifi_lora_32_V3_rotating
+pio run -e heltec_wifi_lora_32_V3_secure
 pio test -e native
 pio test -e native_multiclient
 pio test -e native_adaptive
 pio test -e native_rotating -v
+pio test -e native_secure -v
 python -m unittest discover -s tools -p test_capture_bench.py -v
 python -m unittest discover -s tools -p test_tdma_feasibility.py -v
 python -m unittest discover -s tools -p test_adr_shadow.py -v
 python -m unittest discover -s tools -p test_model_multiclient.py -v
 python -m unittest discover -s tools -p test_check_consistency.py -v
+python -m unittest discover -s tools -p test_adr_sim.py -v
+python -m unittest discover -s tools -p test_secure_provision.py -v
 python tools/check_consistency.py
 ```
 
-Use installed PlatformIO Python for host tools. Inspect the complete diff
+Use installed PlatformIO Python for host tools.
+For `native_secure`, use the installed Mbed TLS 3.6.6 sources or set
+`ADAPTIVE_LORA_MBEDTLS_DIR`. Provisioning tests also require Python
+`cryptography` and `esp-idf-nvs-partition-gen==0.2.0`.
+Inspect the complete diff
 and thin main, then review every staged diff and `git diff --cached --check`.
 Report exact commands, cases/counts, skipped cases, versions and limitations.
 A compile, native test, analytical model and physical measurement are distinct

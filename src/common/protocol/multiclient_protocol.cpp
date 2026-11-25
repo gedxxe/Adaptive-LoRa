@@ -64,7 +64,7 @@ uint32_t Plan::retrySpan() const {
 
 uint32_t Plan::roundStart(uint8_t round) const {
     if (!round) return kSlotGuardUs;
-    const uint32_t control = payloadAir(feedbackBytes(count)) + 2 * kSlotGuardUs;
+    const uint32_t control = feedbackAir(count) + 2 * kSlotGuardUs;
     return kSlotGuardUs + dataSpan() + control + (round - 1) * (retrySpan() + control);
 }
 
@@ -79,8 +79,8 @@ uint32_t Plan::dataStart(uint8_t round, uint8_t index, uint8_t mask) const {
 }
 
 uint32_t reservationUs(const Plan& plan) {
-    return payloadAir(rosterBytes(plan.count)) + grantStart(plan.count) + payloadAir(grantBytes(plan.count)) +
-           plan.feedbackStart(kAttempts - 1) + payloadAir(feedbackBytes(plan.count)) + kSlotGuardUs;
+    return beaconAir(plan.count) + grantStart(plan.count) + grantAir(plan.count) +
+           plan.feedbackStart(kAttempts - 1) + feedbackAir(plan.count) + kSlotGuardUs;
 }
 
 uint32_t requiredPeriodUs(const Roster& roster) {

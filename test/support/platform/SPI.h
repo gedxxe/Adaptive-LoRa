@@ -4,13 +4,14 @@
 #endif
 #include <cstddef>
 #include <cstdint>
+#include "project_config.h"
 
 constexpr int MSBFIRST = 1, SPI_MODE0 = 0;
 constexpr int SS = 8, SCK = 9, MOSI = 10, MISO = 11;
 
 namespace host_adapter {
 enum Call { SPI_BEGIN, BEGIN, CURRENT_LIMIT, HEADER, CRC, IRQ, STANDBY, RX, TX,
-            FINISH_TX, FINISH_RX, FLAGS, LENGTH, READ, RSSI, SNR, TOA, RETUNE, COUNT };
+            FINISH_TX, FINISH_RX, FLAGS, LENGTH, READ, RSSI, SNR, TOA, RETUNE, SET_TX, COUNT };
 // Records arguments and scripted return values, never chip or driver state.
 struct State {
     unsigned calls[COUNT]{};
@@ -30,7 +31,10 @@ struct State {
     void (*callback)() = nullptr;
     uint32_t rxTimeout = 0, rxFlags = 0, rxMask = 0, irqFlags = 0;
     size_t rxLength = 0, packetLength = 0, txLength = 0, readLength = 0, toaLength = 0;
-    uint8_t txBytes[96]{}, rxBytes[96]{};
+    uint8_t txBytes[adaptive_lora::kRadioPacketLimit]{}, rxBytes[adaptive_lora::kRadioPacketLimit]{};
+    uint32_t hardwareTxTicks = 0;
+    uint16_t spiCommand = 0;
+    uint8_t rfMode = 0;
     float rssi = -70, snr = 8;
     uint32_t toa = 12345;
     int16_t record(Call call) {

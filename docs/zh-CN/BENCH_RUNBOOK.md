@@ -164,6 +164,20 @@ pio run -e heltec_wifi_lora_32_V3_rotating -t upload --upload-port COMx
 [轮换模型](SCHEDULED_LINK.md#rotating-schedule)给出预期调度，交付间隔从实际记录测量。
 规模较大时，在网关记录全部交付事件，并用采集工具的八个客户端端口抽查不同组的链路。
 
+<a name="test-the-secure-candidate"></a>
+
+## 测试安全候选版
+
+使用合成样本并在获准的射频环境测试。安全版保留 915.0 MHz、BW125、SF9 控制、CR4/5 和 22 dBm 发射请求。辐射测试前核对实际允许的频率、天线增益、EIRP 和空口占用。
+
+1. 按前文步骤备份各板，并核对实际闪存布局与安全状态。安全角色使用新的 NVS 命名空间，明文角色配置不会迁移。
+2. 在可信离线机器上使用安装了 `cryptography` 的 Python，运行 `python tools/secure_provision.py --out PRIVATE_NEW_DIRECTORY --network 1 --gateway 1 --clients 1`。后续改为 4 或 8。每次生成新的信任代次。输出放在仓库外受限目录，网关 CSV 不得分配给客户端。
+3. 在离线 Python 环境安装 `esp-idf-nvs-partition-gen==0.2.0`。已核实 NVS 为 20 KiB 时，运行 `python -m esp_idf_nvs_partition_gen generate DEVICE.csv DEVICE.bin 0x5000`。每份镜像包含一块板的角色和凭据，并替换其 NVS 分区。写入前核对文件、板卡、偏移和大小。SDK 默认 8 MB 布局的 NVS 偏移为 `0x9000`。若布局、加密或安全设置不同，使用该设备获准的配置流程。
+4. 两种角色均构建并烧录 `heltec_wifi_lora_32_V3_secure`。默认禁用示例生成器。测试显示和链路时，可在构建前设置 `PLATFORMIO_BUILD_SRC_FLAGS=-DADAPTIVE_LORA_SECURE_DEMO=1` 和独立的 `PLATFORMIO_BUILD_DIR`。通过核实的端口，使用 esptool `write-flash` 将匹配的私有 NVS 镜像写到核实的偏移。启动确认 `protocol=7`、`profile=secure`、角色、节点 ID 和登记数量。凭据错误时 `CONFIG_INVALID` 且射频保持关闭。启用无线后只允许离线安装配置。
+5. 使用 1、4 和 8 个客户端加网关测试。至少记录两轮，再测试客户端重启、网关重启、同时重启和信号恢复。分开测试 SF9 控制丢失和 SF10 DATA 丢失。记录交付间隔的最大值与百分位数、`SECURITY_TIMING`、`SECURITY_MEMORY`、射频切换时间、复位、重试与网关发射空口时间。在受控带负载的测试装置上检查凭据缺失和 BUSY 故障。
+
+更换或撤销凭据时生成新代次，按需使用 `--revoke ID`，再为全部活动板安装同一新代次。撤销的位置仍在登记表中，没有可用密钥。恢复闪存备份后重新配置全部活动板，因为没有硬件回退控制时，完整旧快照可能恢复已撤销的凭据。安全版不会降级到 v6。部署板应只使用安全版。
+
 ## 保存结果
 
 采集前关闭监视器。用实测端口，每轮使用新目录。按节点 ID 顺序重复传入 `--client`。

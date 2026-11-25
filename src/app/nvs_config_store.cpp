@@ -3,8 +3,13 @@
 
 namespace adaptive_lora {
 namespace {
+#if defined(ADAPTIVE_LORA_SECURE)
+// A plaintext firmware image cannot use a provisioned secure role record.
+constexpr char kConfigNamespace[] = "alora_v7cfg";
+#else
 // Retain the schema-1 on-device namespace bytes for saved-config compatibility.
 constexpr char kConfigNamespace[] = {0x6d, 0x69, 0x64, 0x65, 0x61, 0x2d, 0x70, 0x32, 0x70, 0};
+#endif
 }
 
 const char* NvsConfigStore::load(DeviceConfig& config) {

@@ -434,15 +434,55 @@ For fixed profiles, a homogeneous group of size $\nu_g$ yields $\tau_{\mathrm{cy
 | 84 | 165 s | 165 s | 180 s | 420 s |
 | 128 | 240 s | 240 s | 285 s | 645 s |
 
-### Authentication design and airtime
+### Earlier authentication estimates
 
 A secure wire version must authenticate Beacon, Grant, ACK, Request and DATA before the receiver uses them. A shared group secret would let a compromised Client impersonate the Gateway. Two designs worth comparing are a 64-byte Gateway signature per control frame and a 16-byte pairwise tag for each listed Client. Signature verification works on every Client, even outside the current group. Pairwise tags use less space for groups smaller than four but require a verifier to know which tag applies.
 
 The host sensitivity check adds 16 bytes to every Request and DATA, then adds either signature or tag bytes to Beacon, Grant and each reserved bitmap. It keeps the original guard, retries and tail. At 32 bytes and DATA SF7/8/9/10, the signature design fits 8/7/4/2 per frame, while pairwise tags fit 8/6/4/2. Both project 240 s at SF7 and 960 s at SF10 for 128 Clients. These are airtime projections. Extra session traffic, CPU time, key management, actual radio service gaps and RF loss still require tests.
 
-For the secure implementation, encrypt uplink bodies with AES-128-CCM and a 16-byte tag under a unique per-Client key. Keep routing fields visible and authenticate them as associated data. Use a Gateway signing key for group origin and pin its verification key per network. Budget signing and verification latency before choosing the group policy. [NIST CCM specification](https://csrc.nist.gov/pubs/sp/800/38/c/upd1/final).
+Those estimates omitted the freshness exchange and the extra processing guard. The [v7 implementation](#secure-wire-v7) uses signatures and a challenge echo. The v6 comparison still uses plaintext.
 
-Bind freshness to an authenticated session with a durable sender epoch, a monotonic frame counter and separate message domains. Commit the next epoch before enabling TX, fail closed on missing credentials or counter failure, bind Grant and ACK to the current session, and replay only identical cached ciphertext for retries. A reset or flash restore must never reuse a key and nonce pair. Credential revocation, provisioning, cold-boot replay, backup rollback and timing on the ESP32-S3 remain open. Wire v6 still permits forged control and data, reveals payloads and offers no cryptographic replay protection.
+## Secure wire v7
+
+Build `heltec_wifi_lora_32_V3_secure` for both roles. It accepts only v7. The existing v1, v2, v3, v5 and v6 images remain comparison profiles. The secure radio buffer allows 237 B. The 28 B inner header and 96 B inner codec limit are unchanged. The inner length byte counts the body before the security trailer.
+
+| Packet | Complete on-air bytes | Protection |
+|---|---:|---|
+| Beacon | $113+3n$ | P-256 signature and 128-bit Gateway boot epoch |
+| Request | 69 | 128-bit Client challenge and HMAC-SHA-256 truncated to 128 bits |
+| Grant | $93+18n$ | P-256 signature and 96-bit challenge echo per roster position |
+| DATA | $48+\lambda$ | AES-128-CCM with a 128-bit tag |
+| ACK bitmap | $95+4n$ | P-256 signature |
+
+Here $n$ is the roster count and $\lambda$ is the application payload size. The compile-time maximum is a 237 B Grant at $n=8$. The 32 B profile selects smaller groups when the reserved airtime requires it. ACKs still confirm the registered receive callback. They do not confirm database persistence.
+
+The Gateway verifies a per-Client MAC before saving a Request. Clients verify Gateway signatures using the network's provisioned public key. The signed bytes include the visible routing header, message type, schedule, frame, role-specific boot ID and payload, plus the credential generation and full Gateway epoch. A Client key allows that Client to submit records under its own ID. It cannot sign Gateway messages or submit as another Client.
+
+A verified Beacon is a tentative schedule. The Client generates a new 128-bit challenge for each Request. It launches DATA only when a valid, timely Grant echoes 96 bits of that challenge and the frame, Client boot ID and size all match. An old signed Beacon can therefore induce a tentative Request after a restart, but its recorded Grant cannot authorize DATA. An accepted ACK must match the current signed Grant, frame and round. Replay of a valid DATA packet in the same transaction cannot call the application twice.
+
+The devices seed Mbed TLS CTR-DRBG using the ESP32-S3 startup entropy source before enabling the radio. Each Gateway boot and frame-counter rollover generates a new 128-bit epoch. HKDF-SHA-256 derives a Request MAC key by credential generation and a DATA key by generation, Gateway epoch and full Client challenge. It uses separate labels for Request and DATA. DATA authenticates the inner header as associated data. Its 13-byte nonce uses bytes 12–23 (sender boot, frame, sequence and reserved configuration fields), followed by the v7 domain byte. A new frame changes the nonce under the same key. A new handshake changes the key, assuming the startup entropy source and HKDF are sound. Once sealed, every retry copies exactly the cached ciphertext and tag. No packet advances a flash counter. [CCM](https://csrc.nist.gov/pubs/sp/800/38/c/upd1/final) · [HKDF](https://datatracker.ietf.org/doc/html/rfc5869)
+
+The operator provisions the private trust material offline. Runtime never installs, repairs, or generates persistent credentials. The secure role record and key record live in separate namespaces from the plaintext role. Missing, unreadable, inconsistent or unseedable state keeps the radio off, including after default NVS formatting. Restoring the same valid credentials renews session keys through fresh handshakes. Flash rollback can still restore revoked trust material. Recovery after a restore therefore requires new credentials and a new generation for all active boards. Secure Boot, flash/NVS encryption and rollback controls need a separate board acceptance step. RF interference, traffic metadata and a compromised Gateway remain outside these protections.
+
+### Secure schedule capacity
+
+The secure planner includes every security byte, all four feedback windows, the 300 ms end reserve, and a 160 ms slot guard. The guard adds a provisional 40 ms allowance per side to the existing 80 ms radio guard. The post-crypto launch limit is 60 ms from the slot start. Late packets are withheld. The secure adapter uses SX1262 SetTx with a chip timeout and skips RadioLib's later unbounded PA-ramp wait. SPI locks and command timing still need physical validation.
+
+| Registered Clients | All SF7 | All SF8 | All SF9 | All SF10 | Repeating SF7–SF10 |
+|---:|---:|---:|---:|---:|---:|
+| 1 | 15 s | 15 s | 15 s | 15 s | 15 s |
+| 4 | 15 s | 15 s | 30 s | 30 s | 30 s |
+| 8 | 30 s | 30 s | 45 s | 60 s | 45 s |
+| 16 | 60 s | 60 s | 90 s | 120 s | 90 s |
+| 32 | 105 s | 120 s | 165 s | 240 s | 180 s |
+| 63 | 195 s | 240 s | 315 s | 480 s | 360 s |
+| 64 | 195 s | 240 s | 330 s | 480 s | 360 s |
+| 70 | 210 s | 270 s | 360 s | 525 s | 390 s |
+| 84 | 255 s | 315 s | 420 s | 630 s | 480 s |
+| 96 | 300 s | 360 s | 480 s | 720 s | 540 s |
+| 128 | 390 s | 480 s | 645 s | 960 s | 720 s |
+
+These are sweep times for a fixed 32-byte ceiling and uninterrupted scheduling. A successful report additionally needs SF9 control in both directions and a successful DATA slot. SF10 DATA does not extend SF9 control coverage. The [model results](PROGRESS.md#secure-rotation-experiment) show delivery gaps under shared interference. For RF tests use the setup and authorization limits in the [secure test procedure](BENCH_RUNBOOK.md#test-the-secure-candidate).
 
 ## Integration prompt
 
@@ -451,6 +491,8 @@ Use this prompt after checking the local code and the target system's license:
 > Read this repository's engineering contract, protocol and setup guide. Audit the target firmware and identify where sampled bytes originate and where received bytes are consumed. State the target's Client count, maximum payload length, report interval, acceptable delivery gap, and permitted RF profile. Check these against the active scheduler and the authentication status. Propose a versioned binary payload with explicit length, byte order, units, timestamp and stable sample identity.
 >
 > Keep application dependencies outside the protocol. Use `FirmwareRuntime::submitPayload` and handle `QUEUED`, `BUSY`, `TOO_LARGE`, and `INACTIVE`. The single pending sample is retained between groups. Copy received bytes before the synchronous `PayloadPort::Receiver` returns and decide whether the local application accepted them. An ACK confirms that callback accepted the packet. If downstream storage needs a guarantee, define a separate idempotent acknowledgment. Account for resets, unknown delivery, queue overflow, and version mismatches. Include byte fixtures and host tests for retries and loss. Preserve the comparison firmware, avoid secrets and private data in logs or Git, and separate build, simulation, and physical results in the final report.
+
+**Sampling and persistence.** Capture each measurement at its scheduled timestamp. Assign a stable sample ID before submitting it to LoRa. Keep that ID and the original timestamp in the binary payload on retries and after application restart. The transport owns a copy of one queued payload per Client, so the consuming application must keep its own bounded durable queue across outages if the measurement cannot be lost. Submit on the cooperative runtime loop via a synchronized handoff from any sampling task. On `BUSY` retain the sample in that queue. Set a queue limit and report overflow, oldest pending age and lost samples. After `MISSING`, `UNKNOWN` or reset, retry using the same application sample ID. The Gateway consumer deduplicates on authenticated Client identity plus sample ID across radio sessions. A receive callback must remain within the radio timing budget. A separate application acknowledgment is required for a durable sink guarantee.
 
 ## Board reference
 

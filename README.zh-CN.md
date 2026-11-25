@@ -20,7 +20,7 @@
 
 ![一台网关按空口预算轮换分组，每帧服务一组](docs/research/figures/rotation.svg)
 
-默认配置最多服务八个客户端。可选轮换配置最多登记 128 个 ID，每个 15 秒帧选择一组。DATA 参数越慢，每组能容纳的节点可能越少。参见[服务间隔和认证开销模型](docs/zh-CN/SCHEDULED_LINK.md#rotating-schedule)。报文认证和规模化射频测试仍是发布条件。
+默认配置最多服务八个客户端。空口 v7 候选版最多登记 128 个节点，每个 15 秒帧选择一组，对网关报文签名，并使用逐客户端密钥加密 DATA。见[安全协议与容量](docs/zh-CN/SCHEDULED_LINK.md#secure-wire-v7)和[配置步骤](docs/zh-CN/BENCH_RUNBOOK.md#test-the-secure-candidate)。无线时序、覆盖和恢复仍待实测。
 
 ## 测试方法
 

@@ -545,3 +545,20 @@ with per-Client tags using the same frame budget, and reserve a new wire
 version once credential lifecycle, authenticated freshness and cryptographic
 timing are verified. Wire v6 uses plaintext. See the
 [security and capacity study](SCHEDULED_LINK.md#rotating-schedule).
+
+## ADR-044 — Sign secure control and confirm freshness in the Grant
+
+Select P-256 signatures for Gateway control and unique Client secrets
+for HMAC Requests and AES-CCM DATA. Separate the HKDF labels and bind the
+DATA key to a fresh Gateway epoch and full Client challenge. The signed
+96-bit echo confirms a pending transaction before DATA. Cache ciphertext
+for retries. Retain the 96 B inner codec and budget the 237 B envelope.
+
+Use an offline credential generation and a separate secure role
+namespace. A new handshake restores packet freshness after reboot.
+Reprovision every active board after backup restoration to revoke
+old trust material. Hardware rollback, timing and RF remain open.
+
+In v7, stage the TX packet through RadioLib and use timed SetTx to avoid
+the separate unbounded PA-ramp wait. Keep the existing SPI transaction
+and Heltec RF switch configuration.

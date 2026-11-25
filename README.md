@@ -20,7 +20,7 @@ The Gateway sends a Beacon at SF9. Clients request space for their payload and t
 
 ![One Gateway rotates through airtime-feasible groups, each using one frame](docs/research/figures/rotation.svg)
 
-The default profile serves up to eight Clients. The opt-in rotating profile selects a group for each 15 s frame from up to 128 registered IDs. Slower DATA profiles can shrink a group. See the [service times and security overhead](docs/en/SCHEDULED_LINK.md#rotating-schedule). Packet authentication and RF tests at scale are release requirements.
+The default profile serves up to eight Clients. The wire-v7 candidate selects a group from up to 128 registered IDs every 15 s. It signs Gateway messages and encrypts DATA with a key unique to each Client. See the [secure protocol and capacity](docs/en/SCHEDULED_LINK.md#secure-wire-v7) and the [provisioning procedure](docs/en/BENCH_RUNBOOK.md#test-the-secure-candidate). Physical timing, coverage and recovery still need measurements.
 
 ## Testing method
 

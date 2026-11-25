@@ -81,6 +81,13 @@ def check(root):
     rotating = board + "_rotating"
     if not rotating_version or rotating not in environments:
         errors.append("platformio.ini and protocol: rotating environment or wire version missing")
+    secure_source = (root / "src/common/protocol/secure_wire.h").read_text(encoding="utf-8")
+    secure_version = re.search(r"\bwireVersion\s*=\s*(\d+)\s*;", secure_source)
+    secure_env = board + "_secure"
+    secure_config = config[f"env:{secure_env}"] if secure_env in environments else {}
+    if (not secure_version or secure_config.get("extends") != f"env:{rotating}"
+            or "ADAPTIVE_LORA_SECURE=1" not in secure_config.get("build_flags", "")):
+        errors.append("platformio.ini and protocol: secure environment or wire version missing")
     roster = (root / "include/research_roster.h").read_text(encoding="utf-8")
     ceiling = re.search(r"kBenchPayloadBytes\s*=\s*kAdaptive\s*\?\s*(\d+)\s*:\s*kMaxData", roster)
     if not ceiling:
@@ -110,6 +117,8 @@ def check(root):
         if adaptive_version and (f"`protocol={adaptive_version.group(1)}`" not in text
                                  or "`profile=adaptive`" not in text):
             errors.append(f"{name}: adaptive serial status must match the firmware")
+        if secure_version and (f"`protocol={secure_version.group(1)}`" not in text or "`profile=secure`" not in text):
+            errors.append(f"{name}: secure serial status must match the firmware")
         if ceiling and f"`bench_payload_ceiling_bytes={ceiling.group(1)}`" not in text:
             errors.append(f"{name}: bench payload ceiling must match the firmware")
         for token in ("PLATFORMIO_BUILD_SRC_FLAGS=-DADAPTIVE_LORA_FIXED_SF_COMPARISON",
@@ -188,12 +197,13 @@ def check(root):
             if adaptive_version and (not row or row.groups() != (firmware, adaptive_version.group(1))):
                 errors.append(f"{name}: current firmware/protocol row mismatch")
             wire_versions = dict(re.findall(r"\| `([A-Za-z0-9_]+)` \| (\d+) \|", body))
-            if adaptive_version and rotating_version and wire_versions != {
+            if adaptive_version and rotating_version and secure_version and wire_versions != {
                 board: legacy_protocol,
                 board + "_research": APPROVED_SETTINGS["src/common/protocol/scheduled_protocol.h"]["kVersion"],
                 multiclient: protocol,
                 adaptive: adaptive_version.group(1),
                 rotating: rotating_version.group(1),
+                secure_env: secure_version.group(1),
             }:
                 errors.append(f"{name}: comparison wire versions differ from firmware")
             field_status = ("| 现场试验 | 走测和无线时序仍待实测 |" if "/zh-CN/" in name

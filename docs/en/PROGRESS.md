@@ -5,15 +5,23 @@
 <!-- current-state:start -->
 | Check | Result |
 |---|---|
-| Firmware / protocol | `0.2.0-alpha.1` / `5` (default) · `6` (rotation) |
+| Firmware / protocol | `0.2.0-alpha.1` / `5` (default) · `6` (rotation) · `7` (secure) |
 | Board | Heltec WiFi LoRa 32 V3.4, ESP32-S3/SX1262 |
 | Adaptive image | `heltec_wifi_lora_32_V3_adaptive`, ESP32 build passed. Native cases 46/46, including all three ADR rules. |
-| Rotating image | `heltec_wifi_lora_32_V3_rotating`, ESP32 build passed, 8/8 native cases. Authenticated wire and physical tests pending. |
+| Rotating image | `heltec_wifi_lora_32_V3_rotating`, 8/8 native cases |
+| Secure candidate | `heltec_wifi_lora_32_V3_secure`, ESP32 build and 15/15 native cases passed |
 | Fixed-SF image | `heltec_wifi_lora_32_V3_multiclient`, ESP32 build passed, 15/15 runtime cases |
-| Shared tests | 356/356 native and 66/66 Python cases passed |
+| Shared tests | 356/356 native and 69/69 Python cases passed |
 | Toolchain | PlatformIO 6.1.19, Espressif32 55.3.311, Arduino ESP32 3.3.11, Xtensa 14.2.0+20260121, RadioLib 7.8.1 |
 | Field test | Walk test and radio timing measurements pending |
 <!-- current-state:end -->
+
+**SOFTWARE VERIFIED / HARDWARE VALIDATION PENDING.** The v7 secure
+candidate has not been flashed or exercised on a board in this iteration.
+Measure cryptographic timing, runtime stack and heap, radio turnaround,
+coverage, power-loss recovery, NVS fault behavior and actual Gateway
+transmit airtime before arranging a controlled pilot. Confirm the on-site
+RF profile and verify protection against restoring revoked credentials.
 
 The operator reported SF adaptation through SF10 in an earlier two-board
 range trial. The current profiles still need field tests with 32 B samples.
@@ -80,6 +88,7 @@ exercise timing faults and peer traffic.
 |---|---|---:|
 | Adaptive field test and PlatformIO default | `heltec_wifi_lora_32_V3_adaptive` | 5 |
 | Rotation study with up to 128 registered IDs | `heltec_wifi_lora_32_V3_rotating` | 6 |
+| Authenticated rotation and encrypted DATA | `heltec_wifi_lora_32_V3_secure` | 7 |
 | Earlier fixed-SF comparison | `heltec_wifi_lora_32_V3_multiclient` | 3 |
 | Single-Client TDMA comparison | `heltec_wifi_lora_32_V3_research` | 2 |
 | HELLO/ACK comparison | `heltec_wifi_lora_32_V3` | 1 |
@@ -95,14 +104,32 @@ are selected by the build. All images share `VERSION` and NVS schema 1.
 
 ## Extended Client capacity
 
-The wire-v6 scheduler supports a registry of 128 Clients. One radio serves up to eight per frame and may select fewer when DATA uses more airtime. At a 32-byte ceiling, the production selector schedules 70, 84 and 128 homogeneous nodes across the periods in the [capacity table](SCHEDULED_LINK.md#rotating-schedule). Security adds overhead. For example, the modeled 128-node case at SF10 goes from 645 s to 960 s once authenticated framing is budgeted. The secure framing is still a design.
+The wire-v7 scheduler supports 128 registered Clients. At a 32 B ceiling the secure image serves at most five per frame at DATA SF7, four at SF8, three at SF9 and two at SF10. The [v7 capacity table](SCHEDULED_LINK.md#secure-schedule-capacity) includes the signed control frames, challenge echo, tags and a provisional timing guard.
 
 The 5–10 minute objective is a service interval for suitable SF distributions. A delivered report additionally requires SF9 control coverage, successful DATA and the relevant feedback. Measure the longest gap for each node and report the conditions behind any missed deadline.
 
 1. Capture repeated runs with 1, 4 and 8 physical Clients and one Gateway. Record first-attempt and final delivery, retransmissions, shared-retry use, SF changes, timing faults, reset recovery and per-Client arrival gaps. Keep sampling timestamps if reporting age of information.
-2. Compare fixed SF7, the delivery-window policy, EWMA and Kalman using the same traffic, loss, control and airtime assumptions. The existing model uses one Client and ideal control. Extend it to correlated losses, blocked links and group rotation before drawing conclusions at 70–128 nodes.
-3. Prototype authenticated control and encrypted DATA, then remeasure frame margins and Gateway transmit airtime. Test credential provisioning, restart, replay, RF interference and backup restoration before a deployment decision. Treat a single Gateway failure as a network outage.
+2. Calibrate the shared-channel experiment with matched captures. Report per-Client gaps and confidence intervals across repeated runs before drawing conclusions at 70–128 nodes.
+3. Measure frame margins, Gateway TX airtime and cryptographic processing on both roles. Verify physical credential installation, reset, NVS fault recovery and backup restoration. A single Gateway failure interrupts service.
 4. Compare against matched scheduling and contention baselines before making a capacity claim. Record the antenna pattern and traffic assumptions. Directional coverage from a Moxon and concurrent reception on a concentrator describe different deployment conditions.
+
+## Secure rotation experiment
+
+`python tools/secure_rotation_model.py --seed 42 --frames 5760` uses the production selector, airtime equations and ADR rules with a modeled channel. The same per-node draws are generated for every policy, regardless of which Clients are scheduled. SNR differs by node and changes under periodic blockage. A two-state shared interference process correlates losses across a frame. Beacon, Request, Grant, DATA and each feedback window have separate decode draws. The model uses one fresh report per scheduled opportunity and ideal software timing. Its assumptions need field calibration.
+
+| 128-Client case | Maximum service gap | Median delivery gap | 95th percentile | Maximum observed delivery gap |
+|---|---:|---:|---:|---:|
+| Fixed SF7 | 390 s | 390 s | 1,560 s | 48,750 s |
+| Delivery window | 795 s | 720 s | 2,130 s | 7,665 s |
+| EWMA | 675 s | 585 s | 1,755 s | 6,945 s |
+| Kalman | 645 s | 585 s | 1,725 s | 5,700 s |
+
+The gaps above are between Gateway deliveries on the same Client. The
+[raw model output](../../logs/test/iteration-036-rotation-model.log)
+also reports unfinished gaps and TX airtime. The 128-Client
+delivery-window case uses about 22.4% modeled Gateway TX occupancy over
+the 24-hour run. This is not a regulatory or physical result. Keep the
+delivery-window default until field data support a change.
 
 ## Past work
 

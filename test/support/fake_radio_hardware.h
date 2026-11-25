@@ -23,7 +23,7 @@ public:
     uint32_t flags = 0, airtime = 12345;
     size_t packetLength = kHeaderSize, txLength = 0, readLength = 0, airtimeLength = 0;
     uint8_t crcLength = 0;
-    uint8_t rxBytes[kMaxFrameSize]{}, txBytes[kMaxFrameSize]{};
+    uint8_t rxBytes[kRadioPacketLimit]{}, txBytes[kRadioPacketLimit]{};
     float rssi = -87.5f, snr = 6.25f;
     HardwareCall trace[128]{};
     size_t traceLength = 0;

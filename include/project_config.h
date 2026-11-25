@@ -1,6 +1,9 @@
 #pragma once
 #include <cstddef>
 #include <cstdint>
+#if defined(ADAPTIVE_LORA_SECURE)
+#include "common/protocol/secure_wire.h"
+#endif
 
 namespace adaptive_lora {
 constexpr char kFirmwareVersion[] = "0.2.0-alpha.1";
@@ -17,6 +20,11 @@ constexpr uint32_t kRadioRecoveryUs = 1000000;
 constexpr unsigned kBootIdAttempts = 8;
 constexpr uint32_t kSessionRecoveryUs = 1000000;
 constexpr size_t kMaxFrameSize = 96;
+#if defined(ADAPTIVE_LORA_SECURE)
+constexpr size_t kRadioPacketLimit = secure::maxPacket;
+#else
+constexpr size_t kRadioPacketLimit = kMaxFrameSize;
+#endif
 constexpr size_t kHeaderSize = 28;
 constexpr size_t kMaxPayloadSize = kMaxFrameSize - kHeaderSize;
 
